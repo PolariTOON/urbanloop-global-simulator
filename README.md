@@ -8,6 +8,7 @@ Ce projet s'inscrit dans l'étude de la faisabilité du Projet URBANLOOP dont l'
 Le sous projet présent est  
 * à la demande de Monsieur Jean-Philippe MANGEOT 
 * encadré par Monsieur Thibault CHOLEZ 
+
 effectué par un groupe de trois élèves ingénieurs de TELECOM Nancy 
 * Charlotte ASSELIN-BOULLÉ
 * Baptiste CHOCOT 
@@ -25,7 +26,7 @@ Ce repot comprend différents fichiers correspondant à la réalisation d'une ma
 
 ## Usage 
 ### Prérequis
-* Python3
+* Python3 
 * SimPy
 
 ### Lancement 
@@ -35,8 +36,13 @@ Pour lancer le programme (après téléchargement des sources) compiler et exéc
 python3 Main.py
 ```
 
-##To do
-* Configuration du Git 
+### Dépendances
+* ```multiprocessing```
+* ```numpy```
+* ```time```
+
+## To do
+* Ajouter Baptiste & M. CHOLEZ
 * Configuration SimPy 
 * Coder 
 

@@ -1,3 +1,42 @@
 # PI_2018-19_urbanloop
 
-Projet Industriel 2018-2019 de Mlle ASSELIN-BOULLÉ M CHOCOT et M HENRY encadré par M CHOLEZ dont l'objectif est de créer un simulateur du réseau des capsules URBANLOOP
+Projet Industriel 2018-2019 de Mlle ASSELIN-BOULLÉ M CHOCOT et M HENRY encadré par M CHOLEZ dont l'objectif est de créer un simulateur du réseau des capsules URBANLOOP. 
+
+## Contexte 
+
+Ce projet s'inscrit dans l'étude de la faisabilité du Projet URBANLOOP dont l'objectif est d'effectuer un fort remaniement des transports en commun en milieu urbain avec une application dans la Métropole Nancéenne. 
+Le sous projet présent est  
+* à la demande de Monsieur Jean-Philippe MANGEOT 
+* encadré par Monsieur Thibault CHOLEZ 
+effectué par un groupe de trois élèves ingénieurs de TELECOM Nancy 
+* Charlotte ASSELIN-BOULLÉ
+* Baptiste CHOCOT 
+* Thibault HENRY
+
+Le projet de ce repôt s'inscrit dans le cadre scolaire d'un Projet Industriel de 3ème année à TELECOM Nancy. Le sujet est _*Simulation du réseau de Transport Urbain par capsules URBANLOOP*_ 
+
+## Contenu 
+Ce repot comprend différents fichiers correspondant à la réalisation d'une maquette numérique simulant le réseau accompagnée de son interface utilisateur. Les éléments sont répartis suivant différents dossiers : 
+* **Documentation** contient les différents Documents pertinent pour la compréhension du projet. 
+* **Simulateur** regroupe les éléments du simulateur à événements discret, les éléments *SimPy* comme sa configuration propre au projet. 
+* **Objets** contient la majorité des classes d'objets et des fonctions liées. 
+* **Interface** regroupe les éléments de l'interface graphique. 
+* **Tests** comprend tous les tests unitaires effectués.
+
+## Usage 
+### Prérequis
+* Python3
+* SimPy
+
+### Lancement 
+Pour lancer le programme (après téléchargement des sources) compiler et exécuter en ligne de commande : 
+
+```
+python3 Main.py
+```
+
+##To do
+* Configuration du Git 
+* Configuration SimPy 
+* Coder 
+

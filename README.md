@@ -42,7 +42,7 @@ python3 Main.py
 * ```time```
 
 ## To do
-* Ajouter Baptiste & M. CHOLEZ
+* Ajouter M. CHOLEZ au dépôt 
 * Configuration SimPy 
 * Coder 
 

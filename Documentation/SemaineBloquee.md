@@ -9,6 +9,7 @@
 | Création d'un mini-réseau pour les tests              |      x      |            |          |
 
 
-#####Notes : 
+######Notes :
 * Snake_case 
 * pas de "FINAL"
+* Pour obtenir une base en temps réel avec Simpy, nous utiliserons *import simpy.rt*

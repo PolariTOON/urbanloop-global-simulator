@@ -6,7 +6,7 @@
 #import Simulator.<fichier> as SimpyConf
 import time
 import simpy.rt
-from Simulateur import Poisson
+from Simulator import Poisson
 
 def main():
     test_seconds_duration = 10

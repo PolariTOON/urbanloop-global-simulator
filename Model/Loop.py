@@ -3,14 +3,15 @@
 
 all_loops = {}
 
+
 class Loop:
-    def __init__(self, name, stations=None, switchs=None):
+    def __init__(self, name, stations=None, switches=None):
         '''global loop_id
         self.id = loop_id
         loop_id += 1'''
         self.name = name
         self.stations = stations
-        self.switchs = None
+        self.switches = switches
         global all_loops
         all_loops[self.name] = self
 

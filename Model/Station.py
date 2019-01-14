@@ -1,5 +1,7 @@
-import Model.Global
+#! /usr/bin/env python3
+# coding: utf-8
 
+station_id = 0
 
 class Station:
     # capsules
@@ -8,8 +10,9 @@ class Station:
     network = None
 
     def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, loop=None):
-        self.id = Model.Global.stationId
-        Model.Global.stationId += 1
+        global station_id
+        self.id = station_id
+        station_id += 1
         # properties
         self.name = "Station #{0}".format(self.id) if (name is None) else name
         self.capacity = capacity

@@ -1,4 +1,9 @@
+#! /usr/bin/env python3
+# coding: utf-8
+
 import Model.Loop
+
+
 def parcours(switch, table, to_cover):
     table_temp = table
     table_to_cover = {}

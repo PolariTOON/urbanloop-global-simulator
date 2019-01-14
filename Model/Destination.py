@@ -1,12 +1,7 @@
-# global
-capsule_id = 0
-station_id = 0
-switch_id = 0
+#! /usr/bin/env python3
+# coding: utf-8
 
-'''def get_station_id(): 
-  return station_id'''
-
-'''class Destination:
+class Destination:
   def __init__(self, station, distance, cost):
     self.station = station
     self.distance = distance
@@ -14,4 +9,4 @@ switch_id = 0
   
   def update_cost(self):
     # TODO
-    return'''
+    return 

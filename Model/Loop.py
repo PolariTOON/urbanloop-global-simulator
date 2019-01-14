@@ -1,5 +1,7 @@
-all_loops = {}
+#! /usr/bin/env python3
+# coding: utf-8
 
+all_loops = {}
 
 class Loop:
     def __init__(self, name, stations=None, switchs=None):

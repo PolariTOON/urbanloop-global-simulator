@@ -7,6 +7,6 @@ class Destination:
     self.distance = distance
     self.cost = cost # estimated time cost
   
-  def updateCost(self):
+  def update_cost(self):
     # TODO
-    return
+    return 

@@ -2,12 +2,14 @@
 #### Lundi 14/01
 | Tâches                                                |Charlotte    |   Baptiste | Thibault |
 | :---------------------------------------------------- |: ----------:| :---------:|:--------:|
-| Configuration de l'espace de travail (git, simpy)     |      x      |      x     |    x     |
+| Configuration de l'espace de travail (git, simpy)     |      ✓      |      x     |    x     |
 | Implémentation  des classes (diag. UML)               |             |      x     |          |
 | Implémentation  du routage basique                    |      x      |            |          |
 | Déployement du simulateur                             |             |            |    x     |
+| Création d'un mini-réseau pour les tests              |      x      |            |          |
 
-✓ 
 
-####Notes :
+######Notes :
+* Snake_case 
+* pas de "FINAL"
 * Pour obtenir une base en temps réel avec Simpy, nous utiliserons *import simpy.rt*

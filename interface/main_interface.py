@@ -3,9 +3,6 @@
 
 from tkinter import *
 
-# main window
-def __init__(self):
-    def createWindow:
-       window = Tk()
-       return window
+window = Tk()
+
 

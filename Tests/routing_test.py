@@ -1,7 +1,9 @@
 import Model.Routing
-
-table = {1: [False, 0, [1, 1]], 2: [True, 20, [1, 2]]}
-a_parcourir = {1: 1, 2: 1}
-
+#table = {}
+#table["loop1"] = [False, 0, [1, "loop1"]]
+#table["loop2"] = [True, 20, [1, "loop2"]]
+table = {"loop1": [False, 0, [1, "loop1"]], "loop2": [True, 20, [1, "loop2"]]}
+a_parcourir = {"loop1": 1, "loop2": 1}
+#print(table)
 t = Model.Routing.parcours(table, a_parcourir)
 print(t)

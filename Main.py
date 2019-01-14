@@ -1,41 +1,33 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-#import Interface.<fichier> as Interf 
-#import Model.<fichier> as Model
-#import Simulator.<fichier> as SimpyConf
-import time
-import simpy.rt
-import numpy as np
-from Simulateur import Poisson
 # import Interface.<fichier> as Interf
 # import Model.<fichier> as Model
 # import Simulator.<fichier> as SimpyConf
-import time
-
-import numpy as np
+# import Interface.<fichier> as Interf
+# import Model.<fichier> as Model
+# import Simulator.<fichier> as SimpyConf
+# import Interface.<fichier> as Interf
+# import Model.<fichier> as Model
+# import Simulator.<fichier> as SimpyConf
+# import Interface.<fichier> as Interf
+# import Model.<fichier> as Model
+# import Simulator.<fichier> as SimpyConf
 import simpy.rt
+import time
+from Simulateur import FlowGenerator
 
-from Simulateur import Poisson
-
-test_seconds_duration = 2
-
-'''Il s'agit du fichier principal de notre projet qui lance les différentes parties et fait le lien entre elles'''
-start_time = time.time()
-poisson = Poisson.Poisson()
-
-'''Load <...>'''
-env = simpy.rt.RealtimeEnvironment(factor=0.1)
-# env.run(until=test_seconds_duration*10)
+"""Initialisation"""
+SIM_DURATION = 60
+SIM_TICK = 0.05
+START_TIME = time.time()
+simpy_environment = simpy.rt.RealtimeEnvironment(factor=SIM_TICK)
+flow_generator = FlowGenerator.FlowGenerator(simpy_environment)
 
 
-
-'''Building <...>'''
-#<...>
-# print("Execution time : " + time.strftime("%M:%S", time.localtime(time.time() - start_time)))
-
-    '''Establish <...>'''
-
-# starting program
+"""Start"""
 if __name__ == "__main__":
-    main()
+    simpy_environment.process(flow_generator.generate_traveler(env=simpy_environment, sim_tick=SIM_TICK))
+    simpy_environment.run(until=SIM_DURATION)
+    print("Execution time : ", round(time.time() - START_TIME, 3), "seconds")
+

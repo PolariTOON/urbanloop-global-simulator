@@ -6,26 +6,33 @@
 #import Simulator.<fichier> as SimpyConf
 import time
 import simpy.rt
+import numpy as np
+from Simulateur import Poisson
+# import Interface.<fichier> as Interf
+# import Model.<fichier> as Model
+# import Simulator.<fichier> as SimpyConf
+import time
+
+import numpy as np
+import simpy.rt
+
 from Simulateur import Poisson
 
-def main():
-    test_seconds_duration = 10
+test_seconds_duration = 2
 
-    '''Il s'agit du fichier principal de notre projet qui lance les différentes parties et fait le lien entre elles'''
-    start_time = time.time()
-    poisson = Poisson.Poisson()
-    print(poisson.generate())
+'''Il s'agit du fichier principal de notre projet qui lance les différentes parties et fait le lien entre elles'''
+start_time = time.time()
+poisson = Poisson.Poisson()
 
-
-    '''Load <...>'''
-    env = simpy.rt.RealtimeEnvironment(factor=0.1)
-    env.run(until=test_seconds_duration*10)
+'''Load <...>'''
+env = simpy.rt.RealtimeEnvironment(factor=0.1)
+# env.run(until=test_seconds_duration*10)
 
 
 
-    '''Building <...>'''
-    #<...>
-    print("Execution time : " + time.strftime("%M:%S", time.localtime(time.time() - start_time)))
+'''Building <...>'''
+#<...>
+# print("Execution time : " + time.strftime("%M:%S", time.localtime(time.time() - start_time)))
 
     '''Establish <...>'''
 

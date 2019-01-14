@@ -1,3 +1,6 @@
+#! /usr/bin/env python3
+# coding: utf-8
+
 def parcours(table, to_cover):
     table_temp = table
     while to_cover != {}:

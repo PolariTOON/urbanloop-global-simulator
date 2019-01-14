@@ -1,18 +1,6 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-# import Interface.<fichier> as Interf
-# import Model.<fichier> as Model
-# import Simulator.<fichier> as SimpyConf
-# import Interface.<fichier> as Interf
-# import Model.<fichier> as Model
-# import Simulator.<fichier> as SimpyConf
-# import Interface.<fichier> as Interf
-# import Model.<fichier> as Model
-# import Simulator.<fichier> as SimpyConf
-# import Interface.<fichier> as Interf
-# import Model.<fichier> as Model
-# import Simulator.<fichier> as SimpyConf
 import simpy.rt
 import time
 from Simulator import FlowGenerator

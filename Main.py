@@ -1,7 +1,7 @@
 # coding: utf-8
 #import Interface.<fichier> as Interf 
-#import Objets.<fichier> as Objets
-#import Simulateur.<fichier> as SimpyConf 
+#import Model.<fichier> as Model
+#import Simulator.<fichier> as SimpyConf
 import time
 
 '''Il s'agit du fichier principal de notre projet qui lance les différentes parties et fait le lien entre elles'''

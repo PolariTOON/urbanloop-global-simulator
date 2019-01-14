@@ -19,8 +19,8 @@ Le projet de ce repôt s'inscrit dans le cadre scolaire d'un Projet Industriel d
 ## Contenu 
 Ce repot comprend différents fichiers correspondant à la réalisation d'une maquette numérique simulant le réseau accompagnée de son interface utilisateur. Les éléments sont répartis suivant différents dossiers : 
 * **Documentation** contient les différents Documents pertinent pour la compréhension du projet. 
-* **Simulateur** regroupe les éléments du simulateur à événements discret, les éléments *SimPy* comme sa configuration propre au projet. 
-* **Objets** contient la majorité des classes d'objets et des fonctions liées. 
+* **Simulator** regroupe les éléments du simulateur à événements discret, les éléments *SimPy* comme sa configuration propre au projet. 
+* **Model** contient la majorité des classes d'objets et des fonctions liées. 
 * **Interface** regroupe les éléments de l'interface graphique. 
 * **Tests** comprend tous les tests unitaires effectués.
 

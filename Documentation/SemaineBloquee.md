@@ -7,4 +7,7 @@
 | Implémentation  du routage basique                    |      x      |            |          |
 | Déployement du simulateur                             |             |            |    x     |
 
-✓
+✓ 
+
+####Notes :
+* Pour obtenir une base en temps réel avec Simpy, nous utiliserons *import simpy.rt*

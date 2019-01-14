@@ -1,23 +1,27 @@
+import Model.Global
+
+
 class Station:
     # capsules
-    capsulesInSlots = None
+    capsules_in_slots = None
     # network
     network = None
 
-    def __init__(self, name=None, capacity=1, previousStation=None, nextStation=None, loop=None):
-        global stationId
+    def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, loop=None):
+        self.id = Model.Global.stationId
+        Model.Global.stationId += 1
         # properties
-        self.name = "Station #{0}".format(stationId) if name == None else name
+        self.name = "Station #{0}".format(self.id) if (name is None) else name
         self.capacity = capacity
-        self.previousStation = previousStation
-        self.nextStation = nextStation
+        self.previous_station = previous_station
+        self.next_station = next_station
         self.loop = loop
-        stationId += 1
 
-    def _updateFlow(self):
-        print("updating flow...")
+    def _update_flow(self):
+        print("updating flow of ", self.id, "...")
         return
 
-    def showDetails(self):
+    def show_details(self):
         print("showing details...")
+        print("\n \t id = ", self.id, "\n \t name = ", self.name)
         return

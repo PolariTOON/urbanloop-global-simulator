@@ -1,43 +1,43 @@
 import Model.Global
 
-stationId = Model.Global.stationId
 
 class Capsule:
     # capsule data
-    isMoving = False
-    isLoaded = False
-    currentStation = None
-    nextSwitch = None
-    finalDestination = None
+    is_moving = False
+    is_loaded = False
+    current_station = None
+    next_switch = None
+    final_destination = None
     velocity = 0
     acceleration = 0
     # parameters to inject
-    securityDistance = 5000  # millimeters
-    releaseTime = 12345  # miilisec
-    accelerationTime = 12345  # miilisec
-    maxSpeed = 22.2  # m/s (80km/h)
+    security_distance = 5000  # millimeters
+    release_time = 12345  # miilisec
+    acceleration_time = 12345  # miilisec
+    max_speed = 22.2  # m/s (80km/h)
     # network data
-    networkMap = None
+    network_map = None
     network = None
 
     def __init__(self, name, station):
-        global capsuleId
-        self.name = "Capsule #{0}".format(stationId) if name == None else name
-        self.currentStation = station
+        self.id = Model.Global.capsule_id
+        Model.Global.capsule_id += 1
+        self.name = "Capsule #{0}".format(self.id) if (name is None) else name
+        self.current_station = station
 
-    def _startMovingTo(self, station):
+    def _start_moving_to(self, station):
         # TODO
         return
 
-    def _enterInto(self, station):
+    def _enter_into(self, station):
         # TODO
         return
 
-    def _hasArrivedTo(self, station):
+    def _has_arrived_to(self, station):
         # TODO
         return
 
-    def _prepareLeaving(self, station):
+    def _prepare_leaving(self, station):
         # TODO
         return
 
@@ -45,22 +45,22 @@ class Capsule:
         # TODO
         return
 
-    def _insertionIntoLoop(self):
+    def _insertion_into_loop(self):
         # TODO
         return
 
-    def _changeLoop(self, station):
+    def _change_loop(self, station):
         # TODO
         return
 
-    def _doALoop(self, station):
+    def _do_a_loop(self, station):
         # TODO
         return
 
-    def _refreshMap(self):
+    def _refresh_map(self):
         # TODO
         return
 
-    def showDetails(self, station):
+    def show_details(self, station):
         # TODO
         return

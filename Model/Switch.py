@@ -1,16 +1,33 @@
+import Model.Global
+import Model.Routing
+
+
 class Switch:
     # network
     network = None
-    isRoutingToLoop = False
+    is_routing_to_loop = False
 
-    def __init__(self, loop, nextStops):
-        self.loop = loop
-        self.nextStops = nextStops
+    '''my_loop = None
+    next_loop = None 
+    size = 0 
+    permanent_table = None'''
 
-    def _changeState(self):
-        self.isRoutingToLoop = not self.isRoutingToLoop
+    def __init__(self, loop, other_loop, size):
+        self.id = Model.Global.switch_id
+        Model.Global.switch_id += 1
+        self.my_loop = loop
+        self.switched_loop = other_loop
+        self.size = size
+        self.permanent_table = {self.my_loop: [False, 0, [self.id, self.my_loop]],
+                           self.switched_loop: [True, self.size, [self.id, self.switched_loop]]}
+        self.table = Model.Routing.parcours(self.permanent_table, {self.my_loop: self.id, self.switched_loop: self.id} )
+        # FINAL
+        self.permanent_table = self.table
+
+    def _change_tate(self):
+        self.isRoutingToLoop = not self.is_routing_to_loop
         return
 
-    def routeCapsuleToStation(self, capsule, station):
+    def route_capsule_to_station(self, capsule, station):
         # TODO
         return

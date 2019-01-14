@@ -1,17 +1,17 @@
 # global
-capsuleId = 0
-stationId = 0
+capsule_id = 0
+station_id = 0
+switch_id = 0
 
-'''def getStationId(): 
-  return stationId'''
+'''def get_station_id(): 
+  return station_id'''
 
-
-class Destination:
+'''class Destination:
   def __init__(self, station, distance, cost):
     self.station = station
     self.distance = distance
     self.cost = cost # estimated time cost
   
-  def updateCost(self):
+  def update_cost(self):
     # TODO
-    return
+    return'''

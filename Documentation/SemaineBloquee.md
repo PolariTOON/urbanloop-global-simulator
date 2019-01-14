@@ -6,3 +6,9 @@
 | Implémentation  des classes (diag. UML)               |             |      x     |          |
 | Implémentation  du routage basique                    |      x      |            |          |
 | Déployement du simulateur                             |             |            |    x     |
+| Création d'un mini-réseau pour les tests              |      x      |            |          |
+
+
+#####Notes : 
+* Snake_case 
+* pas de "FINAL"

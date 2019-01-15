@@ -1,4 +1,7 @@
 import configparser
+"""
+https://docs.python.org/dev/library/configparser.html
+"""
 
 default = None
 interface = None

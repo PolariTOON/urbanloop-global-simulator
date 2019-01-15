@@ -17,7 +17,6 @@ sim_loop = sim_loop.SimLoop(env=simpy_environment, sim_tick=SIM_TICK)
 
 """Start"""
 if __name__ == "__main__":
-
     simpy_environment.process(sim_loop.loop())
     print("Simulation starts")
     simpy_environment.run(until=SIM_DURATION)

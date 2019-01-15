@@ -2,10 +2,11 @@
 # coding: utf-8
 
 import model.routing
+from config import config
 
 switch_id = 0
-TIMER_OTHER = 60
-MY_TIMER = 40
+timer_other = int(config.routing('timer_other'))
+my_timer = int(config.routing('my_timer'))
 
 switches = []
 

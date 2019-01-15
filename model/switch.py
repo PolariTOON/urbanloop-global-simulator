@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-import Model.Routing
+import model.routing
 
 switch_id = 0
 TIMER_OTHER = 60
@@ -53,7 +53,7 @@ def resume():
         s.timers[s.id] = MY_TIMER
         s.defects = [[False, False] for i in range(switch_id)]
     for s in switches:
-        s.table = Model.Routing.parcours(s, s.permanent_table, s.permanent_cover)
+        s.table = model.routing.parcours(s, s.permanent_table, s.permanent_cover)
         # FINAL
         s.permanent_table = s.table
 

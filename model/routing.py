@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-import Model.Loop
+import model.loop
 
 
 def parcours(switch, table, to_cover):
@@ -12,7 +12,8 @@ def parcours(switch, table, to_cover):
     # print(table_to_cover)
     while table_to_cover != {}:
         step = []
-        min_cost = 1000
+        min_cost = float('Inf')
+        #print(min_cost)
         for l, t in table_to_cover.items():
             # print(t)
             if (t[2] < min_cost):
@@ -22,7 +23,7 @@ def parcours(switch, table, to_cover):
         # ['loop XX', switch_id, to_switch, cost, [path]]
         del table_to_cover[step[0]]
 
-        loop = Model.Loop.get_by_name(step[0])
+        loop = model.loop.get_by_name(step[0])
         for next_switch in loop.switches:
 
             if next_switch.id != step[1] and (next_switch.id is not None):

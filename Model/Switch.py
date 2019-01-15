@@ -9,6 +9,7 @@ MY_TIMER = 40
 
 switches = []
 
+
 class Switch:
     # network
     network = None
@@ -32,7 +33,7 @@ class Switch:
         self.other_loop_station = next_station
         self.size = size
         self.permanent_table = {self.my_loop.name: [False, 0, [self.id, self.my_loop.name]],
-                           self.switched_loop.name: [True, self.size, [self.id, self.switched_loop.name]]}
+                                self.switched_loop.name: [True, self.size, [self.id, self.switched_loop.name]]}
         self.permanent_cover = {self.my_loop.name: self.id, self.switched_loop.name: self.id}
         global switches
         switches += [self]
@@ -44,7 +45,6 @@ class Switch:
     def route_capsule_to_station(self, capsule, station):
         # TODO
         return
-
 
 
 def resume():

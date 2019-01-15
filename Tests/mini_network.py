@@ -1,8 +1,8 @@
-from Model.Loop import Loop # name, stations=None, switches=None
-from Model.Station import Station # name=None, capacity=1, previous_station=None, next_station=None, loop=None
-from Model.Switch import Switch # self, loop, previous_station, other_loop, next_station
-from Model.Routing import parcours
 from Model import Switch as MS
+from Model.Loop import Loop  # name, stations=None, switches=None
+from Model.Station import Station  # name=None, capacity=1, previous_station=None, next_station=None, loop=None
+from Model.Switch import Switch  # self, loop, previous_station, other_loop, next_station
+
 nancy = Loop("Nancy")
 
 villers = Loop("Villers-les-Nancy")
@@ -16,7 +16,6 @@ artem = Station("ARTEM", 100, stan, gare, nancy)
 velodrome = Station("Velodrome", 100, None, None, villers)
 tncy = Station("TELECOM Nancy", 100, velodrome, None, villers)
 eglise = Station("Eglise", 100, tncy, velodrome, villers)
-
 
 auchan = Station("Gare", 100, None, None, laxou)
 autoroute = Station("Entree_autoroute", 100, auchan, auchan, laxou)

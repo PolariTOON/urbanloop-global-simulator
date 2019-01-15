@@ -2,11 +2,11 @@
 # coding: utf-8
 
 class Destination:
-  def __init__(self, station, distance, cost):
-    self.station = station
-    self.distance = distance
-    self.cost = cost # estimated time cost
-  
-  def update_cost(self):
-    # TODO
-    return 
+    def __init__(self, station, distance, cost):
+        self.station = station
+        self.distance = distance
+        self.cost = cost  # estimated time cost
+
+    def update_cost(self):
+        # TODO
+        return

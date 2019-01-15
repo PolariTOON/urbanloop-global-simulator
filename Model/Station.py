@@ -3,6 +3,7 @@
 
 station_id = 0
 
+
 class Station:
     # capsules
     capsules_in_slots = None

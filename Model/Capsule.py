@@ -3,6 +3,7 @@
 
 capsule_id = 0
 
+
 class Capsule:
     # capsule data
     is_moving = False

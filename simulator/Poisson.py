@@ -1,12 +1,12 @@
 import numpy as np
+from config import config
 
 
 class Poisson:
     def __init__(self):
-        """45000 voyageurs par jour"""
-        self.traveler_per_day = 45000
+        self.traveler_per_day = int(config.default['traveler_per_day'])
         self.peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]
-        self.lambda_per_hour = [(self.traveler_per_day * phc) / (3600 * np.sum(self.peak_hours_coefficient)) for phc
+        self.lambda_per_hour = [(self.traveler_per_day * coefficient) / (3600 * np.sum(self.peak_hours_coefficient)) for coefficient
                                 in self.peak_hours_coefficient]
 
     def generate(self, hour):

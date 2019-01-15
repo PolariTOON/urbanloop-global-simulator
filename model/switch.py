@@ -76,3 +76,4 @@ def update():
     for s in switches:
         #if s.is_routing_to_loop:
         info = model.routing.update_switch(s)
+        #TODO maj table suivant info

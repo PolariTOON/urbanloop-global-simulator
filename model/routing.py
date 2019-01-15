@@ -47,4 +47,5 @@ def parcours(switch, table, to_cover):
 
 
 def update_switch(s):
-    return
+    #TODO
+    return None

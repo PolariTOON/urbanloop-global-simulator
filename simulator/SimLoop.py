@@ -1,5 +1,5 @@
-from Simulator import FlowGenerator
-from Simulator import SimState
+from simulator import FlowGenerator
+from simulator import SimState
 
 START_HOUR = 12
 

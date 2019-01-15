@@ -1,4 +1,4 @@
-from Simulator import Poisson
+from simulator import Poisson
 
 
 def seconds_from_now(env, sim_tick, start_hour=0):

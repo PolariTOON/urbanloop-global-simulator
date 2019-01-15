@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-import Model.Loop
+import model.Loop
 
 
 def parcours(switch, table, to_cover):
@@ -22,7 +22,7 @@ def parcours(switch, table, to_cover):
         # ['loop XX', switch_id, to_switch, cost, [path]]
         del table_to_cover[step[0]]
 
-        loop = Model.Loop.get_by_name(step[0])
+        loop = model.Loop.get_by_name(step[0])
         for next_switch in loop.switches:
 
             if next_switch.id != step[1] and (next_switch.id is not None):

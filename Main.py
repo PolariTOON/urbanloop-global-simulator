@@ -4,7 +4,7 @@ import time
 
 import simpy.rt
 
-from Simulator import SimLoop
+from simulator import SimLoop
 
 """Initialisation"""
 SIM_DURATION = 60

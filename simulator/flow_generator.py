@@ -1,4 +1,4 @@
-from simulator import Poisson
+from simulator import poisson
 
 
 def seconds_from_now(env, sim_tick, start_hour=0):
@@ -12,7 +12,7 @@ def hour_from_now(now_in_seconds):
 class FlowGenerator:
     def __init__(self, env):
         self.env = env
-        self.poisson = Poisson.Poisson()
+        self.poisson = poisson.Poisson()
 
     def generate_traveler(self, env, sim_tick, start_hour=0):
         while True:

@@ -1,7 +1,7 @@
-from model import Switch as MS
-from model.Loop import Loop  # name, stations=None, switches=None
-from model.Station import Station  # name=None, capacity=1, previous_station=None, next_station=None, loop=None
-from model.Switch import Switch  # self, loop, previous_station, other_loop, next_station
+from model.loop import Loop  # name, stations=None, switches=None
+from model.station import Station  # name=None, capacity=1, previous_station=None, next_station=None, loop=None
+from model.switch import Switch  # self, loop, previous_station, other_loop, next_station
+from model import switch as MS
 
 nancy = Loop("Nancy")
 
@@ -29,5 +29,8 @@ laxou.switches = [la_na]
 nancy.switches = [na_la, na_vi]
 villers.switches = [vi_la]
 
-MS.init()
-print(la_na.permanent_table)
+MS.resume()
+print(la_na.id, la_na.permanent_table)
+print(na_vi.id, na_vi.permanent_table)
+print(vi_la.id, vi_la.permanent_table)
+print(na_la.id, na_la.permanent_table)

@@ -4,14 +4,14 @@ import time
 
 import simpy.rt
 
-from simulator import SimLoop
+from simulator import sim_loop
 
 """Initialisation"""
 SIM_DURATION = 60
 SIM_TICK = 0.05
 START_TIME = time.time()
 simpy_environment = simpy.rt.RealtimeEnvironment(factor=SIM_TICK)
-sim_loop = SimLoop.SimLoop(env=simpy_environment, sim_tick=SIM_TICK)
+sim_loop = sim_loop.SimLoop(env=simpy_environment, sim_tick=SIM_TICK)
 
 """Start"""
 if __name__ == "__main__":

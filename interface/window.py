@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from tkinter import *
+from tkinter import Tk, N,S,E,W, VERTICAL, Frame
 from tkinter import ttk
 
 def create_window(w = 1200, h = 800):
     # creating a graphical app
     window = Tk()
-    window["bg"] = "white"
+    window["bg"] = "#e0e0e0"
     window.title = "URBANLOOP Simulator"
 
     # geometry of the app
@@ -26,7 +26,7 @@ def create_window(w = 1200, h = 800):
     window.columnconfigure(2, weight=1) # blank
     
     # adding main_frame
-    main_frame = Frame(window, relief=GROOVE, bg="green")
+    main_frame = Frame(window, bg="green")
     main_frame.grid(column=1, row=1, sticky=N+S+E+W)
 
     # configuring main_frame grid

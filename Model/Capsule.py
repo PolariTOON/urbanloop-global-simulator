@@ -21,7 +21,7 @@ class Capsule:
     network_map = None
     network = None
 
-    def __init__(self, name, station):
+    def __init__(self, name=None, station=None):
         global capsule_id
         self.id = capsule_id
         capsule_id += 1

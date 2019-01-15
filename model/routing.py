@@ -43,5 +43,8 @@ def parcours(switch, table, to_cover):
                                                                                  next_switch.switched_loop.name]]
                         table_to_cover[next_switch.switched_loop.name] = [next_switch.id] + table_temp[
                             next_switch.switched_loop.name]
-
     return table_temp
+
+
+def update_switch(s):
+    return

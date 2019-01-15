@@ -28,7 +28,15 @@ class Capsule:
         self.id = capsule_id
         capsule_id += 1
         self.name = "Capsule #{0}".format(self.id) if (name is None) else name
-        self.current_station = station
+        self.depart_station = station
+        self.next_switch = station.next_switch
+
+    def _ask_route(self, switch):
+        change = switch.route_capsule_to_station(self, self.final_destination)
+        if change :
+            self._change_loop(switch)
+        else :
+            self._do_a_loop(switch.next_station)
 
     def _start_moving_to(self, station):
         # TODO
@@ -54,8 +62,9 @@ class Capsule:
         # TODO
         return
 
-    def _change_loop(self, station):
+    def _change_loop(self):
         # TODO
+
         return
 
     def _do_a_loop(self, station):

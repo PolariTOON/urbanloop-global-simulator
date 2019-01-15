@@ -29,7 +29,7 @@ laxou.switches = [la_na]
 nancy.switches = [na_la, na_vi]
 villers.switches = [vi_la]
 
-MS.resume()
+MS.init()
 print(la_na.id, la_na.permanent_table)
 print(na_vi.id, na_vi.permanent_table)
 print(vi_la.id, vi_la.permanent_table)

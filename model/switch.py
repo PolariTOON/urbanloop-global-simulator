@@ -5,8 +5,8 @@ import model.routing
 from config import config
 
 switch_id = 0
-timer_other = int(config.routing('timer_other'))
-my_timer = int(config.routing('my_timer'))
+timer_other = 60 #int(config.routing['timer_other'])
+my_timer = 40 #int(config.routing['my_timer'])
 
 switches = []
 alive_timers = []

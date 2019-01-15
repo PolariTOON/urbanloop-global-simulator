@@ -14,12 +14,9 @@ class SimLoop:
     def loop(self):
         while True:
             if self.sim_state == sim_state.SimState.RUNNING:
-                self.env.process(
+                yield self.env.process(
                     self.flow_generator.generate_traveler(env=self.env, sim_tick=self.sim_tick, start_hour=START_HOUR))
-                yield self.env.event()
             elif self.sim_state == sim_state.SimState.SLEEP:
                 print("SLEEP State")
-                yield self.env.event()
             elif self.sim_state == sim_state.SimState.KILLED:
-                self.env.exit()
-                yield self.env.event()
+                yield self.env.exit()

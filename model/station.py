@@ -20,6 +20,7 @@ class Station:
         self.previous_station = previous_station
         self.next_station = next_station
         self.loop = loop
+        self.queue = 0
 
     def _update_flow(self):
         print("updating flow of ", self.id, "...")

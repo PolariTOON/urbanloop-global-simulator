@@ -1,4 +1,4 @@
-from Model.Station import Station
+from model.station import Station
 from render.station_renderer import StationRenderer
 from tkinter import Tk
 from interface.simulator_frame import SimulatorFrame

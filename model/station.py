@@ -3,13 +3,14 @@
 
 station_id = 0
 
+
 class Station:
     # capsules
     capsules_in_slots = None
     # network
     network = None
 
-    def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, loop=None):
+    def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, next_switch=None, loop=None):
         global station_id
         self.id = station_id
         station_id += 1
@@ -18,7 +19,9 @@ class Station:
         self.capacity = capacity
         self.previous_station = previous_station
         self.next_station = next_station
+        self.nex_switch = next_switch
         self.loop = loop
+        self.queue = 0
 
     def _update_flow(self):
         print("updating flow of ", self.id, "...")

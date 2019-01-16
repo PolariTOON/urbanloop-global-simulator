@@ -5,10 +5,10 @@ import scipy.stats
 from model.station import Type
 from settings import config
 
-neutral_percent = 0
-city_percent = 0
-activity_and_residential_percent = 0
-activity_and_residential_fluctuation = 0
+neutral_percent = None
+city_percent = None
+activity_and_residential_percent = None
+activity_and_residential_fluctuation = None
 
 
 def load():
@@ -35,37 +35,40 @@ def convert_to_exact_hour(seconds):
     return round(seconds / 3600, 2)
 
 
+# noinspection PyTypeChecker
 def station_probability(station, second, is_arrival=True):
-    if neutral_percent == 0 or city_percent == 0 or activity_and_residential_percent == 0 or activity_and_residential_fluctuation == 0:
+    if neutral_percent is None or city_percent is None or activity_and_residential_percent is None or activity_and_residential_fluctuation is None:
         logging.error("Converter hasn't been loaded")
         return 0
 
     second = second % 86400
-    station_type = station.type
+    station_type = station.station_type
+    result = 0
     if station_type == Type.NEUTRAL:
-        return round(neutral_percent / 100, 3)
+        result = neutral_percent
+    if station_type == Type.CITY:
+        result = city_percent
     # TODO Change calculation for Activity and Residential
     if station_type == Type.ACTIVITY:
         if is_arrival:
             if second < 43200:
-                return activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
             else:
-                return activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
         else:
             if second < 43200:
-                return activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
             else:
-                return activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
     if station_type == Type.RESIDENTIAL:
         if is_arrival:
             if second < 43200:
-                return activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
             else:
-                return activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
         else:
             if second < 43200:
-                return activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
             else:
-                return activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
-    if station_type == Type.CITY:
-        return round(city_percent / 100, 3)
+                result = activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
+    return round(result / 100, 2)

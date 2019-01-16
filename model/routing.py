@@ -2,9 +2,9 @@
 # coding: utf-8
 
 import model.loop
-from config import config
+from settings import config
 
-CONFIG_PATH = '../resources/config.ini'
+CONFIG_PATH = '../resources/settings.ini'
 config.load(CONFIG_PATH)
 
 timer_other = int(config.routing['timer_other'])

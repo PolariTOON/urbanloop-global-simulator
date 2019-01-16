@@ -1,5 +1,5 @@
 from simulator import poisson
-from config import config
+from settings import config
 
 
 def seconds_from_now(env, sim_tick, start_hour=0):

@@ -1,5 +1,5 @@
 import numpy as np
-from config import config
+from settings import config
 
 
 class Poisson:

@@ -1,7 +1,7 @@
-from config import config
+from settings import config
 from simulator import poisson
 
-CONFIG_PATH = '../resources/config.ini'
+CONFIG_PATH = '../resources/settings.ini'
 config.load(CONFIG_PATH)
 
 poisson = poisson.Poisson()

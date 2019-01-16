@@ -3,11 +3,11 @@
 import time
 
 import simpy.rt
-from config import config
+from settings import config
 from simulator import sim_loop
 
 """Initialisation"""
-CONFIG_PATH = 'resources/config.ini'
+CONFIG_PATH = 'resources/settings.ini'
 config.load(CONFIG_PATH)
 SIM_DURATION = int(config.sim['duration'])
 SIM_TICK = float(config.sim['tick'])

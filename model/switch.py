@@ -4,7 +4,7 @@
 import model.routing
 from settings import config
 
-CONFIG_PATH = '../resources/settings.ini'
+CONFIG_PATH = '../resources/config.ini'
 config.load(CONFIG_PATH)
 
 switch_id = 0

@@ -4,7 +4,7 @@ from model.switch import Switch  # self, loop, previous_station, other_loop, nex
 from model import switch as MS
 from settings import config
 
-CONFIG_PATH = '../resources/settings.ini'
+CONFIG_PATH = '../resources/config.ini'
 config.load(CONFIG_PATH)
 
 nancy = Loop("Nancy")

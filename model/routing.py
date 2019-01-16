@@ -4,7 +4,7 @@
 import model.loop
 from settings import config
 
-CONFIG_PATH = '../resources/settings.ini'
+CONFIG_PATH = '../resources/config.ini'
 config.load(CONFIG_PATH)
 
 timer_other = int(config.routing['timer_other'])

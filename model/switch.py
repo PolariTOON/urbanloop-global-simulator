@@ -39,7 +39,7 @@ class Switch:
         self.switched_loop = other_loop
         self.other_loop_station = next_station
         self.size = size
-        self.permanent_table = {self.my_loop.name: [False, 0, [self.id, self.my_loop.name]],
+        self.permanent_table = {self.my_loop.name: [False, int((self.my_loop.size)/2), [self.id, self.my_loop.name]],
                                 self.switched_loop.name: [True, self.size, [self.id, self.switched_loop.name]]}
         self.permanent_cover = {self.my_loop.name: self.id, self.switched_loop.name: self.id}
         self.direct_defects = [False, False]

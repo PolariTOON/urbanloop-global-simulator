@@ -5,16 +5,34 @@ all_loops = {}
 
 
 class Loop:
-    def __init__(self, name, stations=None, switches=None, lengths = None ):
-        '''global loop_id
-        self.id = loop_id
-        loop_id += 1'''
+    objects = None
+    lenghts = None
+    size = 0
+
+    def __init__(self, name, stations=None, switches=None):
         self.name = name
         self.stations = stations
-        self.lenghts = lengths
         self.switches = switches
+        if stations is None :
+            if switches is None :
+                self.size = 100
+            else :
+                self.size += (len(switches)) * 10
+        else :
+            self.size += (len(stations))*10
+
         global all_loops
         all_loops[self.name] = self
+
+    def add_order(self, order, lengths):
+        for obj in order:
+            self.objects += obj
+            self.lenghts += lengths[order.indexof(order)]
+            if obj[0] == "switch":
+                self.switches += obj[1]
+            else:  # object[0]=="station":
+                self.stations += obj[1]
+            self.size = sum(lengths)
 
 
 def get_by_name(search_name):

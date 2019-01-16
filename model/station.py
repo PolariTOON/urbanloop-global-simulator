@@ -1,7 +1,15 @@
 #! /usr/bin/env python3
 # coding: utf-8
+from enum import Enum
 
 station_id = 0
+
+
+class Type(Enum):
+    NEUTRAL = 0
+    ACTIVITY = 1
+    RESIDENTIAL = 2
+    CITY = 3
 
 
 class Station:
@@ -10,7 +18,7 @@ class Station:
     # network
     network = None
 
-    def __init__(self, name=None, capacity=100, loop=None, angle=None):
+    def __init__(self, name=None, capacity=100, loop=None, angle=None, station_type=Type.NEUTRAL):
         global station_id
         self.id = station_id
         station_id += 1
@@ -18,6 +26,7 @@ class Station:
         self.angle = angle
         self.capacity = capacity
         self.loop = loop
+        self.station_type = station_type
         self.queue = 0
 
     def _update_flow(self):

@@ -1,5 +1,7 @@
 from simulator import poisson
 from settings import config
+from simulator import converter
+import logging
 
 
 def seconds_from_now(env, sim_tick, start_hour=0):
@@ -17,8 +19,10 @@ class FlowGenerator:
         self.ticks_in_second = 1 / float(config.sim['tick'])
 
     def generate_traveler(self, env, sim_tick, start_hour=0):
-        hour = hour_from_now(seconds_from_now(env, sim_tick, start_hour))
-        traveler_number = self.poisson.generate(hour)
+        seconds = seconds_from_now(env, sim_tick, start_hour)
+        hour = hour_from_now(seconds)
+        traveler_number = self.poisson.traveler(hour)
         for traveler in range(traveler_number):
-            print("[", env.now, "] Traveler generated at hour :", hour)
+            logging.info("Traveler generated at time %s" % converter.convert_seconds(seconds))
             yield self.env.timeout(int(round(self.ticks_in_second / traveler_number)))
+

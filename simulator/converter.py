@@ -43,32 +43,32 @@ def station_probability(station, second, is_arrival=True):
 
     second = second % 86400
     station_type = station.station_type
+    gaussian_factor = 250 * (activity_and_residential_fluctuation / 100)
     result = 0
     if station_type == Type.NEUTRAL:
         result = neutral_percent
     if station_type == Type.CITY:
         result = city_percent
-    # TODO Change calculation for Activity and Residential
     if station_type == Type.ACTIVITY:
         if is_arrival:
             if second < 43200:
-                result = activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
             else:
-                result = activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
+                result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
         else:
             if second < 43200:
-                result = activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
             else:
-                result = activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
+                result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
     if station_type == Type.RESIDENTIAL:
         if is_arrival:
             if second < 43200:
-                result = activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
             else:
-                result = activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
+                result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
         else:
             if second < 43200:
-                result = activity_and_residential_percent + 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
+                result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(convert_to_exact_hour(second), 8, 1)
             else:
-                result = activity_and_residential_percent - 50 * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
+                result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(convert_to_exact_hour(second), 18, 1)
     return round(result / 100, 2)

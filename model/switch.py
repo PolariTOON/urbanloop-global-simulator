@@ -38,7 +38,7 @@ class Switch:
         self.my_loop = loop
         self.last_station = previous_station
         self.next_station = next_station
-        self.switched_loop = other_loop
+        self.other_loop = other_loop
         self.other_loop_station = next_station_other
         self.size = size
         self.my_defects = [False, False]

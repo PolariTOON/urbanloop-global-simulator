@@ -8,8 +8,8 @@ default_size = 100
 class Loop:
     objects = None
     lengths = None
-    stations = []
-    switches = []
+    x = None
+    y = None
 
     def __init__(self, name, size=default_size, coordinates=None):
         self.name = name
@@ -20,6 +20,8 @@ class Loop:
         self.size = size
         global all_loops
         all_loops[self.name] = self
+        self.stations = []
+        self.switches = []
 
     def add_order(self, order):
         for obj, angle in order:

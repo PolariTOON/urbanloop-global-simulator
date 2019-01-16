@@ -2,7 +2,13 @@
 # coding: utf-8
 
 import model.loop
+from config import config
 
+CONFIG_PATH = '../resources/config.ini'
+config.load(CONFIG_PATH)
+
+timer_other = int(config.routing['timer_other'])
+my_timer = int(config.routing['my_timer'])
 
 def parcours(switch, table, to_cover):
     table_temp = table
@@ -31,7 +37,7 @@ def parcours(switch, table, to_cover):
                 # --> pas besoin car sinon cout ++
                 if not switch.defects[next_switch.id][0]:  # il n'y a pas d'anomalies pour rester sur la boucle
                     if (next_switch.my_loop.name) not in table_temp:
-                        table_temp[next_switch.my_loop.name] = [step[2], step[3] + 100,
+                        table_temp[next_switch.my_loop.name] = [step[2], step[3] + next_switch.size,
                                                                 step[4] + [next_switch.id, next_switch.my_loop.name]]
                         # TODO 100 à remplacer par distance (switch, point suivant)
                         table_to_cover[next_switch.my_loop.name] = [next_switch.id] + table_temp[
@@ -47,5 +53,6 @@ def parcours(switch, table, to_cover):
 
 
 def update_switch(s):
-    #TODO
-    return None
+    info = None  # "alive", "0_down", "1_down", None
+
+    return info

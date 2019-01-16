@@ -2,6 +2,10 @@ from model.loop import Loop  # name, stations=None, switches=None
 from model.station import Station  # name=None, capacity=1, previous_station=None, next_station=None, loop=None
 from model.switch import Switch  # self, loop, previous_station, other_loop, next_station
 from model import switch as MS
+from config import config
+
+CONFIG_PATH = '../resources/config.ini'
+config.load(CONFIG_PATH)
 
 nancy = Loop("Nancy")
 

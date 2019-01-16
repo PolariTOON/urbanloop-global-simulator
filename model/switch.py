@@ -2,11 +2,16 @@
 # coding: utf-8
 
 import model.routing
-from config import config
+from settings import config
+
+CONFIG_PATH = '../resources/config.ini'
+config.load(CONFIG_PATH)
 
 switch_id = 0
-timer_other = 60 #int(config.routing['timer_other'])
-my_timer = 40 #int(config.routing['my_timer'])
+print(int(config.default['traveler_per_day']))
+timer_other = int(config.routing['timer_other'])
+my_timer = int(config.routing['my_timer'])
+switched_cost = int(config.routing['switched_cost'])
 
 switches = []
 alive_timers = []
@@ -25,7 +30,7 @@ class Switch:
     timers = None
     defects = None
 
-    def __init__(self, loop, other_loop, previous_station=None, next_station= None, next_station_other=None, size=200):
+    def __init__(self, loop, other_loop, previous_station=None, next_station= None, next_station_other=None, size=switched_cost):
         global switch_id
         self.id = switch_id
         switch_id += 1
@@ -76,4 +81,16 @@ def update():
     for s in switches:
         #if s.is_routing_to_loop:
         info = model.routing.update_switch(s)
-        #TODO maj table suivant info
+        # maj des timers suivant info
+        if info == "alive":
+            alive_timers[s.id] = [0, 0]
+        elif info is None:
+            alive_timers[s.id][0] += 1
+            alive_timers[s.id][1] += 1
+        else:
+            if "0_down" in info :
+                alive_timers[s.id][0] = [float("Inf")]
+                alive_timers[s.id][1] += 1
+            if info == "1_down":
+                alive_timers[s.id][0] += 1
+                alive_timers[s.id][1] = [float("Inf")]

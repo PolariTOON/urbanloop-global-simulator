@@ -18,7 +18,8 @@ class Station:
     # network
     network = None
 
-    def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, next_switch=None, loop=None, type = Type.NEUTRAL):
+    def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, next_switch=None, loop=None,
+                 station_type=Type.NEUTRAL):
         global station_id
         self.id = station_id
         station_id += 1
@@ -29,7 +30,7 @@ class Station:
         self.next_station = next_station
         self.nex_switch = next_switch
         self.loop = loop
-        self.type = type
+        self.station_type = station_type
         self.queue = 0
 
     def _update_flow(self):

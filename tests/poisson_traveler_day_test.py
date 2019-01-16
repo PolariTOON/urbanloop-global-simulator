@@ -11,7 +11,7 @@ hour_density = []
 for hour in range(24):
     hour_total = 0
     for second in range(3600):
-        hour_total += poisson.generate(hour)
+        hour_total += poisson.traveler(hour)
     hour_density.append(hour_total)
     total += hour_total
 

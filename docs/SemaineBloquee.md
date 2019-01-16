@@ -26,6 +26,10 @@
 | Configuration des paramètres                          |             |            |    x     |
 | Import du  réseau                                     |      x      |            |          |
 
+
+####Mercredi 16/01
+Implémentation de la probabilité d'apparition dans une station en fonction de l'heure et du type de station
+
 ######Notes :
 * valeure infinie => float('Inf') 
 * Paquets, modules, variables et fonctions en snake_case, Classes en CamlCase  

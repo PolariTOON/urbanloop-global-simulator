@@ -8,7 +8,7 @@ from settings import config
 from simulator import sim_loop
 
 """Initialisation"""
-CONFIG_PATH = 'resources/settings.ini'
+CONFIG_PATH = 'resources/config.ini'
 config.load(CONFIG_PATH)
 
 SIM_DURATION = int(config.sim['duration'])

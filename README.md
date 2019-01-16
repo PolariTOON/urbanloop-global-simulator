@@ -27,7 +27,7 @@ Ce repot comprend différents fichiers correspondant à la réalisation d'une ma
 ## Usage 
 ### Prérequis
 * Python3 
-* SimPy
+
 
 ### Lancement 
 Pour lancer le programme (après téléchargement des sources) compiler et exécuter en ligne de commande : 
@@ -37,7 +37,8 @@ python3 Main.py
 ```
 
 ### Dépendances
-* ```multiprocessing```
+* ```simpy```
+* ```json```
 * ```numpy```
 * ```time```
 

@@ -13,16 +13,16 @@ villers = Loop("Villers-les-Nancy")
 
 laxou = Loop("Laxou")
 
-gare = Station("Gare", 100, None, None, nancy)
-stan = Station("Stanislas", 100, gare, None, nancy)
+gare = Station("Gare", 100, nancy)
+stan = Station("Stanislas", 100, nancy)
 artem = Station("ARTEM", 100, stan, gare, nancy)
 
-velodrome = Station("Velodrome", 100, None, None, villers)
-tncy = Station("TELECOM Nancy", 100, velodrome, None, villers)
-eglise = Station("Eglise", 100, tncy, velodrome, villers)
+velodrome = Station("Velodrome", 100, villers)
+tncy = Station("TELECOM Nancy", 100, villers)
+eglise = Station("Eglise", 100, villers)
 
-auchan = Station("Gare", 100, None, None, laxou)
-autoroute = Station("Entree_autoroute", 100, auchan, auchan, laxou)
+auchan = Station("Gare", 100, laxou)
+autoroute = Station("Entree_autoroute", 100, laxou)
 
 la_na = Switch(laxou, nancy)
 na_vi = Switch(nancy, villers)

@@ -8,7 +8,6 @@ CONFIG_PATH = '../resources/config.ini'
 config.load(CONFIG_PATH)
 
 switch_id = 0
-print(int(config.default['traveler_per_day']))
 timer_other = int(config.routing['timer_other'])
 my_timer = int(config.routing['my_timer'])
 switched_cost = int(config.routing['switched_cost'])
@@ -26,23 +25,23 @@ class Switch:
     next_loop = None 
     size = 0 
     permanent_table = None'''
+    angle_my_loop = None
+    angle_other_loop = None
 
     timers = None
     defects = None
 
-    def __init__(self, loop, other_loop, previous_station=None, next_station= None, next_station_other=None, size=switched_cost):
+    def __init__(self, loop=None, other_loop=None, previous_station=None, next_station= None, next_station_other=None, size=switched_cost):
         global switch_id
         self.id = switch_id
         switch_id += 1
         self.my_loop = loop
         self.last_station = previous_station
+        self.next_station = next_station
         self.switched_loop = other_loop
-        self.other_loop_station = next_station
+        self.other_loop_station = next_station_other
         self.size = size
-        self.permanent_table = {self.my_loop.name: [False, int((self.my_loop.size)/2), [self.id, self.my_loop.name]],
-                                self.switched_loop.name: [True, self.size, [self.id, self.switched_loop.name]]}
-        self.permanent_cover = {self.my_loop.name: self.id, self.switched_loop.name: self.id}
-        self.direct_defects = [False, False]
+        self.my_defects = [False, False]
         global switches
         switches += [self]
         global alive_timers
@@ -66,6 +65,9 @@ class Switch:
 
 def init():
     for s in switches:
+        s.permanent_table = {s.my_loop.name: [False, int((s.my_loop.size) / 2), [s.id, s.my_loop.name]],
+                                s.switched_loop.name: [True, s.size, [s.id, s.switched_loop.name]]}
+        s.permanent_cover = {s.my_loop.name: s.id, s.switched_loop.name: s.id}
         s.timers = [timer_other for i in range(0, switch_id)]
         s.timers[s.id] = my_timer
         s.defects = [[False, False] for i in range(switch_id)]

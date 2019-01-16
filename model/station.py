@@ -10,16 +10,13 @@ class Station:
     # network
     network = None
 
-    def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, next_switch=None, loop=None):
+    def __init__(self, name=None, capacity=100, loop=None, angle=None):
         global station_id
         self.id = station_id
         station_id += 1
-        # properties
         self.name = "Station #{0}".format(self.id) if (name is None) else name
+        self.angle = angle
         self.capacity = capacity
-        self.previous_station = previous_station
-        self.next_station = next_station
-        self.nex_switch = next_switch
         self.loop = loop
         self.queue = 0
 

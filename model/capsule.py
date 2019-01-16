@@ -17,7 +17,6 @@ class Capsule:
     is_moving = False
     is_loaded = False
     current_station = None
-    next_switch = None
     final_destination = None
     # network data
     network_map = None

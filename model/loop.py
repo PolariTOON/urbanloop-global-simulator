@@ -1,38 +1,37 @@
 #! /usr/bin/env python3
 # coding: utf-8
+import numpy as np
 
 all_loops = {}
-
+default_size = 100
 
 class Loop:
     objects = None
-    lenghts = None
-    size = 0
+    lengths = None
+    stations = []
+    switches = []
 
-    def __init__(self, name, stations=None, switches=None):
+    def __init__(self, name, size=default_size, coordinates=None):
         self.name = name
-        self.stations = stations
-        self.switches = switches
-        if stations is None :
-            if switches is None :
-                self.size = 100
-            else :
-                self.size += (len(switches)) * 10
-        else :
-            self.size += (len(stations))*10
-
+        print("Create loop", self.name)
+        if coordinates is not None:
+            self.x = coordinates[0]
+            self.y = coordinates[1]
+        self.size = size
         global all_loops
         all_loops[self.name] = self
 
-    def add_order(self, order, lengths):
-        for obj in order:
+    def add_order(self, order):
+        for obj, angle in order:
             self.objects += obj
-            self.lenghts += lengths[order.indexof(order)]
-            if obj[0] == "switch":
+            self.lengths += int((angle/360)*self.size*np.pi)
+            '''if obj[0] == "switch":
                 self.switches += obj[1]
             else:  # object[0]=="station":
                 self.stations += obj[1]
-            self.size = sum(lengths)
+            '''
+            if self.size is None:
+                self.size = sum(self.lengths)
 
 
 def get_by_name(search_name):

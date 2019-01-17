@@ -24,17 +24,24 @@ class Loop:
     def add_order(self, order):
         self.objects = []
         self.lengths = []
-        for nature, obj, angle in order:
-            # print(nature, obj, angle)
-            self.objects += [[nature, obj, angle]]
-            self.lengths += [int((angle/360)*self.size*np.pi)]
-            '''if obj[0] == "switch":
-                self.switches += obj[1]
-            else:  # object[0]=="station":
-                self.stations += obj[1]
-            '''
+        for i in range(len(order)):
+            element = order[i]
+            # order[i] = [nature, obj, angle]
+            self.objects += [order[i]]
+            angle_next = order[(i+1)%len(order)][2]-element[2]
+            if angle_next < 0 :
+                angle_next += 360
+            self.lengths += [float(angle_next/360)*self.size] # arc = 2*D*pi*angle/360  et D = circonference/pi
             if self.size is None:
                 self.size = sum(self.lengths)
+
+    def dist_to_next_object(self, object):
+        #print(object)
+        for i in range(len(self.objects)):
+            #print(self.objects[i][1] == object)
+            if self.objects[i][1] is object:
+                return self.lengths[i], self.objects[i+1][1]
+        return None
 
 
 def get_by_name(search_name):

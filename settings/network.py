@@ -59,15 +59,17 @@ def load():
         order = []
         for i in range(len(elms)):
             elm = elms[i]
-            elm.next_station = search_next_station(elms, i)
-            elm.previous_station = search_next_station(elms, i)
-            if type(elm) == Station:
-                #print('s')
-                elm.next_switch = search_next_switch(elms, i, l)
-                order += [["st", elm, elm.angle]]
-            #elif type(elm) == Switch:
-                # TODO maj précédents, suivants ajout dans order de [noeud, angle]
-                #print('s')
+            if type(elm) == Switch and elm.other_loop == l:
+                elm.next_station_other = search_next_station(elms, i)
+                order += [["switch_in", elm, elm.angle_other_loop]]
+            else:  # type(elm) == Station or (type(elm) == Switch and elm.my_loop == l):
+                elm.next_station = search_next_station(elms, i)
+                elm.previous_station = search_previous_station(elms, i)
+                if type(elm) == Station:
+                    elm.next_switch = search_next_switch(elms, i, l)
+                    order += [["station", elm, elm.angle]]
+                else:
+                    order += [["switch_out", elm, elm.angle_my_loop]]
         # print(elms)
         l.add_order(order)
     # print(ML.all_loops)
@@ -93,7 +95,7 @@ def search_previous_station(elements, i):
 def search_next_switch(elements, i, loop):
     length = len(elements)
     for index in range(length):
-        e = elements[(index - i) % length]
+        e = elements[(index + i) % length]
         if type(e) == Switch:
             if e.my_loop == loop:
                 return e

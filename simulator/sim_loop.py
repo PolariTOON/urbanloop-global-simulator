@@ -1,6 +1,6 @@
 from enum import Enum
 from settings import config
-from simulator import flow_generator
+from simulator import traveler_generator
 
 
 class SimState(Enum):
@@ -14,7 +14,7 @@ class SimLoop:
         self.env = env
         self.sim_tick = sim_tick
         self.sim_state = SimState.RUNNING
-        self.flow_generator = flow_generator.FlowGenerator(env)
+        self.flow_generator = traveler_generator.FlowGenerator(env)
         self.start_hour = int(config.sim['start_hour'])
 
     def loop(self):

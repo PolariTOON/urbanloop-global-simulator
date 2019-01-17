@@ -41,12 +41,12 @@ def parcours(switch, table, to_cover):
                         table_to_cover[next_switch.my_loop.name] = [next_switch.id] + table_temp[
                             next_switch.my_loop.name]
                 if not switch.defects[next_switch.id][1]:  # il n'y a pas d'anomalies dans la boucle aiguillee
-                    if (next_switch.switched_loop.name) not in table_temp:
-                        table_temp[next_switch.switched_loop.name] = [step[2], step[3] + next_switch.size,
+                    if (next_switch.other_loop.name) not in table_temp:
+                        table_temp[next_switch.other_loop.name] = [step[2], step[3] + next_switch.size,
                                                                       step[4] + [next_switch.id,
-                                                                                 next_switch.switched_loop.name]]
-                        table_to_cover[next_switch.switched_loop.name] = [next_switch.id] + table_temp[
-                            next_switch.switched_loop.name]
+                                                                                 next_switch.other_loop.name]]
+                        table_to_cover[next_switch.other_loop.name] = [next_switch.id] + table_temp[
+                            next_switch.other_loop.name]
     return table_temp
 
 

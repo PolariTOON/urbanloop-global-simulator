@@ -1,5 +1,4 @@
 import configparser
-from pathlib import Path
 
 """
 https://docs.python.org/dev/library/configparser.html
@@ -34,4 +33,4 @@ def load(file_name):
 
 
 if loaded is False:
-    load(Path('resources/config.ini').absolute())
+    load('../resources/config.ini')

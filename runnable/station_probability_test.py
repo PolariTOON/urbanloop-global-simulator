@@ -7,7 +7,7 @@ city_prob = []
 residential_prob = []
 activity_prob = []
 
-is_arrival = True
+is_arrival = False
 
 for hour in range(24):
     second = 3600 * hour

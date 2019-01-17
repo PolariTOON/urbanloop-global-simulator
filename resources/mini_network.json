@@ -2,12 +2,12 @@
   "Nancy": {
     "center": [500,70],
     "circonference": 100,
-    "content": [{"type":"station","name":"Gare", "angle":0},
-                {"type":"station","name":"Stanislas", "angle":90},
-                {"type":"station","name":"Campus_ARTEM", "angle": 160},
-                {"type":"switch_out","other_loop":"Villers-lès-Nancy", "length": 15, "angle":190 },
-                {"type":"switch_out","other_loop":"Laxou", "length": 50, "angle":240 },
-                {"type":"switch_in","other_loop":"Laxou", "angle":305 }
+    "content": [{"type":"station","name":"Gare", "angle":0, "station_type": 3},
+                {"type":"station","name":"Stanislas", "angle":90, "station_type": 3},
+                {"type":"station","name":"Campus_ARTEM", "angle": 160, "station_type": 1},
+                {"type":"switch_out","other_loop":"Villers-lès-Nancy", "length": 15, "angle":190},
+                {"type":"switch_out","other_loop":"Laxou", "length": 50, "angle":240},
+                {"type":"switch_in","other_loop":"Laxou", "angle":305}
     ]
   },
   "Villers-lès-Nancy": {
@@ -21,7 +21,7 @@
     "circonference": 300,
     "content": [{"type":"switch_out","other_loop":"Nancy", "length": 60, "angle":20 },
                 {"type":"switch_in","other_loop":"Nancy", "angle":170 },
-                {"type":"station","name":"Autoroute", "angle":0}
+                {"type":"station","name":"Autoroute", "angle":0, "station_type": 2}
     ]
   }
 

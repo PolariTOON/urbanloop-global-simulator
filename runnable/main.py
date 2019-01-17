@@ -6,12 +6,12 @@ import time
 import simpy.rt
 
 from settings import config
-from settings import load_network
+from settings import network
 from simulator import sim_loop
 
 """Initialisation"""
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
-load_network.load()
+network.load()
 
 SIM_DURATION = int(config.sim['duration'])
 SIM_TICK = float(config.sim['tick'])
@@ -24,4 +24,4 @@ if __name__ == "__main__":
     sim_environment.process(sim_loop.loop())
     logging.debug("Simulation starts")
     sim_environment.run(until=SIM_DURATION)
-    logging.debug("Execution time : ", round(time.time() - START_TIME, 3), "seconds")
+    logging.debug("Execution time : %.3f seconds" % (time.time() - START_TIME))

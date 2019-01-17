@@ -4,11 +4,9 @@
 import model.loop
 from settings import config
 
-CONFIG_PATH = '../resources/config.ini'
-config.load(CONFIG_PATH)
-
 timer_other = int(config.routing['timer_other'])
 my_timer = int(config.routing['my_timer'])
+
 
 def parcours(switch, table, to_cover):
     table_temp = table
@@ -19,7 +17,7 @@ def parcours(switch, table, to_cover):
     while table_to_cover != {}:
         step = []
         min_cost = float('Inf')
-        #print(min_cost)
+        # print(min_cost)
         for l, t in table_to_cover.items():
             # print(t)
             if (t[2] < min_cost):

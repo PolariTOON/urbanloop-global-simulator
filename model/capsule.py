@@ -12,6 +12,8 @@ release_time = 12345  # miilisec
 acceleration_time = 12345  # miilisec
 max_speed = 22.2  # m/s (80km/h)
 '''
+
+
 class Capsule:
     # capsule data
     is_moving = False
@@ -32,9 +34,9 @@ class Capsule:
 
     def _ask_route(self, switch):
         change = switch.route_capsule_to_station(self, self.final_destination)
-        if change :
+        if change:
             self._change_loop(switch)
-        else :
+        else:
             self._do_a_loop(switch.next_station)
 
     def _start_moving_to(self, station):

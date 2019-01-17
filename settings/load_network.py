@@ -1,19 +1,18 @@
-from settings import config
 import json
-from model.loop import Loop
+from pathlib import Path
+
 from model import loop as ML
+from model.loop import Loop
 from model.station import Station
 from model.switch import Switch
-from model import switch as MS
+from settings import config
 
-CONFIG_PATH = '../resources/config.ini'
-config.load(CONFIG_PATH)
 
-def load(file):
-    f = open(file , 'r')
+def load():
+    f = open(Path(config.model['network_file']).absolute(), 'r')
     network = json.load(f)
     for loop, info in network.items():
-        #l = None
+        # l = None
         if loop in ML.all_loops:
             l = ML.get_by_name(loop)
             l.x = info["center"][0]
@@ -39,13 +38,13 @@ def load(file):
                 if el_type == "switch_out":
                     if other_l.switches is not None:
                         for s in other_l.switches:
-                            if s.my_loop is l and s.other_loop is other_l: # il existe déjà
+                            if s.my_loop is l and s.other_loop is other_l:  # il existe déjà
                                 elms += [s]
-                    if len(elms) != e+1 : #existe pas
+                    if len(elms) != e + 1:  # existe pas
                         elms += [Switch(l, other_l)]
                     elms[e].angle_my_loop = element["angle"]
                     elms[e].size = element["length"]
-                else: #"switch_in":
+                else:  # "switch_in":
                     if other_l.switches is not None:
                         for s in other_l.switches:
                             if s.my_loop is other_l and s.other_loop is l:
@@ -56,10 +55,11 @@ def load(file):
                 l.switches += [elms[e]]
             else:
                 print("error")
-            #print(elms[e])
-        #TODO parcours elms pour avoir les précédents, suivants et faire le tableau order = [noeud, angle]
-        #print(elms)
+            # print(elms[e])
+        # TODO parcours elms pour avoir les précédents, suivants et faire le tableau order = [noeud, angle]
+        # print(elms)
     # print(ML.all_loops)
+
 
 '''for name, l in ML.all_loops.items():
     print("\n", l.name, l.x)

@@ -1,8 +1,11 @@
 import configparser
+from pathlib import Path
+
 """
 https://docs.python.org/dev/library/configparser.html
 """
 
+loaded = False
 default = None
 interface = None
 model = None
@@ -12,12 +15,14 @@ sim = None
 
 
 def load(file_name):
+    global loaded
     global default
     global model
     global sim
     global interface
     global capsule
     global routing
+    loaded = True
     config = configparser.ConfigParser()
     config.read(file_name)
     default = config['DEFAULT']
@@ -28,3 +33,5 @@ def load(file_name):
     sim = config['SIM']
 
 
+if loaded is False:
+    load(Path('resources/config.ini').absolute())

@@ -5,6 +5,7 @@ import numpy as np
 all_loops = {}
 default_size = 100
 
+
 class Loop:
     objects = None
     lengths = None
@@ -26,7 +27,7 @@ class Loop:
     def add_order(self, order):
         for obj, angle in order:
             self.objects += obj
-            self.lengths += int((angle/360)*self.size*np.pi)
+            self.lengths += int((angle / 360) * self.size * np.pi)
             '''if obj[0] == "switch":
                 self.switches += obj[1]
             else:  # object[0]=="station":

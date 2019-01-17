@@ -4,9 +4,6 @@
 import model.routing
 from settings import config
 
-CONFIG_PATH = '../resources/config.ini'
-config.load(CONFIG_PATH)
-
 switch_id = 0
 timer_other = int(config.routing['timer_other'])
 my_timer = int(config.routing['my_timer'])
@@ -31,7 +28,8 @@ class Switch:
     timers = None
     defects = None
 
-    def __init__(self, loop=None, other_loop=None, previous_station=None, next_station= None, next_station_other=None, size=switched_cost):
+    def __init__(self, loop=None, other_loop=None, previous_station=None, next_station=None, next_station_other=None,
+                 size=switched_cost):
         global switch_id
         self.id = switch_id
         switch_id += 1
@@ -53,20 +51,20 @@ class Switch:
 
     def route_capsule_to_station(self, capsule, station):
         l = station.loop
-        if self.table[l.name]: #il faut qu'elle change de boucle
+        if self.table[l.name]:  # il faut qu'elle change de boucle
             self.is_routing_to_loop = True
             capsule.current_station = None
             return True
-            #capsule._change_loop(self.next_station)
-        else :
-            #capsule._do_a_loop(self.next_station_other)
+            # capsule._change_loop(self.next_station)
+        else:
+            # capsule._do_a_loop(self.next_station_other)
             return False
 
 
 def init():
     for s in switches:
         s.permanent_table = {s.my_loop.name: [False, int((s.my_loop.size) / 2), [s.id, s.my_loop.name]],
-                                s.switched_loop.name: [True, s.size, [s.id, s.switched_loop.name]]}
+                             s.switched_loop.name: [True, s.size, [s.id, s.switched_loop.name]]}
         s.permanent_cover = {s.my_loop.name: s.id, s.switched_loop.name: s.id}
         s.timers = [timer_other for i in range(0, switch_id)]
         s.timers[s.id] = my_timer
@@ -81,7 +79,7 @@ def init():
 
 def update():
     for s in switches:
-        #if s.is_routing_to_loop:
+        # if s.is_routing_to_loop:
         info = model.routing.update_switch(s)
         # maj des timers suivant info
         if info == "alive":
@@ -90,7 +88,7 @@ def update():
             alive_timers[s.id][0] += 1
             alive_timers[s.id][1] += 1
         else:
-            if "0_down" in info :
+            if "0_down" in info:
                 alive_timers[s.id][0] = [float("Inf")]
                 alive_timers[s.id][1] += 1
             if info == "1_down":

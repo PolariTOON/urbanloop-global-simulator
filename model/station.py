@@ -2,6 +2,8 @@
 # coding: utf-8
 from enum import Enum
 
+from .loop import all_loops
+
 station_id = 0
 
 
@@ -27,7 +29,7 @@ class Station:
         self.capacity = capacity
         self.loop = loop
         self.station_type = station_type
-        self.queue = 0
+        self.queue = []
 
     def _update_flow(self):
         print("updating flow of ", self.id, "...")
@@ -37,3 +39,11 @@ class Station:
         print("showing details...")
         print("\n \t id = ", self.id, "\n \t name = ", self.name)
         return
+
+
+def get_stations():
+    stations = []
+    for loop in all_loops:
+        for station in loop.stations:
+            stations.append(station)
+    return stations

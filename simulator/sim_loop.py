@@ -15,6 +15,7 @@ class SimLoop:
         self.sim_tick = sim_tick
         self.sim_state = SimState.RUNNING
         self.flow_generator = flow_generator.FlowGenerator(env)
+        self.start_hour = int(config.sim['start_hour'])
 
     def loop(self):
         while True:
@@ -22,7 +23,7 @@ class SimLoop:
                 yield self.env.process(self.flow_generator.generate_traveler(
                     env=self.env,
                     sim_tick=self.sim_tick,
-                    start_hour=int(config.sim['start_hour']))
+                    start_hour=self.start_hour)
                 )
             elif self.sim_state == SimState.SLEEP:
                 print("SLEEP State")

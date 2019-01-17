@@ -2,10 +2,12 @@
 # coding: utf-8
 
 from tkinter import Canvas
+from settings import config
 
 class CapsuleRenderer:
 
     def __init__(self, capsule, master):
+        self.config = config.interface
         assert capsule != None and master != None
         self.capsule = capsule
         self.master = master
@@ -14,22 +16,20 @@ class CapsuleRenderer:
     
     def update_canvas(self):
         assert self.canvas != None
-        color = "#00FF00" if self.is_selected else "red"
+        color = self.config["selected_color"] if self.is_selected else self.config["capsule_color"]
         self.canvas.create_oval(self.outline_width,self.outline_width,self.width-self.outline_width,self.height-self.outline_width,fill=color,outline="black",width=self.outline_width)
         self.canvas["bg"] = self.master["bg"]
     
-    def make_canvas(self, w=20, h=20, ow=1):
-        # checking if function is correctly called
-        assert w > 0 and h > 0 and ow > 0
-        self.outline_width = ow
-        self.width = w
-        self.height = h
+    def make_canvas(self):
+        self.outline_width = int(self.config["capsule_outline_width"])
+        self.width = int(self.config["capsule_width"])
+        self.height = int(self.config["capsule_height"])
 
         # if capsule is selected
         self.is_selected = False
 
         # building canvas and adding event listener
-        self.canvas = Canvas(self.master, width=w, height=h)
+        self.canvas = Canvas(self.master, width=self.width, height=self.height)
         def callback(event):
             # checking if click happened inside circle or not
             xr = self.width / 2

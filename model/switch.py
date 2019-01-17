@@ -23,12 +23,13 @@ class Switch:
     size = 0 
     permanent_table = None'''
 
-    def __init__(self, loop=None, other_loop=None, previous_station=None, next_station=None, next_station_other=None,
+    def __init__(self, loop=None, angle=None, other_loop=None, previous_station=None, next_station=None, next_station_other=None,
                  size=switched_cost):
         global switch_id
         self.id = switch_id
         switch_id += 1
         self.my_loop = loop
+        self.angle = angle
         self.last_station = previous_station
         self.next_station = next_station
         self.other_loop = other_loop

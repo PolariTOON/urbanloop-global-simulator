@@ -2,11 +2,13 @@
 # coding: utf-8
 
 from tkinter import Canvas
+from settings import config
 
 
 class StationRenderer:
 
     def __init__(self, station, master):
+        self.config = config.interface
         assert station != None and master != None
         self.station = station
         self.master = master
@@ -16,7 +18,7 @@ class StationRenderer:
 
     def update_canvas(self):
         assert self.canvas != None
-        color = "#00FF00" if self.is_selected else "blue"
+        color = self.config["selected"] if self.is_selected else self.config["station_color"]
         self.canvas.create_oval(self.outline_width, self.outline_width, self.width - self.outline_width,
                                 self.height - self.outline_width, outline=color, width=self.outline_width)
         if not self.is_text_written:  # otherwise text become ugly :/
@@ -24,18 +26,16 @@ class StationRenderer:
             self.is_text_written = True
         self.canvas["bg"] = self.master["bg"]
 
-    def make_canvas(self, w=50, h=50, ow=3):
-        # checking if function is correctly called
-        assert w > 0 and h > 0 and ow > 0
-        self.outline_width = ow
-        self.width = w
-        self.height = h
+    def make_canvas(self):
+        self.outline_width = int(self.config["station_outline_width"])
+        self.width = int(self.config["station_width"])
+        self.height = int(self.config["station_height"])
 
         # if canvas is selected
         self.is_selected = False
 
         # building canvas and adding event listener
-        self.canvas = Canvas(self.master, width=w, height=h)
+        self.canvas = Canvas(self.master, width=self.width, height=self.height)
 
         def callback(event):
             # checking if click happened inside circle or not

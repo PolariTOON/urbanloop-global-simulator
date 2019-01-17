@@ -1,32 +1,53 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
+from model.station import Station
+from model.switch import Switch
+
+from render.station_renderer import StationRenderer
+from render.switch_renderer import SwitchRenderer
+
 from tkinter import Canvas
-from math import pi
+from settings import config
+from math import pi, cos, sin
 
 class LoopRenderer:
     def __init__(self, loop, master):
+        self.config = config.interface
         assert loop != None and master != None
         self.loop = loop
         self.master = master
         # creating canvas
-        self.make_canvas(self.loop.size)
+        self.make_canvas()
     
     def update_canvas(self):
         assert self.canvas != None
         # circle
-        color = "#00FF00" if self.is_selected else "#a0a0a0"
-        self.canvas.create_oval(0, 0, self.outline_width, self.outline_width, self.dim-self.outline_width, self.dim-self.outline_width,
+        color = self.config["selected_color"] if self.is_selected else self.config["loop_color"]
+        self.canvas.create_oval(self.outline_width, self.outline_width, self.dim-self.outline_width, self.dim-self.outline_width,
                         outline=color,width=self.outline_width)
         self.canvas["bg"]=self.master["bg"]
         # objects
-        # TODO
+        angle=0
+        print("ca part")
+        for object in self.loop.objects:
+            if not (isinstance(object, Switch) or isinstance(object, Station)):
+                # TODO
+                print("?")
+            else:
+                # TODO
+                angle+=object.angle
+                x = self.dim/2 * (1 + cos((angle*2*pi)/360))
+                y = self.dim/2 * (1 - sin((angle*2*pi)/360)) 
+                print(object)
+                print("  at [{0};{1}]".format(x, y))
+                renderer = StationRenderer(object, self.canvas) if isinstance(object, Station) else SwitchRenderer(object, self.canvas)
+                canvas = renderer.canvas
+                canvas.place(x=x-renderer.width,y=y-renderer.height)
     
-    def make_canvas(self, c, ow=4):
-        # checking if function is correctly called
-        assert c>0 and ow>0
-        self.outline_width = ow
-        self.dim = c/pi
+    def make_canvas(self):
+        self.outline_width = int(self.config["loop_outline_width"])
+        self.dim = int(self.config["loop_circumference"])/pi
 
         # if canvas is selected
         self.is_selected = False

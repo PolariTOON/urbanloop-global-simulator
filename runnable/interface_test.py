@@ -3,6 +3,7 @@ path_to_add_array = sys.path[0].split("/")
 del path_to_add_array[len(path_to_add_array)-1]
 sys.path.append("/".join(path_to_add_array))
 
+from math import pi
 from model.station import Station
 from model.capsule import Capsule
 from model.switch import Switch
@@ -18,7 +19,7 @@ from interface.simulator_frame import SimulatorFrame
 # window
 window = Tk()
 window["bg"]="#00FF00"
-window.geometry("200x200+100+100")
+window.geometry("800x800+100+100")
 
 w = SimulatorFrame(window)
 w.grid()
@@ -28,12 +29,12 @@ w.rowconfigure(2,weight=1)
 w.columnconfigure(0,weight=1)
 w.columnconfigure(1,weight=1)
 w.columnconfigure(2,weight=1)
-'''
+
 # stations
-s = Station()
+s = Station(angle=90)
 for i in range(1, 15):
     Station()
-s2 = Station()
+s2 = Station(angle=30)
 print(s.name)
 print(s2.name)
 sr = StationRenderer(s,w)
@@ -54,13 +55,14 @@ ccv.grid(row=0,column=0)
 ccv2.grid(row=0,column=1)
 
 # switches
-sw = Switch()
+sw = Switch(angle=150)
 swr = SwitchRenderer(sw,w)
 swcv = swr.canvas
-swcv.grid(row=1,column=0)'''
+swcv.grid(row=1,column=0)
 
 # loop
-l = Loop("oklm",coordinates=[100,100])
+l = Loop("oklm",coordinates=[1000,1000],size=300*pi)
+l.objects = [s2, sw, s]
 lr = LoopRenderer(l,w)
 lcv = lr.canvas
 lcv.grid(row=2,column=1)

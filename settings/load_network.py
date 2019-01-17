@@ -59,7 +59,45 @@ def load(file):
             else:
                 print("error")
             # print(elms[e])
-        # TODO parcours elms pour avoir les précédents, suivants et faire le tableau order = [noeud, angle]
+        order = []
+        for i in range(len(elms)):
+            elm = elms[i]
+            elm.next_station = search_next_station(elms, i)
+            elm.previous_station = search_next_station(elms, i)
+            if type(elm) == Station:
+                print('s')
+                elm.next_switch = search_next_switch(elms, i, l)
+                order +=[["st", elm, elm.angle]]
+            elif type(elm) == Switch:
+                # TODO maj précédents, suivants ajout dans order de [noeud, angle]
+                print(s)
         # print(elms)
+        l.add_order(order)
     # print(ML.all_loops)
     MS.init()
+
+
+def search_next_station(elements, i):
+    length = len(elements)
+    for index in range(length):
+        e = elements[(index+i)%length]
+        if type(e) == Station :
+            return e
+
+
+def search_previous_station(elements, i):
+    length = len(elements)
+    for index in range(length):
+        e = elements[(index-i)%length]
+        if type(e) == Station :
+            return e
+
+
+def search_next_switch(elements, i, loop):
+    length = len(elements)
+    for index in range(length):
+        e = elements[(index-i)%length]
+        if type(e) == Switch :
+            if e.my_loop == loop:
+                return e
+

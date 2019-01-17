@@ -41,6 +41,7 @@ python3 Main.py
 * ```json```
 * ```numpy```
 * ```time```
+* ```scipy```
 
 ## To do
 * Ajouter M. CHOLEZ au dépôt 

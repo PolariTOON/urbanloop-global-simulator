@@ -2,11 +2,13 @@
 # coding: utf-8
 import logging
 import time
-
+import os
 import simpy.rt
+
 from settings import config
 from simulator import converter
 from simulator import sim_loop
+from settings import load_network
 
 """Initialisation"""
 CONFIG_PATH = 'resources/config.ini'
@@ -27,3 +29,6 @@ if __name__ == "__main__":
     print("Simulation starts")
     simpy_environment.run(until=SIM_DURATION)
     print("Execution time : ", round(time.time() - START_TIME, 3), "seconds")
+
+""""Load of network"""
+load_network.load(str(config.model['network_file']))

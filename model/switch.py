@@ -22,11 +22,6 @@ class Switch:
     next_loop = None 
     size = 0 
     permanent_table = None'''
-    angle_my_loop = None
-    angle_other_loop = None
-
-    timers = None
-    defects = None
 
     def __init__(self, loop=None, other_loop=None, previous_station=None, next_station=None, next_station_other=None,
                  size=switched_cost):
@@ -38,12 +33,16 @@ class Switch:
         self.next_station = next_station
         self.other_loop = other_loop
         self.other_loop_station = next_station_other
+        self.angle_my_loop = None
+        self.angle_other_loop = None
         self.size = size
         self.my_defects = [False, False]
+        self.defects = []
         global switches
         switches += [self]
         global alive_timers
         alive_timers += [float('inf'), float('inf')]
+        self.timers = []
 
     def _change_state(self):
         self.isRoutingToLoop = not self.is_routing_to_loop

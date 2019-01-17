@@ -14,17 +14,19 @@ class Loop:
             self.x = coordinates[0]
             self.y = coordinates[1]
         self.size = size
-
         global all_loops
         all_loops[self.name] = self
         self.stations = []
         self.switches = []
+        self.objects = []
+        self.lengths = []
 
     def add_order(self, order):
         self.objects = []
         self.lengths = []
         for nature, obj, angle in order:
-            self.objects += [obj]
+            # print(nature, obj, angle)
+            self.objects += [[nature, obj, angle]]
             self.lengths += [int((angle/360)*self.size*np.pi)]
             '''if obj[0] == "switch":
                 self.switches += obj[1]

@@ -10,6 +10,7 @@ from interface.simulator_frame import SimulatorFrame
 
 # window
 window = Tk()
+window["bg"]="#00FF00"
 window.geometry("200x200+100+100")
 
 w = SimulatorFrame(window)

@@ -8,26 +8,35 @@ from model.switch import Switch
 from settings import config
 
 
-def load():
-    f = open(config.model['network_file'], 'r')
+"""
+fichier pour l'import des réseaux sur les formats json correspondant
+"""
+
+def load(file=config.model['network_file']):
+    """
+    fonction qui a partir d'un fichier json récupère le réseau correspondant et le traduit en objets
+        :param file: fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
+        :return: (void) l'ensemble des objets sont créés et configurés.
+    """
+    f = open(file, 'r')
     network = json.load(f)
     for loop, info in network.items():
-        # l = None
+        # the_loop = None
         if loop in ML.all_loops:
-            l = ML.get_by_name(loop)
-            l.x = info["center"][0]
-            l.y = info["center"][1]
-            l.size = info["circonference"]
+            the_loop = ML.get_by_name(loop)
+            the_loop.x = info["center"][0]
+            the_loop.y = info["center"][1]
+            the_loop.size = info["circonference"]
         else:
-            l = Loop(loop, info["circonference"], info["center"])
+            the_loop = Loop(loop, info["circonference"], info["center"])
         elms = []
         e = -1
         for element in info["content"]:
             e += 1
             el_type = element["type"]
             if el_type == "station":
-                elms += [Station(element["name"], None, l, element["angle"], element["station_type"])]
-                l.stations += [elms[e]]
+                elms += [Station(element["name"], None, the_loop, element["angle"], element["station_type"])]
+                the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
                 if other in ML.all_loops:
@@ -38,45 +47,51 @@ def load():
                 if el_type == "switch_out":
                     if other_l.switches is not None:
                         for s in other_l.switches:
-                            if s.my_loop is l and s.other_loop is other_l:  # il existe déjà
+                            if s.my_loop is the_loop and s.other_loop is other_l:  # il existe déjà
                                 elms += [s]
                     if len(elms) != e + 1:  # existe pas
-                        elms += [Switch(l, other_l)]
+                        elms += [Switch(the_loop, other_l)]
                     elms[e].angle_my_loop = element["angle"]
                     elms[e].size = element["length"]
                 else:  # "switch_in":
                     if other_l.switches is not None:
                         for s in other_l.switches:
-                            if s.my_loop is other_l and s.other_loop is l:
+                            if s.my_loop is other_l and s.other_loop is the_loop:
                                 elms += [s]
                     if len(elms) != e + 1:  # existe pas
-                        elms += [Switch(other_l, l)]
+                        elms += [Switch(other_l, the_loop)]
                     elms[e].angle_other_loop = element["angle"]
-                l.switches += [elms[e]]
+                the_loop.switches += [elms[e]]
             else:
                 print("error")
             # print(elms[e])
         order = []
         for i in range(len(elms)):
             elm = elms[i]
-            if type(elm) == Switch and elm.other_loop == l:
+            if type(elm) == Switch and elm.other_loop == the_loop:
                 elm.next_station_other = search_next_station(elms, i)
                 order += [["switch_in", elm, elm.angle_other_loop]]
             else:  # type(elm) == Station or (type(elm) == Switch and elm.my_loop == l):
                 elm.next_station = search_next_station(elms, i)
                 elm.previous_station = search_previous_station(elms, i)
                 if type(elm) == Station:
-                    elm.next_switch = search_next_switch(elms, i, l)
+                    elm.next_switch = search_next_switch(elms, i, the_loop)
                     order += [["station", elm, elm.angle]]
                 else:
                     order += [["switch_out", elm, elm.angle_my_loop]]
         # print(elms)
-        l.add_order(order)
+        the_loop.add_order(order)
     # print(ML.all_loops)
     MS.init()
 
 
 def search_next_station(elements, i):
+    """
+    recherche la première station juste après un élément parmis les éléments dans une boucle
+        :param elements: liste des objets sur la boucle ([Stations/Switchs])
+        :param  i: indice de l'élément dont on cherche la station suivante (int)
+        :return: la station suivante (Station)
+    """
     length = len(elements)
     for index in range(length):
         e = elements[(index + i) % length]
@@ -85,6 +100,12 @@ def search_next_station(elements, i):
 
 
 def search_previous_station(elements, i):
+    """
+    recherche la première station juste avant un élément parmis les éléments dans une boucle
+        :param elements: liste des objets sur la boucle ([Stations/Switchs])
+        :param i: indice de l'élément dont on cherche la station précédente (int)
+        :return: la station précédente (Station)
+    """
     length = len(elements)
     for index in range(length):
         e = elements[(index - i) % length]
@@ -93,6 +114,14 @@ def search_previous_station(elements, i):
 
 
 def search_next_switch(elements, i, loop):
+    """
+    recherche le premier switch "out" après un élément parmis les éléments dans une boucle
+        :param  elements: liste des objets sur la boucle ([Stations/Switchs])
+        :param  i: indice de l'élément dont on cherche la station précédente (int)
+        :param  loop: boucle dans laquelle on cherche (il faut que le switch soit dans la boucle et non pas que ce
+                        soit un switch qui aiguille vers cette boucle) (Loop)
+        :return: le switch suivant qui aiguille depuis la boucle choisie (Switch)
+    """
     length = len(elements)
     for index in range(length):
         e = elements[(index + i) % length]

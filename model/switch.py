@@ -25,6 +25,16 @@ class Switch:
 
     def __init__(self, loop=None, other_loop=None, previous_station=None, next_station=None, next_station_other=None,
                  size=switched_cost):
+        """
+        initialisation d'un aiguillage
+        :param  loop : boucle où le switch est présent (Loop)
+        :param  other_loop : boucle aiguillée (Loop)
+        :param  previous_station : la station avant le switch de la loop doù le switch est (Station)
+        :param  next_station : la station après le switch sur la loop où le switch est (Station)
+        :param  next_station_other : la station après le switch sur la loop aiguillée (Station)
+        :param  size : la taille de l'aiguillage
+        :return:0UT : un objet aiguillage (Switch)
+        """
         global switch_id
         self.id = switch_id
         switch_id += 1
@@ -43,14 +53,23 @@ class Switch:
         global alive_timers
         alive_timers += [float('inf'), float('inf')]
         self.timers = []
+        self.table = {}
 
-    def _change_state(self):
+    '''def _change_state(self):
         self.isRoutingToLoop = not self.is_routing_to_loop
         return
+    '''
 
     def route_capsule_to_station(self, capsule, station):
-        l = station.loop
-        if self.table[l.name]:  # il faut qu'elle change de boucle
+        """
+        la fonction qu'une capsule déclenche lorsqu'elle arrive sur le switch et souhaite être routée
+            :param  capsule: la capsule a router (CAPSULE) OBLIGATOIRE
+            :param  station: la station de destination vers laquelle la capsule souhaite aller (Station) OBLIGATOIRE
+            :return: OUT : True si la capsule doit changer de loop, False sinon (boolean)
+            """
+        # TODO charlotte
+        the_loop = station.loop
+        if self.table[the_loop.name]:  # il faut qu'elle change de boucle
             self.is_routing_to_loop = True
             capsule.current_station = None
             return True
@@ -61,15 +80,19 @@ class Switch:
 
 
 def init():
+    """
+    fonction d'initialisation de tous les switchs pour que la taille des tableaux correspondant à tous les objets prévus
+        :return: 0UT : (void) modification des attributs intrinsèques aux switchs
+    """
     for s in switches:
-        s.permanent_table = {s.my_loop.name: [False, int((s.my_loop.size) / 2), [s.id, s.my_loop.name]],
+        s.permanent_table = {s.my_loop.name: [False, int(s.my_loop.size / 2), [s.id, s.my_loop.name]],
                              s.other_loop.name: [True, s.size, [s.id, s.other_loop.name]]}
         s.permanent_cover = {s.my_loop.name: s.id, s.other_loop.name: s.id}
         s.timers = [timer_other for i in range(0, switch_id)]
         s.timers[s.id] = my_timer
         s.defects = [[False, False] for i in range(switch_id)]
     for s in switches:
-        s.table = model.routing.parcours(s, s.permanent_table, s.permanent_cover)
+        s.table = model.routing.dijkstra_route(s, s.permanent_table, s.permanent_cover)
         # FINAL
         s.permanent_table = s.table
 
@@ -77,6 +100,10 @@ def init():
 
 
 def update():
+    """
+     fonction qui est lancée à chaque tour pour actualiser les états des switchs et leur table (pour le routage)
+        :return: (void) modifications des éléments, attributs des switches
+    """
     for s in switches:
         # if s.is_routing_to_loop:
         info = model.routing.update_switch(s)

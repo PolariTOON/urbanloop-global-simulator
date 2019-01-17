@@ -3,6 +3,9 @@ from settings import config
 from simulator import traveler_generator
 
 
+# TODO thibault specification
+
+
 class SimState(Enum):
     RUNNING = 0
     SLEEP = 1

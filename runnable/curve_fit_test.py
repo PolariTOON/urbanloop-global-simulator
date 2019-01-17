@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+# TODO thibault specification
+
+
 with open('../resources/curves.txt', "r") as file:
     lines = file.readlines()
 

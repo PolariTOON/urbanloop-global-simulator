@@ -1,6 +1,10 @@
 from settings import config
 from simulator import poisson
 
+
+# TODO thibault specification
+
+
 CONFIG_PATH = '../resources/config.ini'
 config.load(CONFIG_PATH)
 

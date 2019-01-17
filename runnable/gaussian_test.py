@@ -4,6 +4,10 @@ import scipy.stats
 
 from settings import config
 
+
+# TODO thibault specification
+
+
 config.load('../resources/config.ini')
 
 x_left = np.linspace(0, 12, 43200)

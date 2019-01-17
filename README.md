@@ -42,6 +42,7 @@ python3 Main.py
 * ```numpy```
 * ```time```
 * ```scipy```
+* ```matplotlib```
 
 ## To do
 * Ajouter M. CHOLEZ au dépôt 

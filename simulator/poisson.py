@@ -3,6 +3,9 @@ import numpy as np
 from settings import config
 
 
+# TODO thibault specification
+
+
 class Poisson:
     def __init__(self):
         self.peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]

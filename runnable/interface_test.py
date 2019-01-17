@@ -15,6 +15,9 @@ from tkinter import Tk
 from interface.simulator_frame import SimulatorFrame
 
 
+# TODO thibault specification + menage
+
+
 # window
 window = Tk()
 window["bg"]="#00FF00"

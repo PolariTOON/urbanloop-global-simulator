@@ -7,6 +7,7 @@ from tkinter import Canvas
 class StationRenderer:
 
     def __init__(self, station, master):
+        """TODO baptiste specification """
         assert station != None and master != None
         self.station = station
         self.master = master
@@ -15,6 +16,7 @@ class StationRenderer:
         self.make_canvas()
 
     def update_canvas(self):
+        """TODO baptiste specification """
         assert self.canvas != None
         color = "#00FF00" if self.is_selected else "blue"
         self.canvas.create_oval(self.outline_width, self.outline_width, self.width - self.outline_width,
@@ -25,6 +27,7 @@ class StationRenderer:
         self.canvas["bg"] = self.master["bg"]
 
     def make_canvas(self, w=50, h=50, ow=3):
+        """TODO baptiste specification """
         # checking if function is correctly called
         assert w > 0 and h > 0 and ow > 0
         self.outline_width = ow
@@ -38,6 +41,7 @@ class StationRenderer:
         self.canvas = Canvas(self.master, width=w, height=h)
 
         def callback(event):
+            """TODO baptiste specification """
             # checking if click happened inside circle or not
             xr = self.width / 2
             yr = self.height / 2

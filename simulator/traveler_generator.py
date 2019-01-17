@@ -8,6 +8,9 @@ from simulator import converter
 from simulator import poisson
 
 
+# TODO thibault specification
+
+
 class FlowGenerator:
     def __init__(self, env):
         self.env = env

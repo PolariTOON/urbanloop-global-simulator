@@ -2,6 +2,9 @@ from simulator import converter
 from model.station import Type
 
 
+# TODO thibault specification
+
+
 neutral_prob = []
 city_prob = []
 residential_prob = []

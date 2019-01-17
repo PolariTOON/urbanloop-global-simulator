@@ -1,9 +1,12 @@
 import logging
-
 import scipy.stats
 
 from model.station import Type
 from settings import config
+
+
+# TODO thibault specification
+
 
 neutral_percent = int(config.model['neutral_percent'])
 city_percent = int(config.model['city_percent'])

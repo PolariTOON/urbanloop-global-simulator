@@ -2,12 +2,16 @@
 # coding: utf-8
 import logging
 import time
-
 import simpy.rt
 
 from settings import config
 from settings import network
 from simulator import sim_loop
+
+
+"""Fichier principal du projet """
+
+
 
 """Initialisation"""
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)

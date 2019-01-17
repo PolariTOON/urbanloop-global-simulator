@@ -1,3 +1,4 @@
+import sys
 import json
 
 from model import loop as ML
@@ -12,12 +13,18 @@ from settings import config
 fichier pour l'import des réseaux sur les formats json correspondant
 """
 
-def load(file=config.model['network_file']):
+
+def load(file=None):
     """
     fonction qui a partir d'un fichier json récupère le réseau correspondant et le traduit en objets
         :param file: fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
         :return: (void) l'ensemble des objets sont créés et configurés.
     """
+    if file is None: # aller chercher celui par défaut
+        path_to_add_array = sys.path[0].split("/")
+        del path_to_add_array[len(path_to_add_array) - 1]
+        file = "/".join(path_to_add_array)
+        file += config.model['network_file']
     f = open(file, 'r')
     network = json.load(f)
     for loop, info in network.items():
@@ -50,7 +57,7 @@ def load(file=config.model['network_file']):
                             if s.my_loop is the_loop and s.other_loop is other_l:  # il existe déjà
                                 elms += [s]
                     if len(elms) != e + 1:  # existe pas
-                        elms += [Switch(the_loop, other_l)]
+                        elms += [Switch(loop=the_loop, other_loop=other_l)]
                     elms[e].angle_my_loop = element["angle"]
                     elms[e].size = element["length"]
                 else:  # "switch_in":
@@ -59,7 +66,7 @@ def load(file=config.model['network_file']):
                             if s.my_loop is other_l and s.other_loop is the_loop:
                                 elms += [s]
                     if len(elms) != e + 1:  # existe pas
-                        elms += [Switch(other_l, the_loop)]
+                        elms += [Switch(loop=other_l, other_loop=the_loop)]
                     elms[e].angle_other_loop = element["angle"]
                 the_loop.switches += [elms[e]]
             else:

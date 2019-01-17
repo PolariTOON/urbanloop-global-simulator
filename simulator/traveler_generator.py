@@ -1,27 +1,31 @@
 import logging
 import random
 
-from model.traveler import Traveler
 from model.station import *
+from model.traveler import Traveler
 from settings import config
 from simulator import converter
 from simulator import poisson
+
+total_generated = 0
 
 
 # TODO thibault specification
 
 
-class FlowGenerator:
+class TravelerGenerator:
     def __init__(self, env):
         self.env = env
         self.poisson = poisson.Poisson()
         self.ticks_in_second = 1 / float(config.sim['tick'])
 
     def generate_traveler(self, env, sim_tick, start_hour=0):
+        global total_generated
         seconds = converter.now_to_seconds(env, sim_tick, start_hour)
         hour = converter.now_to_floor_hour(seconds)
         traveler_number = self.poisson.traveler(hour)
         for traveler in range(traveler_number):
+            total_generated += 1
             departure_station = select_random_station(env, sim_tick, start_hour)
             destination_station = select_random_station(env, sim_tick, start_hour, departure_station=departure_station)
             Traveler(departure_station.name, destination_station.name, seconds)
@@ -94,6 +98,7 @@ def get_random_station_from_type(station_type, departure_station=None):
         if departure_station is None:
             return random.choice(get_stations())
         else:
-            return random.choice([a_station for a_station in get_stations() if a_station.name != departure_station.name])
+            return random.choice(
+                [a_station for a_station in get_stations() if a_station.name != departure_station.name])
 
     return random.choice(stations)

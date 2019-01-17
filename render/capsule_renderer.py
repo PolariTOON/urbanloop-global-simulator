@@ -2,12 +2,14 @@
 # coding: utf-8
 
 from tkinter import Canvas
+from settings import config
 
 
 class CapsuleRenderer:
 
     def __init__(self, capsule, master):
         """TODO baptiste specification """
+        self.config = config.interface
         assert capsule is not None and master is not None
         self.capsule = capsule
         self.master = master
@@ -22,19 +24,17 @@ class CapsuleRenderer:
                                 self.height - self.outline_width, fill=color, outline="black", width=self.outline_width)
         self.canvas["bg"] = self.master["bg"]
 
-    def make_canvas(self, w=20, h=20, ow=1):
+    def make_canvas(self):
         """TODO baptiste specification """
-        # checking if function is correctly called
-        assert w > 0 and h > 0 and ow > 0
-        self.outline_width = ow  # TODO baptiste variable pas initialisee dans _init ?
-        self.width = w  # TODO baptiste variable pas initialisee dans _init ?
-        self.height = h  # TODO baptiste variable pas initialisee dans _init ?
+        self.outline_width = int(self.config["capsule_outline_width"]) # TODO baptiste variable pas initialisee dans _init ?
+        self.width = int(self.config["capsule_width"])
+        self.height = int(self.config["capsule_height"])
 
         # if capsule is selected
         self.is_selected = False  # TODO baptiste variable pas initialisee dans _init ?
 
         # building canvas and adding event listener
-        self.canvas = Canvas(self.master, width=w, height=h)  # TODO baptiste variable pas initialisee dans _init ?
+        self.canvas = Canvas(self.master, width=self.width, height=self.height, highlightthickness=0)
 
         def callback(event):
             """TODO baptiste specification """

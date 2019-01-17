@@ -1,5 +1,9 @@
 from model.station import Station
+from model.capsule import Capsule
+from model.switch import Switch
 from render.station_renderer import StationRenderer
+from render.capsule_renderer import CapsuleRenderer
+from render.switch_renderer import SwitchRenderer
 from tkinter import Tk
 from interface.simulator_frame import SimulatorFrame
 
@@ -17,7 +21,7 @@ w.columnconfigure(0,weight=1)
 w.columnconfigure(1,weight=1)
 w.columnconfigure(2,weight=1)
 
-# objects
+# stations
 s = Station()
 for i in range(1, 15):
     Station()
@@ -26,9 +30,25 @@ print(s.name)
 print(s2.name)
 sr = StationRenderer(s,w)
 sr2 = StationRenderer(s2,w)
-cv = sr.canvas
-cv2 = sr2.canvas
-cv.grid(row=2, column=2)
-cv2.grid(row=1,column=1)
+scv = sr.canvas
+scv2 = sr2.canvas
+scv.grid(row=2, column=2)
+scv2.grid(row=1,column=1)
+
+# capsules
+c = Capsule()
+c2 = Capsule()
+cr = CapsuleRenderer(c,w)
+cr2 = CapsuleRenderer(c2,w)
+ccv = cr.canvas
+ccv2 = cr2.canvas
+ccv.grid(row=0,column=0)
+ccv2.grid(row=0,column=1)
+
+# switches
+sw = Switch()
+swr = SwitchRenderer(sw,w)
+swcv = swr.canvas
+swcv.grid(row=1,column=0)
 
 w.mainloop()

@@ -18,13 +18,13 @@ class StationRenderer:
 
     def update_canvas(self):
         assert self.canvas != None
-        color = self.config["selected"] if self.is_selected else self.config["station_color"]
+        color = self.config["selected_color"] if self.is_selected else self.config["station_color"]
         self.canvas.create_oval(self.outline_width, self.outline_width, self.width - self.outline_width,
                                 self.height - self.outline_width, outline=color, width=self.outline_width)
         if not self.is_text_written:  # otherwise text become ugly :/
             self.canvas.create_text(self.width / 2, self.height / 2, text=self.station.id, tags="text")
             self.is_text_written = True
-        self.canvas["bg"] = self.master["bg"]
+        #self.canvas["-transparentcolor"] = "TRANSCOLOUR"
 
     def make_canvas(self):
         self.outline_width = int(self.config["station_outline_width"])
@@ -35,7 +35,8 @@ class StationRenderer:
         self.is_selected = False
 
         # building canvas and adding event listener
-        self.canvas = Canvas(self.master, width=self.width, height=self.height)
+        self.canvas = Canvas(self.master, width=self.width, height=self.height, highlightthickness=0)
+        self.canvas["bg"] = self.master["bg"]
 
         def callback(event):
             # checking if click happened inside circle or not

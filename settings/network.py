@@ -1,3 +1,4 @@
+import sys
 import json
 
 from model import loop as ML
@@ -9,7 +10,11 @@ from settings import config
 
 
 def load():
-    f = open(config.model['network_file'], 'r')
+    path_to_add_array = sys.path[0].split("/")
+    del path_to_add_array[len(path_to_add_array)-1]
+    path="/".join(path_to_add_array)
+    path += config.model['network_file']
+    f = open(path, 'r')
     network = json.load(f)
     for loop, info in network.items():
         # l = None

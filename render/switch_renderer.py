@@ -42,7 +42,7 @@ class SwitchRenderer:
         self.is_selected = False
 
         # building canvas and adding event listener
-        self.canvas = Canvas(self.master, width=self.width, height=self.height)
+        self.canvas = Canvas(self.master, width=self.width, height=self.height, highlightthickness=0)
         def callback(event):
             # checking if click happened inside circle or not
             xr = self.width / 2

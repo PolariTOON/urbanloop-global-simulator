@@ -1,5 +1,10 @@
 #! /usr/bin/env python3
 # coding: utf-8
+import sys
+path_to_add_array = sys.path[0].split("/")
+del path_to_add_array[len(path_to_add_array)-1]
+sys.path.append("/".join(path_to_add_array))
+
 import logging
 import time
 

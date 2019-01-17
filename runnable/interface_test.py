@@ -34,7 +34,7 @@ w.columnconfigure(2,weight=1)
 s = Station(angle=90)
 for i in range(1, 15):
     Station()
-s2 = Station(angle=30)
+s2 = Station(angle=0)
 print(s.name)
 print(s2.name)
 sr = StationRenderer(s,w)
@@ -55,7 +55,7 @@ ccv.grid(row=0,column=0)
 ccv2.grid(row=0,column=1)
 
 # switches
-sw = Switch(angle=150)
+sw = Switch(angle=180)
 swr = SwitchRenderer(sw,w)
 swcv = swr.canvas
 swcv.grid(row=1,column=0)

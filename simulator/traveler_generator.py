@@ -1,7 +1,7 @@
 import logging
 import random
 
-from model.capsule import *
+from model.traveler import Traveler
 from model.station import *
 from settings import config
 from simulator import converter
@@ -21,8 +21,7 @@ class FlowGenerator:
         for traveler in range(traveler_number):
             departure_station = select_random_station(env, sim_tick, start_hour)
             destination_station = select_random_station(env, sim_tick, start_hour, departure_station=departure_station)
-            capsule = Capsule(None, departure_station)
-            capsule.final_destination = destination_station
+            Traveler(departure_station.name, destination_station.name, seconds)
             logging.info("Traveler generated at time %s. Routing from %s to %s" %
                          (converter.seconds_to_string(seconds),
                           departure_station.name,

@@ -1,9 +1,16 @@
+import sys
+path_to_add_array = sys.path[0].split("/")
+del path_to_add_array[len(path_to_add_array)-1]
+sys.path.append("/".join(path_to_add_array))
+
 from model.station import Station
 from model.capsule import Capsule
 from model.switch import Switch
+from model.loop import Loop
 from render.station_renderer import StationRenderer
 from render.capsule_renderer import CapsuleRenderer
 from render.switch_renderer import SwitchRenderer
+from render.loop_renderer import LoopRenderer
 from tkinter import Tk
 from interface.simulator_frame import SimulatorFrame
 
@@ -21,7 +28,7 @@ w.rowconfigure(2,weight=1)
 w.columnconfigure(0,weight=1)
 w.columnconfigure(1,weight=1)
 w.columnconfigure(2,weight=1)
-
+'''
 # stations
 s = Station()
 for i in range(1, 15):
@@ -50,6 +57,12 @@ ccv2.grid(row=0,column=1)
 sw = Switch()
 swr = SwitchRenderer(sw,w)
 swcv = swr.canvas
-swcv.grid(row=1,column=0)
+swcv.grid(row=1,column=0)'''
+
+# loop
+l = Loop("oklm",coordinates=[100,100])
+lr = LoopRenderer(l,w)
+lcv = lr.canvas
+lcv.grid(row=2,column=1)
 
 w.mainloop()

@@ -1,4 +1,5 @@
 import configparser
+import sys
 
 """
 https://docs.python.org/dev/library/configparser.html
@@ -33,4 +34,4 @@ def load(file_name):
 
 
 if loaded is False:
-    load('../resources/config.ini')
+    load('{0}/../resources/config.ini'.format(sys.path[0]))

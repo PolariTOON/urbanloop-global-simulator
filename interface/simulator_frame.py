@@ -12,6 +12,15 @@ class SimulatorFrame(Frame):
         self.master = master
         self.network = network
         self.selected_item = None
+        # unselect item
+        def callback(event):
+            print("callback")
+            if self.selected_item != None: # nothing to do else
+                if (self.selected_item.is_selected == True):
+                    self.selected_item.is_selected = False
+                    self.selected_item.update_canvas()
+                self.selected_item = None
+        self.bind("<Button-1>", callback)
     
     def update_selected_item(self, item):
         # updating last selected item if there is one

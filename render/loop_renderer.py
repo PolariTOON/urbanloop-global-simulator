@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from tkinter import Canvas
+from math import pi
 
 class LoopRenderer:
     def __init__(self, loop, master):
@@ -9,18 +10,28 @@ class LoopRenderer:
         self.loop = loop
         self.master = master
         # creating canvas
-        self.make_canvas()
+        self.make_canvas(self.loop.size)
     
     def update_canvas(self):
+        assert self.canvas != None
+        # circle
+        color = "#00FF00" if self.is_selected else "#a0a0a0"
+        self.canvas.create_oval(0, 0, self.outline_width, self.outline_width, self.dim-self.outline_width, self.dim-self.outline_width,
+                        outline=color,width=self.outline_width)
+        self.canvas["bg"]=self.master["bg"]
+        # objects
         # TODO
-        return
     
-    def make_canvas(self):
+    def make_canvas(self, c, ow=4):
+        # checking if function is correctly called
+        assert c>0 and ow>0
+        self.outline_width = ow
+        self.dim = c/pi
+
         # if canvas is selected
         self.is_selected = False
 
         # building canvas
-        self.dim = 2*self.loop.r
         self.canvas = Canvas(self.master, width=self.dim, height=self.dim)
 
         def callback(event):

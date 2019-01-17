@@ -5,13 +5,16 @@ all_loops = {}
 
 
 class Loop:
-    def __init__(self, name, stations=None, switches=None):
+    def __init__(self, name, stations=None, switches=None, x=0, y=0, r=0):
         '''global loop_id
         self.id = loop_id
         loop_id += 1'''
         self.name = name
         self.stations = stations
         self.switches = switches
+        self.x=x
+        self.y=y
+        self.r=r
         global all_loops
         all_loops[self.name] = self
 

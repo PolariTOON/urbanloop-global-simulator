@@ -23,13 +23,14 @@ class Capsule:
     network_map = None
     network = None
 
-    def __init__(self, name, station):
+    def __init__(self, name=None, station=None):
         global capsule_id
         self.id = capsule_id
         capsule_id += 1
         self.name = "Capsule #{0}".format(self.id) if (name is None) else name
-        self.depart_station = station
-        self.next_switch = station.next_switch
+        if station != None:
+            self.depart_station = station
+            self.next_switch = station.next_switch
 
     def _ask_route(self, switch):
         change = switch.route_capsule_to_station(self, self.final_destination)
@@ -62,7 +63,7 @@ class Capsule:
         # TODO
         return
 
-    def _change_loop(self):
+    def _change_loop(self, switch):
         # TODO
 
         return

@@ -10,7 +10,7 @@ class Station:
     # network
     network = None
 
-    def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, next_switch=None, loop=None):
+    def __init__(self, name=None, capacity=1, previous_station=None, next_station=None, next_switch=None, loop=None, theta=0):
         global station_id
         self.id = station_id
         station_id += 1
@@ -22,6 +22,7 @@ class Station:
         self.nex_switch = next_switch
         self.loop = loop
         self.queue = 0
+        self.theta=0
 
     def _update_flow(self):
         print("updating flow of ", self.id, "...")

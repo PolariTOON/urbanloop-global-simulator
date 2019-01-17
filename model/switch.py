@@ -25,7 +25,7 @@ class Switch:
     timers = None
     defects = None
 
-    def __init__(self, loop, other_loop, previous_station=None, next_station= None, next_station_other=None, size=200):
+    def __init__(self, loop=None, other_loop=None, previous_station=None, next_station= None, next_station_other=None, size=200):
         global switch_id
         self.id = switch_id
         switch_id += 1
@@ -34,6 +34,7 @@ class Switch:
         self.switched_loop = other_loop
         self.other_loop_station = next_station
         self.size = size
+        '''
         self.permanent_table = {self.my_loop.name: [False, 0, [self.id, self.my_loop.name]],
                                 self.switched_loop.name: [True, self.size, [self.id, self.switched_loop.name]]}
         self.permanent_cover = {self.my_loop.name: self.id, self.switched_loop.name: self.id}
@@ -41,7 +42,7 @@ class Switch:
         global switches
         switches += [self]
         global alive_timers
-        alive_timers += [float('inf'), float('inf')]
+        alive_timers += [float('inf'), float('inf')]'''
 
     def _change_state(self):
         self.isRoutingToLoop = not self.is_routing_to_loop

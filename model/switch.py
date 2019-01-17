@@ -64,8 +64,8 @@ class Switch:
 def init():
     for s in switches:
         s.permanent_table = {s.my_loop.name: [False, int((s.my_loop.size) / 2), [s.id, s.my_loop.name]],
-                             s.switched_loop.name: [True, s.size, [s.id, s.switched_loop.name]]}
-        s.permanent_cover = {s.my_loop.name: s.id, s.switched_loop.name: s.id}
+                             s.other_loop.name: [True, s.size, [s.id, s.other_loop.name]]}
+        s.permanent_cover = {s.my_loop.name: s.id, s.other_loop.name: s.id}
         s.timers = [timer_other for i in range(0, switch_id)]
         s.timers[s.id] = my_timer
         s.defects = [[False, False] for i in range(switch_id)]

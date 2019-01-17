@@ -43,7 +43,7 @@ class Station:
 
 def get_stations():
     stations = []
-    for loop in all_loops:
+    for name, loop in all_loops.items():
         for station in loop.stations:
             stations.append(station)
     return stations

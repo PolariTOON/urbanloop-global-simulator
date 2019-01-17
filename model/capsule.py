@@ -3,16 +3,6 @@
 
 capsule_id = 0
 
-'''
-[CAPSULE]
-velocity = 0
-#acceleration = 0
-security_distance = 5000  # millimeters
-release_time = 12345  # miilisec
-acceleration_time = 12345  # miilisec
-max_speed = 22.2  # m/s (80km/h)
-'''
-
 
 class Capsule:
     # capsule data

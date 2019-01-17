@@ -41,7 +41,8 @@ def load():
                             if s.my_loop is l and s.other_loop is other_l:  # il existe déjà
                                 elms += [s]
                     if len(elms) != e + 1:  # existe pas
-                        elms += [Switch(l, other_l)]
+                        # TODO vérification par Charlotte
+                        elms += [Switch(loop=l, other_loop=other_l)]
                     elms[e].angle_my_loop = element["angle"]
                     elms[e].size = element["length"]
                 else:  # "switch_in":
@@ -50,7 +51,8 @@ def load():
                             if s.my_loop is other_l and s.other_loop is l:
                                 elms += [s]
                     if len(elms) != e + 1:  # existe pas
-                        elms += [Switch(other_l, l)]
+                        # TODO vérification par Charlotte
+                        elms += [Switch(loop=other_l, other_loop=l)]
                     elms[e].angle_other_loop = element["angle"]
                 l.switches += [elms[e]]
             else:

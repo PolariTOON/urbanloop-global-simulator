@@ -3,33 +3,29 @@
 
 from tkinter import Canvas
 
-class StationRenderer:
+class CapsuleRenderer:
 
-    def __init__(self, station, master):
-        assert station != None and master != None
-        self.station = station
+    def __init__(self, capsule, master):
+        assert capsule != None and master != None
+        self.capsule = capsule
         self.master = master
-        self.is_text_written = False
         # creating canvas
         self.make_canvas()
     
     def update_canvas(self):
         assert self.canvas != None
-        color = "#00FF00" if self.is_selected else "blue"
-        self.canvas.create_oval(self.outline_width,self.outline_width,self.width-self.outline_width,self.height-self.outline_width,outline=color,width=self.outline_width)
-        if not self.is_text_written : # otherwise text become ugly :/
-            self.canvas.create_text(self.width/2, self.height/2, text = self.station.id, tags = "text")
-            self.is_text_written = True
+        color = "#00FF00" if self.is_selected else "red"
+        self.canvas.create_oval(self.outline_width,self.outline_width,self.width-self.outline_width,self.height-self.outline_width,fill=color,outline="black",width=self.outline_width)
         self.canvas["bg"] = self.master["bg"]
     
-    def make_canvas(self, w=50, h=50, ow=3):
+    def make_canvas(self, w=20, h=20, ow=1):
         # checking if function is correctly called
         assert w > 0 and h > 0 and ow > 0
         self.outline_width = ow
         self.width = w
         self.height = h
 
-        # if canvas is selected
+        # if capsule is selected
         self.is_selected = False
 
         # building canvas and adding event listener
@@ -47,4 +43,3 @@ class StationRenderer:
 
         # updating canvas
         self.update_canvas()
-

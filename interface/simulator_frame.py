@@ -18,11 +18,14 @@ class SimulatorFrame(Frame):
         if self.selected_item != None:
             self.selected_item.is_selected = False
             self.selected_item.update_canvas()
-        # storing new one
-        self.selected_item = item
-        self.selected_item.is_selected = True
-        self.selected_item.update_canvas()
-        self.notify_master()
+        # storing new one if it is selected
+        if (item != None and item.is_selected == True):
+            self.selected_item = item
+            self.selected_item.is_selected = True
+            self.selected_item.update_canvas()
+            self.notify_master()
+        else:
+            self.selected_item = None
     
     def notify_master(self):
         # TODO

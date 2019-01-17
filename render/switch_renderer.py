@@ -3,24 +3,33 @@
 
 from tkinter import Canvas
 
-class StationRenderer:
-
-    def __init__(self, station, master):
-        assert station != None and master != None
-        self.station = station
+class SwitchRenderer:
+    def __init__(self, switch, master):
+        assert master != None and switch != None
+        self.switch = switch
         self.master = master
-        self.is_text_written = False
         # creating canvas
         self.make_canvas()
     
     def update_canvas(self):
         assert self.canvas != None
+        # station-like
         color = "#00FF00" if self.is_selected else "blue"
         self.canvas.create_oval(self.outline_width,self.outline_width,self.width-self.outline_width,self.height-self.outline_width,outline=color,width=self.outline_width)
-        if not self.is_text_written : # otherwise text become ugly :/
-            self.canvas.create_text(self.width/2, self.height/2, text = self.station.id, tags = "text")
-            self.is_text_written = True
         self.canvas["bg"] = self.master["bg"]
+        # adding a X
+        xr = self.width / 2
+        yr = self.height / 2
+        r = self.width/2
+        min, max = self.width, 0 
+        for x in range(1, self.width+1):
+            if ((x - xr)**2 + (x - yr)**2) < r*r:
+                if min > x:
+                    min = x
+                if max < x:
+                    max = x
+        self.canvas.create_line(min, min, max, max,fill=color,width=self.outline_width-1)
+        self.canvas.create_line(min, max, max, min,fill=color,width=self.outline_width-1)
     
     def make_canvas(self, w=50, h=50, ow=3):
         # checking if function is correctly called
@@ -47,4 +56,3 @@ class StationRenderer:
 
         # updating canvas
         self.update_canvas()
-

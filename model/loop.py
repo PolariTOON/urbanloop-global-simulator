@@ -7,11 +7,6 @@ default_size = 100
 
 
 class Loop:
-    objects = None
-    lengths = None
-    x = None
-    y = None
-
     def __init__(self, name, size=default_size, coordinates=None):
         self.name = name
         print("Create loop", self.name)
@@ -19,6 +14,7 @@ class Loop:
             self.x = coordinates[0]
             self.y = coordinates[1]
         self.size = size
+
         global all_loops
         all_loops[self.name] = self
         self.stations = []

@@ -18,22 +18,27 @@ class SimLoop:
         self.sim_state = SimState.RUNNING
         self.flow_generator = traveler_generator.FlowGenerator(env)
         self.start_hour = int(config.sim['start_hour'])
+        self.tick_event = self.env.event()
+        self.current_tick = 0
 
-    def test(self):
-        print("test at %d" % self.env.now)
-        if self.env.now > 30:
-            self.sim_state = SimState.KILLED
-        yield self.env.timeout(1)
+    def tick(self):
+        self.current_tick += 1
+        yield self.tick_event.succeed()
+        self.tick_event = self.env.event()
 
     def loop(self):
         while True:
             if self.sim_state == SimState.RUNNING:
-                yield self.env.process(self.test())
-                yield self.env.process(self.flow_generator.generate_traveler(
-                    env=self.env,
-                    sim_tick=self.sim_tick,
-                    start_hour=self.start_hour)
-                )
+                self.env.process(self.tick())
+
+                if self.current_tick % (1 / self.sim_tick) == 0:
+                    self.current_tick = 0
+                    self.env.process(self.flow_generator.generate_traveler(
+                        env=self.env,
+                        sim_tick=self.sim_tick,
+                        start_hour=self.start_hour)
+                    )
+                yield self.env.timeout(1)
             elif self.sim_state == SimState.SLEEP:
                 logging.warning("SLEEP State")
             elif self.sim_state == SimState.KILLED:

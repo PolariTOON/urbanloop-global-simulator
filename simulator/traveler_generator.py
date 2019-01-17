@@ -1,8 +1,8 @@
 import logging
 import random
 
-from model.traveler import Traveler
 from model.station import *
+from model.traveler import Traveler
 from settings import config
 from simulator import converter
 from simulator import poisson
@@ -91,6 +91,7 @@ def get_random_station_from_type(station_type, departure_station=None):
         if departure_station is None:
             return random.choice(get_stations())
         else:
-            return random.choice([a_station for a_station in get_stations() if a_station.name != departure_station.name])
+            return random.choice(
+                [a_station for a_station in get_stations() if a_station.name != departure_station.name])
 
     return random.choice(stations)

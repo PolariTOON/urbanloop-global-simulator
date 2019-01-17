@@ -3,7 +3,7 @@
 import logging
 import time
 
-import simpy.rt
+import simpy
 
 from settings import config
 from settings import network
@@ -17,6 +17,7 @@ SIM_DURATION = int(config.sim['duration'])
 SIM_TICK = float(config.sim['tick'])
 START_TIME = time.time()
 sim_environment = simpy.rt.RealtimeEnvironment(factor=SIM_TICK)
+
 sim_loop = sim_loop.SimLoop(env=sim_environment, sim_tick=SIM_TICK)
 
 """Start"""

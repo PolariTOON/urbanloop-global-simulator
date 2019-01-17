@@ -47,3 +47,9 @@ def get_stations():
         for station in loop.stations:
             stations.append(station)
     return stations
+
+
+def get_by_name(name):
+    for station in get_stations():
+        if station.name == name:
+            return station

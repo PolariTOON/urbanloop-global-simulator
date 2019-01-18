@@ -4,24 +4,30 @@
     "circonference": 100,
     "content": [{"type":"station","name":"Gare", "angle":0, "station_type": 3},
                 {"type":"station","name":"Stanislas", "angle":90, "station_type": 3},
-                {"type":"station","name":"Campus_ARTEM", "angle": 160, "station_type": 1},
-                {"type":"switch_out","other_loop":"Villers-lès-Nancy", "length": 15, "angle":190},
+                {"type":"station","name":"Campus_ARTEM", "angle": 160, "station_type": 2},
+                {"type":"switch_out","other_loop":"Villers-les-Nancy", "length": 15, "angle":190},
                 {"type":"switch_out","other_loop":"Laxou", "length": 50, "angle":240},
                 {"type":"switch_in","other_loop":"Laxou", "angle":305}
     ]
   },
-  "Villers-lès-Nancy": {
+  "Villers-les-Nancy": {
     "center": [300,300],
     "circonference": 500,
-    "content": [{"type":"switch_in","other_loop":"Nancy", "angle":35 }
+    "content": [{"type":"switch_in","other_loop":"Nancy", "angle":60 },
+                {"type":"station","name":"Velodrome", "angle":90, "station_type": 3},
+                {"type":"station","name":"TELECOM Nancy", "angle":140, "station_type": 2},
+                {"type":"station","name":"Eglise", "angle":225, "station_type": 1},
+                {"type":"switch_out","other_loop":"Laxou", "length": 60, "angle":210}
     ]
   },
   "Laxou": {
     "center": [150,50],
     "circonference": 300,
-    "content": [{"type":"switch_out","other_loop":"Nancy", "length": 60, "angle":20 },
-                {"type":"switch_in","other_loop":"Nancy", "angle":170 },
-                {"type":"station","name":"Autoroute", "angle":0, "station_type": 2}
+    "content": [{"type":"switch_out","other_loop":"Nancy", "length": 60, "angle":50 },
+                {"type":"switch_in","other_loop":"Nancy", "angle":150 },
+                {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":210 },
+                {"type":"station","name":"Auchan", "angle":270, "station_type": 2},
+                {"type":"station","name":"Autoroute", "angle":340, "station_type": 1}
     ]
   }
 

@@ -1,5 +1,6 @@
-import json
 import sys
+import json
+import logging
 
 from model import loop as ML
 from model import switch as MS
@@ -65,9 +66,8 @@ def load(file=None):
                     elms[e].angle_other_loop = element["angle"]
                 the_loop.switches += [elms[e]]
             else:
-                print("error")
-            # print(elms[e])
-        order = []
+                logging.error("le json est mal formaté")
+            order = []
         for i in range(len(elms)):
             elm = elms[i]
             if type(elm) == Switch and elm.other_loop == the_loop:
@@ -81,9 +81,7 @@ def load(file=None):
                     order += [["station", elm, elm.angle]]
                 else:
                     order += [["switch_out", elm, elm.angle_my_loop]]
-        # print(elms)
         the_loop.add_order(order)
-    # print(ML.all_loops)
     MS.init()
 
 

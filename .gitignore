@@ -1,6 +1,6 @@
-*/*.idea
-*/*.xml
+.idea
+.idea/*
+*.xml
 */*.iml
 .vscode/
 __pycache__/
-Urbanloop.py

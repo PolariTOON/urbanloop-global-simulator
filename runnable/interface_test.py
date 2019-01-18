@@ -33,8 +33,8 @@ for i in range(1, 15):
 s2 = Station(angle=0)
 print(s.name)
 print(s2.name)
-sr = StationRenderer(s,w)
-sr2 = StationRenderer(s2,w)
+sr = StationRenderer(s, w)
+sr2 = StationRenderer(s2, w)
 scv = sr.canvas
 scv2 = sr2.canvas
 scv.grid(row=2, column=2)

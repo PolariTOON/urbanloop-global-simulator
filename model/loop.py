@@ -1,5 +1,8 @@
 #! /usr/bin/env python3
 # coding: utf-8
+import logging
+
+
 
 all_loops = {}
 default_size = 100
@@ -15,7 +18,7 @@ class Loop:
         :return:0UT : un objet Loop (Loop)
         """
         self.name = name
-        print("Create loop", self.name)
+        logging.info("Create loop "+self.name)
         if coordinates is not None:
             self.x = coordinates[0]
             self.y = coordinates[1]
@@ -41,9 +44,6 @@ class Loop:
             element = order[i]
             # order[i] = [nature, obj, angle]
             self.objects += [order[i]]
-            # print(order[(i + 1) % len(order)][0])
-            # print(order[(i + 1) % len(order)][1])
-            # print(order[(i + 1) % len(order)][2])
             angle_next = order[(i + 1) % len(order)][2] - element[2]
             if angle_next < 0:
                 angle_next += 360

@@ -13,4 +13,4 @@ class Traveler:
         self.departure_station_name = destination_station_name
         self.waiting_since = waiting_since
         departure_station = station.get_by_name(self.departure_station_name)
-        departure_station.queue.append(self)
+        departure_station.traveler_queue.put(self)

@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 # coding: utf-8
+import logging
 
 import model.routing
 from settings import config
@@ -56,21 +57,22 @@ class Switch:
         return
     '''
 
-    def route_capsule_to_station(self, capsule, station):
+    def route_capsule_to_station(self, station):
         """
         la fonction qu'une capsule déclenche lorsqu'elle arrive sur le switch et souhaite être routée
-            :param  capsule: la capsule a router (CAPSULE) OBLIGATOIRE
             :param  station: la station de destination vers laquelle la capsule souhaite aller (Station) OBLIGATOIRE
             :return: OUT : True si la capsule doit changer de loop, False sinon (boolean)
             """
-        # TODO charlotte
         the_loop = station.loop
-        if self.table[the_loop.name]:  # il faut qu'elle change de boucle
-            self.is_routing_to_loop = True
-            capsule.current_station = None
+        if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
+            logging.debug("le switch " + str(self.id) + " aiguille la capsule voulant aller à " + station.name
+                          + " depuis la boucle " + self.my_loop.name)
+            # self.is_routing_to_loop = True
             return True
             # capsule._change_loop(self.next_element)
         else:
+            logging.debug("le switch " + str(self.id) + " laisse la capsule voulant aller à " + station.name
+                          + " sur la boucle " + self.my_loop.name)
             # capsule._do_a_loop(self.next_element_other)
             return False
 

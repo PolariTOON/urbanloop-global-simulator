@@ -40,7 +40,7 @@ class Station:
         self.station_type = station_type
         self.traveler_queue = Queue()
         self.capsule_queue = Queue(maxsize=self.capacity)
-        self.capsule_queue.put(Capsule(this))
+        self.capsule_queue.put(Capsule(self))
 
     # TODO menage
     '''def _update_flow(self):

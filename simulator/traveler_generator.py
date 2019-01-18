@@ -13,24 +13,24 @@ total_generated = 0
 class TravelerGenerator:
     def __init__(self, env):
         self.env = env
+        self.sim_tick = float(config.sim['tick'])
         self.poisson = poisson.Poisson()
-        self.ticks_in_second = 1 / float(config.sim['tick'])
+        self.ticks_in_second = 1 / self.sim_tick
 
-    def generate_traveler(self, env, sim_tick, start_hour=0):
+    def generate_traveler(self, start_hour=0):
         """
-        :param env: Simpy environment
-        :param sim_tick: The simulation tick
         :param start_hour: The initial hour of the simulation
-        :return: Create a timeout
+        :return: The generator of one or several travelers each second
         """
         global total_generated
-        seconds = converter.now_to_seconds(env, sim_tick, start_hour)
+        seconds = converter.now_to_seconds(self.env, self.sim_tick, start_hour)
         hour = converter.seconds_to_floor_hour(seconds)
         traveler_number = self.poisson.traveler(hour)
         for traveler in range(traveler_number):
             total_generated += 1
-            departure_station = select_random_station(env, sim_tick, start_hour)
-            destination_station = select_random_station(env, sim_tick, start_hour, departure_station=departure_station)
+            departure_station = select_random_station(self.env, self.sim_tick, start_hour)
+            destination_station = select_random_station(self.env, self.sim_tick, start_hour,
+                                                        departure_station=departure_station)
             Traveler(departure_station.name, destination_station.name, seconds)
             logging.info("Traveler generated at time %s. Routing from %s to %s" %
                          (converter.seconds_to_string(seconds),

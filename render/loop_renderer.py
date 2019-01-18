@@ -38,11 +38,8 @@ class LoopRenderer:
             else:
                 # TODO
                 angle+=object.angle
-                xr = self.dim/2 #* (1 + cos((angle*2*pi)/360))
-                yr = self.dim/2 #* (1 - sin((angle*2*pi)/360))
-                r = (self.dim - 2 * self.offset)/2
-                x = xr + r*cos((angle*2*pi)/360)
-                y = yr - r*sin((angle*2*pi)/360)
+                x = self.xr + self.r*cos((angle*2*pi)/360)
+                y = self.yr - self.r*sin((angle*2*pi)/360)
                 print(object," at [{0};{1}]".format(x, y))
                 renderer = StationRenderer(object, self.canvas) if isinstance(object, Station) else SwitchRenderer(object, self.canvas)
                 canvas = renderer.canvas
@@ -61,16 +58,29 @@ class LoopRenderer:
         self.canvas = LoopCanvas(master=self.master, width=self.dim, height=self.dim)
         self.canvas["bg"] = self.master["bg"]
 
-        def callback(event):
-            """TODO baptiste specification """
-            # checking if click happened inside donut or not
-            # TODO
-            # and updating is_selected (donut equation)
-            # self.is_selected = ((event.x - xr)**2 + (event.y - yr)**2) <= r*r
-            # self.master.update_selected_item(self)
-            return
+        self.xr = self.dim/2 #* (1 + cos((angle*2*pi)/360))
+        self.yr = self.dim/2 #* (1 - sin((angle*2*pi)/360))
+        self.r = (self.dim - 2 * self.offset)/2
 
+        def callback(event):
+            # checking if click happened inside donut or not
+            square_dist = (event.x - self.xr)**2 + (event.y - self.yr)**2
+            # and updating is_selected (donut equation)
+            self.is_selected = square_dist <= self.r**2 and square_dist >= (self.r - self.outline_width*2)**2
+            self.master.update_selected_item(self)
         self.canvas.bind("<Button-1>", callback)
+
+        def motion(event):
+            # checking if cursor is above donut or not
+            square_dist = (event.x - self.xr)**2 + (event.y - self.yr)**2
+            # and updating is_above
+            self.is_above = square_dist <= self.r**2 and square_dist >= (self.r - self.outline_width)**2
+            if (self.is_above == True):
+                self.canvas["cursor"]='hand2'
+            else:
+                self.canvas["cursor"]=''
+        self.canvas.bind("<Motion>", motion)
+
 
         # updating canvas
         self.update_canvas()

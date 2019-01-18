@@ -7,7 +7,7 @@
 | Implémentation  du routage basique                    |      ✓      |            |          |
 | Déployement du simulateur                             |             |            |    x     |
 | Création d'un mini-réseau pour les tests              |      ✓      |            |          |
-| Début de l'interface graphique                        |      ✓      |      x     |          |
+| Début de l'interface graphique                        |      ✓      |      ✓     |          |
 
 
 ######Notes :
@@ -20,7 +20,7 @@
 | Tâches                                                |Charlotte    |   Baptiste | Thibault |
 | :---------------------------------------------------- |: ----------:| :---------:|:--------:|
 | Réunion avec le chef de projet à 15h30                |      ✓      |      ✓     |    ✓     |
-| Suite de l'interface graphique                        |             |      x     |          |
+| Suite de l'interface graphique                        |             |      ✓     |          |
 | Implémentation  du routage dynamique                  |      x      |            |          |
 | Suite Déployement du simulateur                       |             |            |    x     |
 | Configuration des paramètres                          |             |            |    x     |

@@ -8,7 +8,11 @@ from settings import config
 class CapsuleRenderer:
 
     def __init__(self, capsule, master):
-        """TODO baptiste specification """
+        """
+        constructeur
+        param capsule: capsule à afficher
+        param master: Canvas sur lequel dessiner 
+        """
         self.config = config.interface
         assert capsule is not None and master is not None
         self.capsule = capsule
@@ -17,15 +21,21 @@ class CapsuleRenderer:
         self.make_canvas()
 
     def update_canvas(self):
-        """TODO baptiste specification """
-        assert self.canvas is not None
+        """
+        mise a jour de la texture en fonction de l'état de la capsule
+        """
+        # TODO
+        # faire bouger les capsules selon leurs déplacements
+        assert self.canvas != None
         color = "#00FF00" if self.is_selected else "red"
         self.canvas.create_oval(self.outline_width, self.outline_width, self.width - self.outline_width,
                                 self.height - self.outline_width, fill=color, outline="black", width=self.outline_width)
         self.canvas["bg"] = self.master["bg"]
 
     def make_canvas(self):
-        """TODO baptiste specification """
+        """
+        construit le canvas sur lequel dessiner et lui ajoute des listeners
+        """
         self.outline_width = int(self.config["capsule_outline_width"]) # TODO baptiste variable pas initialisee dans _init ?
         self.width = int(self.config["capsule_width"])
         self.height = int(self.config["capsule_height"])
@@ -37,7 +47,9 @@ class CapsuleRenderer:
         self.canvas = Canvas(self.master, width=self.width, height=self.height, highlightthickness=0)
 
         def callback(event):
-            """TODO baptiste specification """
+            """
+            listener de clic
+            """
             # checking if click happened inside circle or not
             xr = self.width / 2
             yr = self.height / 2
@@ -45,10 +57,12 @@ class CapsuleRenderer:
             # and updating is_selected (circle equation)
             self.is_selected = ((event.x - xr) ** 2 + (event.y - yr) ** 2) <= r * r
             self.master.update_selected_item(self)
-            return
         self.canvas.bind("<Button-1>", callback)
 
         def motion(event):
+            """
+            listener de mouvement
+            """
             # checking if cusor is above circle or not
             xr = self.width / 2
             yr = self.height / 2

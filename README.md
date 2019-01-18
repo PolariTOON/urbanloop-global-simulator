@@ -47,7 +47,7 @@ En cas d'erreur(s), vous pouvez essayer de lancer à la racine du projet `./run 
 * ```matplotlib```
 
 ## To do
-* Ajouter M. CHOLEZ au dépôt 
+* Ajouter M. CHOLEZ au dépôt
 * Configuration SimPy 
 * Coder 
 

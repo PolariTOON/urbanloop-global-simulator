@@ -1,5 +1,4 @@
-(*/)*.*.idea
-*/.idea/*/*.xml
+.idea
 .idea/*
 *.xml
 */*.iml

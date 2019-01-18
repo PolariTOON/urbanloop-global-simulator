@@ -39,6 +39,7 @@ class Station:
         self.loop = loop
         self.station_type = station_type
         self.queue = []
+        self.next_element = None
 
 # TODO menage
     '''def _update_flow(self):

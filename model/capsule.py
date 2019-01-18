@@ -1,18 +1,11 @@
 #! /usr/bin/env python3
 # coding: utf-8
+from model.switch import Switch
 
 capsule_id = 0  # type: int
 
 
 class Capsule:
-    # capsule data
-    is_moving = False
-    is_loaded = False
-    current_station = None
-    final_destination = None
-    # network data
-    network_map = None
-    network = None
 
     def __init__(self, station=None):
         """
@@ -26,27 +19,40 @@ class Capsule:
         # self.name = "Capsule #{0}".format(self.id) if (name is None) else name
         if station is not None:
             self.depart_station = station
-            self.next_switch = station.next_switch
+            self.next_element = station.element
 
     def _ask_route(self, switch):
         """
         Demande au switch de calculer sa route : va déclencher le changement ou non de boucle
             :param  switch : Switch "suivant" a qui la capsule demande d'etre routé (Switch) OBLIGATOIRE
-            :return: void
+            :return: void : mise à jour
         """
         change = switch.route_capsule_to_station(self, self.final_destination)
         if change:
             self._change_loop(switch)
         else:
-            self._do_a_loop(switch.next_station)
+            self._continue_on_loop(switch)
 
     def _change_loop(self, switch):
-        # TODO specification + implementation
+        """
+        Lorsque l'aiguillage indique qu'il faut changer de boucle
+            :param switch: l'aiguillage qui a dit qu'il fallait changer de boucle
+            :return: void : change "l'élément suivant
+        """
+        self.next_element = switch.next_element_other
 
         return
 
-    def _do_a_loop(self, station):
-        # TODO specification + implementation
+    def _continue_on_loop(self, element):
+        """
+         Lorsque qu'il faut rester sur la boucle (la station n'est pas la destination ou pas accessible ou le switch ne veut pas aiguiller
+            :param element: l'element qui fait qu'on doit rester sur la boucle
+            :return: void
+        """
+        if type(element) is Switch:
+            self.next_element = element.next_element
+        else : # c'est une station :
+            self.next_element = element.next_element
         return
 
 # TODO nettoyage

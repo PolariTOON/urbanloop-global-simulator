@@ -17,7 +17,7 @@ class TravelerGenerator:
         self.poisson = poisson.Poisson()
         self.ticks_in_second = 1 / self.sim_tick
 
-    def generate_traveler(self, start_hour=0):
+    def generate(self, start_hour=0):
         """
         :param start_hour: The initial hour of the simulation
         :return: The generator of one or several travelers each second

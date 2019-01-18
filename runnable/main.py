@@ -5,7 +5,6 @@ import time
 
 import simpy
 
-from model.station import *
 from settings import config
 from settings import network
 from simulator import sim_loop
@@ -16,8 +15,6 @@ from simulator import traveler_generator
 """Initialisation"""
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 network.load()
-for station in get_stations():
-    station.capsule_queue.put(Capsule(station=station))
 
 SIM_DURATION = int(config.sim['duration'])
 SIM_TICK = float(config.sim['tick'])

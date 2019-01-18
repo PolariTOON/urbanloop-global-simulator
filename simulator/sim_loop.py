@@ -41,9 +41,9 @@ class SimLoop:
         while True:
             if self.sim_state == SimState.RUNNING:
                 self.env.process(self.tick())
-                self.env.process(self.climb_generator.climb())
+                self.env.process(self.climb_generator.generate())
                 if self.current_tick % (1 / self.sim_tick) == 0:
-                    self.env.process(self.traveler_generator.generate_traveler(start_hour=self.start_hour))
+                    self.env.process(self.traveler_generator.generate(start_hour=self.start_hour))
                 yield self.env.timeout(1)
             elif self.sim_state == SimState.SLEEP:
                 logging.warning("SLEEP State")

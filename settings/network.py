@@ -1,11 +1,12 @@
-import sys
 import json
 import logging
+import sys
 
 from model import loop as ML
 from model import switch as MS
+from model.capsule import Capsule
 from model.loop import Loop
-from model.station import Station
+from model.station import *
 from model.switch import Switch
 
 """
@@ -72,10 +73,10 @@ def load(file=None):
             # gestion des elements precedents et suivants
             elm = elms[i]
             if type(elm) == Switch and elm.other_loop == the_loop:  # c'est un switch_in
-                elm.next_element_other = elms[(i+1) % len(elms)]
+                elm.next_element_other = elms[(i + 1) % len(elms)]
                 order += [["switch_in", elm, elm.angle_other_loop]]
             else:  # type(elm) == Station or (type(elm) == Switch and elm.my_loop == l):
-                elm.next_element = elms[(i+1) % len(elms)]
+                elm.next_element = elms[(i + 1) % len(elms)]
                 if type(elm) == Switch:
                     elm.previous_element = elms[(i - 1) % len(elms)]
                     order += [["switch_out", elm, elm.angle_my_loop]]
@@ -83,6 +84,10 @@ def load(file=None):
                     order += [["station", elm, elm.angle]]
         the_loop.add_order(order)
     MS.init()
+    for station in get_stations():
+        station.capsule_queue.put(Capsule(station=station))
+        station.capsule_queue.put(Capsule(station=station))
+
 
 '''
 def search_next_station(elements, i):

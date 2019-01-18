@@ -1,8 +1,7 @@
 #! /usr/bin/env python3
 # coding: utf-8
-from enum import Enum
 import queue
-from model.capsule import Capsule
+from enum import Enum
 
 from .loop import all_loops
 
@@ -39,15 +38,8 @@ class Station:
         self.loop = loop
         self.station_type = station_type
         self.traveler_queue = queue.Queue()
-        self.capsule_queue = queue.Queue(maxsize=1)
+        self.capsule_queue = queue.Queue(maxsize=100)
         self.next_element = None
-
-    def pop_traveler(self):
-        return self.traveler_queue.get_nowait()
-
-    def pop_capsule(self):
-        print("popping capsule at %s" % self.name)
-        return self.capsule_queue.get_nowait()
 
     # TODO menage
     '''def _update_flow(self):

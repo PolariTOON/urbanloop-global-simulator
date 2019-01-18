@@ -10,9 +10,6 @@ from simulator import poisson
 total_generated = 0
 
 
-# TODO thibault specification
-
-
 class TravelerGenerator:
     def __init__(self, env):
         self.env = env
@@ -20,6 +17,12 @@ class TravelerGenerator:
         self.ticks_in_second = 1 / float(config.sim['tick'])
 
     def generate_traveler(self, env, sim_tick, start_hour=0):
+        """
+        :param env: Simpy environment
+        :param sim_tick: The simulation tick
+        :param start_hour: The initial hour of the simulation
+        :return: Create a timeout
+        """
         global total_generated
         seconds = converter.now_to_seconds(env, sim_tick, start_hour)
         hour = converter.seconds_to_floor_hour(seconds)

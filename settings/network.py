@@ -1,13 +1,11 @@
-import sys
 import json
+import sys
 
 from model import loop as ML
 from model import switch as MS
 from model.loop import Loop
 from model.station import Station
 from model.switch import Switch
-from settings import config
-
 
 """
 fichier pour l'import des réseaux sur les formats json correspondant
@@ -20,11 +18,8 @@ def load(file=None):
         :param file: fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
         :return: (void) l'ensemble des objets sont créés et configurés.
     """
-    if file is None: # aller chercher celui par défaut
-        path_to_add_array = sys.path[0].split("/")
-        del path_to_add_array[len(path_to_add_array) - 1]
-        file = "/".join(path_to_add_array)
-        file += config.model['network_file']
+    if file is None:  # aller chercher celui par défaut
+        file = '{0}/../resources/mini_network.json'.format(sys.path[0])
     f = open(file, 'r')
     network = json.load(f)
     for loop, info in network.items():

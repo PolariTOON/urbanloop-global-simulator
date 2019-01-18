@@ -7,10 +7,13 @@ Test pour approximer les courbes de probabilités
 pour la direction des voyageurs.
 Ce choix n'a pas été retenu
 """
-
-
-with open('../resources/curves.txt', "r") as file:
-    lines = file.readlines()
+lines=""
+try:
+    with open('../resources/curves.txt', "r") as file:
+        lines = file.readlines()
+except FileNotFoundError:
+    with open('resources/curves.txt', "r") as file:
+        lines = file.readlines()
 
 curves = []
 for line in lines:

@@ -28,7 +28,6 @@ class SimulatorFrame(Frame):
             (à savoir pas sur un objet représenté)
             on désélectionne si un objet était sélectionné
             """
-            print("callback")
             if self.selected_item is not None:  # nothing to do else
                 if self.selected_item.is_selected:
                     self.selected_item.is_selected = False
@@ -61,5 +60,5 @@ class SimulatorFrame(Frame):
         """
         # TODO
         # update data in the data field
-        print("notify master")
+        print("notify master: new selected item is ",self.selected_item)
         return

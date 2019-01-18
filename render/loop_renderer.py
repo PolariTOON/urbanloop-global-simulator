@@ -48,7 +48,7 @@ class LoopRenderer:
                 angle+=object.angle
                 x = self.xr + self.r*cos((angle*2*pi)/360)
                 y = self.yr - self.r*sin((angle*2*pi)/360)
-                print(object," at [{0};{1}]".format(x, y))
+                #print(object," at [{0};{1}]".format(x, y))
                 renderer = StationRenderer(object, self.canvas) if isinstance(object, Station) else SwitchRenderer(object, self.canvas)
                 canvas = renderer.canvas
                 canvas.place(x=x-renderer.width/2,y=y-renderer.height/2,bordermode="outside")

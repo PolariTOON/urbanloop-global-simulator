@@ -57,7 +57,6 @@ class CapsuleRenderer:
             # and updating is_selected (circle equation)
             self.is_selected = ((event.x - xr) ** 2 + (event.y - yr) ** 2) <= r * r
             self.master.update_selected_item(self)
-            return
         self.canvas.bind("<Button-1>", callback)
 
         def motion(event):

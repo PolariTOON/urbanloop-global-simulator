@@ -14,9 +14,6 @@ from simulator import traveler_generator
 """Fichier principal du projet """
 
 """Initialisation"""
-path_to_add_array = sys.path[0].split("/")
-del path_to_add_array[len(path_to_add_array) - 1]
-sys.path.append("/".join(path_to_add_array))
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 network.load()
 

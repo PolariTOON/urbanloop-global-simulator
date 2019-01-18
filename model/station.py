@@ -41,6 +41,7 @@ class Station:
         self.traveler_queue = Queue()
         self.capsule_queue = Queue(maxsize=self.capacity)
         self.capsule_queue.put(Capsule(self))
+        self.next_element = None
 
     # TODO menage
     '''def _update_flow(self):

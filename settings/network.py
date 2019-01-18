@@ -69,22 +69,22 @@ def load(file=None):
                 logging.error("le json est mal formaté")
             order = []
         for i in range(len(elms)):
+            # gestion des elements precedents et suivants
             elm = elms[i]
-            if type(elm) == Switch and elm.other_loop == the_loop:
-                elm.next_station_other = search_next_station(elms, i)
+            if type(elm) == Switch and elm.other_loop == the_loop:  # c'est un switch_in
+                elm.next_element_other = elms[(i+1) % len(elms)]
                 order += [["switch_in", elm, elm.angle_other_loop]]
             else:  # type(elm) == Station or (type(elm) == Switch and elm.my_loop == l):
-                elm.next_station = search_next_station(elms, i)
-                elm.previous_station = search_previous_station(elms, i)
-                if type(elm) == Station:
-                    elm.next_switch = search_next_switch(elms, i, the_loop)
-                    order += [["station", elm, elm.angle]]
-                else:
+                elm.next_element = elms[(i+1) % len(elms)]
+                if type(elm) == Switch:
+                    elm.previous_element = elms[(i - 1) % len(elms)]
                     order += [["switch_out", elm, elm.angle_my_loop]]
+                else:
+                    order += [["station", elm, elm.angle]]
         the_loop.add_order(order)
     MS.init()
 
-
+'''
 def search_next_station(elements, i):
     """
     recherche la première station juste après un élément parmis les éléments dans une boucle
@@ -128,3 +128,4 @@ def search_next_switch(elements, i, loop):
         if type(e) == Switch:
             if e.my_loop == loop:
                 return e
+'''

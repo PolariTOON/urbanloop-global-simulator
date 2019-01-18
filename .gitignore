@@ -1,6 +1,6 @@
-*/*.idea
+(*/)*.*.idea
 .idea/*
-(*/)*.xml
+*.xml
 */*.iml
 .vscode/
 __pycache__/

@@ -1,12 +1,9 @@
-from settings import config
 from simulator import poisson
 
-
-# TODO thibault specification
-
-
-CONFIG_PATH = '../resources/config.ini'
-config.load(CONFIG_PATH)
+"""
+Test pour connaître le nombre moyen de défauts apparus aléatoirement
+par jour, sur un total de 100 jours. 
+"""
 
 poisson = poisson.Poisson()
 
@@ -16,7 +13,7 @@ for second in range(86400):
 
 print("Somme des résultats obtenus pour un jour :", total)
 
-do_mean_on_100 = True
+do_mean_on_100 = False
 if do_mean_on_100:
     mean = 0
     for repeat in range(50):

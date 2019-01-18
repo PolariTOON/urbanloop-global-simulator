@@ -1,12 +1,9 @@
-from settings import config
 from simulator import poisson
 
-
-# TODO thibault specification
-
-
-CONFIG_PATH = '../resources/config.ini'
-config.load(CONFIG_PATH)
+"""
+Test pour connaître le nombre de voyageurs apparus
+au cours d'une journée. Un total par heure est affiché.
+"""
 
 poisson = poisson.Poisson()
 

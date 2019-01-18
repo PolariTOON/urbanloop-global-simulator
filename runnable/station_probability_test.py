@@ -1,9 +1,12 @@
-from simulator import converter
 from model.station import Type
+from simulator import converter
 
-
-# TODO thibault specification
-
+"""
+Test pour obtenir la probabilité de diriger un voyageur
+sur un type de station au cours de la journée heure par heure.
+is_arrival est un booléen qui détermine si on souhaite obtenir
+la probabilité de départ ou d'arrivée à une station.
+"""
 
 neutral_prob = []
 city_prob = []

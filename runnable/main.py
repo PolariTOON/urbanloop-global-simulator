@@ -1,24 +1,22 @@
 #! /usr/bin/env python3
 # coding: utf-8
 import logging
-import time
-import simpy
 import sys
+import time
 
-path_to_add_array = sys.path[0].split("/")
-del path_to_add_array[len(path_to_add_array)-1]
-sys.path.append("/".join(path_to_add_array))
+import simpy
 
-from simulator import traveler_generator
 from settings import config
 from settings import network
 from simulator import sim_loop
-
+from simulator import traveler_generator
 
 """Fichier principal du projet """
 
-
 """Initialisation"""
+path_to_add_array = sys.path[0].split("/")
+del path_to_add_array[len(path_to_add_array) - 1]
+sys.path.append("/".join(path_to_add_array))
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 network.load()
 

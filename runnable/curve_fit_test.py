@@ -2,7 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# TODO thibault specification
+"""
+Test pour approximer les courbes de probabilités
+pour la direction des voyageurs.
+Ce choix n'a pas été retenu
+"""
 
 
 with open('../resources/curves.txt', "r") as file:

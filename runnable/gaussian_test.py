@@ -5,7 +5,11 @@ import scipy.stats
 from settings import config
 
 
-# TODO thibault specification
+"""
+Test pour afficher les courbes gaussiennes de probabilités
+pour la direction du voyageur en fonction du type de station.
+Ce choix a été retenu
+"""
 
 
 config.load('../resources/config.ini')

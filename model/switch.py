@@ -18,20 +18,15 @@ class Switch:
     network = None
     is_routing_to_loop = False
 
-    '''my_loop = None
-    next_loop = None 
-    size = 0 
-    permanent_table = None'''
-
-    def __init__(self, loop=None, angle=None, other_loop=None, previous_station=None, next_station=None, next_station_other=None,
-                 size=switched_cost):
+    def __init__(self, loop=None, angle=None, other_loop=None, previous_element=None, next_element=None,
+                 next_element_other=None, size=switched_cost):
         """
         initialisation d'un aiguillage
         :param  loop : boucle où le switch est présent (Loop)
         :param  other_loop : boucle aiguillée (Loop)
-        :param  previous_station : la station avant le switch de la loop doù le switch est (Station)
-        :param  next_station : la station après le switch sur la loop où le switch est (Station)
-        :param  next_station_other : la station après le switch sur la loop aiguillée (Station)
+        :param  previous_element : l'element avant le switch de la loop où le switch est (Station/Switch)
+        :param  next_element : la station après le switch sur la loop où le switch est (Station/Switch)
+        :param  next_element_other : la station après le switch sur la loop aiguillée (Station/Switch)
         :param  size : la taille de l'aiguillage
         :return:0UT : un objet aiguillage (Switch)
         """
@@ -40,10 +35,10 @@ class Switch:
         switch_id += 1
         self.my_loop = loop
         self.angle = angle
-        self.last_station = previous_station
-        self.next_station = next_station
+        self.last_element = previous_element
+        self.next_element = next_element
         self.other_loop = other_loop
-        self.other_loop_station = next_station_other
+        self.next_element_other = next_element_other
         self.angle_my_loop = None
         self.angle_other_loop = None
         self.size = size
@@ -74,9 +69,9 @@ class Switch:
             self.is_routing_to_loop = True
             capsule.current_station = None
             return True
-            # capsule._change_loop(self.next_station)
+            # capsule._change_loop(self.next_element)
         else:
-            # capsule._do_a_loop(self.next_station_other)
+            # capsule._do_a_loop(self.next_element_other)
             return False
 
 

@@ -4,13 +4,13 @@
 from tkinter import Tk, N, S, E, W, VERTICAL, Frame
 from tkinter import ttk
 
+# créer une classe, c'est plus classe.
 
 def create_window(w=1200, h=800):
-    """TODO baptiste specifications """
     # creating a graphical app
     window = Tk()
     window["bg"] = "#e0e0e0"
-    window.title = "URBANLOOP Simulator"
+    window["title"] = "URBANLOOP Simulator"
 
     # geometry of the app
     ws = window.winfo_screenwidth()

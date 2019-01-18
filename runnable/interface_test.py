@@ -1,7 +1,4 @@
 import sys
-path_to_add_array = sys.path[0].split("/")
-del path_to_add_array[len(path_to_add_array)-1]
-sys.path.append("/".join(path_to_add_array))
 
 from math import pi
 from model.station import Station
@@ -15,8 +12,12 @@ from render.loop_renderer import LoopRenderer
 from tkinter import Tk
 from interface.simulator_frame import SimulatorFrame
 
+path_to_add_array = sys.path[0].split("/")
+del path_to_add_array[len(path_to_add_array)-1]
+sys.path.append("/".join(path_to_add_array))
 
-# TODO thibault specification + menage
+
+# TODO baptiste specification + menage
 
 
 # window

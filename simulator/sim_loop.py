@@ -25,11 +25,19 @@ class SimLoop:
         self.current_tick = 0
 
     def tick(self):
+        """
+        This function triggers the tick_event
+        """
         self.current_tick += 1
         yield self.tick_event.succeed()
         self.tick_event = self.env.event()
 
     def loop(self):
+        """
+        This function is the main process loop of the simulation.
+        You can create several independents process while the
+        SimState is RUNNING.
+        """
         while True:
             if self.sim_state == SimState.RUNNING:
                 self.env.process(self.tick())

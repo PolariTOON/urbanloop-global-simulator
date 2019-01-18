@@ -1,14 +1,11 @@
 import configparser
 import sys
 
-
-
 """
  ce fichier permets l'import des différentes valeurs et paramètre du fichier resources/config.ini
  
 https://docs.python.org/dev/library/configparser.html
 """
-
 
 loaded = False
 default = None

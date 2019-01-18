@@ -1,12 +1,9 @@
 import logging
+
 import scipy.stats
 
 from model.station import Type
 from settings import config
-
-
-# TODO thibault specification
-
 
 neutral_percent = int(config.model['neutral_percent'])
 city_percent = int(config.model['city_percent'])
@@ -20,25 +17,57 @@ if activity_and_residential_fluctuation < 0 or activity_and_residential_fluctuat
 
 
 def seconds_to_string(seconds):
+    """
+    This function transforms a second amount to a HH:MM:SS string format
+    :param seconds: The amount of seconds you want to transform
+    :return: The same amount in string with a HH:MM:SS format
+    """
     minutes, secs = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     return '%02d:%02d:%02d' % (hours, minutes, secs)
 
 
 def seconds_to_decimal_hour(seconds):
+    """
+    This function transforms a second amount to a decimal hour
+    For example 5400 seconds = 1,5 hour
+    :param seconds: The amount of seconds you want to transform
+    :return: The same amount in decimal hour
+    """
     return round(seconds / 3600, 2)
 
 
 def now_to_seconds(env, sim_tick, start_hour=0):
+    """
+    This function gives you the current time in seconds
+    :param env: Simpy environment
+    :param sim_tick: Simpy simulation tick value
+    :param start_hour: The initial hour
+    :return: The current time in second
+    """
     return env.now * sim_tick + start_hour * 3600
 
 
-def now_to_floor_hour(now_in_seconds):
-    return round((now_in_seconds % 86400) / 3600)
+def seconds_to_floor_hour(seconds):
+    """
+    This function transforms an amount of seconds to the corresponding hour
+    :param seconds: An amount of seconds
+    :return: The corresponding hour
+    """
+    return round((seconds % 86400) / 3600)
 
 
 # noinspection PyTypeChecker
 def station_probability(station_type, second, is_arrival=True):
+    """
+    This function gives you the probability to lead a traveler to a station_type
+    at a certain time in second. You can choose if the station is a departure or
+    destination station.
+    :param station_type: The type of station you want to find its probability
+    :param second: The time in second
+    :param is_arrival: If the station is a departure or destination station
+    :return: The probability to lead a traveler to the chosen station_type at the given time
+    """
     if neutral_percent is None or city_percent is None or activity_and_residential_percent is None or activity_and_residential_fluctuation is None:
         logging.error("Converter hasn't been loaded")
         return 0

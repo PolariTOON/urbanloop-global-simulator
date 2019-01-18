@@ -22,7 +22,7 @@ class TravelerGenerator:
     def generate_traveler(self, env, sim_tick, start_hour=0):
         global total_generated
         seconds = converter.now_to_seconds(env, sim_tick, start_hour)
-        hour = converter.now_to_floor_hour(seconds)
+        hour = converter.seconds_to_floor_hour(seconds)
         traveler_number = self.poisson.traveler(hour)
         for traveler in range(traveler_number):
             total_generated += 1

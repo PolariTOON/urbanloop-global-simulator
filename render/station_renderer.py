@@ -50,9 +50,20 @@ class StationRenderer:
             # and updating is_selected (circle equation)
             self.is_selected = ((event.x - xr) ** 2 + (event.y - yr) ** 2) <= r * r
             self.master.update_selected_item(self)
-            return
-
         self.canvas.bind("<Button-1>", callback)
+
+        def motion(event):
+            # checking if cusor is above circle or not
+            xr = self.width / 2
+            yr = self.height / 2
+            r = self.width / 2
+            # and updating is_above
+            self.is_above = ((event.x - xr) ** 2 + (event.y - yr) ** 2) <= r * r
+            if (self.is_above == True):
+                self.canvas["cursor"]='hand2'
+            else:
+                self.canvas["cursor"]=''
+        self.canvas.bind("<Motion>",motion)
 
         # updating canvas
         self.update_canvas()

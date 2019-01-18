@@ -60,7 +60,7 @@ class Loop:
         """
         for i in range(len(self.objects)):
             if self.objects[i][1] is element:
-                return self.lengths[i], self.objects[i + 1][1]
+                return self.lengths[i], self.objects[(i + 1)%len(self.objects)][1]
         return 0, None
 
 

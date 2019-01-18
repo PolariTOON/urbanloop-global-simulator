@@ -7,7 +7,7 @@ capsule_id = 0  # type: int
 
 class Capsule:
 
-    def __init__(self, station=None):
+    def __init__(self, station=None, destination=None):
         """
         initialisation d'une capsule
             :param  station : Station où la capsule est initiee (Station)
@@ -17,17 +17,21 @@ class Capsule:
         self.id = capsule_id
         capsule_id += 1
         # self.name = "Capsule #{0}".format(self.id) if (name is None) else name
+        self.current_element = None
+        self.next_element = None
         if station is not None:
-            self.depart_station = station
-            self.next_element = station.element
+            self.current_element = station
+            self.next_element = station.next_element
+            self.loop = station.loop
+        self.destination = destination
 
-    def _ask_route(self, switch):
+    def ask_route(self, switch):
         """
         Demande au switch de calculer sa route : va déclencher le changement ou non de boucle
             :param  switch : Switch "suivant" a qui la capsule demande d'etre routé (Switch) OBLIGATOIRE
             :return: void : mise à jour
         """
-        change = switch.route_capsule_to_station(self, self.final_destination)
+        change = switch.route_capsule_to_station(self.destination)
         if change:
             self._change_loop(switch)
         else:
@@ -39,8 +43,9 @@ class Capsule:
             :param switch: l'aiguillage qui a dit qu'il fallait changer de boucle
             :return: void : change "l'élément suivant
         """
-        self.next_element = switch.next_element_other
-
+        self.current_element = switch.next_element_other
+        self.loop = switch.other_loop
+        d, self.next_element = self.loop.dist_to_next_object(self.current_element)
         return
 
     def _continue_on_loop(self, element):
@@ -49,13 +54,11 @@ class Capsule:
             :param element: l'element qui fait qu'on doit rester sur la boucle
             :return: void
         """
-        if type(element) is Switch:
-            self.next_element = element.next_element
-        else : # c'est une station :
-            self.next_element = element.next_element
+        self.current_element = element.next_element
+        self.next_element = self.loop.dist_to_next_object(self.current_element)
         return
 
-# TODO nettoyage
+    # TODO nettoyage
     ''' 
     def _start_moving_to(self, station):
         # TODO

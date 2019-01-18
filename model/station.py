@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # coding: utf-8
 from enum import Enum
-from queue import Queue
+import queue
 from model.capsule import Capsule
 
 from .loop import all_loops
@@ -38,9 +38,8 @@ class Station:
         self.capacity = capacity
         self.loop = loop
         self.station_type = station_type
-        self.traveler_queue = Queue()
-        self.capsule_queue = Queue(maxsize=self.capacity)
-        self.capsule_queue.put(Capsule(self))
+        self.traveler_queue = queue.Queue()
+        self.capsule_queue = queue.Queue(maxsize=1)
         self.next_element = None
 
     # TODO menage

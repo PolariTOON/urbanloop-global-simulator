@@ -40,7 +40,7 @@ class Station:
         self.station_type = station_type
         self.traveler_queue = Queue()
         self.capsule_queue = Queue(maxsize=self.capacity)
-        self.capsule_queue.put(Capsule(self))
+        # self.capsule_queue.put(Capsule(self))
         self.next_element = None
 
     # TODO menage

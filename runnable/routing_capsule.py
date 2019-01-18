@@ -21,12 +21,13 @@ def promenade(c):
         if type(current) == station.Station:
             the_loop = current.loop
             d, n = the_loop.dist_to_next_object(current)
-            print(current.name, d, n)
+            # print(current.name, d, n)
             if current == c.destination:
-                # logging.info("capsule " + str(c.id) + " acheminée a bon port")
-                print("capsule " + str(c.id) + " acheminée a bon port")
+                logging.info("capsule " + str(c.id) + " acheminée a bon port")
+                # print("capsule " + str(c.id) + " acheminée a bon port")
                 return
             else:
+                logging.debug("capsule " + str(c.id) + " passe par station " + current.name)
                 c.current_element = n
                 d, c.next_element = the_loop.dist_to_next_object(n)
         else: # c'est un switch
@@ -36,7 +37,7 @@ def promenade(c):
                 d, n = the_loop.dist_to_next_object(current)
                 c.current_element = n
                 c.next_element = the_loop.dist_to_next_object(n)
-            print(current.id, d, n)
+            # print(current.id, d, n)
 
 
 

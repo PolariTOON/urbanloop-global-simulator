@@ -7,6 +7,8 @@ from model.switch import Switch
 from render.station_renderer import StationRenderer
 from render.switch_renderer import SwitchRenderer
 
+from interface.loop_canvas import LoopCanvas
+
 from tkinter import Canvas
 from settings import config
 from math import pi, cos, sin
@@ -14,7 +16,6 @@ from math import pi, cos, sin
 
 class LoopRenderer:
     def __init__(self, loop, master):
-        """TODO baptiste specification """
         self.config = config.interface
         assert loop is not None and master is not None
         self.loop = loop
@@ -23,7 +24,6 @@ class LoopRenderer:
         self.make_canvas()
     
     def update_canvas(self):
-        """TODO baptiste specification """
         assert self.canvas is not None
         # circle
         color = self.config["selected_color"] if self.is_selected else self.config["loop_color"]
@@ -34,7 +34,7 @@ class LoopRenderer:
         for object in self.loop.objects:
             if not (isinstance(object, Switch) or isinstance(object, Station)):
                 # TODO
-                print("?")
+                print("something is wrong with the network. Things may go wrong")
             else:
                 # TODO
                 angle+=object.angle
@@ -43,14 +43,12 @@ class LoopRenderer:
                 r = (self.dim - 2 * self.offset)/2
                 x = xr + r*cos((angle*2*pi)/360)
                 y = yr - r*sin((angle*2*pi)/360)
-                print(object)
-                print("  at [{0};{1}]".format(x, y))
+                print(object," at [{0};{1}]".format(x, y))
                 renderer = StationRenderer(object, self.canvas) if isinstance(object, Station) else SwitchRenderer(object, self.canvas)
                 canvas = renderer.canvas
                 canvas.place(x=x-renderer.width/2,y=y-renderer.height/2,bordermode="outside")
 
     def make_canvas(self):
-        """TODO baptiste specification """
         self.outline_width = int(self.config["loop_outline_width"])
         diam = int(self.config["loop_circumference"])/pi
         self.offset = diam * 0.075
@@ -60,7 +58,7 @@ class LoopRenderer:
         self.is_selected = False
 
         # building canvas
-        self.canvas = Canvas(self.master, width=self.dim, height=self.dim, highlightthickness=0)
+        self.canvas = LoopCanvas(master=self.master, width=self.dim, height=self.dim)
         self.canvas["bg"] = self.master["bg"]
 
         def callback(event):

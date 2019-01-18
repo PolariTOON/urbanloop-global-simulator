@@ -23,26 +23,22 @@ def dijkstra_route(switch, table, to_cover):
     table_to_cover = {}
     for l, a in to_cover.items():
         table_to_cover[l] = [a] + table[l]
-    # print(table_to_cover)
     while table_to_cover != {}:
         step = []
         min_cost = float('Inf')
-        # print(min_cost)
         for l, t in table_to_cover.items():
-            # print(t)
             if t[2] < min_cost:
                 step = [l] + t
                 min_cost = t[2]
-        # print(step)
-        # ['loop XX', switch_id, to_switch, cost, [path]]
+        # step = table de la loop avec le plus faible cout qu'il restait à parcourir
+        # format : ['loop XX', switch_id, to_switch, cost, [path]]
         del table_to_cover[step[0]]
 
         loop = model.loop.get_by_name(step[0])
         for next_switch in loop.switches:
 
             if next_switch.id != step[1] and (next_switch.id is not None):
-                # vérifier que ce n'est pas déjà dans la table
-                # --> pas besoin car sinon cout ++
+                # --> pas besoin de vérifier que ce n'est pas déjà dans la table car sinon cout ++
                 if not switch.defects[next_switch.id][0]:  # il n'y a pas d'anomalies pour rester sur la boucle
                     if next_switch.my_loop.name not in table_temp:
                         table_temp[next_switch.my_loop.name] = [step[2], step[3] + next_switch.size,

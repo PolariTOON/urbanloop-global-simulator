@@ -25,4 +25,4 @@ if do_mean_on_100:
             total += poisson.defect()
         mean += total
     mean = float(mean / 50)
-    print("Moyenne des résultats obtenus pour 100 jour :", total)
+    print("Moyenne des résultats obtenus pour 100 jours :", total)

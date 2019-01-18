@@ -42,6 +42,13 @@ class Station:
         self.capsule_queue = queue.Queue(maxsize=1)
         self.next_element = None
 
+    def pop_traveler(self):
+        return self.traveler_queue.get_nowait()
+
+    def pop_capsule(self):
+        print("popping capsule at %s" % self.name)
+        return self.capsule_queue.get_nowait()
+
     # TODO menage
     '''def _update_flow(self):
         print("updating flow of ", self.id, "...")

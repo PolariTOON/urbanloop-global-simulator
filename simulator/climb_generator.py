@@ -1,8 +1,5 @@
-import logging
-
 from model.station import *
 from settings import config
-from simulator import converter
 
 
 class ClimbGenerator:
@@ -12,22 +9,23 @@ class ClimbGenerator:
         self.climbing_time = int(config.capsule['climbing_time'])
 
     def timeout_event(self):
-        test = random_climbing_time() * (1 / float(config.sim['tick']))
-        return self.env.timeout(test)
+        event = self.env.timeout(random_climbing_time() * (1 / float(config.sim['tick'])))
+        event.callbacks.append(callback)
+        yield event
 
     def climb(self):
         for station in self.stations:
-            if station is not None and station.traveler_queue.qsize() > 0 and station.capsule_queue.qsize() > 0:
-                traveler = station.traveler_queue.get_nowait()
-                print("capsule avant :", station.capsule_queue.qsize())
-                capsule = station.capsule_queue.get_nowait()
-                print("capsule apres :", station.capsule_queue.qsize())
-                logging.info("Traveler climb at time %s" % converter.seconds_to_string(
-                    converter.now_to_seconds(self.env, float(config.sim['tick']), int(config.sim['start_hour']))))
-                yield self.timeout_event()
+            if not station.traveler_queue.empty() and not station.capsule_queue.empty():
+                traveler = station.pop_traveler()
+                capsule = station.pop_capsule()
+                yield self.env.process(self.timeout_event())
         yield self.env.event().succeed()
 
 
 def random_climbing_time():
     # TODO Utiliser une gaussienne à 8 secondes
-    return 4
+    return 2
+
+
+def callback(event):
+    print("callback")

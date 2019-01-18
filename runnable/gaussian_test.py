@@ -11,9 +11,6 @@ pour la direction du voyageur en fonction du type de station.
 Ce choix a été retenu
 """
 
-
-config.load('../resources/config.ini')
-
 x_left = np.linspace(0, 12, 43200)
 x_right = np.linspace(12, 24, 43200)
 x_all = np.linspace(0, 24, 86400)

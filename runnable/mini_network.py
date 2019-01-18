@@ -5,7 +5,7 @@ from settings import network
 """fichier de test d'import d'un réseau """
 
 
-network.load('../resources/mini_network.json')
+network.load()
 
 # on charge toutes les boucles créées
 for name, l in ML.all_loops.items():

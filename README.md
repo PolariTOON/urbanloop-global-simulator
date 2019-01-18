@@ -33,8 +33,10 @@ Ce repot comprend différents fichiers correspondant à la réalisation d'une ma
 Pour lancer le programme (après téléchargement des sources) compiler et exécuter en ligne de commande : 
 
 ```
-python3 Main.py
+python3 main.py
 ```
+
+En cas d'erreur(s), vous pouvez essayer de lancer à la racine du projet `./run main.py` qui mettra à jour le *PYTHONPATH* pour vous.
 
 ### Dépendances
 * ```simpy```

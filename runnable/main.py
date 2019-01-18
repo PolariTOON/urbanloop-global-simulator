@@ -17,6 +17,7 @@ from simulator import traveler_generator
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 network.load()
 for station in get_stations():
+    logging.debug("Ajout d'une capsule dans la station %s" % station.name)
     station.capsule_queue.put(Capsule(station=station))
 
 SIM_DURATION = int(config.sim['duration'])

@@ -2,9 +2,8 @@ import logging
 from enum import Enum
 
 from settings import config
-from model.station import get_stations
-from simulator.traveler_generator import TravelerGenerator
 from simulator.climb_generator import ClimbGenerator
+from simulator.traveler_generator import TravelerGenerator
 
 
 class SimState(Enum):
@@ -32,13 +31,6 @@ class SimLoop:
         self.current_tick += 1
         yield self.tick_event.succeed()
         self.tick_event = self.env.event()
-
-    def climb(self, station=None):
-        #traveler = station.traveler_queue.get()
-        #capsule = station.traveler_queue.get()
-        print("cc")
-        yield self.event.succeed()
-        self.event = self.env.event()
 
     def loop(self):
         """

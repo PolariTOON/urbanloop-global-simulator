@@ -18,12 +18,14 @@ class ClimbGenerator:
     def climb(self):
         for station in self.stations:
             if station is not None and station.traveler_queue.qsize() > 0 and station.capsule_queue.qsize() > 0:
-                traveler = station.traveler_queue.get()
-                capsule = station.capsule_queue.get()
+                traveler = station.traveler_queue.get_nowait()
+                print("capsule avant :", station.capsule_queue.qsize())
+                capsule = station.capsule_queue.get_nowait()
+                print("capsule apres :", station.capsule_queue.qsize())
                 logging.info("Traveler climb at time %s" % converter.seconds_to_string(
                     converter.now_to_seconds(self.env, float(config.sim['tick']), int(config.sim['start_hour']))))
                 yield self.timeout_event()
-        yield self.timeout_event()
+        yield self.env.event().succeed()
 
 
 def random_climbing_time():

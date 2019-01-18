@@ -17,9 +17,13 @@ class Capsule:
         self.id = capsule_id
         capsule_id += 1
         # self.name = "Capsule #{0}".format(self.id) if (name is None) else name
+
+        self.depart_station = None
+        self.next_element = None
+
         if station is not None:
             self.depart_station = station
-            self.next_element = station.element
+            self.next_element = station.next_element
 
     def _ask_route(self, switch):
         """
@@ -51,11 +55,11 @@ class Capsule:
         """
         if type(element) is Switch:
             self.next_element = element.next_element
-        else : # c'est une station :
+        else:  # c'est une station :
             self.next_element = element.next_element
         return
 
-# TODO nettoyage
+    # TODO nettoyage
     ''' 
     def _start_moving_to(self, station):
         # TODO

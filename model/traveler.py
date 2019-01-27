@@ -1,3 +1,5 @@
+import uuid
+
 from model import station
 
 
@@ -9,6 +11,7 @@ class Traveler:
             :param destination_station_name: nom de la station d'arrivée souhaitée par le voyageur (String)
             :param waiting_since: The time since the Traveler is waiting at departure_station (in seconds)
         """
+        self.id = uuid.uuid4().hex
         self.departure_station_name = departure_station_name
         self.destination_station_name = destination_station_name
         self.waiting_since = waiting_since

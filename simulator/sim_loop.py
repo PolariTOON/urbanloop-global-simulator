@@ -2,7 +2,7 @@ import logging
 from enum import Enum
 
 from settings import config
-from simulator.climb_generator import ClimbGenerator
+from simulator.ascent_generator import ClimbGenerator
 from simulator.traveler_generator import TravelerGenerator
 
 
@@ -27,6 +27,8 @@ class SimLoop:
     def tick(self):
         """
         This function triggers the tick_event
+        The tick_event update the current_tick.
+        It should be used to frequency process
         """
         self.current_tick += 1
         yield self.tick_event.succeed()
@@ -42,7 +44,7 @@ class SimLoop:
             if self.sim_state == SimState.RUNNING:
                 self.env.process(self.tick())
                 self.env.process(self.climb_generator.generate())
-                if self.current_tick % (1 / self.sim_tick) == 0:
+                if self.is_frequency(1):
                     self.env.process(self.traveler_generator.generate(start_hour=self.start_hour))
                 yield self.env.timeout(1)
             elif self.sim_state == SimState.SLEEP:
@@ -50,6 +52,13 @@ class SimLoop:
             elif self.sim_state == SimState.KILLED:
                 logging.warning("KILLED State")
                 yield self.env.process(self.env.exit())
+
+    def is_frequency(self, seconds):
+        """
+        :param seconds: The desired frequency
+        :return: Boolean, if the current_tick is in phase with the given frequency
+        """
+        return self.current_tick % (1 / self.sim_tick) == 0
 
     def exit(self):
         self.sim_state = SimState.KILLED

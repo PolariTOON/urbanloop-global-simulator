@@ -27,8 +27,6 @@ if real_time_boolean in ['false', 'False']:
 else:
     sim_environment = simpy.rt.RealtimeEnvironment(factor=SIM_TICK)
 
-simpy.rt.RealtimeEnvironment(factor=SIM_TICK)
-
 sim_loop = sim_loop.SimLoop(env=sim_environment, sim_tick=SIM_TICK)
 
 """Start"""
@@ -37,4 +35,5 @@ if __name__ == "__main__":
     logging.debug("Simulation starts")
     sim_environment.run(until=SIM_DURATION)
     logging.debug("Execution time : %.3f seconds" % (time.time() - START_TIME))
-    logging.debug("Total generated : %d" % traveler_generator.total_generated)
+    logging.debug("Simulation time : %.1f seconds" % (sim_environment.now * SIM_TICK))
+    logging.debug("Amount of traveler generated : %d" % traveler_generator.total_generated)

@@ -13,8 +13,7 @@ from simulator import traveler_generator
 """Fichier principal du projet """
 
 """Initialisation"""
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
-network.load()
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 SIM_DURATION = int(config.sim['duration'])
 SIM_TICK = float(config.sim['tick'])
@@ -27,7 +26,8 @@ if real_time_boolean in ['false', 'False']:
 else:
     sim_environment = simpy.rt.RealtimeEnvironment(factor=SIM_TICK)
 
-sim_loop = sim_loop.SimLoop(env=sim_environment, sim_tick=SIM_TICK)
+sim_loop = sim_loop.SimLoop(sim_env=sim_environment, sim_tick=SIM_TICK)
+network.load()
 
 """Start"""
 if __name__ == "__main__":

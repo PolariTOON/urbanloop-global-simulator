@@ -1,6 +1,6 @@
 import uuid
 
-from model import station
+from model.station import get_station_by_name
 
 
 class Traveler:
@@ -15,5 +15,5 @@ class Traveler:
         self.departure_station_name = departure_station_name
         self.destination_station_name = destination_station_name
         self.waiting_since = waiting_since
-        departure_station = station.get_by_name(self.departure_station_name)
+        departure_station = get_station_by_name(self.departure_station_name)
         departure_station.traveler_queue.put(self)

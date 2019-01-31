@@ -1,6 +1,10 @@
 import logging
 
-capsule_id = 0  # type: int
+from model.station import get_station_by_name, Station
+from settings import config
+from simulator.sim_loop import get_env
+
+capsule_id = 0  # type:int
 
 
 class Capsule:
@@ -18,6 +22,10 @@ class Capsule:
         self.loop = None
         self.destination = destination
         self.travelers = list()
+        self.trip_event = None
+        self.speed = float(config.capsule['max_speed'])
+        self.tick_per_second = (1 / float(config.sim['tick']))
+        self.env = get_env()
         if station is not None:
             self.current_element = station
             self.next_element = station.next_element
@@ -44,7 +52,8 @@ class Capsule:
         self.current_element = switch.next_element_other
         self.loop = switch.other_loop
         d, self.next_element = self.loop.dist_to_next_object(self.current_element)
-        return
+        logging.info("Capsule n°%d is switched to the loop :  %s" %
+                     (self.id, self.loop.name))
 
     def _continue_on_loop(self, element):
         """
@@ -53,14 +62,15 @@ class Capsule:
             :return: void
         """
         self.current_element = element.next_element
-        self.next_element = self.loop.dist_to_next_object(self.current_element)
-        return
+        d, self.next_element = self.loop.dist_to_next_object(self.current_element)
+        logging.info("Capsule n°%d stays on its loop :  %s" %
+                     (self.id, self.loop.name))
 
     def get_in_traveler(self, traveler):
         """
         :param traveler: The traveler who gets in the capsule
         """
-        self.destination = traveler.destination_station_name
+        self.destination = get_station_by_name(traveler.destination_station_name)
         self.travelers.append(traveler)
         logging.info("[%s] Get traveler (%s) in capsule n°%d" %
                      (traveler.departure_station_name, self._get_travelers_id(), self.id))
@@ -85,3 +95,29 @@ class Capsule:
         if len(self.travelers) == 1:
             return self.travelers[0].id
         return " - ".join(map(lambda traveler: traveler.id, self.travelers))
+
+    def start_trip(self):
+        logging.info("Capsule n°%d starts its trip from %s to %s" %
+                     (self.id, self.current_element.name, self.destination.name))
+        self.env.process(self.update_trip())
+
+    def update_trip(self):
+        time_to_next_element = self.loop.dist_to_next_object(self.current_element)[0] / self.speed
+        self.trip_event = self.env.timeout(time_to_next_element * self.tick_per_second)
+        self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
+        yield self.trip_event
+
+    def callback_trip_event(self):
+        self.current_element = self.next_element
+
+        if self.current_element == self.destination:
+            logging.info("Capsule n°%d arrives to its destination %s" %
+                         (self.id, self.destination.name))
+            return
+
+        if type(self.current_element) == Station:
+            self.next_element = self.current_element.next_element
+        else:
+            self.ask_route(self.current_element)
+
+        self.env.process(self.update_trip())

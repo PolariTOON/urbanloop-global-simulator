@@ -1,4 +1,3 @@
-import logging
 import random
 
 from model.station import *
@@ -6,7 +5,7 @@ from settings import config
 
 
 class ClimbGenerator:
-    def __init__(self, env=None):
+    def __init__(self, env):
         self.stations = get_stations()
         self.env = env
         self.climbing_time = int(config.capsule['climbing_time'])
@@ -14,7 +13,7 @@ class ClimbGenerator:
 
     def ascent_event(self, capsule):
         climb_timeout = self.env.timeout(random_ascent_duration() * self.tick_per_second)
-        climb_timeout.callbacks.append(lambda event: ascent_event_callback(event=event, capsule=capsule))
+        climb_timeout.callbacks.append(lambda event: capsule.start_trip())
         yield climb_timeout
 
     def generate(self):
@@ -28,7 +27,3 @@ class ClimbGenerator:
 
 def random_ascent_duration():
     return random.randrange(6, 10, 1)
-
-
-def ascent_event_callback(event, capsule):
-    logging.info("Capsule %d starts its trip" % capsule.id)

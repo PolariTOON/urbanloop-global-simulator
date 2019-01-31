@@ -14,16 +14,19 @@ fichier pour l'import des réseaux sur les formats json correspondant
 """
 
 
-def load(file=None):
+def load(file_path=None):
     """
     fonction qui a partir d'un fichier json récupère le réseau correspondant et le traduit en objets
         :param file: fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
         :return: (void) l'ensemble des objets sont créés et configurés.
     """
-    if file is None:  # aller chercher celui par défaut
-        file = '{0}/../resources/mini_network.json'.format(sys.path[0])
-    f = open(file, 'r')
-    network = json.load(f)
+    if file_path is None:  # aller chercher celui par défaut
+        file_path = '{0}/../resources/mini_network.json'.format(sys.path[0])
+    
+    network = None
+    ML.all_loops = {} # autrement ca foire quand on charge un autre network
+    with open(file_path, 'r') as file:
+        network = json.load(file)
     for loop, info in network.items():
         # the_loop = None
         if loop in ML.all_loops:

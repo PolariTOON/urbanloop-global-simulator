@@ -2,23 +2,31 @@
 # coding: utf-8
 
 from tkinter import Frame
+from model import loop as ML
 
 
 class SimulatorFrame(Frame):
 
-    def __init__(self, master, network=None):
+    def __init__(self, master):
         """
         constructeur
         param master: son contenant (un objet Tk ou Frame)
         network: le simulateur
         """
-        Frame.__init__(self)
+        Frame.__init__(self, master)
         # checking if called correctly
         assert master is not None
         # attributes
         self.master = master
-        self.network = network
         self.selected_item = None
+
+        # draw loop
+        print(ML.all_loops)
+        loops = ML.all_loops
+        if len(loops) != 0 :
+            self["bg"] = "orange"
+        else:
+            self["bg"] = "red"
 
         # unselect item
 
@@ -59,6 +67,6 @@ class SimulatorFrame(Frame):
         jour le panel d'informations
         """
         # TODO
-        # update data in the data field
+        # update data in the data field (main window)
         print("notify master: new selected item is ",self.selected_item)
         return

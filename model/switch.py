@@ -45,6 +45,7 @@ class Switch:
         self.size = size
         self.my_defects = [False, False]
         self.defects = []
+        self.name = "switch"
         global switches
         switches += [self]
         global alive_timers

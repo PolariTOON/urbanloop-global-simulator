@@ -1,6 +1,7 @@
 import logging
 
-from model.station import get_station_by_name, Station
+from model.station import get_station_by_name
+from model.switch import Switch
 from settings import config
 from simulator.sim_loop import get_env
 
@@ -41,30 +42,52 @@ class Capsule:
         if change:
             self._change_loop(switch)
         else:
-            self._continue_on_loop(switch)
+            self._continue()
+            logging.info("Capsule n°%d stays on its loop :  %s" %
+                         (self.id, self.loop.name))
+
+    def _continue(self):
+        logging.info("Capsule n°%d arrives at %s from %s" %
+                     (self.id, self.next_element.name, self.current_element.name))
+        self.current_element = self.next_element
+        self.next_element = self.current_element.next_element
 
     def _change_loop(self, switch):
-        """
-        Lorsque l'aiguillage indique qu'il faut changer de boucle
-            :param switch: l'aiguillage qui a dit qu'il fallait changer de boucle
-            :return: void : change "l'élément suivant
-        """
-        self.current_element = switch.next_element_other
+        self.current_element = self.next_element
+        self.next_element = switch.next_element_other
         self.loop = switch.other_loop
-        d, self.next_element = self.loop.dist_to_next_object(self.current_element)
         logging.info("Capsule n°%d is switched to the loop :  %s" %
                      (self.id, self.loop.name))
 
-    def _continue_on_loop(self, element):
+    def start_trip(self):
+        logging.info("Capsule n°%d starts its trip from %s to %s" %
+                     (self.id, self.current_element.name, self.destination.name))
+        self.env.process(self.update_trip())
+
+    def update_trip(self):
         """
-         Lorsque qu'il faut rester sur la boucle (la station n'est pas la destination ou pas accessible ou le switch ne veut pas aiguiller
-            :param element: l'element qui fait qu'on doit rester sur la boucle
-            :return: void
+        :return: Trip event generator
         """
-        self.current_element = element.next_element
-        d, self.next_element = self.loop.dist_to_next_object(self.current_element)
-        logging.info("Capsule n°%d stays on its loop :  %s" %
-                     (self.id, self.loop.name))
+        time_to_next_element = self.loop.dist_to_next_object(self.current_element)[0] / self.speed
+        self.trip_event = self.env.timeout(time_to_next_element * self.tick_per_second)
+        self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
+        yield self.trip_event
+
+    def callback_trip_event(self):
+        """
+        Recursive callback that steps the trip event
+        """
+        if type(self.next_element) == Switch:
+            self.ask_route(self.next_element)
+        else:
+            self._continue()
+
+        if self.current_element == self.destination:
+            logging.info("Capsule n°%d arrives to its destination %s" %
+                         (self.id, self.destination.name))
+            return
+
+        self.env.process(self.update_trip())
 
     def get_in_traveler(self, traveler):
         """
@@ -76,6 +99,9 @@ class Capsule:
                      (traveler.departure_station_name, self._get_travelers_id(), self.id))
 
     def get_out_traveler(self):
+        """
+        Clear the traveler list and set the destination to None.
+        """
         logging.info("[%s] Get traveler (%s) out of capsule n°%d" %
                      (self.destination.name, self._get_travelers_id(), self.id))
         self.destination = None
@@ -95,29 +121,3 @@ class Capsule:
         if len(self.travelers) == 1:
             return self.travelers[0].id
         return " - ".join(map(lambda traveler: traveler.id, self.travelers))
-
-    def start_trip(self):
-        logging.info("Capsule n°%d starts its trip from %s to %s" %
-                     (self.id, self.current_element.name, self.destination.name))
-        self.env.process(self.update_trip())
-
-    def update_trip(self):
-        time_to_next_element = self.loop.dist_to_next_object(self.current_element)[0] / self.speed
-        self.trip_event = self.env.timeout(time_to_next_element * self.tick_per_second)
-        self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
-        yield self.trip_event
-
-    def callback_trip_event(self):
-        self.current_element = self.next_element
-
-        if self.current_element == self.destination:
-            logging.info("Capsule n°%d arrives to its destination %s" %
-                         (self.id, self.destination.name))
-            return
-
-        if type(self.current_element) == Station:
-            self.next_element = self.current_element.next_element
-        else:
-            self.ask_route(self.current_element)
-
-        self.env.process(self.update_trip())

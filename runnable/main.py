@@ -13,7 +13,7 @@ from simulator import traveler_generator
 """Fichier principal du projet """
 
 """Initialisation"""
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
 SIM_DURATION = int(config.sim['duration'])
 SIM_TICK = float(config.sim['tick'])

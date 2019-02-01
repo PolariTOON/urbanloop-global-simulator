@@ -1,7 +1,6 @@
 import logging
 import random
 
-
 from model.station import *
 from model.traveler import Traveler
 from settings import config
@@ -17,6 +16,10 @@ class TravelerGenerator:
         self.sim_tick = float(config.sim['tick'])
         self.poisson = poisson.Poisson()
         self.ticks_in_second = 1 / self.sim_tick
+        self.traveler_limit = int(config.sim['traveler_limit'])
+
+    def can_generate(self):
+        return self.traveler_limit > 0 or self.traveler_limit == -1
 
     def generate(self, start_hour=0):
         """
@@ -28,6 +31,12 @@ class TravelerGenerator:
         hour = converter.seconds_to_floor_hour(seconds)
         traveler_number = self.poisson.traveler(hour)
         for traveler in range(traveler_number):
+            if not self.can_generate():
+                return
+
+            if self.traveler_limit != -1:
+                self.traveler_limit -= 1
+
             total_generated += 1
             departure_station = self.select_random_station(start_hour)
             destination_station = self.select_random_station(start_hour, departure_station=departure_station)

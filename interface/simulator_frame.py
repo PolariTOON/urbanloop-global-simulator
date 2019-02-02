@@ -30,7 +30,6 @@ class SimulatorFrame(Frame):
         hscrollbar.pack(side="bottom",fill="x")
 
         # draw loop
-        print(ML.all_loops)
         loops = ML.all_loops
         if len(loops) != 0 :
             self["bg"] = "orange"

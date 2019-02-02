@@ -1,15 +1,15 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from tkinter import Tk, N, S, E, W, VERTICAL, Frame
+from tkinter import Tk, N, S, E, W, VERTICAL, Frame, Canvas
 from tkinter import ttk, Menu, filedialog
 
 from interface.simulator_frame import SimulatorFrame
+from render.loop_renderer import LoopRenderer
 from settings import network
 from model import loop as ML
 
 # créer une classe, c'est plus classe.
-
 def create_window(w=1200, h=800, loop=None):
     # creating a graphical app
     window = Tk()
@@ -35,13 +35,19 @@ def create_window(w=1200, h=800, loop=None):
     def open_file():
         file_path = filedialog.askopenfilename()
         network.load(file_path)
-        simulator_frame = SimulatorFrame(master=main_frame)
-        simulator_frame.grid(column=0, sticky=N+S+E+W)
+        lr = LoopRenderer(ML.all_loops[0], simulator_frame)
+        lr.update_canvas()
+        simulator_frame.canvas = lr.canvas
+        #simulator_frame.grid(column=0, sticky=N+S+E+W)
     
     def open_example():
         network.load(None) # load default network
-        simulator_frame = SimulatorFrame(master=main_frame)
-        simulator_frame.grid(column=0, sticky=N+S+E+W)
+        print(ML.all_loops[0])
+        lr = LoopRenderer(ML.all_loops[0], simulator_frame)
+        lr.update_canvas()
+        simulator_frame.canvas = Canvas(simulator_frame)
+        simulator_frame.canvas.pack()
+        #simulator_frame.grid(column=0, sticky=N+S+E+W)
 
     menubar = Menu(window)
     filemenu = Menu(menubar, tearoff=0)
@@ -79,7 +85,6 @@ def create_window(w=1200, h=800, loop=None):
     information_frame.grid(row=0, column=4, sticky=N+S+E+W)
 
     return window
-    # window.mainloop()
 
 # window = create_window(800, 500)
 # window.mainloop()

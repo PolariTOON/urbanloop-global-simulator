@@ -45,9 +45,22 @@ En cas d'erreur(s), vous pouvez essayer de lancer à la racine du projet `./run 
 * ```time```
 * ```scipy```
 * ```matplotlib```
+* ```PyQt5```
 
 ## To do
 * Ajouter M. CHOLEZ au dépôt
 * Configuration SimPy 
 * Coder 
+
+## Icons
+<div>
+    Icons made by <a href="https://www.flaticon.com/authors/smashicons">Smashicons</a> from <a href="https://www.flaticon.com/">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+</div>
+<div>
+    Icons made by <a href="https://www.flaticon.com/authors/dario-ferrando">Dario Ferrando</a> from <a href="https://www.flaticon.com/">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+</div>
+<div>
+    Icons made by <a href="https://www.flaticon.com/authors/naseer-ahmed">Naseer Ahmed</a> from <a href="https://www.flaticon.com/">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+</div>
+        
 

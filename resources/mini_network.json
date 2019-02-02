@@ -12,7 +12,7 @@
   },
   "Villers-les-Nancy": {
     "center": [300,300],
-    "circonference": 500,
+    "circonference": 600,
     "content": [{"type":"switch_in","other_loop":"Nancy", "angle":60 },
                 {"type":"station","name":"Velodrome", "angle":90, "station_type": 3},
                 {"type":"station","name":"TELECOM Nancy", "angle":140, "station_type": 2},

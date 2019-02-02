@@ -55,7 +55,7 @@ class Capsule:
             :return: void
         """
         self.current_element = element.next_element
-        self.next_element = self.loop.dist_to_next_object(self.current_element)
+        d, self.next_element = self.loop.dist_to_next_object(self.current_element)
         return
 
 # TODO nettoyage

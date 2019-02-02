@@ -2,13 +2,13 @@
 
 | Tâches                                |       En charge          | Deadline |Respect|
 | :------------------------------------ |: ----------------------- |:--------:|:-----:|
-| Amélioration Routage permanent (cout) |      Charlotte           |mar 22/01 |✓ ou x |
+| Amélioration Routage permanent (cout) |      Charlotte           |mar 22/01 |✓  |
 | lien entre modèle et interface        |      Baptiste            |mar 22/01 |✓ ou x |
 | Monter dans & depart d'un capsule     |      Thibault            |dim 27/01 |✓ ou x |
 | Trajet d'une capsule                  | **Thibault**, Charlotte  |dim 27/01 |✓ ou x |
 | arrivée & descente d'un capsule       |      Thibault            |dim 27/01 |✓ ou x |
 | positionnenement intelligent des loops|      Baptiste            |dim 27/01 |✓ ou x |
-| CR et gestion de l'administratif      | **Charlotte**, *         |lun 28/01 |✓ ou x |
+| CR et gestion de l'administratif      | **Charlotte**, *         |lun 28/01 | x |
 
 
 ###### Objectifs :

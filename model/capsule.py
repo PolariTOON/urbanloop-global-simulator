@@ -3,13 +3,12 @@ import logging
 from model.station import get_station_by_name
 from model.switch import Switch
 from settings import config
-from simulator.sim_loop import get_env
+from simulator.sim_loop import get_env, get_tick_per_second, get_current_tick
 
 capsule_id = 0  # type:int
 
 
 class Capsule:
-
     def __init__(self, station=None, destination=None):
         """
         initialisation d'une capsule
@@ -27,7 +26,8 @@ class Capsule:
         self.travelers = list()
         self.trip_event = None
         self.speed = float(config.capsule['max_speed'])
-        self.tick_per_second = (1 / float(config.sim['tick']))
+        self.segment_start_tick = 0
+        self.segment_ticks_duration = 0
         if station is not None:
             self.current_element = station
             self.next_element = station.next_element
@@ -48,8 +48,8 @@ class Capsule:
                          (self.id, self.loop.name))
 
     def _continue(self):
-        # logging.info("Capsule n°%d arrives at %s from %s" %
-        #             (self.id, self.next_element.name, self.current_element.name))
+        logging.info("Capsule n°%d arrives at %s from %s" %
+                     (self.id, self.next_element.name, self.current_element.name))
         self.current_element = self.next_element
         self.next_element = self.current_element.next_element
 
@@ -75,7 +75,9 @@ class Capsule:
         :return: Trip event generator
         """
         time_to_next_element = self.loop.dist_to_next_object(self.current_element)[0] / self.speed
-        self.trip_event = get_env().timeout(time_to_next_element * self.tick_per_second)
+        self.segment_start_tick = get_current_tick()
+        self.segment_ticks_duration = time_to_next_element * get_tick_per_second()
+        self.trip_event = get_env().timeout(self.segment_ticks_duration)
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
 
@@ -91,6 +93,7 @@ class Capsule:
         if self.current_element == self.destination:
             logging.info("Capsule n°%d arrives to its destination %s" %
                          (self.id, self.destination.name))
+            self.get_out_traveler()
             return
 
         get_env().process(self.update_trip())
@@ -123,6 +126,7 @@ class Capsule:
         if not self.is_aboard():
             return 0
 
+        return (get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration
 
     def _get_travelers_id(self):
         """

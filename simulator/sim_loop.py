@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 
 from settings import config
@@ -74,6 +75,7 @@ def change_state(sim_state=SimState.RUNNING):
     """
     :param sim_state: The desired simulation state
     """
+    logging.debug("Changing SimState to %s" % sim_state.name)
     global _sim_state
     _sim_state = sim_state
 

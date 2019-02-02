@@ -1,8 +1,7 @@
-import logging
 from enum import Enum
 
 from settings import config
-from simulator.ascent_generator import ClimbGenerator
+from simulator.ascent_generator import AscentGenerator
 from simulator.traveler_generator import TravelerGenerator
 
 
@@ -13,23 +12,27 @@ class SimState(Enum):
 
 
 _env = None
+_current_tick = 0
+_sim_state = SimState.RUNNING
+_sim_tick = 0.05
+_start_hour = None
 
 
 class SimLoop:
     def __init__(self, sim_env, sim_tick):
         global _env
+        global _sim_state
+        global _sim_tick
+        global _start_hour
         _env = sim_env
-        self.sim_tick = sim_tick
-        self.sim_state = SimState.RUNNING
-        self.traveler_generator = TravelerGenerator(_env)
-        self.climb_generator = ClimbGenerator(_env)
-        self.start_hour = int(config.sim['start_hour'])
+        _sim_tick = sim_tick
+        _start_hour = int(config.sim['start_hour'])
+        self.traveler_generator = TravelerGenerator()
+        self.ascent_generator = AscentGenerator()
         self.tick_event = _env.event()
-        self.current_tick = 0
-        self.event = _env.event()
 
         if config.sim['auto_run'] in ['false', 'False']:
-            self.sim_state = SimState.PAUSED
+            _sim_state = SimState.PAUSED
 
     def tick(self):
         """
@@ -37,7 +40,8 @@ class SimLoop:
         The tick_event update the current_tick.
         It should be used to frequency process
         """
-        self.current_tick += 1
+        global _current_tick
+        _current_tick += 1
         yield self.tick_event.succeed()
         self.tick_event = _env.event()
 
@@ -48,43 +52,69 @@ class SimLoop:
         SimState is RUNNING.
         """
         while True:
-            if self.sim_state == SimState.RUNNING:
+            if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
-                _env.process(self.climb_generator.generate())
-                if self.is_frequency(1):
-                    _env.process(self.traveler_generator.generate(start_hour=self.start_hour))
+                _env.process(self.ascent_generator.generate())
+                if is_frequency(1):
+                    _env.process(self.traveler_generator.generate())
                 yield _env.timeout(1)
-            elif self.sim_state == SimState.KILLED:
+            elif _sim_state == SimState.KILLED:
                 yield _env.process(_env.exit())
 
-    def is_frequency(self, seconds):
-        """
-        :param seconds: The desired frequency
-        :return: Boolean, if the current_tick is in phase with the given frequency
-        """
-        return self.current_tick % (seconds / self.sim_tick) == 0
 
-    def run(self):
-        """
-        Run or unpause the simulation
-        """
-        logging.debug("RUN State")
-        self.sim_state = SimState.RUNNING
+def is_frequency(seconds):
+    """
+    :param seconds: The desired frequency
+    :return: Boolean, if the current_tick is in phase with the given frequency
+    """
+    return get_current_tick() % (seconds / _sim_tick) == 0
 
-    def pause(self):
-        """
-        Pause the simulation
-        """
-        logging.debug("SLEEP State")
-        self.sim_state = SimState.PAUSED
 
-    def exit(self):
-        """
-        Exit the simulation
-        """
-        logging.debug("KILLED State")
-        self.sim_state = SimState.KILLED
+def change_state(sim_state=SimState.RUNNING):
+    """
+    :param sim_state: The desired simulation state
+    """
+    global _sim_state
+    _sim_state = sim_state
 
 
 def get_env():
+    """
+    :return: The simulation environment
+    """
     return _env
+
+
+def get_current_tick():
+    """
+    :return: The simulation current tick
+    """
+    return _current_tick
+
+
+def get_state():
+    """
+    :return: The simulation state
+    """
+    return _sim_state
+
+
+def get_sim_tick():
+    """
+    :return: The simulation tick
+    """
+    return _sim_tick
+
+
+def get_tick_per_second():
+    """
+    :return: The simulation ticks per second
+    """
+    return 1 / _sim_tick
+
+
+def get_start_hour():
+    """
+    :return: The simulation start hour
+    """
+    return _start_hour

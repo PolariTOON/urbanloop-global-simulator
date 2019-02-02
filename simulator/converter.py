@@ -2,6 +2,7 @@ import logging
 
 import scipy.stats
 
+import simulator.sim_loop as sim_loop
 from model.station import Type
 from settings import config
 
@@ -37,15 +38,11 @@ def seconds_to_decimal_hour(seconds):
     return round(seconds / 3600, 2)
 
 
-def now_to_seconds(env, sim_tick, start_hour=0):
+def now_to_seconds():
     """
-    This function gives you the current time in seconds
-    :param env: Simpy environment
-    :param sim_tick: Simpy simulation tick value
-    :param start_hour: The initial hour
     :return: The current time in second
     """
-    return env.now * sim_tick + start_hour * 3600
+    return sim_loop.get_env().now * sim_loop.get_sim_tick() + sim_loop.get_start_hour() * 3600
 
 
 def seconds_to_floor_hour(seconds):

@@ -1,19 +1,18 @@
 import random
 
-from model.station import *
+import simulator.sim_loop as sim_loop
+from model.station import get_stations
 from settings import config
 
 
-class ClimbGenerator:
-    def __init__(self, env):
+class AscentGenerator:
+    def __init__(self):
         self.stations = get_stations()
-        self.env = env
         self.climbing_time = int(config.capsule['climbing_time'])
-        self.tick_per_second = (1 / float(config.sim['tick']))
         self.trip_limit = int(config.sim['trip_limit'])
 
     def ascent_event(self, capsule):
-        climb_timeout = self.env.timeout(random_ascent_duration() * self.tick_per_second)
+        climb_timeout = sim_loop.get_env().timeout(self.random_ascent_duration() * sim_loop.get_tick_per_second())
         climb_timeout.callbacks.append(lambda event: capsule.start_trip())
         yield climb_timeout
 
@@ -25,11 +24,10 @@ class ClimbGenerator:
                 traveler = station.traveler_queue.get_nowait()
                 capsule = station.capsule_queue.get_nowait()
                 capsule.get_in_traveler(traveler=traveler)
-                yield self.env.process(self.ascent_event(capsule))
+                yield sim_loop.get_env().process(self.ascent_event(capsule))
 
     def can_generate(self):
         return self.trip_limit > 0 or self.trip_limit == -1
 
-
-def random_ascent_duration():
-    return random.randrange(6, 10, 1)
+    def random_ascent_duration(self):
+        return random.randrange(self.climbing_time - 2, self.climbing_time + 2, 1)

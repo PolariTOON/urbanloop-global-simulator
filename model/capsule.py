@@ -1,6 +1,4 @@
 import logging
-#! /usr/bin/env python3
-# coding: utf-8
 
 from model.station import get_station_by_name
 from model.switch import Switch
@@ -30,7 +28,6 @@ class Capsule:
         self.trip_event = None
         self.speed = float(config.capsule['max_speed'])
         self.tick_per_second = (1 / float(config.sim['tick']))
-        self.env = get_env()
         if station is not None:
             self.current_element = station
             self.next_element = station.next_element
@@ -71,14 +68,14 @@ class Capsule:
     def start_trip(self):
         logging.info("Capsule n°%d starts its trip from %s to %s" %
                      (self.id, self.current_element.name, self.destination.name))
-        self.env.process(self.update_trip())
+        get_env().process(self.update_trip())
 
     def update_trip(self):
         """
         :return: Trip event generator
         """
         time_to_next_element = self.loop.dist_to_next_object(self.current_element)[0] / self.speed
-        self.trip_event = self.env.timeout(time_to_next_element * self.tick_per_second)
+        self.trip_event = get_env().timeout(time_to_next_element * self.tick_per_second)
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
 
@@ -96,7 +93,7 @@ class Capsule:
                          (self.id, self.destination.name))
             return
 
-        self.env.process(self.update_trip())
+        get_env().process(self.update_trip())
 
     def get_in_traveler(self, traveler):
         """
@@ -121,6 +118,11 @@ class Capsule:
         :return: True if someone is aboard the capsule. Otherwise returns False
         """
         return len(self.travelers) > 0
+
+    def get_trip_percentage(self):
+        if not self.is_aboard():
+            return 0
+
 
     def _get_travelers_id(self):
         """

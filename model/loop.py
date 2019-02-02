@@ -3,7 +3,6 @@
 import logging
 
 
-
 all_loops = {}
 default_size = 100
 
@@ -51,16 +50,27 @@ class Loop:
             if self.size is None:
                 self.size = sum(self.lengths)
 
-    def dist_to_next_object(self, element):
+    def dist_to_next_object(self, element, element2=None):
         """
-        determine le prochain objet de la boucle et la distance
+        determine la distance entre l'element et le second element ou bien le suivant (et dans ce cas on le retourne
             :param  element : element permettant de calculer "le suivant" (Station) OBLIGATOIRE
+            :param  element2 : distance entre les 2 elements (Station) OBLIGATOIRE
             :return:0UT 1 : la distance à parcourir jusqu'au prochain objet sur la boucle (int)
                     OUT 2 : le prochain objet sur la boucle (Station/Switch)
         """
+        # logging.debug("element "+str(element))
         for i in range(len(self.objects)):
             if self.objects[i][1] is element:
-                return self.lengths[i], self.objects[(i + 1)%len(self.objects)][1]
+                if element2 is None :
+                    return self.lengths[i], self.objects[(i + 1)%len(self.objects)][1]
+                else:
+                    cost = self.lengths[i]
+                    for j in range(0, len(self.objects)):
+                        index = (i + j) % len(self.objects)
+                        cost += self.lengths[j]
+                        if self.objects[j][1] is element2:
+                            print(cost)
+                            return cost, self.objects[j][1]
         return 0, None
 
 

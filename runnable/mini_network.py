@@ -2,6 +2,7 @@ import logging
 
 import model.loop as ML
 from settings import network
+from model.switch import Switch
 
 
 """fichier de test d'import d'un réseau """
@@ -22,7 +23,18 @@ for name, l in ML.all_loops.items():
             logging.info("\t \t table of switch " + str(sw.id) + " : " + str(sw.table))
     # logging.debug(l.lengths)
 
-loop_nancy = ML.get_by_name("Nancy")
+'''loop_nancy = ML.get_by_name("Nancy")
 o = loop_nancy.objects[2][1]
 dist, next_elm = loop_nancy.dist_to_next_object(o)
 logging.debug("\n Next object after " + o.name + " is " + str(next_elm) + " at " + str(dist))
+'''
+
+loop_laxou = ML.get_by_name("Laxou")
+for obj in loop_laxou.objects:
+    # print(o);
+    o = obj[1]
+    dist, next_elm = loop_laxou.dist_to_next_object(o);
+    if type(next_elm) is Switch :
+        logging.debug("\n Next object after " + str(obj) + " is " + str(next_elm.id) + " at " + str(dist))
+    else :
+        logging.debug("\n Next object after " + str(obj) + " is " + next_elm.name + " at " + str(dist))

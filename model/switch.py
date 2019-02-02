@@ -66,7 +66,7 @@ class Switch:
         the_loop = station.loop
         if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
             logging.debug("le switch " + str(self.id) + " aiguille la capsule voulant aller à " + station.name
-                          + " depuis la boucle " + self.my_loop.name)
+                          + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
             # self.is_routing_to_loop = True
             return True
             # capsule._change_loop(self.next_element)
@@ -83,7 +83,7 @@ def init():
         :return: 0UT : (void) modification des attributs intrinsèques aux switchs
     """
     for s in switches:
-        s.permanent_table = {s.my_loop.name: [False, int(s.my_loop.size / 2), [s.id, s.my_loop.name]],
+        s.permanent_table = {s.my_loop.name: [False, 0, [s.id, s.my_loop.name]],
                              s.other_loop.name: [True, s.size, [s.id, s.other_loop.name]]}
         s.permanent_cover = {s.my_loop.name: s.id, s.other_loop.name: s.id}
         s.timers = [timer_other for i in range(0, switch_id)]

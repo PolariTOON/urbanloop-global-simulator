@@ -8,7 +8,7 @@ from simulator.traveler_generator import TravelerGenerator
 
 class SimState(Enum):
     RUNNING = 0
-    SLEEP = 1
+    PAUSED = 1
     KILLED = 2
 
 
@@ -27,6 +27,9 @@ class SimLoop:
         self.tick_event = _env.event()
         self.current_tick = 0
         self.event = _env.event()
+
+        if config.sim['auto_run'] in ['false', 'False']:
+            self.sim_state = SimState.PAUSED
 
     def tick(self):
         """
@@ -51,10 +54,7 @@ class SimLoop:
                 if self.is_frequency(1):
                     _env.process(self.traveler_generator.generate(start_hour=self.start_hour))
                 yield _env.timeout(1)
-            elif self.sim_state == SimState.SLEEP:
-                logging.warning("SLEEP State")
             elif self.sim_state == SimState.KILLED:
-                logging.warning("KILLED State")
                 yield _env.process(_env.exit())
 
     def is_frequency(self, seconds):
@@ -64,7 +64,25 @@ class SimLoop:
         """
         return self.current_tick % (seconds / self.sim_tick) == 0
 
+    def run(self):
+        """
+        Run or unpause the simulation
+        """
+        logging.debug("RUN State")
+        self.sim_state = SimState.RUNNING
+
+    def pause(self):
+        """
+        Pause the simulation
+        """
+        logging.debug("SLEEP State")
+        self.sim_state = SimState.PAUSED
+
     def exit(self):
+        """
+        Exit the simulation
+        """
+        logging.debug("KILLED State")
         self.sim_state = SimState.KILLED
 
 

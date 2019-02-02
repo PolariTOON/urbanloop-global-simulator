@@ -17,32 +17,37 @@ capsule = Capsule(station=telecom, destination=stan)
 
 def promenade(c):
     cost = 0
+    logging.info("capsule " + str(c.id) + " part de la station = " + c.current_element.name)
     while 1:
         current = c.current_element
         the_loop = c.loop
-        #logging.debug(current)
+        dist, next = the_loop.dist_to_next_object(current)
         if type(current) == station.Station:
-            d, n = the_loop.dist_to_next_object(current)
-            cost += d
-            # print(current.name, d, n)
             if current == c.destination:
                 logging.info("capsule " + str(c.id) + " acheminée a bon port, cost = "+str(cost))
-                # print("capsule " + str(c.id) + " acheminée a bon port")
                 return
             else:
-                logging.debug("capsule " + str(c.id) + " passe par station " + current.name)
-                c.current_element = n
-                d, c.next_element = the_loop.dist_to_next_object(n)
-        else: # c'est un switch
-            logging.debug("capsule " + str(c.id) + " passe par switch " + str(current.id))
+                logging.debug("capsule " + str(c.id) + " passe par station " + current.name + ", cout = "+str(cost))
+                cost += dist
+                c.current_element = next
+                d, c.next_element = the_loop.dist_to_next_object(next)
+        else:  # c'est un switch
             if the_loop == current.my_loop:  # aiguiller
+                logging.debug("capsule " + str(c.id) + " passe par switch out " + str(current.id) + ", cout = " + str(cost))
                 c.ask_route(current)
-            else : # c'est juste un croisement
-                logging.debug("switch in "+ the_loop.name)
-                d, c.current_element = the_loop.dist_to_next_object(current)
+                if c.loop == the_loop :
+                    # je n'ai pas été aiguillée
+                    cost += dist
+                else:
+                    # j'ai été aiguillée
+                    d, n = current.other_loop.dist_to_next_object(current)
+                    cost += current.size + d
+            else:  # c'est juste un croisement
+                logging.debug("capsule " + str(c.id) + " passe par switch in " + str(current.id) + ", cout = " + str(cost))
+                cost += dist
+                c.current_element = next
                 d, c.next_element = the_loop.dist_to_next_object(c.current_element)
-                cost += d
-                logging.debug("next"+ str(c.next_element))
+
             # print(current.id, d, n)
 
 

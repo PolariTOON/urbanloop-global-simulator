@@ -8,7 +8,7 @@ from model.switch import Switch
 """fichier de test d'import d'un réseau """
 
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 network_path = '../resources/mini_network.json'
 try:
@@ -22,7 +22,7 @@ network.load(network_path)
 
 # on charge toutes les boucles créées
 for name, l in ML.all_loops.items():
-    logging.info("\n" + l.name + ", circonférence : "+ str(l.size) + " coordonnées du centre : x = " + str(l.x) + ", y = " + str(l.y))
+    logging.info("\t" + l.name + ", circonférence : "+ str(l.size) + " coordonnées du centre : x = " + str(l.x) + ", y = " + str(l.y))
     logging.debug("\t Stations : " + str([[st.name, st.id] for st in l.stations]))
     logging.debug("\t  -- an object in the loop = [[nature, id, angle in the loop]] -- ")
     logging.debug("\t" + str([[o[0], o[1].id, o[2]] for o in l.objects]))  # objects est un attributs des loops qui contient la succession des éléments

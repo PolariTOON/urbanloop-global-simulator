@@ -42,6 +42,7 @@ class Capsule:
         :param  switch : Switch "suivant" a qui la capsule demande d'etre routé (Switch) OBLIGATOIRE
         :return: void : mise à jour
         """
+        self.current_element = switch
         change = switch.route_capsule_to_station(self.destination)
         if change:
             self._change_loop(switch)
@@ -51,8 +52,8 @@ class Capsule:
                          (self.id, self.loop.name))
 
     def _continue(self):
-        logging.info("Capsule n°%d arrives at %s from %s" %
-                     (self.id, self.next_element.name, self.current_element.name))
+        # logging.info("Capsule n°%d arrives at %s from %s" %
+        #             (self.id, self.next_element.name, self.current_element.name))
         self.current_element = self.next_element
         self.next_element = self.current_element.next_element
 
@@ -62,7 +63,7 @@ class Capsule:
             :param switch: l'aiguillage qui a dit qu'il fallait changer de boucle
             :return: void : change "l'élément suivant
         """
-        self.current_element = self.next_element
+        # self.current_element = self.next_element
         self.next_element = switch.next_element_other
         self.loop = switch.other_loop
         logging.info("Capsule n°%d is switched to the loop :  %s" %

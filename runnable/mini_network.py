@@ -10,7 +10,15 @@ from model.switch import Switch
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
-network.load('../resources/mini_network.json')
+network_path = '../resources/mini_network.json'
+try:
+    with open(network_path, "r") as file:
+        None
+except FileNotFoundError:
+    network_path = 'resources/mini_network.json'
+
+
+network.load(network_path)
 
 # on charge toutes les boucles créées
 for name, l in ML.all_loops.items():

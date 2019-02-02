@@ -15,7 +15,7 @@ from interface.simulator_frame import SimulatorFrame
 # window
 window = Tk()
 window["bg"]="#00FF00"
-window.geometry("800x800+100+100")
+window.geometry("1200x800+100+100")
 
 w = SimulatorFrame(window)
 w.grid()

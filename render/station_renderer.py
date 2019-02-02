@@ -18,7 +18,9 @@ class StationRenderer:
         self.make_canvas()
 
     def update_canvas(self):
-        """TODO baptiste specification """
+        """
+        mise a jour de la texture en fonction de l'état de la capsule
+        """
         assert self.canvas != None
         color = self.config["selected_color"] if self.is_selected else self.config["station_color"]
         self.canvas.create_oval(self.outline_width, self.outline_width, self.width - self.outline_width,
@@ -29,7 +31,9 @@ class StationRenderer:
         #self.canvas["-transparentcolor"] = "TRANSCOLOUR"
 
     def make_canvas(self):
-        """TODO baptiste specification """
+        """
+        construit le canvas sur lequel dessiner et lui ajoute des listeners
+        """
         self.outline_width = int(self.config["station_outline_width"])
         self.width = int(self.config["station_width"])
         self.height = int(self.config["station_height"])
@@ -42,7 +46,9 @@ class StationRenderer:
         self.canvas["bg"] = self.master["bg"]
 
         def callback(event):
-            """TODO baptiste specification """
+            """
+            listener de clic
+            """
             # checking if click happened inside circle or not
             xr = self.width / 2
             yr = self.height / 2
@@ -53,6 +59,9 @@ class StationRenderer:
         self.canvas.bind("<Button-1>", callback)
 
         def motion(event):
+            """
+            listener de mouvement
+            """
             # checking if cusor is above circle or not
             xr = self.width / 2
             yr = self.height / 2

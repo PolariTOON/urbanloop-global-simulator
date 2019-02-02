@@ -1,11 +1,7 @@
-#! /usr/bin/env python3
-# coding: utf-8
+import queue
 from enum import Enum
-from queue import Queue
-from model.capsule import Capsule
 
-from .loop import all_loops
-
+_stations = list()
 station_id = 0
 
 
@@ -17,62 +13,44 @@ class Type(Enum):
 
 
 class Station:
-    # network
     network = None
 
     def __init__(self, name=None, capacity=100, loop=None, angle=None, station_type=Type.NEUTRAL):
         """
-        initialisation d'une station
-        :param name : Nom de la station
-        :param capacity: Circonference de la boucle (float)
-        :param loop : boucle à laquelle la station appartient (Loop)
-        :param angle : angle entre le haut de la boucle et la position de la station - sens horaire (float)
-        :param station_type : type de station par rapport à son affluence (Enum)
-        :return:0UT : un objet Station (Station)
+        :param name: Name of the station
+        :param capacity: Loop circumference (float)
+        :param loop: Loop to which the station belongs
+        :param angle: Angle between the top of the loop and the position of the station - clockwise (float)
+        :param station_type: Type of station compared to its affluence (Enum)
         """
         global station_id
+        global _stations
         self.id = station_id
         station_id += 1
+        _stations.append(self)
         self.name = "Station #{0}".format(self.id) if (name is None) else name
         self.angle = angle
         self.capacity = capacity
         self.loop = loop
         self.station_type = station_type
-        self.traveler_queue = Queue()
-        self.capsule_queue = Queue(maxsize=self.capacity)
-        # self.capsule_queue.put(Capsule(self))
+        self.traveler_queue = queue.Queue()
+        self.capsule_queue = queue.Queue(maxsize=100)
         self.next_element = None
-
-    # TODO menage
-    '''def _update_flow(self):
-        print("updating flow of ", self.id, "...")
-        return
-
-    def show_details(self):
-        print("showing details...")
-        print("\n \t id = ", self.id, "\n \t name = ", self.name)
-        return
-    '''
 
 
 def get_stations():
     """
-    récupère toute les stations
-        :return: tableau de toutes les stations toutes boucles confondues ([Station])
+    :return: All stations of the network
     """
-    stations = []
-    for name, loop in all_loops.items():
-        for station in loop.stations:
-            stations.append(station)
-    return stations
+    return _stations
 
 
-def get_by_name(name):
+def get_station_by_name(name):
     """
-    récupérer une station par rapport à son nom
-        :param  name : le nom de la station voulue (String) OBLIGATOIRE
-        :return: 0UT : la station voulue (Station)
+    :param name: Name of the desired station
+    :return: The desired station
     """
-    for station in get_stations():
+    global _stations
+    for station in _stations:
         if station.name == name:
             return station

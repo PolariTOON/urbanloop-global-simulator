@@ -43,6 +43,7 @@ class Loop:
             element = order[i]
             # order[i] = [nature, obj, angle]
             self.objects += [order[i]]
+            print(order[i])
             angle_next = order[(i + 1) % len(order)][2] - element[2]
             if angle_next < 0:
                 angle_next += 360

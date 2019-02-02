@@ -10,8 +10,8 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 network.load("../resources/mini_network.json")
 
 """création d'une capsule à TELECOM Nancy voulant aller à la Gare """
-telecom = station.get_by_name("TELECOM Nancy")
-stan = station.get_by_name("Stanislas")
+telecom = station.get_station_by_name("TELECOM Nancy")
+stan = station.get_station_by_name("Stanislas")
 capsule = Capsule(station=telecom, destination=stan)
 
 

@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 # coding: utf-8
 import logging
-import sys
 import time
 
 import simpy
@@ -15,7 +14,6 @@ from simulator import traveler_generator
 
 """Initialisation"""
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
-network.load()
 
 SIM_DURATION = int(config.sim['duration'])
 SIM_TICK = float(config.sim['tick'])
@@ -28,9 +26,8 @@ if real_time_boolean in ['false', 'False']:
 else:
     sim_environment = simpy.rt.RealtimeEnvironment(factor=SIM_TICK)
 
-simpy.rt.RealtimeEnvironment(factor=SIM_TICK)
-
-sim_loop = sim_loop.SimLoop(env=sim_environment, sim_tick=SIM_TICK)
+sim_loop = sim_loop.SimLoop(sim_env=sim_environment, sim_tick=SIM_TICK)
+network.load()
 
 """Start"""
 if __name__ == "__main__":
@@ -38,4 +35,5 @@ if __name__ == "__main__":
     logging.debug("Simulation starts")
     sim_environment.run(until=SIM_DURATION)
     logging.debug("Execution time : %.3f seconds" % (time.time() - START_TIME))
-    logging.debug("Total generated : %d" % traveler_generator.total_generated)
+    logging.debug("Simulation time : %.1f seconds" % (sim_environment.now * SIM_TICK))
+    logging.debug("Amount of traveler generated : %d" % traveler_generator.total_generated)

@@ -2,15 +2,19 @@
 # coding: utf-8
 
 from tkinter import Tk, N, S, E, W, VERTICAL, Frame
-from tkinter import ttk
+from tkinter import ttk, Menu, filedialog
 
+from interface.simulator_frame import SimulatorFrame
+from settings import network
+from model import loop as ML
 
-def create_window(w=1200, h=800):
-    """TODO baptiste specifications """
+# créer une classe, c'est plus classe.
+
+def create_window(w=1200, h=800, loop=None):
     # creating a graphical app
     window = Tk()
     window["bg"] = "#e0e0e0"
-    window.title = "URBANLOOP Simulator"
+    window.title("URBANLOOP Simulator")
 
     # geometry of the app
     ws = window.winfo_screenwidth()
@@ -27,6 +31,27 @@ def create_window(w=1200, h=800):
     window.columnconfigure(1, weight=22)  # content
     window.columnconfigure(2, weight=1)  # blank
 
+    # add menu to window
+    def open_file():
+        file_path = filedialog.askopenfilename()
+        network.load(file_path)
+        simulator_frame = SimulatorFrame(master=main_frame)
+        simulator_frame.grid(column=0, sticky=N+S+E+W)
+    
+    def open_example():
+        network.load(None) # load default network
+        simulator_frame = SimulatorFrame(master=main_frame)
+        simulator_frame.grid(column=0, sticky=N+S+E+W)
+
+    menubar = Menu(window)
+    filemenu = Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Open file...", command=open_file)
+    filemenu.add_command(label="Open example...", command=open_example)
+    filemenu.add_separator()
+    filemenu.add_command(label="Exit", command=window.quit)
+    menubar.add_cascade(label="File", menu=filemenu)
+    window.config(menu=menubar)
+
     # adding main_frame
     main_frame = Frame(window, bg="green")
     main_frame.grid(column=1, row=1, sticky=N+S+E+W)
@@ -40,8 +65,11 @@ def create_window(w=1200, h=800):
     main_frame.columnconfigure(4, weight=10)  # information_frame
 
     # adding simulator_frame
-    simulator_frame = Frame(main_frame, bg="orange")
+    # simulator_frame = Frame(main_frame, bg="orange")
+    # simulator_frame.grid(column=0, sticky=N+S+E+W)
+    simulator_frame = SimulatorFrame(master=main_frame)
     simulator_frame.grid(column=0, sticky=N+S+E+W)
+
 
     # adding vertical separator
     ttk.Separator(main_frame, orient=VERTICAL).grid(row=0, column=2, sticky=N+S)

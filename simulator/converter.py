@@ -2,7 +2,7 @@ import logging
 
 import scipy.stats
 
-import simulator.sim_loop as sim_loop
+from simulator import sim_loop  # import simulator.sim_loop as sim_loop
 from model.station import Type
 from settings import config
 

@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from tkinter import Frame
+from tkinter import Frame, Scrollbar, Canvas
 from model import loop as ML
 
 
@@ -19,9 +19,17 @@ class SimulatorFrame(Frame):
         # attributes
         self.master = master
         self.selected_item = None
+        self.canvas = Canvas(self)
+
+        # scroll bars
+        vscrollbar = Scrollbar(self, orient="vertical",command=self.canvas.yview,cursor="hand2")
+        self.canvas.configure(yscrollcommand=vscrollbar.set)
+        vscrollbar.pack(side="right",fill="y")
+        hscrollbar = Scrollbar(self, orient="horizontal",command=self.canvas.xview,cursor="hand2")
+        self.canvas.configure(xscrollcommand=hscrollbar.set)
+        hscrollbar.pack(side="bottom",fill="x")
 
         # draw loop
-        print(ML.all_loops)
         loops = ML.all_loops
         if len(loops) != 0 :
             self["bg"] = "orange"

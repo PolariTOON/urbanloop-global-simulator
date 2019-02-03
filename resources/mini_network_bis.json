@@ -1,0 +1,16 @@
+{
+    "Nancy": {
+      "center": [100,100],
+      "circonference": 300,
+      "content": [{"type":"switch_out","other_loop":"Laxou", "length": 15, "angle":45},
+                  {"type":"switch_in","other_loop":"Laxou", "angle":135}
+      ]
+    },
+    "Laxou": {
+      "center": [300,100],
+      "circonference": 300,
+      "content": [{"type":"switch_in","other_loop":"Nancy", "angle":315 },
+                  {"type":"switch_out","other_loop":"Nancy", "length": 60, "angle":225}
+      ]
+    }
+  }

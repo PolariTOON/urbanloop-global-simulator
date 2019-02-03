@@ -1,8 +1,8 @@
 import random
 
-import simulator.sim_loop as sim_loop
 from model.station import get_stations
 from settings import config
+from simulator import sim_loop
 
 
 class AscentGenerator:

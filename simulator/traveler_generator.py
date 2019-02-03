@@ -1,7 +1,7 @@
 import logging
 import random
 
-import simulator.sim_loop as sim_loop
+from simulator import sim_loop
 from model.station import *
 from model.traveler import Traveler
 from settings import config

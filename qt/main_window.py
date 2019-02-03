@@ -9,6 +9,7 @@ from sys import path
 
 from settings import network
 from qt.simulator_widget import SimulatorWidget
+from qt.data_widget import DataWidget
 
 
 def get_resource_path(resource):
@@ -64,12 +65,9 @@ class MainWindow(QMainWindow):
         # | +-----------+ |  +-------------+ |
         # +----------------------------------+
         # data #TODO Ne sont pas défninis dans _init
-        self.title_label = QLabel("Nothing selected")
-        self.data_textedit = QTextEdit()
-        self.data_textedit.setEnabled(False)
+        self.title_label = DataWidget()
         data_vbox = QVBoxLayout()
         data_vbox.addWidget(self.title_label)
-        data_vbox.addWidget(self.data_textedit)
 
         # buttons & layout  #TODO Ne sont pas défninis dans _init
         self.decrease_speed_button = QPushButton(QIcon(get_resource_path("minus.png")), "")
@@ -91,7 +89,7 @@ class MainWindow(QMainWindow):
         right_layout.addLayout(data_vbox)
 
         # main layout  #TODO Ne sont pas défninis dans _init
-        self.simulator = SimulatorWidget()
+        self.simulator = SimulatorWidget(self.title_label)
         separator = QSplitter()
         separator.setOrientation(Qt.Vertical)
         main_layout = QHBoxLayout()
@@ -129,3 +127,5 @@ class MainWindow(QMainWindow):
 
     def refresh(self):
         return
+
+

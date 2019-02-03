@@ -23,7 +23,8 @@ def get_resource_path(resource):
 
 
 class SimulatorWidget(QWidget):
-    def __init__(self):
+    def __init__(self, data_widget):
+        self.data_widget = data_widget
         network.load()
         self.selected_item = None
         # network.load("{0}/../resources/mini_network_bis.json".format(path[0]))
@@ -85,6 +86,7 @@ class SimulatorWidget(QWidget):
                 if ((x - item_x) ** 2 / item_rx ** 2) + ((y - item_y) ** 2 / item_ry ** 2) <= 1:
                     # inside object
                     self.selected_item = item
+                    self.data_widget.refresh(item)
                     self.refresh()
                     return
                 # if you get here, click did not happened on
@@ -93,11 +95,13 @@ class SimulatorWidget(QWidget):
             if (x - loop.x) ** 2 + (y - loop.y) ** 2 <= loop_r ** 2:
                 # click happened inside loop
                 self.selected_item = loop
+                self.data_widget.refresh(loop)
                 self.refresh()
                 return
         # if we get here, click happened on nothing
         print("unselect")
         self.selected_item = None
+        self.data_widget.refresh(None)
         self.refresh()
 
     def refresh(self):

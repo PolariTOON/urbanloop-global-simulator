@@ -2,18 +2,46 @@
 # coding: utf-8
 
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QPicture
+from PyQt5.QtGui import QPicture, QPainter, QColor
+from PyQt5.QtCore import Qt
+
 from settings import config
 
-config = config.interface
 
 """
 draw a simple graphical object representing a capsule
 return a clickable QPicture
 """
-def draw_capsule(root, capsule, percentage, handler):
-    assert root != None and capsule != None and percentage != None and handler != None
-    w = QPicture()
-    w.resize(int(config["capsule_width"]), int(config["capsule_height"]))
+class CapsuleRenderer:
+    def __init__(self, root, capsule, percentage):
+        assert root != None and capsule != None and percentage != None and handler != None
+        self.config = config.interface
+        self.root = root
+        self.capsule = capsule
+        self.percentage = percentage
+        self.handler = self.root.handler
+        # image
+        pic = QPicture()
+        pic.resize(int(self.config["capsule_width"]), int(self.config["capsule_height"]))
+        self.color = config["selected_color"] if self.handler.selected_item == self.capsule else self.config["capsule_color"]
 
-    return
+    def paintEvent(self, event):
+        paint = QPainter()
+        paint.begin(self.root.image)
+        # optional
+        paint.setRenderHint(QPainter.Antialiasing)
+        # make a red ellipse
+        paint.setBrush(QColor(self.color))
+        paint.drawRect(event.rect())
+        # then make black border
+        # for circle make the ellipse radii match
+        radx = 100
+        rady = 100
+        # draw red circles
+        paint.setPen(Qt.red)
+        for k in range(125, 220, 10):
+            center = QPoint(k, k)
+            # optionally fill each circle yellow
+            paint.setBrush(Qt.yellow)
+            paint.drawEllipse(center, radx, rady)
+        paint.end()

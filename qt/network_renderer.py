@@ -24,7 +24,7 @@ class NetworkRenderer:
             loop = ML.get_by_name(name)
             # make a circle
             r = loop.size / 2 / pi
-            paint.setBrush(QColor(self.config["selected_color"] if self.root.handler.selected_item == loop else self.config["loop_color"]))
+            paint.setBrush(QColor(self.config["selected_color"] if self.root.selected_item == loop else self.config["loop_color"]))
             paint.drawEllipse(get_rect_for_loop(loop, 0))
             paint.setBrush(QColor("white"))
             paint.drawEllipse(get_rect_for_loop(loop, int(self.config["loop_outline_width"])))
@@ -43,7 +43,10 @@ class NetworkRenderer:
             item = obj[1]
             if (item != None):
                 is_station = isinstance(item, MST.Station)
-                paint.setBrush(QColor(self.config["station_color" if is_station else "switch_color"]))
+                if self.root.selected_item == item:
+                    paint.setBrush(QColor(self.config["selected_color"]))
+                else:
+                    paint.setBrush(QColor(self.config["station_color" if is_station else "switch_color"]))
                 paint.drawEllipse(get_rect_for_item(item, loop, 0, None if is_station else item_type))
                 paint.setBrush(QColor("white"))
                 outline_width = int(self.config["switch_outline_width"]) if isinstance(item, MSW.Switch) else int(self.config["station_outline_width"])

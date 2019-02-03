@@ -24,29 +24,16 @@ def getResourcePath(resource):
 class SimulatorWidget(QWidget):
     def __init__(self):
         network.load()
+        self.selected_item = None
         #network.load("{0}/../resources/mini_network_bis.json".format(path[0]))
         QWidget.__init__(self)
-        self.handler = Handler(self)
-        self.resize(600,600)
+        #self.handler = Handler(self)
+        self.resize(600,600) # not working at all
         self.loops = ML.all_loops
-        if (self.loops == {}):
-            # show picture if nothing loaded
-            self.image = QPixmap(getResourcePath("nothing.png"))
-        else :
-            # build view
-            self.image = QPicture()
-            nr = NetworkRenderer(self)
-            nr.paint()
-
-        simulator_view = QLabel()
-        if isinstance(self.image, QPicture):
-            simulator_view.setPicture(self.image)
-        else:
-            simulator_view.setPixmap(self.image)
-        simulator_view.mouseReleaseEvent = self.select_item
-            
+        self.simulator_view = QLabel()
+        self.refresh() # build image
         layout = QHBoxLayout(self)
-        layout.addWidget(simulator_view)
+        layout.addWidget(self.simulator_view)
 
     """
     the aim of this is to make clickable the image
@@ -76,7 +63,7 @@ class SimulatorWidget(QWidget):
         for name in loops:
             loop = ML.get_by_name(name)
             loop_r = loop.size / 2 / pi
-            for i in range(len(loop.objects)-1, 0, -1):
+            for i in range(len(loop.objects)-1, -1, -1):
                 # for each station/switch, starting from last
                 # check if click happened on it
                 item_type = loop.objects[i][0]
@@ -96,23 +83,34 @@ class SimulatorWidget(QWidget):
                 # computing if click happened inside ellipse or not
                 if ((x - item_x)**2/item_rx**2)+((y - item_y)**2/item_ry**2) <= 1:
                     # inside object
-                    print("{0} [{3};{4}] (center at [{1};{2}])".format(item, item_x, item_y,x,y))
+                    self.selected_item = item
+                    self.refresh()
                     return
-                """
-                else:
-                    print("not on {0} item is centered at {1};{2}".format(item, item_x, item_y))
-                    print("must click between [{0};{1}] and [{2};{3}]".format(item_x-item_rx, item_y-item_ry,item_x+item_rx,item_y+item_ry))
-                """
                 # if you get here, click did not happened on
                 # something inside this loop
             # check inside the loop
             if (x - loop.x)**2 + (y - loop.y)**2 <= loop_r**2:
                 # click happened inside loop
-                print("{0} at [{1};{2}]".format(loop, x, y))
+                self.selected_item = loop
+                self.refresh()
                 return
         # if we get here, click happened on nothing
-        print("nothing clicked on")
-        print(x, y)
+        print("unselect")
+        self.selected_item = None
+        self.refresh()
+    
+    def refresh(self):
+        if (self.loops == {}):
+            # show picture if nothing loaded
+            self.image = QPixmap(getResourcePath("nothing.png"))
+            self.simulator_view.setPixmap(self.image)
+        else :
+            # build view
+            self.image = QPicture()
+            nr = NetworkRenderer(self)
+            nr.paint()
+            self.simulator_view.setPicture(self.image)
+            self.simulator_view.mouseReleaseEvent = self.select_item
         return
 
         

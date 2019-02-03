@@ -84,12 +84,13 @@ class Switch:
         """
         details = "Switch ID : " + str(self.id)
         details += "\nLoop of the switch : " + self.my_loop.name
-        details += "\n \t Next element in this loop : "
+        details += "\n \t Next element : "
         if type(self.next_element) is Switch:
             details += "Switch " + str(self.next_element.id)
         else:
             details += "Station " + self.next_element.name
         details += "\nLoop switched : " + self.other_loop.name
+        details += "\n \t Next element : "
         if type(self.next_element_other) is Switch:
             details += "Switch " + str(self.next_element_other.id)
         else:

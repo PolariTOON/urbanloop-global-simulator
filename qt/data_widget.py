@@ -33,8 +33,10 @@ class DataWidget(QWidget):
                 self.title.setText("Switch " + str(item.id))
             elif item_type is Capsule:
                 self.title.setText("Capsule " + str(item.id))
+            self.data_textedit.setText(item.show_details())
         # self.layout = QHBoxLayout(self)
         else :
             self.title.setText("Nothing selected")
+            self.data_textedit.setText()
         self.layout.update()
         return

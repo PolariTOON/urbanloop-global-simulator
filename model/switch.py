@@ -77,6 +77,27 @@ class Switch:
             # capsule._do_a_loop(self.next_element_other)
             return False
 
+    def show_details(self):
+        """
+        crée un text contenant toutes les informations à propos de l'aiguillage
+        :return: String
+        """
+        details = "Switch ID : " + str(self.id)
+        details += "\nLoop of the switch : " + self.my_loop.name
+        details += "\n \t Next element in this loop : "
+        if type(self.next_element) is Switch:
+            details += "Switch " + str(self.next_element.id)
+        else:
+            details += "Station " + self.next_element.name
+        details += "\nLoop switched : " + self.other_loop.name
+        if type(self.next_element_other) is Switch:
+            details += "Switch " + str(self.next_element_other.id)
+        else:
+            details += "Station " + self.next_element_other.name
+        details += "\nSize of the link : " + str(self.size)
+        details += "\nRouting Table : " + str(self.table)
+        return details
+
 
 def init():
     """

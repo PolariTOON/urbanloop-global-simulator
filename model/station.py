@@ -1,7 +1,7 @@
 import queue
 from enum import Enum
 
-import model.capsule
+from model import capsule
 
 _stations = list()
 station_id = 0
@@ -43,6 +43,32 @@ class Station:
         self.traveler_queue = queue.Queue()
         self.capsule_queue = queue.Queue(maxsize=100)
 
+    def show_details(self):
+        """
+        crée un text contenant toutes les informations à propos de la station
+        :return: String
+        """
+        details = "Station name : " + self.name
+        details += "\nStation id : " + str(self.id)
+        details += "\nLoop : " + self.loop.name
+        details += "\nStation Type : "
+        t = self.station_type
+        if t == 0:
+            details += "neutral"
+        elif t == 1:
+            details += "activity zone"
+        elif t == 2:
+            details += "residential zone"
+        elif t == 3:
+            details += "down town"
+        details += "\nCapacity : " + str(self.capacity)
+        details += "\nNext element : "
+        if type(self.next_element) is Station:
+            details += "Station " + self.next_element.name
+        else:
+            details += "Switch " + str(self.next_element.id)
+        return details
+
 
 def get_stations():
     """
@@ -65,5 +91,5 @@ def get_station_by_name(name):
 def reset_simulation():
     for station in _stations:
         station.reset_simulation()
-        station.capsule_queue.put(model.capsule.Capsule(station=station))
-        station.capsule_queue.put(model.capsule.Capsule(station=station))
+        station.capsule_queue.put(capsule.Capsule(station=station))
+        station.capsule_queue.put(capsule.Capsule(station=station))

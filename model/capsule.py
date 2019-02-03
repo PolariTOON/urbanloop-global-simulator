@@ -1,7 +1,7 @@
 import logging
 
-from simulator import sim_loop # import simulator.sim_loop as sim_loop
-from model.station import get_station_by_name
+from simulator import sim_loop  # import simulator.sim_loop as sim_loop
+from model import station
 from model.switch import Switch
 from settings import config
 
@@ -109,7 +109,7 @@ class Capsule:
         """
         :param traveler: The traveler who gets in the capsule
         """
-        self.destination = get_station_by_name(traveler.destination_station_name)
+        self.destination = station.get_station_by_name(traveler.destination_station_name)
         self.travelers.append(traveler)
         logging.info("[%s] Get traveler (%s) in capsule n°%d" %
                      (traveler.departure_station_name, self._get_travelers_id(), self.id))
@@ -146,6 +146,27 @@ class Capsule:
         if len(self.travelers) == 1:
             return self.travelers[0].id
         return " - ".join(map(lambda traveler: traveler.id, self.travelers))
+
+    def show_details(self):
+        """
+        crée un text contenant toutes les informations à propos de la capsule
+        :return: String
+        """
+        details = "Capsule ID : " + str(self.id)
+        details += "\nContains a Travelers : " + str(self.is_aboard())
+        details += "\nDestination : " + self.destination.name
+        details += "\nCurrent Loop : " + self.loop.name
+        details += "\nLast or current element : "
+        if type(self.current_element) is station.Station:
+            details += "Station " + self.current_element.name
+        else:
+            details += "Switch " + str(self.current_element.id)
+        details += "\nNext element : "
+        if type(self.next_element) is station.Station:
+            details += "Station " + self.next_element.name
+        else:
+            details += "Switch " + str(self.next_element.id)
+        return details
 
 
 def reset_simulation():

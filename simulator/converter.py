@@ -3,7 +3,7 @@ import logging
 import scipy.stats
 
 from simulator import sim_loop  # import simulator.sim_loop as sim_loop
-from model.station import Type
+from model import station
 from settings import config
 
 neutral_percent = int(config.model['neutral_percent'])
@@ -74,11 +74,11 @@ def station_probability(station_type, second, is_arrival=True):
     eph = evening_peak_hour
     gaussian_factor = 250 * (activity_and_residential_fluctuation / 100)
     result = 0
-    if station_type == Type.NEUTRAL:
+    if station_type == station.Type.NEUTRAL:
         result = neutral_percent
-    if station_type == Type.CITY:
+    if station_type == station.Type.CITY:
         result = city_percent
-    if station_type == Type.ACTIVITY:
+    if station_type == station.Type.ACTIVITY:
         if is_arrival:
             if second < 43200:
                 result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(

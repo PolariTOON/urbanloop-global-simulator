@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 # coding: utf-8
 import logging
+from model import station
 
 all_loops = {}
 default_size = 100
@@ -74,6 +75,26 @@ class Loop:
                             return cost, self.objects[index][1]
         # logging.error("pas trouvé"+str(element.id)+"dans boucle"+ self.name+ str(self.objects))
         return 0, None
+
+    def show_details(self):
+        """
+        crée un text contenant toutes les informations à propos de la boucle
+        :return: String
+        """
+        details = "Loop Name : " + self.name
+        details += "\nCircumference : " + str(self.size)
+        details += "\nCenter coordinates : x = " + str(self.x) + " ; y = " + str(self.y)
+        details += "\nElements : "
+        for o in self.objects:
+            if o[0] == "station":
+                details += "\n \t Station " + o[1].name
+            else:
+                details += "\n \t Switch "
+                if o[0] == "switch_out":
+                    details += "out " + str(o[1].id) + " to " + o[1].other_loop.name
+                else:
+                    details += "in " + str(o[1].id) + " from " + o[1].my_loop.name
+        return details
 
 
 def get_by_name(search_name):

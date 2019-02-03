@@ -2,8 +2,6 @@
 # coding: utf-8
 import logging
 
-
-
 all_loops = {}
 default_size = 100
 
@@ -18,7 +16,7 @@ class Loop:
         :return:0UT : un objet Loop (Loop)
         """
         self.name = name
-        logging.info("Create loop "+self.name)
+        logging.info("Create loop " + self.name)
         if coordinates is not None:
             self.x = coordinates[0]
             self.y = coordinates[1]
@@ -44,7 +42,7 @@ class Loop:
             element = order[i]
             # order[i] = [nature, obj, angle]
             self.objects += [order[i]]
-            print(order[i])
+            # print(order[i])
             angle_next = order[(i + 1) % len(order)][2] - element[2]
             if angle_next < 0:
                 angle_next += 360
@@ -52,16 +50,29 @@ class Loop:
             if self.size is None:
                 self.size = sum(self.lengths)
 
-    def dist_to_next_object(self, element):
+    def dist_to_next_object(self, element, element2=None):
         """
-        determine le prochain objet de la boucle et la distance
+        determine la distance entre l'element et le second element ou bien le suivant (et dans ce cas on le retourne
             :param  element : element permettant de calculer "le suivant" (Station) OBLIGATOIRE
+            :param  element2 : distance entre les 2 elements (Station) OBLIGATOIRE
             :return:0UT 1 : la distance à parcourir jusqu'au prochain objet sur la boucle (int)
                     OUT 2 : le prochain objet sur la boucle (Station/Switch)
         """
+        # logging.debug("element " + str(element))
         for i in range(len(self.objects)):
-            if self.objects[i][1] is element:
-                return self.lengths[i], self.objects[(i + 1)%len(self.objects)][1]
+            if self.objects[i][1] == element:
+                if element2 is None:
+                    # logging.debug(str((i + 1) % len(self.objects)))
+                    return self.lengths[i], self.objects[(i + 1) % len(self.objects)][1]
+                else:
+                    cost = self.lengths[i]
+                    for j in range(0, len(self.objects)):
+                        index = (i + j) % len(self.objects)
+                        cost += self.lengths[index]
+                        if self.objects[index][1] is element2:
+                            print(cost)
+                            return cost, self.objects[index][1]
+        # logging.error("pas trouvé"+str(element.id)+"dans boucle"+ self.name+ str(self.objects))
         return 0, None
 
 

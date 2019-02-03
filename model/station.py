@@ -1,8 +1,9 @@
 import queue
 from enum import Enum
 
-from .loop import all_loops
+import model.capsule
 
+_stations = list()
 station_id = 0
 
 
@@ -25,8 +26,10 @@ class Station:
         :param station_type: Type of station compared to its affluence (Enum)
         """
         global station_id
+        global _stations
         self.id = station_id
         station_id += 1
+        _stations.append(self)
         self.name = "Station #{0}".format(self.id) if (name is None) else name
         self.angle = angle
         self.capacity = capacity
@@ -36,24 +39,31 @@ class Station:
         self.capsule_queue = queue.Queue(maxsize=100)
         self.next_element = None
 
+    def reset_simulation(self):
+        self.traveler_queue = queue.Queue()
+        self.capsule_queue = queue.Queue(maxsize=100)
+
 
 def get_stations():
     """
-    récupère toute les stations
-        :return: tableau de toutes les stations toutes boucles confondues ([Station])
+    :return: All stations of the network
     """
-    stations = []
-    for name, loop in all_loops.items():
-        for station in loop.stations:
-            stations.append(station)
-    return stations
+    return _stations
 
 
-def get_by_name(name):
+def get_station_by_name(name):
     """
     :param name: Name of the desired station
     :return: The desired station
     """
-    for station in get_stations():
+    global _stations
+    for station in _stations:
         if station.name == name:
             return station
+
+
+def reset_simulation():
+    for station in _stations:
+        station.reset_simulation()
+        station.capsule_queue.put(model.capsule.Capsule(station=station))
+        station.capsule_queue.put(model.capsule.Capsule(station=station))

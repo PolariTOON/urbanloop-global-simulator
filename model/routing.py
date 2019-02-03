@@ -21,42 +21,70 @@ def dijkstra_route(switch, table, to_cover):
     """
     table_temp = table
     table_to_cover = {}
+    # on actualise la table à parcourir
     for l, a in to_cover.items():
         table_to_cover[l] = [a] + table[l]
+
+    # on veut calculer tous les chemins
     while table_to_cover != {}:
+        # print(switch.id, table_to_cover)
+        # on récupère dans step la table vers la loop qu'il reste à visiter avec le cout le plus faible
         step = []
         min_cost = float('Inf')
         for l, t in table_to_cover.items():
             if t[2] < min_cost:
                 step = [l] + t
                 min_cost = t[2]
-        # step = table de la loop avec le plus faible cout qu'il restait à parcourir
-        # format : ['loop XX', switch_id, to_switch, cost, [path]]
+        # format de step : ['loop XX', switch_id, to_switch, cost, [path]]
         del table_to_cover[step[0]]
 
+        # on ajoute la découverte à la table
         loop = model.loop.get_by_name(step[0])
         for next_switch in loop.switches:
+            # parcours de tous les switchs de la boucle
+            if next_switch.id != step[1]:
+                if next_switch.my_loop is loop:
+                    # on a bien affaire a un switch aiguillant depuis la boucle
+                    # on doit parcourir à partir de next_switch
+                    if not switch.defects[next_switch.id][0]:
+                        # il n'y a pas d'anomalies pour rester sur la boucle
+                        if next_switch.my_loop.name not in table_temp:
+                            distance, a = loop.dist_to_next_object(step[1], next_switch)
+                            # print(distance)
+                            table_temp[next_switch.my_loop.name] = [step[2],
+                                                                    step[3] + distance,
+                                                                    step[4] + [next_switch.id, next_switch.my_loop.name]]
+                            if next_switch.my_loop.name not in table_to_cover:
+                                table_to_cover[next_switch.my_loop.name] = [next_switch.id] + table_temp[
+                                    next_switch.my_loop.name]
 
-            if next_switch.id != step[1] and (next_switch.id is not None):
-                # --> pas besoin de vérifier que ce n'est pas déjà dans la table car sinon cout ++
-                if not switch.defects[next_switch.id][0]:  # il n'y a pas d'anomalies pour rester sur la boucle
-                    if next_switch.my_loop.name not in table_temp:
-                        table_temp[next_switch.my_loop.name] = [step[2], step[3] + next_switch.size,
-                                                                step[4] + [next_switch.id, next_switch.my_loop.name]]
-                        table_to_cover[next_switch.my_loop.name] = [next_switch.id] + table_temp[
-                            next_switch.my_loop.name]
-                if not switch.defects[next_switch.id][1]:  # il n'y a pas d'anomalies dans la boucle aiguillee
-                    if next_switch.other_loop.name not in table_temp:
-                        table_temp[next_switch.other_loop.name] = [step[2], step[3] + next_switch.size,
-                                                                   step[4] + [next_switch.id,
-                                                                              next_switch.other_loop.name]]
-                        table_to_cover[next_switch.other_loop.name] = [next_switch.id] + table_temp[
-                            next_switch.other_loop.name]
+                    if not switch.defects[next_switch.id][1]:
+                        # il n'y a pas d'anomalies dans la boucle aiguillee
+                        new_loop = next_switch.other_loop
+                        if new_loop.name not in table_temp:
+                            distance, a = new_loop.dist_to_next_object(switch, next_switch)
+                            # print(distance)
+                            table_temp[new_loop.name] = [step[2],
+                                                         step[3] + distance + next_switch.size,
+                                                         step[4] + [next_switch.id, next_switch.other_loop.name]]
+                            if next_switch.my_loop.name not in table_to_cover:
+                                table_to_cover[next_switch.other_loop.name] = [next_switch.id] + table_temp[
+                                    next_switch.other_loop.name]
+                            else :
+                                # on regarde si c'est plus faible
+                                if table_temp[next_switch.other_loop.name][1] > table_to_cover[3]:
+                                    table_to_cover[next_switch.other_loop.name] = [next_switch.id] + table_temp[
+                                        next_switch.other_loop.name]
+
+                # else :
+                    # le calcul n'a pas à se faire maintenant
+    #print(table_temp)
     return table_temp
 
 
 def update_switch(s):
     """
+    
     mise à jour de la table en fonction des données reçues ou non + envoie de notre état
         :param  s : switch a tester et impacter (Switch) OBLIGATOIRE
         :return: 0UT : notre information (String : 'alive', '0_down', '1_down' ou None )

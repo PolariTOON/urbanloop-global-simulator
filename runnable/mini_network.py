@@ -4,28 +4,27 @@ import model.loop as ML
 from settings import network
 from model.switch import Switch
 
-
 """fichier de test d'import d'un réseau """
-
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 network_path = '../resources/mini_network.json'
 try:
     with open(network_path, "r") as file:
-        None
+        None  # TODO WTF ?
 except FileNotFoundError:
     network_path = 'resources/mini_network.json'
-
 
 network.load(network_path)
 
 # on charge toutes les boucles créées
 for name, l in ML.all_loops.items():
-    logging.info("\t" + l.name + ", circonférence : "+ str(l.size) + " coordonnées du centre : x = " + str(l.x) + ", y = " + str(l.y))
+    logging.info("\t" + l.name + ", circonférence : " + str(l.size) + " coordonnées du centre : x = " + str(
+        l.x) + ", y = " + str(l.y))
     logging.debug("\t Stations : " + str([[st.name, st.id] for st in l.stations]))
     logging.debug("\t  -- an object in the loop = [[nature, id, angle in the loop]] -- ")
-    logging.debug("\t" + str([[o[0], o[1].id, o[2]] for o in l.objects]))  # objects est un attributs des loops qui contient la succession des éléments
+    logging.debug("\t" + str([[o[0], o[1].id, o[2]] for o in
+                              l.objects]))  # objects est un attributs des loops qui contient la succession des éléments
     for sw in l.switches:
         if sw.my_loop == l:
             logging.info("\t \t table of switch " + str(sw.id) + " : " + str(sw.table))
@@ -42,7 +41,7 @@ for obj in loop_laxou.objects:
     # print(o);
     o = obj[1]
     dist, next_elm = loop_laxou.dist_to_next_object(o);
-    if type(next_elm) is Switch :
+    if type(next_elm) is Switch:
         logging.debug("\n Next object after " + str(obj) + " is " + str(next_elm.id) + " at " + str(dist))
-    else :
+    else:
         logging.debug("\n Next object after " + str(obj) + " is " + next_elm.name + " at " + str(dist))

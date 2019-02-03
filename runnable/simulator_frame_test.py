@@ -14,17 +14,17 @@ from interface.simulator_frame import SimulatorFrame
 
 # window
 window = Tk()
-window["bg"]="#00FF00"
+window["bg"] = "#00FF00"
 window.geometry("1200x800+100+100")
 
 w = SimulatorFrame(window)
 w.grid()
-w.rowconfigure(0,weight=1)
-w.rowconfigure(1,weight=1)
-w.rowconfigure(2,weight=1)
-w.columnconfigure(0,weight=1)
-w.columnconfigure(1,weight=1)
-w.columnconfigure(2,weight=1)
+w.rowconfigure(0, weight=1)
+w.rowconfigure(1, weight=1)
+w.rowconfigure(2, weight=1)
+w.columnconfigure(0, weight=1)
+w.columnconfigure(1, weight=1)
+w.columnconfigure(2, weight=1)
 
 # stations
 s = Station(angle=90)
@@ -38,29 +38,29 @@ sr2 = StationRenderer(s2, w)
 scv = sr.canvas
 scv2 = sr2.canvas
 scv.grid(row=2, column=2)
-scv2.grid(row=1,column=1)
+scv2.grid(row=1, column=1)
 
 # capsules
 c = Capsule()
 c2 = Capsule()
-cr = CapsuleRenderer(c,w)
-cr2 = CapsuleRenderer(c2,w)
+cr = CapsuleRenderer(c, w)
+cr2 = CapsuleRenderer(c2, w)
 ccv = cr.canvas
 ccv2 = cr2.canvas
-ccv.grid(row=0,column=0)
-ccv2.grid(row=0,column=1)
+ccv.grid(row=0, column=0)
+ccv2.grid(row=0, column=1)
 
 # switches
 sw = Switch(angle=180)
-swr = SwitchRenderer(sw,w)
+swr = SwitchRenderer(sw, w)
 swcv = swr.canvas
-swcv.grid(row=1,column=0)
+swcv.grid(row=1, column=0)
 
 # loop
-l = Loop("oklm",coordinates=[1000,1000],size=300*pi)
+l = Loop("oklm", coordinates=[1000, 1000], size=300 * pi)
 l.objects = [s2, sw, s]
-lr = LoopRenderer(l,w)
+lr = LoopRenderer(l, w)
 lcv = lr.canvas
-lcv.grid(row=2,column=1)
+lcv.grid(row=2, column=1)
 
 w.mainloop()

@@ -26,7 +26,7 @@ class CapsuleRenderer:
         """
         # TODO
         # faire bouger les capsules selon leurs déplacements
-        assert self.canvas != None
+        assert self.canvas is not None
         color = "#00FF00" if self.is_selected else "red"
         self.canvas.create_oval(self.outline_width, self.outline_width, self.width - self.outline_width,
                                 self.height - self.outline_width, fill=color, outline="black", width=self.outline_width)
@@ -36,7 +36,9 @@ class CapsuleRenderer:
         """
         construit le canvas sur lequel dessiner et lui ajoute des listeners
         """
-        self.outline_width = int(self.config["capsule_outline_width"]) # TODO baptiste variable pas initialisee dans _init ?
+        # TODO baptiste variable pas initialisee dans _init ?
+        self.outline_width = int(
+            self.config["capsule_outline_width"])
         self.width = int(self.config["capsule_width"])
         self.height = int(self.config["capsule_height"])
 
@@ -44,7 +46,8 @@ class CapsuleRenderer:
         self.is_selected = False  # TODO baptiste variable pas initialisee dans _init ?
 
         # building canvas and adding event listener
-        self.canvas = Canvas(self.master, width=self.width, height=self.height, highlightthickness=0)
+        self.canvas = Canvas(self.master, width=self.width, height=self.height,
+                             highlightthickness=0)  # TODO baptiste variable pas initialisee dans _init ?
 
         def callback(event):
             """
@@ -57,6 +60,7 @@ class CapsuleRenderer:
             # and updating is_selected (circle equation)
             self.is_selected = ((event.x - xr) ** 2 + (event.y - yr) ** 2) <= r * r
             self.master.update_selected_item(self)
+
         self.canvas.bind("<Button-1>", callback)
 
         def motion(event):
@@ -69,11 +73,12 @@ class CapsuleRenderer:
             r = self.width / 2
             # and updating is_above (circle equation)
             self.is_above = ((event.x - xr) ** 2 + (event.y - yr) ** 2) <= r * r
-            if (self.is_above == True):
-                self.canvas["cursor"]='hand2'
+            if self.is_above:
+                self.canvas["cursor"] = 'hand2'
             else:
-                self.canvas["cursor"]=''
-        self.canvas.bind("<Motion>",motion)
+                self.canvas["cursor"] = ''
+
+        self.canvas.bind("<Motion>", motion)
 
         # updating canvas
         self.update_canvas()

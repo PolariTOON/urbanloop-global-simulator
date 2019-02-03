@@ -17,19 +17,21 @@ import qt.draw_capsule
 
 config = config.interface
 
-def getResourcePath(resource):
-    return "{0}/../resources/img/{1}".format(path[0],resource)
+
+def get_resource_path(resource):
+    return "{0}/../resources/img/{1}".format(path[0], resource)
+
 
 class SimulatorWidget(QWidget):
     def __init__(self):
         network.load()
         self.selected_item = None
-        #network.load("{0}/../resources/mini_network_bis.json".format(path[0]))
+        # network.load("{0}/../resources/mini_network_bis.json".format(path[0]))
         QWidget.__init__(self)
-        self.resize(600,600) # not working at all
+        self.resize(600, 600)  # not working at all
         self.loops = ML.all_loops
         self.simulator_view = QLabel()
-        self.refresh() # build image
+        self.refresh()  # build image
         layout = QHBoxLayout(self)
         layout.addWidget(self.simulator_view)
 
@@ -38,6 +40,7 @@ class SimulatorWidget(QWidget):
     for each represented object, check if click happened
     on it or not; if yes: select it, else unselect
     """
+
     def select_item(self, event):
         loops = ML.all_loops
         # first compute graphical offsets
@@ -56,12 +59,12 @@ class SimulatorWidget(QWidget):
         # then go
         # 18 and 122 are relative to mini_network.json
         # need to find something better
-        x = event.x() - 18# - x_offset
-        y = event.y() - 122# - y_offset
+        x = event.x() - 18  # - x_offset
+        y = event.y() - 122  # - y_offset
         for name in loops:
             loop = ML.get_by_name(name)
             loop_r = loop.size / 2 / pi
-            for i in range(len(loop.objects)-1, -1, -1):
+            for i in range(len(loop.objects) - 1, -1, -1):
                 # for each station/switch, starting from last
                 # check if click happened on it
                 item_type = loop.objects[i][0]
@@ -74,12 +77,12 @@ class SimulatorWidget(QWidget):
                     item_angle = item.angle_my_loop
                 item_angle += 90
                 item_angle *= 2 * pi / 360
-                item_rx = int(config["{0}_width".format(item_type.split("_")[0])])/2
-                item_ry = int(config["{0}_height".format(item_type.split("_")[0])])/2
+                item_rx = int(config["{0}_width".format(item_type.split("_")[0])]) / 2
+                item_ry = int(config["{0}_height".format(item_type.split("_")[0])]) / 2
                 item_x = loop.x - loop_r * cos(item_angle)
                 item_y = loop.y - loop_r * sin(item_angle)
                 # computing if click happened inside ellipse or not
-                if ((x - item_x)**2/item_rx**2)+((y - item_y)**2/item_ry**2) <= 1:
+                if ((x - item_x) ** 2 / item_rx ** 2) + ((y - item_y) ** 2 / item_ry ** 2) <= 1:
                     # inside object
                     self.selected_item = item
                     self.refresh()
@@ -87,7 +90,7 @@ class SimulatorWidget(QWidget):
                 # if you get here, click did not happened on
                 # something inside this loop
             # check inside the loop
-            if (x - loop.x)**2 + (y - loop.y)**2 <= loop_r**2:
+            if (x - loop.x) ** 2 + (y - loop.y) ** 2 <= loop_r ** 2:
                 # click happened inside loop
                 self.selected_item = loop
                 self.refresh()
@@ -96,19 +99,17 @@ class SimulatorWidget(QWidget):
         print("unselect")
         self.selected_item = None
         self.refresh()
-    
+
     def refresh(self):
-        if (self.loops == {}):
+        if self.loops == {}:
             # show picture if nothing loaded
-            self.image = QPixmap(getResourcePath("nothing.png"))
+            self.image = QPixmap(get_resource_path("nothing.png"))
             self.simulator_view.setPixmap(self.image)
-        else :
+        else:
             # build view
-            self.image = QPicture()
+            self.image = QPicture()   # TODO attribut pas dnas le _init
             nr = NetworkRenderer(self)
             nr.paint()
             self.simulator_view.setPicture(self.image)
             self.simulator_view.mouseReleaseEvent = self.select_item
         return
-
-        

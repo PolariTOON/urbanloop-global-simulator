@@ -22,16 +22,16 @@ class SimulatorFrame(Frame):
         self.canvas = Canvas(self)
 
         # scroll bars
-        vscrollbar = Scrollbar(self, orient="vertical",command=self.canvas.yview,cursor="hand2")
+        vscrollbar = Scrollbar(self, orient="vertical", command=self.canvas.yview, cursor="hand2")
         self.canvas.configure(yscrollcommand=vscrollbar.set)
-        vscrollbar.pack(side="right",fill="y")
-        hscrollbar = Scrollbar(self, orient="horizontal",command=self.canvas.xview,cursor="hand2")
+        vscrollbar.pack(side="right", fill="y")
+        hscrollbar = Scrollbar(self, orient="horizontal", command=self.canvas.xview, cursor="hand2")
         self.canvas.configure(xscrollcommand=hscrollbar.set)
-        hscrollbar.pack(side="bottom",fill="x")
+        hscrollbar.pack(side="bottom", fill="x")
 
         # draw loop
         loops = ML.all_loops
-        if len(loops) != 0 :
+        if len(loops) != 0:
             self["bg"] = "orange"
         else:
             self["bg"] = "red"
@@ -49,6 +49,7 @@ class SimulatorFrame(Frame):
                     self.selected_item.is_selected = False
                     self.selected_item.update_canvas()
                 self.selected_item = None
+
         self.bind("<Button-1>", callback)
 
     def update_selected_item(self, item):
@@ -76,5 +77,5 @@ class SimulatorFrame(Frame):
         """
         # TODO
         # update data in the data field (main window)
-        print("notify master: new selected item is ",self.selected_item)
+        print("notify master: new selected item is ", self.selected_item)
         return

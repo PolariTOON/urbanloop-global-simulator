@@ -10,7 +10,7 @@ class StationRenderer:
     def __init__(self, station, master):
         """TODO baptiste specification """
         self.config = config.interface
-        assert station != None and master != None
+        assert station is not None and master is not None
         self.station = station
         self.master = master
         self.is_text_written = False
@@ -21,14 +21,14 @@ class StationRenderer:
         """
         mise a jour de la texture en fonction de l'état de la capsule
         """
-        assert self.canvas != None
+        assert self.canvas is not None
         color = self.config["selected_color"] if self.is_selected else self.config["station_color"]
         self.canvas.create_oval(self.outline_width, self.outline_width, self.width - self.outline_width,
                                 self.height - self.outline_width, outline=color, width=self.outline_width)
         if not self.is_text_written:  # otherwise text become ugly :/
             self.canvas.create_text(self.width / 2, self.height / 2, text=self.station.id, tags="text")
             self.is_text_written = True
-        #self.canvas["-transparentcolor"] = "TRANSCOLOUR"
+        # self.canvas["-transparentcolor"] = "TRANSCOLOUR"
 
     def make_canvas(self):
         """
@@ -56,6 +56,7 @@ class StationRenderer:
             # and updating is_selected (circle equation)
             self.is_selected = ((event.x - xr) ** 2 + (event.y - yr) ** 2) <= r * r
             self.master.update_selected_item(self)
+
         self.canvas.bind("<Button-1>", callback)
 
         def motion(event):
@@ -68,11 +69,12 @@ class StationRenderer:
             r = self.width / 2
             # and updating is_above
             self.is_above = ((event.x - xr) ** 2 + (event.y - yr) ** 2) <= r * r
-            if (self.is_above == True):
-                self.canvas["cursor"]='hand2'
+            if self.is_above:
+                self.canvas["cursor"] = 'hand2'
             else:
-                self.canvas["cursor"]=''
-        self.canvas.bind("<Motion>",motion)
+                self.canvas["cursor"] = ''
+
+        self.canvas.bind("<Motion>", motion)
 
         # updating canvas
         self.update_canvas()

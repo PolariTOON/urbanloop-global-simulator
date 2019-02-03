@@ -1,13 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 """
 Test pour approximer les courbes de probabilités
 pour la direction des voyageurs.
 Ce choix n'a pas été retenu
 """
-lines=""
+lines = ""
 try:
     with open('../resources/curves.txt', "r") as file:
         lines = file.readlines()

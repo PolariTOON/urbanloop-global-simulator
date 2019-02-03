@@ -3,6 +3,7 @@
 
 from tkinter import Canvas
 
+
 class LoopCanvas(Canvas):
     """
     constructeur; il s'agit d'un artifice pour ajouter la fonction
@@ -12,7 +13,7 @@ class LoopCanvas(Canvas):
     param height: largeur de self.canvas
     param master: la Frame dans laquelle est dessiné self.canvas
     """
-    def __init__(self,width,height,master):
+    def __init__(self, width, height, master):
         self.width = width
         self.height = height
         super().__init__(width=self.width, height=self.height, highlightthickness=0)

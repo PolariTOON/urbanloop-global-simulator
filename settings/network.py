@@ -23,7 +23,6 @@ def load(file_path=None):
     if file_path is None:  # aller chercher celui par défaut
         file_path = '{0}/../resources/mini_network.json'.format(sys.path[0])
 
-    network = None
     ML.all_loops = {}  # autrement ca foire quand on charge un autre network
     with open(file_path, 'r') as file:
         network = json.load(file)

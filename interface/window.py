@@ -9,8 +9,9 @@ from render.loop_renderer import LoopRenderer
 from settings import network
 from model import loop as ML
 
+
 # créer une classe, c'est plus classe.
-def create_window(w=1200, h=800, loop=None):
+def create_window(w=1200, h=800, loop=None):  # TODO loop not used
     # creating a graphical app
     window = Tk()
     window["bg"] = "#e0e0e0"
@@ -19,8 +20,8 @@ def create_window(w=1200, h=800, loop=None):
     # geometry of the app
     ws = window.winfo_screenwidth()
     hs = window.winfo_screenheight()
-    x = (ws/2) - (w/2)
-    y = (hs/2) - (h/2)
+    x = (ws / 2) - (w / 2)
+    y = (hs / 2) - (h / 2)
     window.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     # configuring window grid
@@ -38,16 +39,16 @@ def create_window(w=1200, h=800, loop=None):
         lr = LoopRenderer(ML.all_loops[0], simulator_frame)
         lr.update_canvas()
         simulator_frame.canvas = lr.canvas
-        #simulator_frame.grid(column=0, sticky=N+S+E+W)
-    
+        # simulator_frame.grid(column=0, sticky=N+S+E+W)
+
     def open_example():
-        network.load(None) # load default network
+        network.load(None)  # load default network
         print(ML.all_loops[0])
         lr = LoopRenderer(ML.all_loops[0], simulator_frame)
         lr.update_canvas()
         simulator_frame.canvas = Canvas(simulator_frame)
         simulator_frame.canvas.pack()
-        #simulator_frame.grid(column=0, sticky=N+S+E+W)
+        # simulator_frame.grid(column=0, sticky=N+S+E+W)
 
     menubar = Menu(window)
     filemenu = Menu(menubar, tearoff=0)
@@ -60,7 +61,7 @@ def create_window(w=1200, h=800, loop=None):
 
     # adding main_frame
     main_frame = Frame(window, bg="green")
-    main_frame.grid(column=1, row=1, sticky=N+S+E+W)
+    main_frame.grid(column=1, row=1, sticky=N + S + E + W)
 
     # configuring main_frame grid
     main_frame.rowconfigure(0, weight=1)  # single row
@@ -74,15 +75,14 @@ def create_window(w=1200, h=800, loop=None):
     # simulator_frame = Frame(main_frame, bg="orange")
     # simulator_frame.grid(column=0, sticky=N+S+E+W)
     simulator_frame = SimulatorFrame(master=main_frame)
-    simulator_frame.grid(column=0, sticky=N+S+E+W)
-
+    simulator_frame.grid(column=0, sticky=N + S + E + W)
 
     # adding vertical separator
-    ttk.Separator(main_frame, orient=VERTICAL).grid(row=0, column=2, sticky=N+S)
+    ttk.Separator(main_frame, orient=VERTICAL).grid(row=0, column=2, sticky=N + S)
 
     # adding information_frame
     information_frame = Frame(main_frame, bg="blue")
-    information_frame.grid(row=0, column=4, sticky=N+S+E+W)
+    information_frame.grid(row=0, column=4, sticky=N + S + E + W)
 
     return window
 

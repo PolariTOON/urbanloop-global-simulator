@@ -78,7 +78,7 @@ def dijkstra_route(switch, table, to_cover):
 
                 # else :
                     # le calcul n'a pas à se faire maintenant
-    #print(table_temp)
+    # print(table_temp)
     return table_temp
 
 

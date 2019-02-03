@@ -12,7 +12,6 @@ from settings import network, config
 from model import loop as ML
 from model import switch as MSW
 from model import station as MST
-from qt.handler import Handler
 from qt.network_renderer import NetworkRenderer
 import qt.draw_capsule
 
@@ -27,7 +26,6 @@ class SimulatorWidget(QWidget):
         self.selected_item = None
         #network.load("{0}/../resources/mini_network_bis.json".format(path[0]))
         QWidget.__init__(self)
-        #self.handler = Handler(self)
         self.resize(600,600) # not working at all
         self.loops = ML.all_loops
         self.simulator_view = QLabel()

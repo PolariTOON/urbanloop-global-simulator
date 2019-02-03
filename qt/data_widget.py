@@ -37,6 +37,6 @@ class DataWidget(QWidget):
         # self.layout = QHBoxLayout(self)
         else :
             self.title.setText("Nothing selected")
-            self.data_textedit.setText()
+            self.data_textedit.setText(" ")
         self.layout.update()
         return

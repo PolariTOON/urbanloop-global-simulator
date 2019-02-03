@@ -1,6 +1,8 @@
 import queue
 from enum import Enum
 
+import model.capsule
+
 _stations = list()
 station_id = 0
 
@@ -37,6 +39,10 @@ class Station:
         self.capsule_queue = queue.Queue(maxsize=100)
         self.next_element = None
 
+    def reset_simulation(self):
+        self.traveler_queue = queue.Queue()
+        self.capsule_queue = queue.Queue(maxsize=100)
+
 
 def get_stations():
     """
@@ -54,3 +60,10 @@ def get_station_by_name(name):
     for station in _stations:
         if station.name == name:
             return station
+
+
+def reset_simulation():
+    for station in _stations:
+        station.reset_simulation()
+        station.capsule_queue.put(model.capsule.Capsule(station=station))
+        station.capsule_queue.put(model.capsule.Capsule(station=station))

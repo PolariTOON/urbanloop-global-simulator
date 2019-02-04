@@ -29,13 +29,13 @@ class NetworkRenderer:
             paint.drawEllipse(get_rect_for_loop(loop, 0))
             paint.setBrush(QColor("white"))
             paint.drawEllipse(get_rect_for_loop(loop, int(self.config["loop_outline_width"])))
+            # display loop's name
+            paint.setBrush(QColor("black"))
+            paint.drawText(loop.x-len(name)/2*8, loop.y, name)
             # make stations and switches for after painting loop
             self.fill_loop(loop, paint)
         # join loops between themselves
-        self.join_loops()
-        paint.setBrush(QColor("black"))
-        paint.drawPoint(0, 0)
-        paint.drawPoint(7, 50)
+        self.join_loops(paint)
 
     def fill_loop(self, loop, paint):
         item_nbr = 0
@@ -57,7 +57,33 @@ class NetworkRenderer:
                 paint.drawText(rect.getCoords()[0], rect.getCoords()[1], "{0}".format(item_nbr))
                 item_nbr += 1
 
-    def join_loops(self):
+    def join_loops(self, paint):
+        for name in ML.all_loops:
+            loop = ML.get_by_name(name)
+            for obj in loop.objects:
+                if isinstance(obj[1], MSW.Switch):
+                    if obj[0]=="switch_out":
+                        sw = obj[1]
+                        # compute coord of switch in both loop
+                        current_loop = sw.my_loop
+                        current_loop_r = current_loop.size / 2 / pi
+                        current_angle = sw.angle_my_loop + 90
+                        current_angle *= 2 * pi / 360 
+                        x1 = current_loop.x - cos(current_angle) * current_loop_r
+                        y1 = current_loop.y - sin(current_angle) * current_loop_r
+                        #
+                        other_loop = sw.other_loop
+                        other_loop_r = other_loop.size / 2 / pi
+                        other_angle = sw.angle_other_loop + 90
+                        other_angle *= 2 * pi / 360
+                        x2 = other_loop.x - cos(other_angle) * other_loop_r
+                        y2 = other_loop.y - sin(other_angle) * other_loop_r
+                        # compute slope
+                        #slope = (x2 - x1) / (y2 - y1)
+                        #upper_slope = 
+                        #lower_slope = 
+                        # draw 
+                        paint.drawLine(x1, y1, x2, y2)                        
         return
 
 

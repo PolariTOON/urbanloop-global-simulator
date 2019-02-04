@@ -93,7 +93,7 @@ def station_probability(station_type, second, is_arrival=True):
             else:
                 result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), eph, 1)
-    if station_type == Type.RESIDENTIAL:
+    if station_type == station.Type.RESIDENTIAL:
         if is_arrival:
             if second < 43200:
                 result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(

@@ -1,2 +1,2 @@
 #!/bin/bash
-PYTHONPATH=. /usr/bin/python3 runnable/`ls -1 runnable | grep $1`
+PYTHONPATH=. /usr/bin/python3 runnable/`ls -R -1 runnable | grep $1`

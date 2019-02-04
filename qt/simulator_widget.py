@@ -99,12 +99,12 @@ class SimulatorWidget(QWidget):
                 self.refresh()
                 return
         # if we get here, click happened on nothing
-        print("unselect")
         self.selected_item = None
         self.data_widget.refresh(None)
         self.refresh()
 
     def refresh(self):
+        self.loops = ML.all_loops
         if self.loops == {}:
             # show picture if nothing loaded
             self.image = QPixmap(get_resource_path("nothing.png"))

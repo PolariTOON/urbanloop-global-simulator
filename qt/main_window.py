@@ -11,10 +11,8 @@ from settings import network
 from qt.simulator_widget import SimulatorWidget
 from qt.data_widget import DataWidget
 
-
 def get_resource_path(resource):
     return "{0}/../resources/img/{1}".format(path[0], resource)
-
 
 class MainWindow(QMainWindow):
     def __init__(self, root):
@@ -31,13 +29,15 @@ class MainWindow(QMainWindow):
 
         # menu
         def open_file():
+            print("file")
             file_path = self.open_file_name_dialog()
             network.load(file_path)
             self.refresh()
             return
 
         def open_sample():
-            network.load(None)  # load default network
+            print("sample")
+            network.load()  # load default network
             self.refresh()
             return
 
@@ -126,6 +126,7 @@ class MainWindow(QMainWindow):
         and load a new simulator view"""
 
     def refresh(self):
-        return
+        print("refreshing")
+        self.simulator.refresh()
 
 

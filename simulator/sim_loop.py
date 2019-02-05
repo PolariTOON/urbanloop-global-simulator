@@ -1,6 +1,6 @@
 import logging
 from enum import Enum
-
+import time
 import simpy
 
 from qt import main_window
@@ -75,9 +75,12 @@ class SimLoop:
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
+
                 # print(_current_tick)
-                if main_window.window is not None:
-                    window.refresh()
+                if is_frequency(1):
+                    if main_window.window is not None:
+                        main_window.window.refresh()
+
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
                 yield _env.process(_env.exit())
@@ -187,8 +190,8 @@ def stop_simulation():
     logging.debug("Stopping simulation")
     capsule.reset_simulation()
     station.reset_simulation()
-    if window is not None:
-        window.refresh()
+    if main_window.window is not None:
+        main_window.window.refresh()
     change_state(SimState.KILLED)
 
 

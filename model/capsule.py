@@ -1,9 +1,9 @@
 import logging
 
-from simulator import sim_loop  # import simulator.sim_loop as sim_loop
 from model import station
 from model.switch import Switch
 from settings import config
+from simulator import sim_loop  # import simulator.sim_loop as sim_loop
 
 _capsules = list()
 _capsule_id = 0
@@ -92,7 +92,7 @@ class Capsule:
         """
         Recursive callback that steps the trip event
         """
-        if type(self.next_element) == Switch:
+        if type(self.next_element) == Switch and self.loop == self.next_element.my_loop:
             self.ask_route(self.next_element)
         else:
             self._continue()
@@ -133,10 +133,10 @@ class Capsule:
         """
         :return: The percentage travelled by the capsule on the segment road from the previous to the next element
         """
-        if not self.is_aboard():
+        if not self.is_aboard() or self.segment_ticks_duration == 0:
             return 0
 
-        return (sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration if self.segment_ticks_duration != 0 else 0
+        return (sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration
 
     def _get_travelers_id(self):
         """

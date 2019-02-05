@@ -15,6 +15,7 @@ class SimState(Enum):
     PAUSED = 1
     KILLED = 2
 
+
 window = None
 _env = None
 _current_tick = 0
@@ -23,6 +24,7 @@ _sim_tick = 0.05
 _start_hour = None
 _sim_tick_variation = list()
 _loop_process = None
+_endless_quit_event = None
 
 
 class SimLoop:
@@ -31,12 +33,18 @@ class SimLoop:
         global _sim_state
         global _sim_tick
         global _start_hour
+        global _endless_quit_event
         _sim_tick = float(config.sim['tick'])
         _load_env()
         _start_hour = int(config.sim['start_hour'])
         self.traveler_generator = TravelerGenerator()
         self.ascent_generator = AscentGenerator()
         self.tick_event = _env.event()
+        self.is_endless = False
+        _endless_quit_event = _env.event()
+
+        if config.sim['endless'] in ['true', 'True']:
+            self.is_endless = True
 
         if config.sim['auto_run'] in ['false', 'False']:
             _sim_state = SimState.KILLED
@@ -71,8 +79,6 @@ class SimLoop:
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
                 yield _env.process(_env.exit())
-            else: # _sim_state == SimState.PAUSED
-                yield _env.timeout(1)
 
 
 def _process_loop(sim_loop):
@@ -150,35 +156,42 @@ def run_simulation(sim_loop=None):
         sim_loop = SimLoop()
 
     _process_loop(sim_loop)
+
+    if sim_loop.is_endless:
+        global _endless_quit_event
+        print("cc")
+        _env.run(_endless_quit_event)
+        return
+
     _env.run(until=int(config.sim['duration']))
 
+<<<<<<< HEAD
 """
 endless simulation for demonstration
 """
 def run_endless_simulation(win, sim_loop):
     global _env, _sim_state, window
     window = win
+=======
+>>>>>>> a8b882097276daf46547660486bd1578f63ce194
 
-    if sim_loop is None:
-        sim_loop = SimLoop()
-    
-    if _sim_state == SimState.KILLED:
-        _sim_state = SimState.RUNNING
-        _process_loop(sim_loop)
-        _env.run(until=int(config.sim["duration"]))
-    elif _sim_state == SimState.PAUSED:
-        # reprendre la simulation
-        return
-    else: # _sim_state == SimState.RUNNING
-        # anormal but nothing to do
-        return
+def quit_endless_simulation():
+    global _env
+    global _endless_quit_event
 
-def pause_endless_simulation():
+    def _trigger():
+        yield _endless_quit_event.succeed()
+
+    _env.process(_trigger())
+
+
+def pause_simulation():
     global _loop_process
     change_state(SimState.PAUSED)
     _loop_process.interrupt()
 
-def stop_endless_simulation():
+
+def stop_simulation():
     logging.debug("Stopping simulation")
     change_state(SimState.KILLED)
 

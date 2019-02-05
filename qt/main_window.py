@@ -23,6 +23,9 @@ class MainWindow(QMainWindow):
         self.root = root
         QMainWindow.__init__(self)
         self.init_ui()
+    
+    def reset_capsules(self):
+        self.simulator.reset_capsules()
 
     def init_ui(self):
         # window itself

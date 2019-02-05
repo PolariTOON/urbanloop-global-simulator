@@ -17,6 +17,8 @@ import qt.draw_capsule
 
 config = config.interface
 
+capsules = []
+
 
 def get_resource_path(resource):
     return "{0}/../resources/img/{1}".format(path[0], resource)
@@ -24,10 +26,16 @@ def get_resource_path(resource):
 
 class SimulatorWidget(QWidget):
     def __init__(self, data_widget):
+        # storing reference to capsules
+        global capsules
+        self.capsules = capsules
+        # data widget
         self.data_widget = data_widget
+        # loading network (need to be remose in future release)
         network.load()
+        # at start, nothing is selected
         self.selected_item = None
-        # network.load("{0}/../resources/mini_network_bis.json".format(path[0]))
+        # creating widget
         QWidget.__init__(self)
         self.resize(600, 600)  # not working at all
         self.loops = ML.all_loops
@@ -35,6 +43,10 @@ class SimulatorWidget(QWidget):
         self.refresh()  # build image
         layout = QHBoxLayout(self)
         layout.addWidget(self.simulator_view)
+    
+    def reset_capsules(self):
+        self.capsules = []
+        self.refresh()
 
     """
     the aim of this is to make clickable the image

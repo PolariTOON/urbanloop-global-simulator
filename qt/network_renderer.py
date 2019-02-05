@@ -36,6 +36,11 @@ class NetworkRenderer:
             self.fill_loop(loop, paint)
         # join loops between themselves
         self.join_loops(paint)
+        # draw capsules
+        self.draw_capsules()
+
+    def draw_capsules(self):
+        print(self.root.capsules)
 
     def fill_loop(self, loop, paint):
         item_nbr = 0

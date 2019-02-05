@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
             """
             sim.run_simulation(self, None)
             self.refresh()
-            print("fini")
+            #print("fini")
 
         def on_pause_button_pressed():
             self.state = "paused"
@@ -207,7 +207,7 @@ class MainWindow(QMainWindow):
         and load a new simulator view"""
 
     def refresh(self):
-        print("refreshing")
+        #print("refreshing")
         self.simulator.refresh()
 
 

@@ -47,7 +47,7 @@ class SimLoop:
             self.is_endless = True
 
         if config.sim['auto_run'] in ['false', 'False']:
-            _sim_state = SimState.KILLED
+            _sim_state = SimState.PAUSED
         else:
             _sim_state = SimState.RUNNING
 
@@ -75,7 +75,7 @@ class SimLoop:
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
-                print(_current_tick)
+                #print(_current_tick)
                 window.refresh()
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:

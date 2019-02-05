@@ -7,6 +7,7 @@ from model.traveler import Traveler
 from settings import config
 from simulator import converter
 from simulator import poisson
+from model import capsule
 
 total_generated = 0
 
@@ -38,6 +39,7 @@ class TravelerGenerator:
             departure_station = _select_random_station()
             destination_station = _select_random_station(departure_station=departure_station)
             Traveler(departure_station.name, destination_station.name, seconds)
+            departure_station.capsule_queue.put(capsule.Capsule(departure_station))
             logging.info("Traveler generated at time %s. Routing from %s to %s" %
                          (converter.seconds_to_string(seconds),
                           departure_station.name,

@@ -68,9 +68,9 @@ class Station:
         else:
             details += "Switch " + str(self.next_element.id)
         if self.capsule_queue.qsize() != 0:
-            details +="\nCapsules (%d): " % self.capsule_queue.qsize()
+            details += "\nCapsules (%d): " % self.capsule_queue.qsize()
             l = list(self.capsule_queue.queue)
-            for c in l :
+            for c in l:
                 details += "\n    Capsule #{0}".format(c.id)
         return details
 

@@ -8,7 +8,7 @@ import model.loop as ML
 import model.station as MST
 import model.switch as MSW
 import model.capsule as MC
-import logging
+
 
 class NetworkRenderer:
     def __init__(self, root):
@@ -46,7 +46,7 @@ class NetworkRenderer:
             rect = get_rect_for_capsule(capsule, 0)
             paint.setBrush(QColor(config.interface["selected_color"] if capsule == self.root.selected_item else config.interface["capsule_color"]))
             paint.drawEllipse(rect)
-            
+
 
     def fill_loop(self, loop, paint):
         item_nbr = 0
@@ -65,7 +65,7 @@ class NetworkRenderer:
                     self.config["station_outline_width"])
                 rect = get_rect_for_item(item, loop, outline_width, None if is_station else item_type)
                 paint.drawEllipse(rect)
-                paint.drawText(rect.getCoords()[0], rect.getCoords()[1], "{0}".format(item_nbr))
+                # paint.drawText(rect.getCoords()[0], rect.getCoords()[1], "{0}".format(item_nbr))
                 item_nbr += 1
 
     def join_loops(self, paint):
@@ -97,6 +97,7 @@ class NetworkRenderer:
                         paint.drawLine(x1, y1, x2, y2)                        
         return
 
+
 def get_rect_for_loop(loop, i):
     """
     return the rect in which @param loop
@@ -111,6 +112,7 @@ def get_rect_for_loop(loop, i):
     rw = d - i * 2
     rh = d - i * 2
     return QRect(rx, ry, rw, rh)
+
 
 def get_rect_for_item(item, loop, i, item_type=None):
     is_station = isinstance(item, MST.Station)

@@ -73,7 +73,7 @@ class SimLoop:
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
-                if is_frequency(1):
+                if is_frequency(5000):
                     _env.process(self.traveler_generator.generate())
 
                 # print(_current_tick)

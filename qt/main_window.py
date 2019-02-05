@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
             self.state = "running"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # starting thread
-            self.thd = Thread(target=sim.run_simulation, args=(self,None))
+            self.thd = Thread(target=sim.run_simulation)
             self.thd.start()
             print("thread started")
             #self.thd.join()

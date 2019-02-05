@@ -152,7 +152,8 @@ def run_simulation(w, sim_loop=None):
     Run the simulation with the loop_process
     """
     global _env, window
-    window = w
+    if w != None:
+        window = w
 
     if sim_loop is None:
         sim_loop = SimLoop()

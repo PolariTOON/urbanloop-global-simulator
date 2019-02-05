@@ -13,11 +13,15 @@ from qt.simulator_widget import SimulatorWidget
 from qt.data_widget import DataWidget
 from simulator import sim_loop as sim
 
+window = None
+
 def get_resource_path(resource):
     return "{0}/../resources/img/{1}".format(path[0], resource)
 
 class MainWindow(QMainWindow):
     def __init__(self, root):
+        global window
+        window = self
         self.speed = 1.
         self.state = "None"
         self.root = root
@@ -81,14 +85,12 @@ class MainWindow(QMainWindow):
             self.state = "running"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # starting thread
-            """
             self.thd = Thread(target=sim.run_simulation, args=(self,None))
             self.thd.start()
             print("thread started")
-            self.thd.join()
-            """
-            sim.run_simulation(self, None)
-            self.refresh()
+            #self.thd.join()
+            #sim.run_simulation(self, None)
+            #self.refresh()
             #print("fini")
 
         def on_pause_button_pressed():

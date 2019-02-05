@@ -8,6 +8,7 @@ import model.loop as ML
 import model.station as MST
 import model.switch as MSW
 import model.capsule as MC
+import logging
 
 class NetworkRenderer:
     def __init__(self, root):

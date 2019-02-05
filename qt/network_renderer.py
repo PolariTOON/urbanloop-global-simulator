@@ -143,12 +143,11 @@ def get_rect_for_item(item, loop, i, item_type=None):
     return QRect(xr, yr, wr, hr)
 
 def get_rect_for_capsule(capsule, i):
-    print("###########")
     loop = capsule.loop
     percentage = capsule.get_trip_percentage()
     # compute capsule coords
     lx, ly, lr = loop.x, loop.y, loop.size / 2 / pi
-    print("loop at [{0};{1}]".format(lx, ly))
+    
     if isinstance(capsule.current_element, MSW.Switch):
         sa = capsule.current_element.angle_my_loop
     else:
@@ -159,19 +158,12 @@ def get_rect_for_capsule(capsule, i):
         nsa = capsule.next_element.angle
     if nsa < sa:
         nsa += 360
-    print("start angle: %f" % sa)
     ca = (nsa-sa) * percentage  + sa
-    print("current angle: %f (+%f /100)" % (ca, percentage))
     ca += 90
     ca = ca * 2 * pi / 360
     cx, cy = lx - lr * cos(ca), ly - lr * sin(ca)
     # compute rectangle coord
     cw = int(config.interface["capsule_width"])
     ch = int(config.interface["capsule_height"])
-    print("caps at [{0};{1}]".format(cx, cy))
-    print("x1: %f" % (cx-cw/2-i))
-    print("y1: %f" % (cy-ch/2-i))
-    print("x2: %f" % (cx+cw/2-i))
-    print("y2: %f" % (cy+ch/2-i))
-
+    
     return QRect(cx-cw/2-i, cy-ch/2-i, cw, ch)

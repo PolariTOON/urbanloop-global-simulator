@@ -67,7 +67,7 @@ class SimulatorWidget(QWidget):
         # 18 and 122 are relative to mini_network.json
         # need to find something better
         x = event.x() - 18  # - x_offset
-        y = event.y() - 122  # - y_offset
+        y = event.y() - 102  # - y_offset
         for name in loops:
             loop = ML.get_by_name(name)
             loop_r = loop.size / 2 / pi

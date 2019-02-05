@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # stop simulation
             self.thd = None
-            sim.stop_endless_simulation()
+            sim.stop_simulation()
 
         def on_play_button_pressed():
             # buttons
@@ -81,9 +81,15 @@ class MainWindow(QMainWindow):
             self.state = "running"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # starting thread
-            self.thd = Thread(target=sim.run_endless_simulation, args=(self,None))
+            """
+            self.thd = Thread(target=sim.run_simulation, args=(self,None))
             self.thd.start()
             print("thread started")
+            self.thd.join()
+            """
+            sim.run_simulation(self, None)
+            self.refresh()
+            print("fini")
 
         def on_pause_button_pressed():
             self.state = "paused"

@@ -3,7 +3,7 @@ from enum import Enum
 
 import simpy
 
-from qt.main_window import window
+from qt import main_window
 from model import capsule
 from model import station
 from settings import config
@@ -76,7 +76,7 @@ class SimLoop:
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
                 # print(_current_tick)
-                if window is not None:
+                if main_window.window is not None:
                     window.refresh()
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:

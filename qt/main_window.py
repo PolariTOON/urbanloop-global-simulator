@@ -98,7 +98,7 @@ class MainWindow(QMainWindow):
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             self.play_button.setDisabled(False)
             self.pause_button.setDisabled(True)
-            sim.pause_endless_simulation()
+            sim.pause_simulation()
 
         def on_increase_button_pressed():
             self.speed *= 2

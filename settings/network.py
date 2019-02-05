@@ -4,7 +4,7 @@ import sys
 
 from model import loop as ML
 from model import switch as MS
-from model.capsule import Capsule
+from model import capsule as MC
 from model.loop import Loop
 from model.station import *
 from model.switch import Switch
@@ -24,6 +24,8 @@ def load(file_path=None):
         file_path = '{0}/../resources/mini_network.json'.format(sys.path[0])
 
     ML.all_loops = {}  # autrement ca foire quand on charge un autre network
+    MC._capsules = list()
+
     with open(file_path, 'r') as file:
         network = json.load(file)
     for loop, info in network.items():
@@ -88,8 +90,8 @@ def load(file_path=None):
     MS.init()
     for station in get_stations():
         #creating capsules
-        c1 = Capsule(station=station)
-        c2 = Capsule(station=station)
+        c1 = MC.Capsule(station=station)
+        c2 = MC.Capsule(station=station)
         # adding capsules to station
         station.capsule_queue.put(c1)
         station.capsule_queue.put(c2)        

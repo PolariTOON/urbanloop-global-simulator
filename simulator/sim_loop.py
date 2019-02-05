@@ -3,9 +3,9 @@ from enum import Enum
 
 import simpy
 
-import model.capsule
+from model import capsule as MC
 import model.station
-from settings import config
+from settings import config, network
 from simulator.ascent_generator import AscentGenerator
 from simulator.traveler_generator import TravelerGenerator
 
@@ -184,6 +184,12 @@ def pause_simulation():
 
 def stop_simulation():
     logging.debug("Stopping simulation")
+    model.capsule.reset_simulation()
+    model.station.reset_simulation()
+    #_current_tick = 0
+    #_sim_tick_variation = list()
+    global window
+    window.refresh()
     change_state(SimState.KILLED)
 
 

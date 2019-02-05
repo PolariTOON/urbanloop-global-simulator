@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
             self.state = "stopped"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # stop simulation
-            self.thd = None
+            #self.thd = None
             sim.stop_simulation()
 
         def on_play_button_pressed():

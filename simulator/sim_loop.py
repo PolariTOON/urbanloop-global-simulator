@@ -3,9 +3,10 @@ from enum import Enum
 
 import simpy
 
-from model import capsule as MC
-import model.station
-from settings import config, network
+from qt.main_window import window
+from model import capsule
+from model import station
+from settings import config
 from simulator.ascent_generator import AscentGenerator
 from simulator.traveler_generator import TravelerGenerator
 
@@ -16,7 +17,6 @@ class SimState(Enum):
     KILLED = 2
 
 
-window = None
 _env = None
 _current_tick = 0
 _sim_state = None
@@ -68,15 +68,16 @@ class SimLoop:
         You can create several independents process while the
         SimState is RUNNING.
         """
-        global window, _current_tick
+        global _current_tick
         while True:
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
-                #print(_current_tick)
-                window.refresh()
+                # print(_current_tick)
+                if window is not None:
+                    window.refresh()
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
                 yield _env.process(_env.exit())
@@ -147,13 +148,11 @@ def change_state(sim_state=SimState.RUNNING):
     _sim_state = sim_state
 
 
-def run_simulation(w, sim_loop=None):
+def run_simulation(sim_loop=None):
     """
     Run the simulation with the loop_process
     """
-    global _env, window
-    if w != None:
-        window = w
+    global _env
 
     if sim_loop is None:
         sim_loop = SimLoop()
@@ -166,6 +165,7 @@ def run_simulation(w, sim_loop=None):
         return
 
     _env.run(until=int(config.sim['duration']))
+
 
 def quit_endless_simulation():
     global _env
@@ -185,12 +185,10 @@ def pause_simulation():
 
 def stop_simulation():
     logging.debug("Stopping simulation")
-    model.capsule.reset_simulation()
-    model.station.reset_simulation()
-    #_current_tick = 0
-    #_sim_tick_variation = list()
-    global window
-    window.refresh()
+    capsule.reset_simulation()
+    station.reset_simulation()
+    if window is not None:
+        window.refresh()
     change_state(SimState.KILLED)
 
 
@@ -204,8 +202,8 @@ def reset_simulation():
     logging.warning("Resetting the simulation")
     change_state(SimState.PAUSED)
     _loop_process.interrupt()
-    model.capsule.reset_simulation()
-    model.station.reset_simulation()
+    capsule.reset_simulation()
+    station.reset_simulation()
     _current_tick = 0
     _sim_tick_variation = list()
     change_state(SimState.RUNNING)

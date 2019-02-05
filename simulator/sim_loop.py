@@ -60,12 +60,14 @@ class SimLoop:
         You can create several independents process while the
         SimState is RUNNING.
         """
+        global window
         while True:
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
+                window.refresh()
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
                 yield _env.process(_env.exit())
@@ -153,7 +155,7 @@ def run_simulation(sim_loop=None):
 """
 endless simulation for demonstration
 """
-def run_endless_simulation(win, sim_loop=None):
+def run_endless_simulation(win, sim_loop):
     global _env, _sim_state, window
     window = win
 

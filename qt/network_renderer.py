@@ -7,6 +7,7 @@ from settings import config
 import model.loop as ML
 import model.station as MST
 import model.switch as MSW
+import model.capsule as MC
 
 
 class NetworkRenderer:
@@ -37,10 +38,15 @@ class NetworkRenderer:
         # join loops between themselves
         self.join_loops(paint)
         # draw capsules
-        self.draw_capsules()
+        self.draw_capsules(paint)
 
-    def draw_capsules(self):
-        print(self.root.capsules)
+    def draw_capsules(self, paint):
+        capsules = MC._capsules
+        for capsule in capsules:
+            rect = get_rect_for_capsule(capsule, 0)
+            paint.setBrush(QColor(config.interface["selected_color"] if capsule == self.root.selected_item else config.interface["capsule_color"]))
+            paint.drawEllipse(rect)
+            
 
     def fill_loop(self, loop, paint):
         item_nbr = 0
@@ -135,3 +141,37 @@ def get_rect_for_item(item, loop, i, item_type=None):
     wr = item_width - i * 2
     hr = item_height - i * 2
     return QRect(xr, yr, wr, hr)
+
+def get_rect_for_capsule(capsule, i):
+    print("###########")
+    loop = capsule.loop
+    percentage = capsule.get_trip_percentage()
+    # compute capsule coords
+    lx, ly, lr = loop.x, loop.y, loop.size / 2 / pi
+    print("loop at [{0};{1}]".format(lx, ly))
+    if isinstance(capsule.current_element, MSW.Switch):
+        sa = capsule.current_element.angle_my_loop
+    else:
+        sa = capsule.current_element.angle
+    if isinstance(capsule.next_element, MSW.Switch):
+        nsa = capsule.next_element.angle_my_loop
+    else:
+        nsa = capsule.next_element.angle
+    if nsa < sa:
+        nsa += 360
+    print("start angle: %f" % sa)
+    ca = (nsa-sa) * percentage  + sa
+    print("current angle: %f (+%f /100)" % (ca, percentage))
+    ca += 90
+    ca = ca * 2 * pi / 360
+    cx, cy = lx - lr * cos(ca), ly - lr * sin(ca)
+    # compute rectangle coord
+    cw = int(config.interface["capsule_width"])
+    ch = int(config.interface["capsule_height"])
+    print("caps at [{0};{1}]".format(cx, cy))
+    print("x1: %f" % (cx-cw/2-i))
+    print("y1: %f" % (cy-ch/2-i))
+    print("x2: %f" % (cx+cw/2-i))
+    print("y2: %f" % (cy+ch/2-i))
+
+    return QRect(cx-cw/2-i, cy-ch/2-i, cw, ch)

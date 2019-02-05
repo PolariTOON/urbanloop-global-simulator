@@ -17,9 +17,6 @@ import qt.draw_capsule
 
 config = config.interface
 
-capsules = []
-
-
 def get_resource_path(resource):
     return "{0}/../resources/img/{1}".format(path[0], resource)
 
@@ -27,8 +24,6 @@ def get_resource_path(resource):
 class SimulatorWidget(QWidget):
     def __init__(self, data_widget):
         # storing reference to capsules
-        global capsules
-        self.capsules = capsules
         # data widget
         self.data_widget = data_widget
         # loading network (need to be remose in future release)

@@ -87,9 +87,12 @@ def load(file_path=None):
         the_loop.add_order(order)
     MS.init()
     for station in get_stations():
-        station.capsule_queue.put(Capsule(station=station))
-        station.capsule_queue.put(Capsule(station=station))
-
+        #creating capsules
+        c1 = Capsule(station=station)
+        c2 = Capsule(station=station)
+        # adding capsules to station
+        station.capsule_queue.put(c1)
+        station.capsule_queue.put(c2)        
 
 '''
 def search_next_station(elements, i):

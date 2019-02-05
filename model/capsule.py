@@ -136,7 +136,7 @@ class Capsule:
         if not self.is_aboard():
             return 0
 
-        return (sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration
+        return (sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration if self.segment_ticks_duration != 0 else 0
 
     def _get_travelers_id(self):
         """

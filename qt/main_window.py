@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         # window itself
         self.root.setWindowIcon(QIcon(get_resource_path("icon.png")))
-        self.resize(1000, 600)
+        #self.resize(1000, 600)
         self.center()
         self.setWindowTitle('URBANLOOP Simulator')
 
@@ -81,7 +81,7 @@ class MainWindow(QMainWindow):
             self.state = "running"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # starting thread
-            self.thd = Thread(target=sim.run_endless_simulation(), args=self)
+            self.thd = Thread(target=sim.run_endless_simulation, args=(self,None))
             self.thd.start()
             print("thread started")
 

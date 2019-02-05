@@ -92,7 +92,7 @@ class Capsule:
         """
         Recursive callback that steps the trip event
         """
-        if type(self.next_element) == Switch and self.loop == self.next_element.my_loop:
+        if type(self.next_element) == Switch:
             self.ask_route(self.next_element)
         else:
             self._continue()
@@ -100,6 +100,7 @@ class Capsule:
         if self.current_element == self.destination:
             logging.info("Capsule n°%d arrives to its destination %s" %
                          (self.id, self.destination.name))
+            self.current_element.capsule_queue.put(self)
             self.get_out_traveler()
             return
 

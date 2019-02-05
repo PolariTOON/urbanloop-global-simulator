@@ -2,7 +2,7 @@ import logging
 import random
 
 from simulator import sim_loop  # import simulator.sim_loop as sim_loop
-from model.station import *
+from model import station as st
 from model.traveler import Traveler
 from settings import config
 from simulator import converter
@@ -55,36 +55,36 @@ def _select_random_station(departure_station=None):
     is_arrival = departure_station is not None
 
     second = converter.now_to_seconds()
-    city_prob = converter.station_probability(Type.CITY, second, is_arrival=is_arrival)
-    neutral_prob = converter.station_probability(Type.NEUTRAL, second, is_arrival=is_arrival)
-    residential_prob = converter.station_probability(Type.RESIDENTIAL, second, is_arrival=is_arrival)
-    activity_prob = converter.station_probability(Type.ACTIVITY, second, is_arrival=is_arrival)
+    city_prob = converter.station_probability(st.Type.CITY, second, is_arrival=is_arrival)
+    neutral_prob = converter.station_probability(st.Type.NEUTRAL, second, is_arrival=is_arrival)
+    residential_prob = converter.station_probability(st.Type.RESIDENTIAL, second, is_arrival=is_arrival)
+    activity_prob = converter.station_probability(st.Type.ACTIVITY, second, is_arrival=is_arrival)
 
     prob = random.uniform(0, 1)
     interval = [0, city_prob]
 
     if interval[0] <= prob < interval[1]:
-        return _get_random_station_from_type(Type.CITY, departure_station=departure_station)
+        return _get_random_station_from_type(st.Type.CITY, departure_station=departure_station)
 
     interval[0] = interval[1]
     interval[1] += neutral_prob
 
     if interval[0] <= prob < interval[1]:
-        return _get_random_station_from_type(Type.NEUTRAL, departure_station=departure_station)
+        return _get_random_station_from_type(st.Type.NEUTRAL, departure_station=departure_station)
 
     interval[0] = interval[1]
     interval[1] += residential_prob
 
     if interval[0] <= prob < interval[1]:
-        return _get_random_station_from_type(Type.RESIDENTIAL, departure_station=departure_station)
+        return _get_random_station_from_type(st.Type.RESIDENTIAL, departure_station=departure_station)
 
     interval[0] = interval[1]
     interval[1] += activity_prob
 
     if interval[0] <= prob < interval[1]:
-        return _get_random_station_from_type(Type.ACTIVITY, departure_station=departure_station)
+        return _get_random_station_from_type(st.Type.ACTIVITY, departure_station=departure_station)
 
-    return _get_random_station_from_type(Type.CITY, departure_station=departure_station)
+    return _get_random_station_from_type(st.Type.CITY, departure_station=departure_station)
 
 
 def _get_random_station_from_type(station_type, departure_station=None):
@@ -96,7 +96,7 @@ def _get_random_station_from_type(station_type, departure_station=None):
     """
 
     stations = []
-    for station in get_stations():
+    for station in st.get_stations():
         if station.station_type == station_type.value:
             if departure_station is None:
                 stations.append(station)
@@ -105,9 +105,9 @@ def _get_random_station_from_type(station_type, departure_station=None):
 
     if not stations:
         if departure_station is None:
-            return random.choice(get_stations())
+            return random.choice(st.get_stations())
         else:
             return random.choice(
-                [a_station for a_station in get_stations() if a_station.name != departure_station.name])
+                [a_station for a_station in st.get_stations() if a_station.name != departure_station.name])
 
     return random.choice(stations)

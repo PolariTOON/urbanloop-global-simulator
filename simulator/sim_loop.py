@@ -15,10 +15,10 @@ class SimState(Enum):
     PAUSED = 1
     KILLED = 2
 
-
+window = None
 _env = None
 _current_tick = 0
-_sim_state = SimState.RUNNING
+_sim_state = None
 _sim_tick = 0.05
 _start_hour = None
 _sim_tick_variation = list()
@@ -39,7 +39,9 @@ class SimLoop:
         self.tick_event = _env.event()
 
         if config.sim['auto_run'] in ['false', 'False']:
-            _sim_state = SimState.PAUSED
+            _sim_state = SimState.KILLED
+        else:
+            _sim_state = SimState.RUNNING
 
     def tick(self):
         """
@@ -67,6 +69,8 @@ class SimLoop:
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
                 yield _env.process(_env.exit())
+            else: # _sim_state == SimState.PAUSED
+                yield _env.timeout(1)
 
 
 def _process_loop(sim_loop):
@@ -145,6 +149,36 @@ def run_simulation(sim_loop=None):
 
     _process_loop(sim_loop)
     _env.run(until=int(config.sim['duration']))
+
+"""
+endless simulation for demonstration
+"""
+def run_endless_simulation(win, sim_loop=None):
+    global _env, _sim_state, window
+    window = win
+
+    if sim_loop is None:
+        sim_loop = SimLoop()
+    
+    if _sim_state == SimState.KILLED:
+        _sim_state = SimState.RUNNING
+        _process_loop(sim_loop)
+        _env.run(until=int(config.sim["duration"]))
+    elif _sim_state == SimState.PAUSED:
+        # reprendre la simulation
+        return
+    else: # _sim_state == SimState.RUNNING
+        # anormal but nothing to do
+        return
+
+def pause_endless_simulation():
+    global _loop_process
+    change_state(SimState.PAUSED)
+    _loop_process.interrupt()
+
+def stop_endless_simulation():
+    logging.debug("Stopping simulation")
+    change_state(SimState.KILLED)
 
 
 def reset_simulation():

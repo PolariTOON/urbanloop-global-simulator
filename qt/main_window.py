@@ -6,16 +6,20 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFile
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from sys import path
+from threading import Thread
 
 from settings import network
 from qt.simulator_widget import SimulatorWidget
 from qt.data_widget import DataWidget
+from simulator import sim_loop as sim
 
 def get_resource_path(resource):
     return "{0}/../resources/img/{1}".format(path[0], resource)
 
 class MainWindow(QMainWindow):
     def __init__(self, root):
+        self.speed = 1.
+        self.state = "None"
         self.root = root
         QMainWindow.__init__(self)
         self.init_ui()
@@ -40,6 +44,55 @@ class MainWindow(QMainWindow):
             network.load()  # load default network
             self.refresh()
             return
+        
+        # buttons
+        def on_decrease_button_pressed():
+            # speed label
+            self.speed /= 2
+            self.speed_label.setText(self.speed_label.text().split(" : ")[0] + " : x%f" % self.speed)
+            # decrease speed
+            sim.decelerate_sim()
+
+        def on_stop_button_pressed():
+            # buttons
+            self.play_button.setDisabled(False)
+            self.stop_button.setDisabled(True)
+            self.pause_button.setDisabled(True)
+            self.increase_speed_button.setDisabled(True)
+            self.decrease_speed_button.setDisabled(True)
+            # state label
+            self.state = "stopped"
+            self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
+            # stop simulation
+            self.thd = None
+            sim.stop_endless_simulation()
+
+        def on_play_button_pressed():
+            # buttons
+            self.play_button.setDisabled(True)
+            self.stop_button.setDisabled(False)
+            self.pause_button.setDisabled(False)
+            self.increase_speed_button.setDisabled(False)
+            self.decrease_speed_button.setDisabled(False)
+            # state label
+            self.state = "running"
+            self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
+            # starting thread
+            self.thd = Thread(target=sim.run_endless_simulation(), args=self)
+            self.thd.start()
+            print("thread started")
+
+        def on_pause_button_pressed():
+            self.state = "paused"
+            self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
+            self.play_button.setDisabled(False)
+            self.pause_button.setDisabled(True)
+            sim.pause_endless_simulation()
+
+        def on_increase_button_pressed():
+            self.speed *= 2
+            self.speed_label.setText(self.speed_label.text().split(" : ")[0] + " : x%f" % self.speed)
+            sim.accelerate_sim()
 
         menubar = self.menuBar()
         file_menu = menubar.addMenu('&File')
@@ -56,6 +109,7 @@ class MainWindow(QMainWindow):
         # +----------------------------------+
         # | +-----------+ |   VBOX           |
         # | |           | |  +-------------+ |
+        # | |           | |  | state       | |
         # | |           | |  | +---------+ | |
         # | | simulator | |  | | buttons | | |
         # | |           | |  | +---------+ | |
@@ -64,17 +118,29 @@ class MainWindow(QMainWindow):
         # | |           | |  | +---------+ | |
         # | +-----------+ |  +-------------+ |
         # +----------------------------------+
-        # data #TODO Ne sont pas défninis dans _init
+        # data
         self.title_label = DataWidget()
         data_vbox = QVBoxLayout()
         data_vbox.addWidget(self.title_label)
 
-        # buttons & layout  #TODO Ne sont pas défninis dans _init
+        # buttons & layout
         self.decrease_speed_button = QPushButton(QIcon(get_resource_path("minus.png")), "")
+        self.decrease_speed_button.released.connect(on_decrease_button_pressed)
         self.stop_button = QPushButton(QIcon(get_resource_path("stop.png")), "")
+        self.stop_button.released.connect(on_stop_button_pressed)
         self.play_button = QPushButton(QIcon(get_resource_path("play-button.png")), "")
+        self.play_button.released.connect(on_play_button_pressed)
         self.pause_button = QPushButton(QIcon(get_resource_path("pause.png")), "")
+        self.pause_button.released.connect(on_pause_button_pressed)
         self.increase_speed_button = QPushButton(QIcon(get_resource_path("plus.png")), "")
+        self.increase_speed_button.released.connect(on_increase_button_pressed)
+        # turning on/off buttons
+        self.play_button.setDisabled(False)
+        self.stop_button.setDisabled(True)
+        self.pause_button.setDisabled(True)
+        self.increase_speed_button.setDisabled(True)
+        self.decrease_speed_button.setDisabled(True)
+        # adding em to the layout
         buttons_hbox = QHBoxLayout()
         buttons_hbox.addWidget(self.decrease_speed_button)
         buttons_hbox.addWidget(self.stop_button)
@@ -82,8 +148,14 @@ class MainWindow(QMainWindow):
         buttons_hbox.addWidget(self.pause_button)
         buttons_hbox.addWidget(self.increase_speed_button)
 
+        # state label
+        self.state_label = QLabel("State : None")
+        self.speed_label = QLabel("Speed : x%f" % self.speed)
+
         # right part
         right_layout = QVBoxLayout()
+        right_layout.addWidget(self.state_label)
+        right_layout.addWidget(self.speed_label)
         right_layout.addLayout(buttons_hbox)
         right_layout.addWidget(QSplitter())
         right_layout.addLayout(data_vbox)

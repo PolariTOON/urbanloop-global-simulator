@@ -41,7 +41,6 @@ class SimulatorWidget(QWidget):
     for each represented object, check if click happened
     on it or not; if yes: select it, else unselect
     """
-
     def select_item(self, event):
         loops = ML.all_loops
         # first compute graphical offsets

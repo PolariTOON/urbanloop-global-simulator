@@ -13,7 +13,7 @@ network.load("{0}/../resources/{1}".format(path[0], "mini_network.json"))
 """création d'une capsule à TELECOM Nancy voulant aller à la Gare """
 telecom = station.get_station_by_name("TELECOM Nancy")
 stan = station.get_station_by_name("Stanislas")
-capsule = Capsule(station=telecom, destination=stan)
+capsule = Capsule(departure_station=telecom, destination_station=stan)
 
 
 def promenade(c):

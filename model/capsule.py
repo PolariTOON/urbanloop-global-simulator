@@ -1,7 +1,7 @@
 import logging
 
 from model import station
-from model.switch import Switch
+from model import switch
 from settings import config
 from simulator import sim_loop  # import simulator.sim_loop as sim_loop
 
@@ -10,10 +10,10 @@ _capsule_id = 0
 
 
 class Capsule:
-    def __init__(self, station=None, destination=None):
+    def __init__(self, departure_station=None, destination_station=None):
         """
-        :param  station: Initial station of this capsule (Station)
-        :param destination: The destination station of the capsule (optional - Station)
+        :param departure_station: Initial station of this capsule (Station)
+        :param destination_station: The destination station of the capsule (optional - Station)
         """
         global _capsules
         global _capsule_id
@@ -24,26 +24,26 @@ class Capsule:
         self.current_element = None
         self.next_element = None
         self.loop = None
-        self.destination = destination
+        self.destination = destination_station
         self.travelers = list()
         self.trip_event = None
         self.speed = float(config.capsule['max_speed'])
         self.segment_start_tick = 0
         self.segment_ticks_duration = 0
 
-        if station is not None:
-            self.current_element = station
-            self.next_element = station.next_element
-            self.loop = station.loop
+        if departure_station is not None:
+            self.current_element = departure_station
+            self.next_element = departure_station.next_element
+            self.loop = departure_station.loop
 
-    def ask_route(self, switch):
+    def ask_route(self, current_switch):
         """
         Ask to the selected switch if the capsule should switch or not to another loop to reach its destination.
-        :param switch: The current switch which decide whether the capsule needs to go on another loop
+        :param current_switch: The current switch which decide whether the capsule needs to go on another loop
         """
-        change = switch.route_capsule_to_station(self.destination)
+        change = current_switch.route_capsule_to_station(self.destination)
         if change:
-            self._change_loop(switch)
+            self._change_loop(current_switch)
         else:
             self._continue()
             logging.info("Capsule n°%d stays on its loop :  %s" %
@@ -58,14 +58,14 @@ class Capsule:
         self.current_element = self.next_element
         self.next_element = self.current_element.next_element
 
-    def _change_loop(self, switch):
+    def _change_loop(self, current_switch):
         """
         The capsule goes to another loop to reach its destination
-        :param switch: The current switch which has decided to lead the capsule on another loop
+        :param current_switch: The current switch which has decided to lead the capsule on another loop
         """
-        self.current_element = switch
-        self.next_element = switch.next_element_other
-        self.loop = switch.other_loop
+        self.current_element = current_switch
+        self.next_element = current_switch.next_element_other
+        self.loop = current_switch.other_loop
         logging.info("Capsule n°%d is switched to the loop :  %s" %
                      (self.id, self.loop.name))
 
@@ -92,7 +92,7 @@ class Capsule:
         """
         Recursive callback that steps the trip event
         """
-        if type(self.next_element) == Switch:
+        if type(self.next_element) == switch.Switch:
             self.ask_route(self.next_element)
         else:
             self._continue()

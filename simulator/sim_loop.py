@@ -7,8 +7,8 @@ from qt import main_window
 from model import capsule
 from model import station
 from settings import config
-from simulator.ascent_generator import AscentGenerator
-from simulator.traveler_generator import TravelerGenerator
+from simulator import ascent_generator
+from simulator import traveler_generator
 
 
 class SimState(Enum):
@@ -37,8 +37,8 @@ class SimLoop:
         _sim_tick = float(config.sim['tick'])
         _load_env()
         _start_hour = int(config.sim['start_hour'])
-        self.traveler_generator = TravelerGenerator()
-        self.ascent_generator = AscentGenerator()
+        self.traveler_generator = traveler_generator.TravelerGenerator()
+        self.ascent_generator = ascent_generator.AscentGenerator()
         self.tick_event = _env.event()
         self.is_endless = False
         _endless_quit_event = _env.event()
@@ -76,7 +76,6 @@ class SimLoop:
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
 
-                # print(_current_tick)
                 if is_frequency(1):
                     if main_window.window is not None:
                         main_window.window.refresh()

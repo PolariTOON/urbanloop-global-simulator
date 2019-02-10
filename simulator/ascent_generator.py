@@ -1,6 +1,6 @@
 import random
 
-from simulator import sim_loop  # import simulator.sim_loop as sim_loop
+from simulator import sim_loop
 from model import station
 from settings import config
 
@@ -17,12 +17,12 @@ class AscentGenerator:
         yield climb_timeout
 
     def generate(self):
-        for station in self.stations:
-            if not station.traveler_queue.empty() and not station.capsule_queue.empty() and self.can_generate():
+        for a_station in self.stations:
+            if not a_station.traveler_queue.empty() and not a_station.capsule_queue.empty() and self.can_generate():
                 if self.trip_limit != -1:
                     self.trip_limit -= 1
-                traveler = station.traveler_queue.get_nowait()
-                capsule = station.capsule_queue.get_nowait()
+                traveler = a_station.traveler_queue.get_nowait()
+                capsule = a_station.capsule_queue.get_nowait()
                 capsule.get_in_traveler(traveler=traveler)
                 yield sim_loop.get_env().process(self.ascent_event(capsule))
 

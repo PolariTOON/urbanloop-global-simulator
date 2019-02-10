@@ -90,8 +90,8 @@ def load(file_path=None):
     MS.init()
     for station in get_stations():
         #creating capsules
-        c1 = MC.Capsule(station=station)
-        c2 = MC.Capsule(station=station)
+        c1 = MC.Capsule(departure_station=station)
+        c2 = MC.Capsule(departure_station=station)
         # adding capsules to station
         station.capsule_queue.put(c1)
         station.capsule_queue.put(c2)        

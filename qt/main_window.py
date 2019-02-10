@@ -84,14 +84,10 @@ class MainWindow(QMainWindow):
             # state label
             self.state = "running"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
-            # starting thread
-            self.thd = Thread(target=sim.run_simulation)
-            self.thd.start()
-            print("thread started")
-            #self.thd.join()
-            #sim.run_simulation(self, None)
-            #self.refresh()
-            #print("fini")
+            # starting simulation and get list of states
+            self.states = sim.run_simulation()
+            # TODO
+            #self.play()
 
         def on_pause_button_pressed():
             self.state = "paused"

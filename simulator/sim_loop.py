@@ -26,6 +26,9 @@ _sim_tick_variation = list()
 _loop_process = None
 _endless_quit_event = None
 
+# list of states to show on display
+states = []
+
 
 class SimLoop:
     def __init__(self):
@@ -75,10 +78,6 @@ class SimLoop:
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
-
-                if is_frequency(1):
-                    if main_window.window is not None:
-                        main_window.window.refresh()
 
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
@@ -154,7 +153,9 @@ def run_simulation(sim_loop=None):
     """
     Run the simulation with the loop_process
     """
-    global _env
+    global _env, states
+
+    states = [] # reset
 
     if sim_loop is None:
         sim_loop = SimLoop()
@@ -167,6 +168,8 @@ def run_simulation(sim_loop=None):
         return
 
     _env.run(until=int(config.sim['duration']))
+
+    return states
 
 
 def quit_endless_simulation():

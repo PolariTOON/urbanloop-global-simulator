@@ -77,8 +77,7 @@ class NetworkRenderer:
         for capsule in capsules:
             rect = get_rect_for_capsule(capsule, 0)
             paint.setBrush(QColor(
-                config.interface["selected_color"] if capsule == self.root.selected_item else config.interface[
-                    "capsule_color"]))
+                config["selected_color"] if capsule == self.root.selected_item else config["capsule_color"]))
             paint.drawEllipse(rect)
 
 def join_loops(paint):
@@ -133,8 +132,8 @@ def get_rect_for_item(item, loop, i, item_type=None):
     yi = yl - rl * sin(angle)
     # rect
     item = "station" if is_station else "switch"
-    item_width = int(config.interface["{0}_width".format(item)])
-    item_height = int(config.interface["{0}_height".format(item)])
+    item_width = int(config["{0}_width".format(item)])
+    item_height = int(config["{0}_height".format(item)])
     xr = xi - item_width / 2 + i
     yr = yi - item_height / 2 + i
     wr = item_width - i * 2
@@ -166,8 +165,8 @@ def get_rect_for_capsule(capsule, i):
     ca = ca * 2 * pi / 360
     cx, cy = lx - lr * cos(ca), ly - lr * sin(ca)
     # compute rectangle coord
-    cw = int(config.interface["capsule_width"])
-    ch = int(config.interface["capsule_height"])
+    cw = int(config["capsule_width"])
+    ch = int(config["capsule_height"])
 
     return QRect(cx - cw / 2 - i, cy - ch / 2 - i, cw, ch)
 
@@ -176,11 +175,11 @@ def get_line_for_switch(switch):
     Return the QLine to join two loops between @param:switch in/out
     """
     # first loop
-    r = switch.loop.size / 2 / pi
+    r = switch.my_loop.size / 2 / pi
     a = switch.angle_my_loop + 90
     a *= 2 * pi / 360
-    x1 = switch.current_loop.x - cos(a) * r
-    y1 = switch.current_loop.y - sin(a) * r
+    x1 = switch.my_loop.x - cos(a) * r
+    y1 = switch.my_loop.y - sin(a) * r
     # second loop
     r = switch.other_loop.size / 2 / pi
     a = switch.angle_other_loop + 90

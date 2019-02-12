@@ -97,7 +97,7 @@ def load(file_path=None):
         departure.capsule_queue.put(Capsule(departure))
         '''
     for station in MST.get_stations():
-        #creating capsules
+        # creating capsules
         c1 = Capsule(departure_station=station)
         c2 = Capsule(departure_station=station)
         # adding capsules to station

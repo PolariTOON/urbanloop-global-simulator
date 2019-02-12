@@ -66,6 +66,9 @@ class Loop:
                     # logging.debug(str((i + 1) % len(self.objects)))
                     return self.lengths[i], self.objects[(i + 1) % len(self.objects)][1]
                 else:
+                    if element is element2:
+                        # On veut la distance d'un switch in vers le même switch out
+                        return element.size, element
                     cost = self.lengths[i]
                     for j in range(0, len(self.objects)):
                         index = (i + j) % len(self.objects)

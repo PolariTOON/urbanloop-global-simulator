@@ -57,6 +57,9 @@ class Capsule:
                      (self.id, self.next_element.name, self.current_element.name))
         self.current_element = self.next_element
         self.next_element = self.current_element.next_element
+        if type(self.current_element) is switch.Switch:
+            if self.loop is self.current_element.other_loop:
+                self.next_element = self.current_element.next_element_other
 
     def _change_loop(self, current_switch):
         """
@@ -93,7 +96,10 @@ class Capsule:
         Recursive callback that steps the trip event
         """
         if type(self.next_element) == switch.Switch:
-            self.ask_route(self.next_element)
+            if self.next_element.my_loop is self.loop:
+                self.ask_route(self.next_element)
+            else:
+                self._continue()
         else:
             self._continue()
 

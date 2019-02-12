@@ -35,12 +35,15 @@
 ### Programme SPRINT jusqu'au 12/02 
 | Tâches                                 |       En charge          | Deadline |Respect|
 | :------------------------------------  |: ----------------------- |:--------:|:-----:|
-| File d'attente simulateur              | Thibault                 | 12/02    |✓ ou x |
-| File d'attente interface               |  Baptiste                | 12/02    |✓ ou x |
-| Gestion de projet                      |          Charlotte       |   _      |✓      |
+| File d'attente simulateur              | Thibault                 | 12/02    |✓      |
+| File d'attente interface               |  Baptiste                | 12/02    |x      |
+| Gestion de la capacité d'une station   |          Charlotte       |   12/02  |✓      |
+| Drainage des stations pleine (capsules vides dans le réseau)|Charlotte| 12/02|✓      |
+| Gestion de projet                      |          Charlotte       |   _      | _     |
 
 ###### Objectifs :
-* Fixer les défauts 
+* Fixer les défauts de l'interface 
+* gérer les stations vides
 
 
 ### Programme SPRINTs suivants
@@ -50,6 +53,7 @@
 | Routage dynamique                      | Charlotte                | to define|✓ ou x |
 | Défauts                                |  **Thibault**, Charlotte | to define|✓ ou x |
 | Zoom, dézoom et déplacement            |          Baptiste        | to define|✓ ou x |
+| Gestion graphique des capacités        |          Charlotte       | to define|✓ ou x |
 
 
 ###### Objectifs :
@@ -66,9 +70,7 @@
     * x Interface 
 * simulateur 
     * x ajout des défauts 
-    * x file 
     * x routage Dynamique 
-    * x capsules vides se promenant 
 * interface
     * x modifications 
         * ajout défauts 
@@ -76,6 +78,7 @@
         * ajout personnes 
     * adaptation du json 
     * (zoom, dézoom)
-    * slotes 
+    * slotes (gestion des capacités)
+    * capsules vides 
 *
  

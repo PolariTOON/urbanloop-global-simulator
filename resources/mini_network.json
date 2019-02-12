@@ -2,9 +2,9 @@
   "Nancy": {
     "center": [500,70],
     "circonference": 500,
-    "content": [{"type":"station","name":"Gare", "angle":0, "station_type": 3},
-                {"type":"station","name":"Stanislas", "angle":90, "station_type": 3},
-                {"type":"station","name":"Campus_ARTEM", "angle": 160, "station_type": 1},
+    "content": [{"type":"station","name":"Gare", "angle":0, "station_type": 3, "capacity": 5},
+                {"type":"station","name":"Stanislas", "angle":90, "station_type": 3, "capacity": 4},
+                {"type":"station","name":"Campus_ARTEM", "angle": 160, "station_type": 1, "capacity": 4},
                 {"type":"switch_out","other_loop":"Villers-les-Nancy", "length": 15, "angle":190},
                 {"type":"switch_out","other_loop":"Laxou", "length": 50, "angle":240},
                 {"type":"switch_in","other_loop":"Laxou", "angle":305}
@@ -14,9 +14,9 @@
     "center": [300,300],
     "circonference": 700,
     "content": [{"type":"switch_in","other_loop":"Nancy", "angle":60 },
-                {"type":"station","name":"Velodrome", "angle":90, "station_type": 3},
-                {"type":"station","name":"TELECOM Nancy", "angle":140, "station_type": 1},
-                {"type":"station","name":"Eglise", "angle":225, "station_type": 2},
+                {"type":"station","name":"Velodrome", "angle":90, "station_type": 3, "capacity": 5},
+                {"type":"station","name":"TELECOM Nancy", "angle":140, "station_type": 1, "capacity": 4},
+                {"type":"station","name":"Eglise", "angle":225, "station_type": 2, "capacity": 3},
                 {"type":"switch_out","other_loop":"Laxou", "length": 60, "angle":310}
     ]
   },
@@ -26,8 +26,8 @@
     "content": [{"type":"switch_out","other_loop":"Nancy", "length": 60, "angle":50 },
                 {"type":"switch_in","other_loop":"Nancy", "angle":150 },
                 {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":210 },
-                {"type":"station","name":"Auchan", "angle":270, "station_type": 1},
-                {"type":"station","name":"Autoroute", "angle":340, "station_type": 2}
+                {"type":"station","name":"Auchan", "angle":270, "station_type": 1, "capacity": 3},
+                {"type":"station","name":"Sapiniere", "angle":340, "station_type": 2, "capacity": 3}
     ]
   }
 }

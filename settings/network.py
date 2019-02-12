@@ -42,7 +42,7 @@ def load(file_path=None):
             e += 1
             el_type = element["type"]
             if el_type == "station":
-                elms += [MST.Station(element["name"], None, the_loop, element["angle"], element["station_type"])]
+                elms += [MST.Station(name=element["name"], capacity=element["capacity"], loop=the_loop, angle=element["angle"], station_type=["station_type"])]
                 the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]

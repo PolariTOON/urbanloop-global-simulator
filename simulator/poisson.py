@@ -9,7 +9,7 @@ class Poisson:
         self.traveller_lambda_per_hour = [
             (int(config.default['traveler_per_day']) * coefficient) / (3600 * np.sum(self.peak_hours_coefficient))
             for coefficient in self.peak_hours_coefficient]
-        self.defect_lambda = int(config.default['defect_per_day']) / 86400
+        # self.defect_lambda = int(config.default['defect_per_day']) / 86400
 
     def traveler(self, hour):
         """

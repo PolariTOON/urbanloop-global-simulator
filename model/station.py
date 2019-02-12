@@ -2,6 +2,7 @@ import queue
 from enum import Enum
 
 from model import capsule
+import logging
 
 _stations = list()
 station_id = 0
@@ -17,7 +18,7 @@ class Type(Enum):
 class Station:
     network = None
 
-    def __init__(self, name=None, capacity=100, loop=None, angle=None, station_type=Type.NEUTRAL):
+    def __init__(self, name=None, capacity=4, loop=None, angle=None, station_type=Type.NEUTRAL):
         """
         :param name: Name of the station
         :param capacity: Loop circumference (float)
@@ -36,12 +37,12 @@ class Station:
         self.loop = loop
         self.station_type = station_type
         self.traveler_queue = queue.Queue()
-        self.capsule_queue = queue.Queue(maxsize=100)
+        self.capsule_queue = queue.Queue(maxsize=capacity)
         self.next_element = None
 
     def reset_simulation(self):
         self.traveler_queue = queue.Queue()
-        self.capsule_queue = queue.Queue(maxsize=100)
+        self.capsule_queue = queue.Queue(maxsize=self.capacity)
 
     def show_details(self):
         """
@@ -74,6 +75,24 @@ class Station:
                 details += "\n    Capsule #{0}".format(c.id)
         return details
 
+    def drain(self):
+        """
+        Lance les capsules vides dans le réseau si la station est trop pleine
+        :return:
+        """
+        if self.capsule_queue.qsize() >= ((3 * self.capacity) % 4):
+            empty = 0
+            for caps in list(self.capsule_queue.queue):
+                if not caps.is_aboard():
+                    empty += 1
+                    if empty >= 2:
+                        # la lancer
+                        dest = select_destination_empty(self)
+                        logging.debug(str(dest.loop))
+                        caps.destination = dest
+                        caps.start_trip()
+
+
 
 def get_stations():
     """
@@ -98,3 +117,22 @@ def reset_simulation():
         station.reset_simulation()
         station.capsule_queue.put(capsule.Capsule(departure_station=station))
         station.capsule_queue.put(capsule.Capsule(departure_station=station))
+
+
+def select_destination_empty(departure):
+    """ Selectionne une station la plus proche 'presque vide' """
+    list_station = get_stations()
+    dep = list_station.index(departure)
+    for i in range(1, len(list_station)):
+        cand = list_station[(dep+i) % len(list_station)]
+        if cand.capsule_queue.qsize() <= min(cand.capacity % 3, 2):
+            return cand
+    return departure
+
+
+#def draining():
+#    """ Vide l'ensemble des stations 'trop pleines' """
+#    list_station = get_stations()
+#    for cand in list_station:
+#        if cand.capsule_queue.qsize() >= ((3 * cand.capacity) % 4):
+#            cand.drain()

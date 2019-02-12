@@ -1,12 +1,13 @@
 import json
 import logging
 import sys
+import numpy as np
 
 from model import loop as ML
 from model import switch as MS
-from model import capsule as MC
+from model.capsule import Capsule
 from model.loop import Loop
-from model.station import *
+import model.station as MST
 from model.switch import Switch
 
 """
@@ -24,8 +25,6 @@ def load(file_path=None):
         file_path = '{0}/../resources/mini_network.json'.format(sys.path[0])
 
     ML.all_loops = {}  # autrement ca foire quand on charge un autre network
-    MC._capsules = list()
-
     with open(file_path, 'r') as file:
         network = json.load(file)
     for loop, info in network.items():
@@ -43,7 +42,7 @@ def load(file_path=None):
             e += 1
             el_type = element["type"]
             if el_type == "station":
-                elms += [Station(element["name"], None, the_loop, element["angle"], element["station_type"])]
+                elms += [MST.Station(element["name"], None, the_loop, element["angle"], element["station_type"])]
                 the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
@@ -88,13 +87,23 @@ def load(file_path=None):
                     order += [["station", elm, elm.angle]]
         the_loop.add_order(order)
     MS.init()
-    for station in get_stations():
-        #creating capsules
-        c1 = MC.Capsule(departure_station=station)
-        c2 = MC.Capsule(departure_station=station)
+    '''nb_st = len(st.get_stations())
+        print(nb_st)
+        r = np.random.randint(nb_st)
+        departure = st.get_station_by_id(r)
+        r = np.random.randint(nb_st)
+        arrivee = st.get_station_by_id(r)
+        Traveler(departure.name, arrivee.name, 0)
+        departure.capsule_queue.put(Capsule(departure))
+        '''
+    for station in MST.get_stations():
+        # creating capsules
+        c1 = Capsule(departure_station=station)
+        c2 = Capsule(departure_station=station)
         # adding capsules to station
         station.capsule_queue.put(c1)
-        station.capsule_queue.put(c2)        
+        station.capsule_queue.put(c2)
+
 
 '''
 def search_next_station(elements, i):

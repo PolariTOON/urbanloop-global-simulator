@@ -1,12 +1,12 @@
 import logging
 import random
 
-from simulator import sim_loop  # import simulator.sim_loop as sim_loop
 from model import station
 from model import traveler
 from settings import config
 from simulator import converter
 from simulator import poisson
+from simulator import sim_loop
 
 total_generated = 0
 

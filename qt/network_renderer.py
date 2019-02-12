@@ -49,6 +49,7 @@ class NetworkRenderer:
         paint.drawText(loop.x - len(name) / 2 * 8, loop.y, name)
         return loop
 
+
     def fill_loop(self, loop, paint):
         """
         Draw every switch and station which belong to @param:loop with @param;paint

@@ -29,7 +29,7 @@ class Switch:
         :param  next_element : la station après le switch sur la loop où le switch est (Station/Switch)
         :param  next_element_other : la station après le switch sur la loop aiguillée (Station/Switch)
         :param  size : la taille de l'aiguillage
-        :return:0UT : un objet aiguillage (Switch)
+        :return: 0UT : un objet aiguillage (Switch)
         """
         global switch_id
         self.id = switch_id
@@ -98,6 +98,14 @@ class Switch:
         details += "\nSize of the link : " + str(self.size)
         details += "\nRouting Table : " + str(self.table)
         return details
+
+    def is_switch_out(self, the_loop):
+        if the_loop is self.my_loop:
+            return True
+        elif the_loop is self.other_loop:
+            return False
+        else:
+            logging.error("Le switch " + str(self.id) + " n'est pas sur la boucle " + the_loop.name)
 
 
 def init():

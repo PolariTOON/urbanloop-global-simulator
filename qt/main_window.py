@@ -1,22 +1,26 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFileDialog, QPushButton, QHBoxLayout, \
-    QVBoxLayout, QLabel, QTextEdit, QSplitter
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
+import logging
 from sys import path
 from threading import Thread
 
-from settings import network
-from qt.simulator_widget import SimulatorWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFileDialog, QPushButton, QHBoxLayout, \
+    QVBoxLayout, QLabel, QSplitter
+
 from qt.data_widget import DataWidget
+from qt.simulator_widget import SimulatorWidget
+from settings import network
 from simulator import sim_loop as sim
 
 window = None
 
+
 def get_resource_path(resource):
     return "{0}/../resources/img/{1}".format(path[0], resource)
+
 
 class MainWindow(QMainWindow):
     def __init__(self, root):
@@ -27,31 +31,31 @@ class MainWindow(QMainWindow):
         self.root = root
         QMainWindow.__init__(self)
         self.init_ui()
-    
+
     def reset_capsules(self):
         self.simulator.reset_capsules()
 
     def init_ui(self):
         # window itself
         self.root.setWindowIcon(QIcon(get_resource_path("icon.png")))
-        #self.resize(1000, 600)
+        # self.resize(1000, 600)
         self.center()
         self.setWindowTitle('URBANLOOP Simulator')
 
         # menu
         def open_file():
-            print("file")
+            logging.debug("Custom Network File")
             file_path = self.open_file_name_dialog()
             network.load(file_path)
             self.refresh()
             return
 
         def open_sample():
-            print("sample")
-            network.load()  # load default network
+            logging.debug("Default Network File")
+            network.load()
             self.refresh()
             return
-        
+
         # buttons
         def on_decrease_button_pressed():
             # speed label
@@ -71,7 +75,7 @@ class MainWindow(QMainWindow):
             self.state = "stopped"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # stop simulation
-            #self.thd = None
+            # self.thd = None
             sim.stop_simulation()
 
         def on_play_button_pressed():
@@ -88,17 +92,12 @@ class MainWindow(QMainWindow):
             self.thd = Thread(target=sim.run_simulation)
             self.thd.start()
             print("thread started")
-            #self.thd.join()
-            #sim.run_simulation(self, None)
-            #self.refresh()
-            #print("fini")
 
         def on_pause_button_pressed():
             self.state = "paused"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             self.play_button.setDisabled(False)
             self.pause_button.setDisabled(True)
-            sim.pause_endless_simulation()
 
         def on_increase_button_pressed():
             self.speed *= 2
@@ -209,7 +208,5 @@ class MainWindow(QMainWindow):
         and load a new simulator view"""
 
     def refresh(self):
-        #print("refreshing")
+        # print("refreshing")
         self.simulator.refresh()
-
-

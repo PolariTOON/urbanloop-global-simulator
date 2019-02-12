@@ -83,7 +83,7 @@ class Capsule:
         """
         time_to_next_element = self.loop.dist_to_next_object(self.current_element)[0] / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
-        self.segment_ticks_duration = time_to_next_element * sim_loop.get_tick_per_second()
+        self.segment_ticks_duration = 10 * time_to_next_element * sim_loop.get_tick_per_second()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
@@ -176,3 +176,7 @@ def reset_simulation():
     _capsule_id = 0
     for capsule in _capsules:
         del capsule
+
+
+def get_capsules():
+    return _capsules

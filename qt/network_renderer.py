@@ -1,14 +1,15 @@
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QPicture, QPainter, QColor
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtGui import QPainter, QColor
 from math import pi, cos, sin
 
-from settings import config
+from PyQt5.QtCore import QRect
+from PyQt5.QtGui import QPainter, QColor
+
+import model.capsule as MC
 import model.loop as ML
 import model.station as MST
 import model.switch as MSW
-import model.capsule as MC
-import logging
+from settings import config
+
 
 class NetworkRenderer:
     def __init__(self, root):
@@ -32,7 +33,7 @@ class NetworkRenderer:
             paint.drawEllipse(get_rect_for_loop(loop, int(self.config["loop_outline_width"])))
             # display loop's name
             paint.setBrush(QColor("black"))
-            paint.drawText(loop.x-len(name)/2*8, loop.y, name)
+            paint.drawText(loop.x - len(name) / 2 * 8, loop.y, name)
             # make stations and switches for after painting loop
             self.fill_loop(loop, paint)
         # join loops between themselves
@@ -41,12 +42,13 @@ class NetworkRenderer:
         self.draw_capsules(paint)
 
     def draw_capsules(self, paint):
-        capsules = MC._capsules
+        capsules = MC.get_capsules()
         for capsule in capsules:
             rect = get_rect_for_capsule(capsule, 0)
-            paint.setBrush(QColor(config.interface["selected_color"] if capsule == self.root.selected_item else config.interface["capsule_color"]))
+            paint.setBrush(QColor(
+                config.interface["selected_color"] if capsule == self.root.selected_item else config.interface[
+                    "capsule_color"]))
             paint.drawEllipse(rect)
-            
 
     def fill_loop(self, loop, paint):
         item_nbr = 0
@@ -73,13 +75,13 @@ class NetworkRenderer:
             loop = ML.get_by_name(name)
             for obj in loop.objects:
                 if isinstance(obj[1], MSW.Switch):
-                    if obj[0]=="switch_out":
+                    if obj[0] == "switch_out":
                         sw = obj[1]
                         # compute coord of switch in both loop
                         current_loop = sw.my_loop
                         current_loop_r = current_loop.size / 2 / pi
                         current_angle = sw.angle_my_loop + 90
-                        current_angle *= 2 * pi / 360 
+                        current_angle *= 2 * pi / 360
                         x1 = current_loop.x - cos(current_angle) * current_loop_r
                         y1 = current_loop.y - sin(current_angle) * current_loop_r
                         #
@@ -90,12 +92,13 @@ class NetworkRenderer:
                         x2 = other_loop.x - cos(other_angle) * other_loop_r
                         y2 = other_loop.y - sin(other_angle) * other_loop_r
                         # compute slope
-                        #slope = (x2 - x1) / (y2 - y1)
-                        #upper_slope = 
-                        #lower_slope = 
+                        # slope = (x2 - x1) / (y2 - y1)
+                        # upper_slope =
+                        # lower_slope =
                         # draw 
-                        paint.drawLine(x1, y1, x2, y2)                        
+                        paint.drawLine(x1, y1, x2, y2)
         return
+
 
 def get_rect_for_loop(loop, i):
     """
@@ -111,6 +114,7 @@ def get_rect_for_loop(loop, i):
     rw = d - i * 2
     rh = d - i * 2
     return QRect(rx, ry, rw, rh)
+
 
 def get_rect_for_item(item, loop, i, item_type=None):
     is_station = isinstance(item, MST.Station)
@@ -140,12 +144,13 @@ def get_rect_for_item(item, loop, i, item_type=None):
     hr = item_height - i * 2
     return QRect(xr, yr, wr, hr)
 
+
 def get_rect_for_capsule(capsule, i):
     loop = capsule.loop
     percentage = capsule.get_trip_percentage()
     # compute capsule coords
     lx, ly, lr = loop.x, loop.y, loop.size / 2 / pi
-    
+
     if isinstance(capsule.current_element, MSW.Switch):
         sa = capsule.current_element.angle_my_loop
     else:
@@ -156,12 +161,12 @@ def get_rect_for_capsule(capsule, i):
         nsa = capsule.next_element.angle
     if nsa < sa:
         nsa += 360
-    ca = (nsa-sa) * percentage  + sa
+    ca = (nsa - sa) * percentage + sa
     ca += 90
     ca = ca * 2 * pi / 360
     cx, cy = lx - lr * cos(ca), ly - lr * sin(ca)
     # compute rectangle coord
     cw = int(config.interface["capsule_width"])
     ch = int(config.interface["capsule_height"])
-    
-    return QRect(cx-cw/2-i, cy-ch/2-i, cw, ch)
+
+    return QRect(cx - cw / 2 - i, cy - ch / 2 - i, cw, ch)

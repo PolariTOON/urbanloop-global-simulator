@@ -1,11 +1,12 @@
 import logging
 from enum import Enum
-import time
+
 import simpy
 
-from qt import main_window
 from model import capsule
+from model import sim_record
 from model import station
+from qt import main_window
 from settings import config
 from simulator import ascent_generator
 from simulator import traveler_generator
@@ -19,7 +20,7 @@ class SimState(Enum):
 
 _env = None
 _current_tick = 0
-_sim_state = None
+_sim_state = SimState.RUNNING
 _sim_tick = 0.05
 _start_hour = None
 _sim_tick_variation = list()
@@ -41,15 +42,13 @@ class SimLoop:
         self.ascent_generator = ascent_generator.AscentGenerator()
         self.tick_event = _env.event()
         self.is_endless = False
+        self.is_recorded = False
         _endless_quit_event = _env.event()
 
         if config.sim['endless'] in ['true', 'True']:
             self.is_endless = True
-
-        if config.sim['auto_run'] in ['false', 'False']:
-            _sim_state = SimState.PAUSED
-        else:
-            _sim_state = SimState.RUNNING
+        if config.sim['recorded'] in ['true', 'True']:
+            self.is_recorded = True
 
     def tick(self):
         """
@@ -76,9 +75,8 @@ class SimLoop:
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
 
-                if is_frequency(1):
-                    if main_window.window is not None:
-                        main_window.window.refresh()
+                if self.is_recorded:
+                    sim_record.put_record()
 
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
@@ -170,6 +168,9 @@ def run_simulation(sim_loop=None):
 
 
 def quit_endless_simulation():
+    """
+    Stop an endless simulation by triggering the _endless_quit_event
+    """
     global _env
     global _endless_quit_event
 
@@ -180,12 +181,17 @@ def quit_endless_simulation():
 
 
 def pause_simulation():
+    """
+    Pause the simulation. Call run_simulation to restart the simulation
+    """
     global _loop_process
     change_state(SimState.PAUSED)
-    _loop_process.interrupt()
 
 
 def stop_simulation():
+    """
+    Stop the simulation definitely. All capsules or stations are reset
+    """
     logging.debug("Stopping simulation")
     capsule.reset_simulation()
     station.reset_simulation()
@@ -245,6 +251,13 @@ def get_state():
     :return: The simulation state
     """
     return _sim_state
+
+
+def is_paused():
+    """
+    :return: True if the simulation is currently paused
+    """
+    return _sim_state == SimState.PAUSED
 
 
 def get_sim_tick():

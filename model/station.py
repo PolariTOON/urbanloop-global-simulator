@@ -80,7 +80,7 @@ class Station:
         Lance les capsules vides dans le réseau si la station est trop pleine
         :return:
         """
-        if self.capsule_queue.qsize() >= ((3 * self.capacity) % 4):
+        if self.capsule_queue.qsize() >= int((3 * self.capacity) / 4):
             empty = 0
             for caps in list(self.capsule_queue.queue):
                 if not caps.is_aboard():
@@ -125,7 +125,7 @@ def select_destination_empty(departure):
     dep = list_station.index(departure)
     for i in range(1, len(list_station)):
         cand = list_station[(dep+i) % len(list_station)]
-        if cand.capsule_queue.qsize() <= min(cand.capacity % 3, 2):
+        if cand.capsule_queue.qsize() <= min(int(cand.capacity / 3), 2):
             return cand
     return departure
 

@@ -111,17 +111,17 @@ class Capsule:
             self._continue()
 
         if self.current_element == self.destination:
-            if self.current_element.capsule_queue.qsize() < self.current_element.capacity:
+            if self.current_element.capsule_queue.full():
+                logging.info("Capsule n°%d arrives to its destination %s but the station is already full !" %(self.id, self.destination.name))
+                self.current_element.drain()
+                # relance
+                sim_loop.get_env().process(self.update_trip())
+            else :
                 logging.info("Capsule n°%d arrives to its destination %s" %
                              (self.id, self.destination.name))
                 self.current_element.capsule_queue.put(self)
                 self.get_out_traveler()
                 return
-            else:
-                logging.info("Capsule n°%d arrives to its destination %s but the station is already full !" %(self.id, self.destination.name))
-                self.current_element.drain()
-                # relance
-                sim_loop.get_env().process(self.update_trip())
         else: # continue :
             sim_loop.get_env().process(self.update_trip())
 

@@ -15,21 +15,23 @@ config = config.interface
 
 
 def get_resource_path(resource):
+    """
+    Return resource path
+    """
     return "{0}/../resources/img/{1}".format(path[0], resource)
 
 
 class SimulatorWidget(QWidget):
     def __init__(self, data_widget):
-        # storing reference to capsules
-        # data widget
+        """
+        SimulatorWidget constructor
+        @param:data_widget if the widget where data of the self.selected_item is displayed
+        """
         self.data_widget = data_widget
-        # loading network (need to be remose in future release)
-        network.load()
         # at start, nothing is selected
         self.selected_item = None
         # creating widget
         QWidget.__init__(self)
-        self.resize(600, 600)  # not working at all
         self.loops = ML.all_loops
         self.simulator_view = QLabel()
         self.refresh()  # build image
@@ -37,19 +39,21 @@ class SimulatorWidget(QWidget):
         layout.addWidget(self.simulator_view)
 
     def reset_capsules(self):
+        """
+        Reset Simulator knowledge of capsules in the network and update simulator view
+        """
         self.capsules = []
         self.refresh()
 
-    """
-    the aim of this is to make clickable the image
-    for each represented object, check if click happened
-    on it or not; if yes: select it, else unselect
-    """
-
     def select_item(self, event):
-        loops = ML.all_loops
-        # first compute graphical offsets
         """
+        Update self.selected_item
+        """
+        loops = ML.all_loops
+        # WARNING
+        # this sucks. this is why we must move on another way to display the network
+        """
+        # first compute graphical offsets
         x_offsets = []
         y_offsets = []
         for name in loops:
@@ -61,9 +65,8 @@ class SimulatorWidget(QWidget):
         x_offset = max(x_offsets)
         y_offset = max(y_offsets)
         """
-        # then go
+        # WARNING
         # 18 and 122 are relative to mini_network.json
-        # need to find something better
         x = event.x() - 18  # - x_offset
         y = event.y() - 102  # - y_offset
         for name in loops:
@@ -86,28 +89,32 @@ class SimulatorWidget(QWidget):
                 item_ry = int(config["{0}_height".format(item_type.split("_")[0])]) / 2
                 item_x = loop.x - loop_r * cos(item_angle)
                 item_y = loop.y - loop_r * sin(item_angle)
-                # computing if click happened inside ellipse or not
+                # computing if click happened on a switch or a station
                 if ((x - item_x) ** 2 / item_rx ** 2) + ((y - item_y) ** 2 / item_ry ** 2) <= 1:
                     # inside object
                     self.selected_item = item
                     self.data_widget.refresh(item)
                     self.refresh()
                     return
-                # if you get here, click did not happened on
-                # something inside this loop
-            # check inside the loop
+                # if you get here, click did not happened on something on this loop
+            # computing if click happened inside a loop
             if (x - loop.x) ** 2 + (y - loop.y) ** 2 <= loop_r ** 2:
                 # click happened inside loop
                 self.selected_item = loop
                 self.data_widget.refresh(loop)
                 self.refresh()
                 return
+        # computing if click happened on a capsule
+        # TODO
         # if we get here, click happened on nothing
         self.selected_item = None
         self.data_widget.refresh(None)
         self.refresh()
 
     def refresh(self):
+        """
+        Refresh simulator view
+        """
         self.loops = ML.all_loops
         if self.loops == {}:
             # show picture if nothing loaded
@@ -120,4 +127,3 @@ class SimulatorWidget(QWidget):
             nr.paint()
             self.simulator_view.setPicture(self.image)
             self.simulator_view.mouseReleaseEvent = self.select_item
-        return

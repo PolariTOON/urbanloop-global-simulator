@@ -29,7 +29,7 @@ class Switch:
         :param  next_element : la station après le switch sur la loop où le switch est (Station/Switch)
         :param  next_element_other : la station après le switch sur la loop aiguillée (Station/Switch)
         :param  size : la taille de l'aiguillage
-        :return:0UT : un objet aiguillage (Switch)
+        :return: 0UT : un objet aiguillage (Switch)
         """
         global switch_id
         self.id = switch_id

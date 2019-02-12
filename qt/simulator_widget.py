@@ -1,21 +1,18 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from PyQt5.QtWidgets import QWidget, QPushButton, QHBoxLayout, QLabel
-from PyQt5.QtGui import QPixmap, QPicture
-
-from sys import path
 from math import pi, cos, sin
+from sys import path
 
-from settings import network, config
+from PyQt5.QtGui import QPixmap, QPicture
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 
 from model import loop as ML
-from model import switch as MSW
-from model import station as MST
 from qt.network_renderer import NetworkRenderer
-import qt.draw_capsule
+from settings import network, config
 
 config = config.interface
+
 
 def get_resource_path(resource):
     return "{0}/../resources/img/{1}".format(path[0], resource)
@@ -38,7 +35,7 @@ class SimulatorWidget(QWidget):
         self.refresh()  # build image
         layout = QHBoxLayout(self)
         layout.addWidget(self.simulator_view)
-    
+
     def reset_capsules(self):
         self.capsules = []
         self.refresh()
@@ -48,6 +45,7 @@ class SimulatorWidget(QWidget):
     for each represented object, check if click happened
     on it or not; if yes: select it, else unselect
     """
+
     def select_item(self, event):
         loops = ML.all_loops
         # first compute graphical offsets
@@ -117,7 +115,7 @@ class SimulatorWidget(QWidget):
             self.simulator_view.setPixmap(self.image)
         else:
             # build view
-            self.image = QPicture()   # TODO attribut pas dnas le _init
+            self.image = QPicture()  # TODO attribut pas dnas le _init
             nr = NetworkRenderer(self)
             nr.paint()
             self.simulator_view.setPicture(self.image)

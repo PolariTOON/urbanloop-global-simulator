@@ -98,8 +98,8 @@ def load(file_path=None):
         '''
     for station in MST.get_stations():
         #creating capsules
-        c1 = Capsule(station=station)
-        c2 = Capsule(station=station)
+        c1 = Capsule(departure_station=station)
+        c2 = Capsule(departure_station=station)
         # adding capsules to station
         station.capsule_queue.put(c1)
         station.capsule_queue.put(c2)

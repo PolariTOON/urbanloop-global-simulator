@@ -96,5 +96,5 @@ def get_station_by_name(name):
 def reset_simulation():
     for station in _stations:
         station.reset_simulation()
-        station.capsule_queue.put(capsule.Capsule(station=station))
-        station.capsule_queue.put(capsule.Capsule(station=station))
+        station.capsule_queue.put(capsule.Capsule(departure_station=station))
+        station.capsule_queue.put(capsule.Capsule(departure_station=station))

@@ -42,7 +42,7 @@ def now_to_seconds():
     """
     :return: The current time in second
     """
-    return sim_loop.get_env().now * sim_loop.get_sim_tick() + sim_loop.get_start_hour() * 3600
+    return sim_loop.get_current_tick() * sim_loop.get_sim_tick() + sim_loop.get_start_hour() * 3600
 
 
 def seconds_to_floor_hour(seconds):

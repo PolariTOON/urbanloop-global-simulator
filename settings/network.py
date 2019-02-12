@@ -3,11 +3,11 @@ import logging
 import sys
 import numpy as np
 
-from model import loop as ML
-from model import switch as MS
-from model.capsule import Capsule, _capsules
+from model import loop as model_loop
+from model import switch as model_switch
+from model import capsule as model_capsule
 from model.loop import Loop
-import model.station as MST
+from model import station as model_station
 from model.switch import Switch
 
 """
@@ -24,13 +24,13 @@ def load(file_path=None):
     if file_path is None:  # aller chercher celui par défaut
         file_path = '{0}/../resources/mini_network.json'.format(sys.path[0])
 
-    ML.all_loops = {}  # autrement ca foire quand on charge un autre network
+    model_loop.all_loops = {}  # autrement ca foire quand on charge un autre network
     with open(file_path, 'r') as file:
         network = json.load(file)
     for loop, info in network.items():
         # the_loop = None
-        if loop in ML.all_loops:
-            the_loop = ML.get_by_name(loop)
+        if loop in model_loop.all_loops:
+            the_loop = model_loop.get_by_name(loop)
             the_loop.x = info["center"][0]
             the_loop.y = info["center"][1]
             the_loop.size = info["circonference"]
@@ -42,12 +42,12 @@ def load(file_path=None):
             e += 1
             el_type = element["type"]
             if el_type == "station":
-                elms += [MST.Station(name=element["name"], capacity=element["capacity"], loop=the_loop, angle=element["angle"], station_type=["station_type"])]
+                elms += [model_station.Station(name=element["name"], capacity=element["capacity"], loop=the_loop, angle=element["angle"], station_type=["station_type"])]
                 the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
-                if other in ML.all_loops:
-                    other_l = ML.get_by_name(other)
+                if other in model_loop.all_loops:
+                    other_l = model_loop.get_by_name(other)
                 else:
                     other_l = Loop(other)
 
@@ -86,7 +86,7 @@ def load(file_path=None):
                 else:
                     order += [["station", elm, elm.angle]]
         the_loop.add_order(order)
-    MS.init()
+    model_switch.init()
     '''nb_st = len(st.get_stations())
         print(nb_st)
         r = np.random.randint(nb_st)
@@ -96,17 +96,20 @@ def load(file_path=None):
         Traveler(departure.name, arrivee.name, 0)
         departure.capsule_queue.put(Capsule(departure))
         '''
-    for station in MST.get_stations():
-        # creating capsules
-        c1 = Capsule(departure_station=station)
-        c2 = Capsule(departure_station=station)
-        # adding capsules to station
-        station.capsule_queue.put(c1)
-        station.capsule_queue.put(c2)
+    for station in model_station.get_stations():
+        for i in range(station.capacity):
+            if station.capsule_queue.qsize() < (station.capacity - 1):
+                # creating capsules
+                caps = model_capsule.Capsule(departure_station=station)
+                # adding capsules to station
+                station.capsule_queue.put(caps)
+    # print("load done")
+    return
+
 
 def reload(file_path=None):
-    ML.all_loops = {}
-    _capsules = list()
+    model_loop.all_loops = {}
+    model_capsule._capsules = list()
     load(file_path)
 
 '''

@@ -20,9 +20,9 @@
 
 | Tâches                                 |       En charge          | Deadline |Respect|
 | :------------------------------------  |: ----------------------- |:--------:|:-----:|
-| Interface - Positionnement des capsules|  **Baptiste**, Thibault  | 04/02    |✓ ou x |
+| Interface - Positionnement des capsules|  **Baptiste**, Thibault  | 04/02    |✓ |
 | boutons de gestion de simulation (temps)|          Baptiste       | 04/02    |✓ |
-| Slide de présentation                  |     Charlotte            | 05/02    |✓ ou x |
+| Slide de présentation                  |     Charlotte            | 05/02    |✓ |
 
 
 
@@ -32,16 +32,50 @@
 * présentations du travail réalisé auprès de Monsieur FESTOR, la vidéo puis tous les acteurs du projet 
 
 
+### Programme SPRINT jusqu'au 12/02 
+| Tâches                                 |       En charge          | Deadline |Respect|
+| :------------------------------------  |: ----------------------- |:--------:|:-----:|
+| File d'attente simulateur              | Thibault                 | 12/02    |✓ ou x |
+| File d'attente interface               |  Baptiste                | 12/02    |✓ ou x |
+| Gestion de projet                      |          Charlotte       |   _      |✓      |
+
+###### Objectifs :
+* Fixer les défauts 
+
+
 ### Programme SPRINTs suivants
 
 | Tâches                                 |       En charge          | Deadline |Respect|
 | :------------------------------------  |: ----------------------- |:--------:|:-----:|
 | Routage dynamique                      | Charlotte                | to define|✓ ou x |
 | Défauts                                |  **Thibault**, Charlotte | to define|✓ ou x |
-| Affichage des informations             |  **Baptiste**, Charlotte | to define|✓ ou x |
 | Zoom, dézoom et déplacement            |          Baptiste        | to define|✓ ou x |
 
 
 ###### Objectifs :
 * Ajout de fonctions graphiques 
-* Arrivée des anomalies 
+* Arrivée des anomalies
+
+
+
+### Tâches restantes au 12/02 : 
+* rapport   
+    * x Introduction 
+    * x Routage 
+    * x Simulateur 
+    * x Interface 
+* simulateur 
+    * x ajout des défauts 
+    * x file 
+    * x routage Dynamique 
+    * x capsules vides se promenant 
+* interface
+    * x modifications 
+        * ajout défauts 
+        * ajout capsules 
+        * ajout personnes 
+    * adaptation du json 
+    * (zoom, dézoom)
+    * slotes 
+*
+ 

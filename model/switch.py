@@ -99,6 +99,14 @@ class Switch:
         details += "\nRouting Table : " + str(self.table)
         return details
 
+    def is_switch_out(self, the_loop):
+        if the_loop is self.my_loop :
+            return True
+        elif the_loop is self.other_loop :
+            return False
+        else:
+            logging.error("Le switch " + str(self.id) + " n'est pas sur la boucle " + the_loop.name)
+
 
 def init():
     """

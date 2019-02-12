@@ -89,7 +89,8 @@ class Capsule:
         dist_to_next_element = self.loop.dist_to_next_object(self.current_element, tmp_element)[0]
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
-        self.segment_ticks_duration = 10 * time_to_next_element * sim_loop.get_tick_per_second()
+        #self.segment_ticks_duration = 10 * time_to_next_element * sim_loop.get_tick_per_second()
+        self.segment_ticks_duration = 100 * time_to_next_element * sim_loop.get_tick_per_second()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
@@ -161,7 +162,8 @@ class Capsule:
         """
         details = "Capsule ID : " + str(self.id)
         details += "\nContains a Travelers : " + str(self.is_aboard())
-        details += "\nDestination : " + self.destination.name
+        if (self.destination != None):
+            details += "\nDestination : " + self.destination.name
         details += "\nCurrent Loop : " + self.loop.name
         details += "\nLast or current element : "
         if type(self.current_element) is station.Station:

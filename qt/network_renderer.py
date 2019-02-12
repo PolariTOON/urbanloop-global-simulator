@@ -13,13 +13,14 @@ from settings import config
 config = config.interface
 
 class NetworkRenderer:
-    def __init__(self, root):
+    def __init__(self, root, record=None):
         """
         NetworkRenderer constructor
         It is used to draw the network
         """
         self.root = root
         self.outline_width = int(config["loop_outline_width"])
+        self.record = record
 
     def paint(self):
         """
@@ -49,19 +50,21 @@ class NetworkRenderer:
         paint.drawText(loop.x - len(name) / 2 * 8, loop.y, name)
         return loop
 
-
     def fill_loop(self, loop, paint):
         """
         Draw every switch and station which belong to @param:loop with @param;paint
         """
+        if self.record != None:
+            self.modify_loops(loop, paint)
+            return
         for item_descriptor in loop.objects:
             item_type = item_descriptor[0]
             item = item_descriptor[1]
             if item is not None:
+                is_station = isinstance(item, MST.Station)
                 if self.root.selected_item == item:
                     paint.setBrush(QColor(config["selected_color"]))
                 else:
-                    is_station = isinstance(item, MST.Station)
                     paint.setBrush(QColor(config["station_color" if is_station else "switch_color"]))
                 paint.drawEllipse(get_rect_for_item(item, loop, 0, None if is_station else item_type))
                 paint.setBrush(QColor("white"))
@@ -70,11 +73,39 @@ class NetworkRenderer:
                 rect = get_rect_for_item(item, loop, outline_width, None if is_station else item_type)
                 paint.drawEllipse(rect)
 
+    def modify_loops(self, loop, paint):
+        """
+        Update stations only. Called when showing from a record
+        """
+        # faut dessiner les switch comme d'hab
+        for item_descriptor in loop.objects:
+            item_type = item_descriptor[0]
+            item = item_descriptor[1]
+            if isinstance(item, MSW.Switch):
+                if self.root.selected_item == item:
+                    paint.setBrush(QColor(config["selected_color"]))
+                else:
+                    paint.setBrush(QColor(config["switch_color"]))
+                paint.drawEllipse(get_rect_for_item(item, loop, 0, item_type))
+                paint.setBrush(QColor("white"))
+                outline_width = int(config["switch_outline_width"])
+                paint.drawEllipse(get_rect_for_item(item, loop, outline_width, item_type))
+        # ensuite on dessine les stations depuis le record
+        for station in self.record.stations:
+            if self.root.selected_item == item:
+                    paint.setBrush(QColor(config["selected_color"]))
+            else:
+                paint.setBrush(QColor(config["station_color"]))
+            paint.drawEllipse(get_rect_for_item(station, loop, 0, None))
+            paint.setBrush(QColor("white"))
+            outline_width = int(config["station_outline_width"])
+            paint.drawEllipse(get_rect_for_item(station, loop, outline_width, None))
+
     def draw_capsules(self, paint):
         """
         Draw capsules with @param:paint
         """
-        capsules = MC.get_capsules()
+        capsules = MC.get_capsules() if self.record == None else self.record.capsules
         for capsule in capsules:
             rect = get_rect_for_capsule(capsule, 0)
             paint.setBrush(QColor(
@@ -146,25 +177,7 @@ def get_rect_for_capsule(capsule, i):
     Return the rect in which @param:capsule will be displayed
     @param:i is an absolute offset
     """
-    loop = capsule.loop
-    percentage = capsule.get_trip_percentage()
-    # compute capsule coords
-    lx, ly, lr = loop.x, loop.y, loop.size / 2 / pi
-
-    if isinstance(capsule.current_element, MSW.Switch):
-        sa = capsule.current_element.angle_my_loop
-    else:
-        sa = capsule.current_element.angle
-    if isinstance(capsule.next_element, MSW.Switch):
-        nsa = capsule.next_element.angle_my_loop
-    else:
-        nsa = capsule.next_element.angle
-    if nsa < sa:
-        nsa += 360
-    ca = (nsa - sa) * percentage + sa
-    ca += 90
-    ca = ca * 2 * pi / 360
-    cx, cy = lx - lr * cos(ca), ly - lr * sin(ca)
+    [cx,cy] = get_capsule_coordinates(capsule)
     # compute rectangle coord
     cw = int(config["capsule_width"])
     ch = int(config["capsule_height"])
@@ -188,3 +201,28 @@ def get_line_for_switch(switch):
     x2 = switch.other_loop.x - cos(a) * r
     y2 = switch.other_loop.y - sin(a) * r
     return QLine(x1, y1, x2, y2)
+
+def get_capsule_coordinates(capsule):
+    """
+    Return @param:capsule's coordinates
+    """
+    loop = capsule.loop
+    percentage = capsule.get_trip_percentage()
+    # compute capsule coords
+    lx, ly, lr = loop.x, loop.y, loop.size / 2 / pi
+
+    if isinstance(capsule.current_element, MSW.Switch):
+        sa = capsule.current_element.angle_my_loop
+    else:
+        sa = capsule.current_element.angle
+    if isinstance(capsule.next_element, MSW.Switch):
+        nsa = capsule.next_element.angle_my_loop
+    else:
+        nsa = capsule.next_element.angle
+    if nsa < sa:
+        nsa += 360
+    ca = (nsa - sa) * percentage + sa
+    ca += 90
+    ca = ca * 2 * pi / 360
+    cx, cy = lx - lr * cos(ca), ly - lr * sin(ca)
+    return [cx,cy]

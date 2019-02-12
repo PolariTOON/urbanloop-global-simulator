@@ -8,7 +8,8 @@ from PyQt5.QtGui import QPixmap, QPicture
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 
 from model import loop as ML
-from qt.network_renderer import NetworkRenderer
+from model import capsule as MC
+from qt.network_renderer import NetworkRenderer, get_capsule_coordinates
 from settings import network, config
 
 config = config.interface
@@ -66,9 +67,19 @@ class SimulatorWidget(QWidget):
         y_offset = max(y_offsets)
         """
         # WARNING
-        # 18 and 122 are relative to mini_network.json
+        # relative offsets to mini_network.json
         x = event.x() - 18  # - x_offset
-        y = event.y() - 102  # - y_offset
+        y = event.y() - 102 # - y_offset
+        # computing if click happened on a capsule
+        for capsule in MC._capsules:
+            [cx,cy] = get_capsule_coordinates(capsule)
+            rx = int(config["capsule_width"])
+            ry = int(config["capsule_height"])
+            if (x - cx)**2 / rx**2 + (y - cy)**2 / ry**2 <= 1:
+                self.selected_item = capsule
+                self.data_widget.refresh(capsule)
+                self.refresh()
+                return
         for name in loops:
             loop = ML.get_by_name(name)
             loop_r = loop.size / 2 / pi
@@ -90,8 +101,7 @@ class SimulatorWidget(QWidget):
                 item_x = loop.x - loop_r * cos(item_angle)
                 item_y = loop.y - loop_r * sin(item_angle)
                 # computing if click happened on a switch or a station
-                if ((x - item_x) ** 2 / item_rx ** 2) + ((y - item_y) ** 2 / item_ry ** 2) <= 1:
-                    # inside object
+                if (x - item_x) ** 2 / item_rx ** 2 + (y - item_y) ** 2 / item_ry ** 2 <= 1:
                     self.selected_item = item
                     self.data_widget.refresh(item)
                     self.refresh()
@@ -104,14 +114,12 @@ class SimulatorWidget(QWidget):
                 self.data_widget.refresh(loop)
                 self.refresh()
                 return
-        # computing if click happened on a capsule
-        # TODO
         # if we get here, click happened on nothing
         self.selected_item = None
         self.data_widget.refresh(None)
         self.refresh()
 
-    def refresh(self):
+    def refresh(self, record=None):
         """
         Refresh simulator view
         """
@@ -123,7 +131,7 @@ class SimulatorWidget(QWidget):
         else:
             # build view
             self.image = QPicture()  # TODO attribut pas dnas le _init
-            nr = NetworkRenderer(self)
+            nr = NetworkRenderer(self, record)
             nr.paint()
             self.simulator_view.setPicture(self.image)
             self.simulator_view.mouseReleaseEvent = self.select_item

@@ -195,8 +195,6 @@ def stop_simulation():
     logging.debug("Stopping simulation")
     capsule.reset_simulation()
     station.reset_simulation()
-    if main_window.window is not None:
-        main_window.window.refresh()
     change_state(SimState.KILLED)
 
 

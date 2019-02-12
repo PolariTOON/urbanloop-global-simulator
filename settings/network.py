@@ -5,7 +5,7 @@ import numpy as np
 
 from model import loop as ML
 from model import switch as MS
-from model.capsule import Capsule
+from model.capsule import Capsule, _capsules
 from model.loop import Loop
 import model.station as MST
 from model.switch import Switch
@@ -104,6 +104,10 @@ def load(file_path=None):
         station.capsule_queue.put(c1)
         station.capsule_queue.put(c2)
 
+def reload(file_path=None):
+    ML.all_loops = {}
+    _capsules = list()
+    load(file_path)
 
 '''
 def search_next_station(elements, i):

@@ -4,6 +4,8 @@
 import logging
 from sys import path
 from threading import Thread
+from time import sleep, time
+from math import ceil
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -12,16 +14,22 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFile
 
 from qt.data_widget import DataWidget
 from qt.simulator_widget import SimulatorWidget
-from settings import network
+from settings import network, config
 from simulator import sim_loop as sim
+from model import sim_record
 
 window = None
+config = config.sim
 
-def get_resource_path(resource):
+#to be removed
+network.load()
+#to be removed
+
+def get_image_path(image):
     """
-    Return resource path
+    Return image path
     """
-    return "{0}/../resources/img/{1}".format(path[0], resource)
+    return "{0}/../resources/img/{1}".format(path[0], image)
 
 
 class MainWindow(QMainWindow):
@@ -34,7 +42,10 @@ class MainWindow(QMainWindow):
         self.speed = 1.
         self.state = "None"
         self.root = root
+        self.thd_run = None
+        self.path = None
         QMainWindow.__init__(self)
+        self.refresh_time = float(config["tick"])
         self.init_ui()
 
     def reset_capsules(self):
@@ -63,7 +74,7 @@ class MainWindow(QMainWindow):
         # +----------------------------------+
 
         # window itself
-        self.root.setWindowIcon(QIcon(get_resource_path("icon.png")))
+        self.root.setWindowIcon(QIcon(get_image_path("icon.png")))
         self.center()
         self.setWindowTitle('URBANLOOP Simulator')
         self.build_menu()
@@ -99,19 +110,8 @@ class MainWindow(QMainWindow):
             Method called when menu button "Open sample" is pressed
             """
             logging.debug("Using default network file")
-            network.load()
+            network.load(None)
             self.refresh()
-
-        def open_file_name_dialog(self):
-            """
-            Open a file dialog.
-            Return the selected file's path if it exists, else return None
-            """
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
-            file_name, _ = QFileDialog.getOpenFileName(
-                self, "QFileDialog.getOpenFileName()", "", "All Files (*)", options=options)
-            return file_name if file_name else None
         
         menubar = self.menuBar()
         file_menu = menubar.addMenu('&File')
@@ -123,6 +123,18 @@ class MainWindow(QMainWindow):
         open_sample_act.setShortcut('Ctrl+Shift+O')
         open_file_act.triggered.connect(open_sample)
         file_menu.addAction(open_sample_act)
+
+    def open_file_name_dialog(self):
+        """
+        Open a file dialog.
+        Return the selected file's path if it exists, else return None
+        """
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        file_name, _ = QFileDialog.getOpenFileName(
+            self, "QFileDialog.getOpenFileName()", "", "All Files (*)", options=options)
+        self.path = file_name if file_name else None
+        return self.path
 
     def build_buttons(self):
         """
@@ -153,7 +165,10 @@ class MainWindow(QMainWindow):
             self.state = "stopped"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # stop simulation
-            sim.stop_simulation()
+            sim.quit_endless_simulation()
+            self.thd_run = None
+            self.thd_refresh = None
+            network.reload(self.path)
 
         def on_play_button_pressed():
             """
@@ -168,8 +183,14 @@ class MainWindow(QMainWindow):
             # state label
             self.state = "running"
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
-            # starting simulation
-            sim.run_simulation()
+            # start or resume simulation
+            if self.thd_run == None:
+                self.thd_run = Thread(target=sim.run_simulation)
+                self.thd_run.start()
+                sleep(1)
+            
+            self.thd_refresh = Thread(target=self.start_refresh)
+            self.thd_refresh.start()
 
         def on_pause_button_pressed():
             """
@@ -188,15 +209,15 @@ class MainWindow(QMainWindow):
             self.speed_label.setText(self.speed_label.text().split(" : ")[0] + " : x%f" % self.speed)
             sim.accelerate_sim()
         
-        self.decrease_speed_button = QPushButton(QIcon(get_resource_path("minus.png")), "")
+        self.decrease_speed_button = QPushButton(QIcon(get_image_path("minus.png")), "")
         self.decrease_speed_button.released.connect(on_decrease_button_pressed)
-        self.stop_button = QPushButton(QIcon(get_resource_path("stop.png")), "")
+        self.stop_button = QPushButton(QIcon(get_image_path("stop.png")), "")
         self.stop_button.released.connect(on_stop_button_pressed)
-        self.play_button = QPushButton(QIcon(get_resource_path("play-button.png")), "")
+        self.play_button = QPushButton(QIcon(get_image_path("play-button.png")), "")
         self.play_button.released.connect(on_play_button_pressed)
-        self.pause_button = QPushButton(QIcon(get_resource_path("pause.png")), "")
+        self.pause_button = QPushButton(QIcon(get_image_path("pause.png")), "")
         self.pause_button.released.connect(on_pause_button_pressed)
-        self.increase_speed_button = QPushButton(QIcon(get_resource_path("plus.png")), "")
+        self.increase_speed_button = QPushButton(QIcon(get_image_path("plus.png")), "")
         self.increase_speed_button.released.connect(on_increase_button_pressed)
         # turning on/off buttons
         self.play_button.setDisabled(False)
@@ -259,8 +280,24 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(w)
         self.show()
 
-    def refresh(self):
+    def refresh(self, record=None):
         """
         Reset simulation, buttons, information panel and load a new simulator view
         """
-        self.simulator.refresh()
+        self.simulator.refresh(record)
+
+    def start_refresh(self):
+        while self.state == "running":
+            start = time()
+            rec = sim_record.get_record()
+            self.refresh(rec)
+            end = time()
+            logging.debug("Execution time: %f secs" % (end - start))
+            # if refresh has taken too much time
+            if end - start >= self.refresh_time:
+                ticks = ceil((end - start) % self.refresh_time)
+                logging.warning("Skipping {0} ticks.".format(ticks))
+                for i in range(0, ticks):
+                    sim_record.get_record()
+                return
+            sleep(self.refresh_time)

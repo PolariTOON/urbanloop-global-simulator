@@ -43,10 +43,20 @@ class MainWindow(QMainWindow):
         self.state = "None"
         self.root = root
         self.thd_run = None
+        self.thd_refresh = None
         self.path = None
         QMainWindow.__init__(self)
         self.refresh_time = float(config["tick"])
         self.init_ui()
+    
+    def closeEvent(self, event):
+        """
+        Method called when window is closed
+        """
+        sim.quit_endless_simulation()
+        self.state= "stopped"
+        self.thd_run = None
+        self.thd_refresh = None
 
     def reset_capsules(self):
         """

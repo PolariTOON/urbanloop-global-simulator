@@ -72,7 +72,7 @@ class SimLoop:
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
-                if is_frequency(5000):
+                if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
 
                 if self.is_recorded:

@@ -56,10 +56,11 @@ class Capsule:
         logging.info("Capsule n°%d arrives at %s from %s" %
                      (self.id, self.next_element.name, self.current_element.name))
         self.current_element = self.next_element
-        self.next_element = self.current_element.next_element
-        if type(self.current_element) is switch.Switch:
-            if self.loop is self.current_element.other_loop:
-                self.next_element = self.current_element.next_element_other
+
+        if type(self.current_element) is switch.Switch and not self.current_element.is_switch_out(self.loop):
+            self.next_element = self.current_element.next_element_other
+        else:
+            self.next_element = self.current_element.next_element
 
     def _change_loop(self, current_switch):
         """
@@ -88,7 +89,9 @@ class Capsule:
         """
         :return: Trip event generator
         """
-        time_to_next_element = self.loop.dist_to_next_object(self.current_element)[0] / self.speed
+        tmp_element = (None, self.current_element)[type(self.current_element) == switch.Switch]
+        dist_to_next_element = self.loop.dist_to_next_object(self.current_element, tmp_element)[0]
+        time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
         self.segment_ticks_duration = 10 * time_to_next_element * sim_loop.get_tick_per_second()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
@@ -100,12 +103,9 @@ class Capsule:
         Recursive callback that steps the trip event
         """
         logging.debug(str(self.id) + str(self.destination))
-        if type(self.next_element) == switch.Switch:
-            if self.next_element.my_loop is self.loop:
-                logging.debug("capsule" + str(self.id) + "route to " + str(self.destination))
-                self.ask_route(self.next_element)
-            else:
-                self._continue()
+        if type(self.next_element) == switch.Switch and self.next_element.is_switch_out(self.loop):
+            logging.debug("capsule" + str(self.id) + "route to " + str(self.destination))
+            self.ask_route(self.next_element)
         else:
             self._continue()
 

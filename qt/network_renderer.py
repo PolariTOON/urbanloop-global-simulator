@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QPainter, QColor
 from math import pi, cos, sin
 
-from PyQt5.QtCore import QRect
+from PyQt5.QtCore import QRect, QLine
 from PyQt5.QtGui import QPainter, QColor
 
 import model.capsule as MC
@@ -10,102 +10,94 @@ import model.station as MST
 import model.switch as MSW
 from settings import config
 
+config = config.interface
 
 class NetworkRenderer:
     def __init__(self, root):
+        """
+        NetworkRenderer constructor
+        It is used to draw the network
+        """
         self.root = root
-        self.config = config.interface
-        self.outline_width = int(self.config["loop_outline_width"])
+        self.outline_width = int(config["loop_outline_width"])
 
     def paint(self):
+        """
+        Draw the network on self.root.image
+        """
         paint = QPainter()
         paint.begin(self.root.image)
         paint.setRenderHint(QPainter.Antialiasing)
-        # make loops
         for name in ML.all_loops:
-            loop = ML.get_by_name(name)
-            # make a circle
-            r = loop.size / 2 / pi  # TODO r not used
-            paint.setBrush(
-                QColor(self.config["selected_color"] if self.root.selected_item == loop else self.config["loop_color"]))
-            paint.drawEllipse(get_rect_for_loop(loop, 0))
-            paint.setBrush(QColor("white"))
-            paint.drawEllipse(get_rect_for_loop(loop, int(self.config["loop_outline_width"])))
-            # display loop's name
-            paint.setBrush(QColor("black"))
-            paint.drawText(loop.x - len(name) / 2 * 8, loop.y, name)
-            # make stations and switches for after painting loop
-            self.fill_loop(loop, paint)
-        # join loops between themselves
-        self.join_loops(paint)
-        # draw capsules
-        self.draw_capsules(paint)
+            loop = self.draw_loop(name, paint) # draw every loop
+            self.fill_loop(loop, paint) # and fill it
+        join_loops(paint) # them join loops between themselves
+        self.draw_capsules(paint) # finally draw capsules
+    
+    def draw_loop(self, name, paint):
+        """
+        Draw an empty loop and its name with @param:paint
+        """
+        loop = ML.get_by_name(name)
+        paint.setBrush(
+            QColor(config["selected_color"] if self.root.selected_item == loop else config["loop_color"]))
+        paint.drawEllipse(get_rect_for_loop(loop, 0))
+        paint.setBrush(QColor("white"))
+        paint.drawEllipse(get_rect_for_loop(loop, int(config["loop_outline_width"])))
+        # display loop's name
+        paint.setBrush(QColor("black"))
+        paint.drawText(loop.x - len(name) / 2 * 8, loop.y, name)
+        return loop
+
+
+    def fill_loop(self, loop, paint):
+        """
+        Draw every switch and station which belong to @param:loop with @param;paint
+        """
+        for item_descriptor in loop.objects:
+            item_type = item_descriptor[0]
+            item = item_descriptor[1]
+            if item is not None:
+                if self.root.selected_item == item:
+                    paint.setBrush(QColor(config["selected_color"]))
+                else:
+                    is_station = isinstance(item, MST.Station)
+                    paint.setBrush(QColor(config["station_color" if is_station else "switch_color"]))
+                paint.drawEllipse(get_rect_for_item(item, loop, 0, None if is_station else item_type))
+                paint.setBrush(QColor("white"))
+                outline_width = int(config["switch_outline_width"]) if isinstance(item, MSW.Switch) else int(
+                    config["station_outline_width"])
+                rect = get_rect_for_item(item, loop, outline_width, None if is_station else item_type)
+                paint.drawEllipse(rect)
 
     def draw_capsules(self, paint):
+        """
+        Draw capsules with @param:paint
+        """
         capsules = MC.get_capsules()
         for capsule in capsules:
             rect = get_rect_for_capsule(capsule, 0)
             paint.setBrush(QColor(
-                config.interface["selected_color"] if capsule == self.root.selected_item else config.interface[
-                    "capsule_color"]))
+                config["selected_color"] if capsule == self.root.selected_item else config["capsule_color"]))
             paint.drawEllipse(rect)
 
-
-    def fill_loop(self, loop, paint):
-        item_nbr = 0
+def join_loops(paint):
+    """
+    Draw a line between every switch_in and its associated switch_out with @param:paint
+    """
+    for name in ML.all_loops:
+        loop = ML.get_by_name(name)
         for obj in loop.objects:
-            item_type = obj[0]
-            item = obj[1]
-            if item is not None:
-                is_station = isinstance(item, MST.Station)
-                if self.root.selected_item == item:
-                    paint.setBrush(QColor(self.config["selected_color"]))
-                else:
-                    paint.setBrush(QColor(self.config["station_color" if is_station else "switch_color"]))
-                paint.drawEllipse(get_rect_for_item(item, loop, 0, None if is_station else item_type))
-                paint.setBrush(QColor("white"))
-                outline_width = int(self.config["switch_outline_width"]) if isinstance(item, MSW.Switch) else int(
-                    self.config["station_outline_width"])
-                rect = get_rect_for_item(item, loop, outline_width, None if is_station else item_type)
-                paint.drawEllipse(rect)
-                # paint.drawText(rect.getCoords()[0], rect.getCoords()[1], "{0}".format(item_nbr))
-                item_nbr += 1
-
-    def join_loops(self, paint):
-        for name in ML.all_loops:
-            loop = ML.get_by_name(name)
-            for obj in loop.objects:
-                if isinstance(obj[1], MSW.Switch):
-                    if obj[0] == "switch_out":
-                        sw = obj[1]
-                        # compute coord of switch in both loop
-                        current_loop = sw.my_loop
-                        current_loop_r = current_loop.size / 2 / pi
-                        current_angle = sw.angle_my_loop + 90
-                        current_angle *= 2 * pi / 360
-                        x1 = current_loop.x - cos(current_angle) * current_loop_r
-                        y1 = current_loop.y - sin(current_angle) * current_loop_r
-                        #
-                        other_loop = sw.other_loop
-                        other_loop_r = other_loop.size / 2 / pi
-                        other_angle = sw.angle_other_loop + 90
-                        other_angle *= 2 * pi / 360
-                        x2 = other_loop.x - cos(other_angle) * other_loop_r
-                        y2 = other_loop.y - sin(other_angle) * other_loop_r
-                        # compute slope
-                        # slope = (x2 - x1) / (y2 - y1)
-                        # upper_slope =
-                        # lower_slope =
-                        # draw 
-                        paint.drawLine(x1, y1, x2, y2)
-        return
-
+            if isinstance(obj[1], MSW.Switch):
+                if obj[0] == "switch_out":
+                    sw = obj[1]
+                    line = get_line_for_switch(sw)
+                    paint.drawLine(line)
 
 def get_rect_for_loop(loop, i):
     """
-    return the rect in which @param loop
-    will be displayed. @param i represent
-    the outline width of the loop
+    Return the rect in which @param loop will be displayed
+    @param i is an absolute offset
     """
     x = loop.x
     y = loop.y
@@ -116,8 +108,12 @@ def get_rect_for_loop(loop, i):
     rh = d - i * 2
     return QRect(rx, ry, rw, rh)
 
-
 def get_rect_for_item(item, loop, i, item_type=None):
+    """
+    Return the rect in which @param:item will be displayed, relatively the the @param:loop
+    @param:i is an absolute offset
+    @param:item_type is useful for switches (_out or _in)
+    """
     is_station = isinstance(item, MST.Station)
     # loop
     xl = loop.x
@@ -137,16 +133,19 @@ def get_rect_for_item(item, loop, i, item_type=None):
     yi = yl - rl * sin(angle)
     # rect
     item = "station" if is_station else "switch"
-    item_width = int(config.interface["{0}_width".format(item)])
-    item_height = int(config.interface["{0}_height".format(item)])
+    item_width = int(config["{0}_width".format(item)])
+    item_height = int(config["{0}_height".format(item)])
     xr = xi - item_width / 2 + i
     yr = yi - item_height / 2 + i
     wr = item_width - i * 2
     hr = item_height - i * 2
     return QRect(xr, yr, wr, hr)
 
-
 def get_rect_for_capsule(capsule, i):
+    """
+    Return the rect in which @param:capsule will be displayed
+    @param:i is an absolute offset
+    """
     loop = capsule.loop
     percentage = capsule.get_trip_percentage()
     # compute capsule coords
@@ -167,7 +166,25 @@ def get_rect_for_capsule(capsule, i):
     ca = ca * 2 * pi / 360
     cx, cy = lx - lr * cos(ca), ly - lr * sin(ca)
     # compute rectangle coord
-    cw = int(config.interface["capsule_width"])
-    ch = int(config.interface["capsule_height"])
+    cw = int(config["capsule_width"])
+    ch = int(config["capsule_height"])
 
     return QRect(cx - cw / 2 - i, cy - ch / 2 - i, cw, ch)
+
+def get_line_for_switch(switch):
+    """
+    Return the QLine to join two loops between @param:switch in/out
+    """
+    # first loop
+    r = switch.my_loop.size / 2 / pi
+    a = switch.angle_my_loop + 90
+    a *= 2 * pi / 360
+    x1 = switch.my_loop.x - cos(a) * r
+    y1 = switch.my_loop.y - sin(a) * r
+    # second loop
+    r = switch.other_loop.size / 2 / pi
+    a = switch.angle_other_loop + 90
+    a *= 2 * pi / 360
+    x2 = switch.other_loop.x - cos(a) * r
+    y2 = switch.other_loop.y - sin(a) * r
+    return QLine(x1, y1, x2, y2)

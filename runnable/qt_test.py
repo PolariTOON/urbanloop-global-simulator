@@ -1,12 +1,11 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from PyQt5.QtWidgets import QApplication
-import logging
-from qt.main_window import *
 from sys import exit, argv
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
+from PyQt5.QtWidgets import QApplication
+
+from qt.main_window import *
 
 if __name__ == '__main__':
     app = QApplication(argv)

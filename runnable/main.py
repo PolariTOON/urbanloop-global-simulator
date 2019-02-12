@@ -1,26 +1,21 @@
 #! /usr/bin/env python3
 # coding: utf-8
-import logging
 import time
 
-import simulator.sim_loop
 from settings import network
+from settings import simlog
+from simulator import sim_loop
 from simulator.traveler_generator import total_generated
 
-"""Fichier principal du projet """
-
-"""Initialisation"""
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
-
+# Initialisation
 START_TIME = time.time()
-
-sim_loop = simulator.sim_loop.SimLoop()
+starting_sim_loop = sim_loop.SimLoop()
 network.load()
 
-"""Start"""
+# Start
 if __name__ == "__main__":
-    logging.debug("Simulation starts")
-    simulator.sim_loop.run_simulation(sim_loop=sim_loop)
-    logging.debug("Execution time : %.3f seconds" % (time.time() - START_TIME))
-    logging.debug("Simulation time : %.1f seconds" % (simulator.sim_loop.get_simulation_time()))
-    logging.debug("Amount of traveler generated : %d" % total_generated)
+    simlog.debug("Simulation starts")
+    sim_loop.run_simulation(sim_loop=starting_sim_loop)
+    simlog.debug("Execution time : %.3f seconds" % (time.time() - START_TIME))
+    simlog.debug("Simulation time : %.1f seconds" % (sim_loop.get_simulation_time()))
+    simlog.debug("Amount of traveler generated : %d" % total_generated)

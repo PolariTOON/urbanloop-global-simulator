@@ -1,8 +1,8 @@
 import logging
 
 import model.loop as ML
-from settings import network
 from model.switch import Switch
+from settings import network
 
 """fichier de test d'import d'un réseau """
 
@@ -28,12 +28,12 @@ for name, l in ML.all_loops.items():
     for sw in l.switches:
         if sw.my_loop == l:
             logging.info("\t \t table of switch " + str(sw.id) + " : " + str(sw.table))
-    # logging.debug(l.lengths)
+    # simlog.debug(l.lengths)
 
 '''loop_nancy = ML.get_by_name("Nancy")
 o = loop_nancy.objects[2][1]
 dist, next_elm = loop_nancy.dist_to_next_object(o)
-logging.debug("\n Next object after " + o.name + " is " + str(next_elm) + " at " + str(dist))
+simlog.debug("\n Next object after " + o.name + " is " + str(next_elm) + " at " + str(dist))
 '''
 
 loop_laxou = ML.get_by_name("Laxou")

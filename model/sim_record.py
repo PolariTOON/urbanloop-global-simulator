@@ -1,10 +1,10 @@
-import logging
-import queue
 import copy
+import queue
 
 from model import capsule
 from model import station
 from settings import config
+from settings import simlog
 from simulator import sim_loop
 
 records = queue.Queue()
@@ -41,7 +41,7 @@ def put_record():
     """
     Put a new record of the simulation in the record queue. If the limit is reached, the simulation is paused.
     """
-    records.put(SimRecord())
+    records.put_nowait(SimRecord())
 
     if records.qsize() >= _limit:
         sim_loop.pause_simulation()
@@ -53,7 +53,7 @@ def get_record():
     mid-empty, the simulation will restart in order to refill the record queue.
     """
     if records.empty():
-        logging.error("The record queue is empty, impossible to get any")
+        simlog.error("The record queue is empty, impossible to get any")
         return None
 
     if records.qsize() <= int(_limit / 2) and sim_loop.is_paused():

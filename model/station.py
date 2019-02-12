@@ -1,7 +1,6 @@
-import logging
 import queue
-from enum import Enum
 import random
+from enum import Enum
 
 from model import capsule
 
@@ -78,20 +77,18 @@ class Station:
 
     def drain(self):
         """
-        Lance les capsules vides dans le réseau si la station est trop pleine
-        :return:
+        This function will drain the first empty capsule if the station is 3/4 full.
+        in order to make room for other capsules
         """
         if self.capsule_queue.qsize() >= round((3 * self.capacity) / 4):
-            empty = 0
-            for caps in list(self.capsule_queue.queue):
-                if not caps.is_aboard():
-                    empty += 1
-                    if empty >= 2:
-                        # la lancer
-                        dest = get_almost_empty_station(self)
-                        logging.debug(str(dest.loop))
-                        caps.destination = dest
-                        caps.start_trip()
+            for capsule_index in range(self.capsule_queue.qsize()):
+                a_capsule = self.capsule_queue.get_nowait()
+                if not a_capsule.is_aboard():
+                    a_capsule.destination = get_almost_empty_station(self)
+                    a_capsule.start_trip()
+                    return
+                else:
+                    self.capsule_queue.put_nowait(a_capsule)
 
 
 def get_stations():
@@ -118,8 +115,8 @@ def reset_simulation():
     """
     for station in _stations:
         station.reset_simulation()
-        station.capsule_queue.put(capsule.Capsule(departure_station=station))
-        station.capsule_queue.put(capsule.Capsule(departure_station=station))
+        station.capsule_queue.put_nowait(capsule.Capsule(departure_station=station))
+        station.capsule_queue.put_nowait(capsule.Capsule(departure_station=station))
 
 
 def get_almost_empty_station(departure_station=None):
@@ -135,3 +132,9 @@ def get_almost_empty_station(departure_station=None):
             return station
 
     return random.choice(_stations)
+
+
+def drain():
+    for station in get_stations():
+        if station.capsule_queue.full():
+            station.drain()

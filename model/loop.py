@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # coding: utf-8
-import logging
+from settings import simlog
 
 all_loops = {}
 default_size = 100
@@ -16,7 +16,7 @@ class Loop:
         :return:0UT : un objet Loop (Loop)
         """
         self.name = name
-        logging.info("Create loop " + self.name)
+        simlog.info("Create loop " + self.name)
         if coordinates is not None:
             self.x = coordinates[0]
             self.y = coordinates[1]

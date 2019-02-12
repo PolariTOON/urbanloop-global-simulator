@@ -1,14 +1,13 @@
 import json
-import logging
 import sys
-import numpy as np
 
+import model.station as MST
 from model import loop as ML
 from model import switch as MS
-from model.capsule import Capsule, _capsules
+from model.capsule import Capsule
 from model.loop import Loop
-import model.station as MST
 from model.switch import Switch
+from settings import simlog
 
 """
 fichier pour l'import des réseaux sur les formats json correspondant
@@ -42,7 +41,8 @@ def load(file_path=None):
             e += 1
             el_type = element["type"]
             if el_type == "station":
-                elms += [MST.Station(name=element["name"], capacity=element["capacity"], loop=the_loop, angle=element["angle"], station_type=["station_type"])]
+                elms += [MST.Station(name=element["name"], capacity=2, loop=the_loop,
+                                     angle=element["angle"], station_type=["station_type"])]
                 the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
@@ -70,7 +70,7 @@ def load(file_path=None):
                     elms[e].angle_other_loop = element["angle"]
                 the_loop.switches += [elms[e]]
             else:
-                logging.error("le json est mal formaté")
+                simlog.error("le json est mal formaté")
             order = []
         for i in range(len(elms)):
             # gestion des elements precedents et suivants
@@ -94,20 +94,22 @@ def load(file_path=None):
         r = np.random.randint(nb_st)
         arrivee = st.get_station_by_id(r)
         Traveler(departure.name, arrivee.name, 0)
-        departure.capsule_queue.put(Capsule(departure))
+        departure.capsule_queue.put_nowait(Capsule(departure))
         '''
     for station in MST.get_stations():
         # creating capsules
         c1 = Capsule(departure_station=station)
         c2 = Capsule(departure_station=station)
         # adding capsules to station
-        station.capsule_queue.put(c1)
-        station.capsule_queue.put(c2)
+        station.capsule_queue.put_nowait(c1)
+        station.capsule_queue.put_nowait(c2)
+
 
 def reload(file_path=None):
     ML.all_loops = {}
     _capsules = list()
     load(file_path)
+
 
 '''
 def search_next_station(elements, i):

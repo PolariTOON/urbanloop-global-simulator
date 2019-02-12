@@ -6,7 +6,6 @@ import simpy
 from model import capsule
 from model import sim_record
 from model import station
-from qt import main_window
 from settings import config
 from simulator import ascent_generator
 from simulator import traveler_generator

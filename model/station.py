@@ -1,8 +1,9 @@
+import logging
 import queue
 from enum import Enum
+import random
 
 from model import capsule
-import logging
 
 _stations = list()
 station_id = 0
@@ -80,18 +81,17 @@ class Station:
         Lance les capsules vides dans le réseau si la station est trop pleine
         :return:
         """
-        if self.capsule_queue.qsize() >= int((3 * self.capacity) / 4):
+        if self.capsule_queue.qsize() >= round((3 * self.capacity) / 4):
             empty = 0
             for caps in list(self.capsule_queue.queue):
                 if not caps.is_aboard():
                     empty += 1
                     if empty >= 2:
                         # la lancer
-                        dest = select_destination_empty(self)
+                        dest = get_almost_empty_station(self)
                         logging.debug(str(dest.loop))
                         caps.destination = dest
                         caps.start_trip()
-
 
 
 def get_stations():
@@ -113,26 +113,25 @@ def get_station_by_name(name):
 
 
 def reset_simulation():
+    """
+    This function will reset every stations of the network
+    """
     for station in _stations:
         station.reset_simulation()
         station.capsule_queue.put(capsule.Capsule(departure_station=station))
         station.capsule_queue.put(capsule.Capsule(departure_station=station))
 
 
-def select_destination_empty(departure):
-    """ Selectionne une station la plus proche 'presque vide' """
-    list_station = get_stations()
-    dep = list_station.index(departure)
-    for i in range(1, len(list_station)):
-        cand = list_station[(dep+i) % len(list_station)]
-        if cand.capsule_queue.qsize() <= min(int(cand.capacity / 3), 2):
-            return cand
-    return departure
+def get_almost_empty_station(departure_station=None):
+    """
+    :param departure_station: The departure_station
+    :return: An almost empty station (2/3 empty). If there is no almost empty station,
+    it will return a random station.
+    """
+    for station in random.sample(_stations, len(_stations)):
+        if departure_station is not None and station is departure_station:
+            continue
+        if station.capsule_queue.qsize() < round(station.capacity / 3):
+            return station
 
-
-#def draining():
-#    """ Vide l'ensemble des stations 'trop pleines' """
-#    list_station = get_stations()
-#    for cand in list_station:
-#        if cand.capsule_queue.qsize() >= ((3 * cand.capacity) % 4):
-#            cand.drain()
+    return random.choice(_stations)

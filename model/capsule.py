@@ -119,7 +119,7 @@ class Capsule:
         simlog.info("Capsule n°%d ends its trip to the destination %s" %
                     (self.id, self.destination.name))
         self.current_element.capsule_queue.put_nowait(self)
-        if not self.travelers:
+        if self.travelers:
             self.get_out_traveler()
 
     def get_in_traveler(self, traveler):

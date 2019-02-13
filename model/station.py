@@ -2,6 +2,8 @@ import queue
 import random
 from enum import Enum
 
+from settings import simlog
+
 from model import capsule
 
 _stations = list()
@@ -76,15 +78,31 @@ class Station:
                 details += "\n    Capsule #{0}".format(c.id)
         return details
 
-    def drain(self):
+    def drain(self, destination=None):
         """
         This function will drain the first empty capsule if the station is 3/4 full.
         in order to make room for other capsules
         """
         if self.capsule_queue.qsize() >= round((3 * self.capacity) / 4):
-            empty = 0
-            for capsule_index in range(self.capsule_queue.qsize()):
+            compt = self.capsule_queue.qsize()
+            # empty = 0
+            for capsule_index in range(self.capsule_queue.qsize()):  # for a_capsule in self.capsule_queue.queue():
                 a_capsule = self.capsule_queue.get_nowait()
+                if not a_capsule.is_aboard():
+                    # empty += 1
+                    if True: # if empty > 2:
+                        if destination is None:
+                            destination = get_almost_empty_station(self)
+                        a_capsule.destination = destination
+                        simlog.debug("Station %s (%s/%d capsules) drained to "
+                                     "%s (%d/%d capsules)" % (self.name, compt, self.capacity, destination.name,
+                                                              destination.capsule_queue.qsize(), destination.capacity))
+                        a_capsule.start_trip()
+                        return
+                else:
+                    self.capsule_queue.put_nowait(a_capsule)
+
+        """
                 if not a_capsule.is_aboard():
                     empty += 1
                     if empty > 2:
@@ -126,15 +144,13 @@ def reset_simulation():
 def get_almost_empty_station(departure_station=None):
     """
     :param departure_station: The departure_station
-    :return: An almost empty station (2/3 empty). If there is no almost empty station,
+    :return: An almost empty station (3/4 empty). If there is no almost empty station,
     it will return a random station.
     """
     for station in random.sample(_stations, len(_stations)):
-        if departure_station is not None and station is departure_station:
-            continue
-        if station.capsule_queue.qsize() < round(station.capacity / 3):
-            return station
-
+        if departure_station is not None and station is not departure_station:
+            if station.capsule_queue.qsize() < max(1, round(station.capacity / 4)):
+                return station
     return random.choice(_stations)
 
 

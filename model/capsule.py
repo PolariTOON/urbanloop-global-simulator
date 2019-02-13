@@ -78,6 +78,8 @@ class Capsule:
         """
         simlog.info("Capsule n°%d (%s) starts its trip from %s to %s" %
                     (self.id, ("Empty", "Aboard")[self.is_aboard()], self.current_element.name, self.destination.name))
+        simlog.debug(
+            "%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
         sim_loop.get_env().process(self.update_trip())
 
     def update_trip(self):
@@ -106,8 +108,10 @@ class Capsule:
 
         if self.current_element == self.destination:
             if self.current_element.capsule_queue.full():
-                simlog.info("Capsule n°%d arrives to its destination %s but the station is full !" %
-                            (self.id, self.destination.name))
+                simlog.info("Capsule n°%d (%s) arrives to its destination %s but the station is full !" %
+                            (self.id, ("Empty", "Aboard")[self.is_aboard()], self.destination.name))
+                simlog.debug("%s contains %d capsules now" % (
+                self.current_element.name, self.current_element.capsule_queue.qsize()))
                 self.current_element.drain()
             else:
                 self.end_trip()
@@ -116,10 +120,11 @@ class Capsule:
         sim_loop.get_env().process(self.update_trip())
 
     def end_trip(self):
-        simlog.info("Capsule n°%d ends its trip to the destination %s" %
-                    (self.id, self.destination.name))
+        simlog.info("Capsule n°%d (%s) ends its trip to the destination %s" %
+                    (self.id, ("Empty", "Aboard")[self.is_aboard()], self.destination.name))
         self.current_element.capsule_queue.put_nowait(self)
-        if not self.travelers:
+        simlog.debug("%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
+        if self.travelers:
             self.get_out_traveler()
 
     def get_in_traveler(self, traveler):

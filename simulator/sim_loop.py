@@ -59,6 +59,12 @@ class SimLoop:
         _current_tick += 1
         yield self.tick_event.succeed()
         self.tick_event = _env.event()
+        # TODO begin To check
+        if not get_current_tick() % 1000:
+            simlog.info("Stations drainage process launched.")
+            station.drain_all()
+        # TODO end of to check
+
 
     def loop(self):
         """

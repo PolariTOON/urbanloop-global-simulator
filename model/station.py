@@ -102,15 +102,14 @@ class Station:
                 else:
                     self.capsule_queue.put_nowait(a_capsule)
 
+    def complete(self):
         """
-                if not a_capsule.is_aboard():
-                    empty += 1
-                    if empty > 2:
-                        a_capsule.destination = get_almost_empty_station(self)
-                        a_capsule.start_trip()
-                        return
-                else:
-                    self.capsule_queue.put_nowait(a_capsule)
+        This function will search to recover a capsule from a station 3/4 full.
+        in order to make complete the queue
+        """
+        if self.capsule_queue.qsize() <= max(1, round(self.capacity / 4)):
+            departure = get_almost_full_station(self)
+            departure.drain(self)
 
 
 def get_stations():
@@ -154,8 +153,23 @@ def get_almost_empty_station(departure_station=None):
     return random.choice(_stations)
 
 
+def get_almost_full_station(destination_station=None):
+    """
+    :param destination_station: The destination_station
+    :return: An almost full station (3/4 full). If there is no almost full station,
+    it will return a random station.
+    """
+    for station in random.sample(_stations, len(_stations)):
+        if destination_station is not None and station is not destination_station:
+            if station.capsule_queue.qsize() > round((3 * station.capacity) / 4) :
+                return station
+    return random.choice(_stations)
+
+
 def drain_all():
-    """ Vide l'ensemble des stations 'trop pleines' """
+    """ Vide l'ensemble des stations 'trop pleines' _ rempli les 'trop vides'"""
     for station in get_stations():
-        if station.capsule_queue.qsize() >= int((3*station.capacity)/4):
+        if station.capsule_queue.qsize() >= (station.capacity - 1):
             station.drain()
+        if station.capsule_queue.qsize() <= 1:
+            station.complete()

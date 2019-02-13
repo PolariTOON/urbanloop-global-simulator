@@ -1,9 +1,9 @@
-import logging
 import random
 
 from model import station
 from model import traveler
 from settings import config
+from settings import simlog
 from simulator import converter
 from simulator import poisson
 from simulator import sim_loop
@@ -38,11 +38,10 @@ class TravelerGenerator:
             departure_station = _select_random_station()
             destination_station = _select_random_station(departure_station=departure_station)
             traveler.Traveler(departure_station.name, destination_station.name, seconds)
-            logging.info("Traveler generated at time %s. Routing from %s to %s" %
-                         (converter.seconds_to_string(seconds),
-                          departure_station.name,
-                          destination_station.name
-                          ))
+            simlog.info("Traveler travelling from %s to %s has been generated" %
+                        (departure_station.name,
+                         destination_station.name
+                         ))
             yield sim_loop.get_env().timeout(int(round(sim_loop.get_tick_per_second() / traveler_number)))
 
 
@@ -56,7 +55,6 @@ def _select_random_station(departure_station=None):
 
     second = converter.now_to_seconds()
     city_prob = converter.station_probability(station.Type.CITY, second, is_arrival=is_arrival)
-    neutral_prob = converter.station_probability(station.Type.NEUTRAL, second, is_arrival=is_arrival)
     residential_prob = converter.station_probability(station.Type.RESIDENTIAL, second, is_arrival=is_arrival)
     activity_prob = converter.station_probability(station.Type.ACTIVITY, second, is_arrival=is_arrival)
 
@@ -65,12 +63,6 @@ def _select_random_station(departure_station=None):
 
     if interval[0] <= prob < interval[1]:
         return _get_random_station_from_type(station.Type.CITY, departure_station=departure_station)
-
-    interval[0] = interval[1]
-    interval[1] += neutral_prob
-
-    if interval[0] <= prob < interval[1]:
-        return _get_random_station_from_type(station.Type.NEUTRAL, departure_station=departure_station)
 
     interval[0] = interval[1]
     interval[1] += residential_prob

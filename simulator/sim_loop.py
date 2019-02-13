@@ -1,4 +1,3 @@
-import logging
 from enum import Enum
 
 import simpy
@@ -7,6 +6,7 @@ from model import capsule
 from model import sim_record
 from model import station
 from settings import config
+from settings import simlog
 from simulator import ascent_generator
 from simulator import traveler_generator
 
@@ -113,7 +113,7 @@ def _change_sim_tick(value=_sim_tick):
     """
 
     if type(_env) is simpy.rt.RealtimeEnvironment:
-        logging.warning("You can't change the sim_tick in a real-time environment")
+        simlog.warn("You can't change the sim_tick in a real-time environment")
         return
 
     global _sim_tick
@@ -127,7 +127,7 @@ def _change_sim_tick(value=_sim_tick):
     old_value = get_tick_per_second()
     _sim_tick = value
 
-    logging.debug("Changing sim ticks per seconds from %f to %f" % (old_value, get_tick_per_second()))
+    simlog.debug("Changing sim ticks per seconds from %f to %f" % (old_value, get_tick_per_second()))
 
 
 def is_frequency(seconds):
@@ -142,7 +142,7 @@ def change_state(sim_state=SimState.RUNNING):
     """
     :param sim_state: The desired simulation state
     """
-    logging.debug("Changing SimState to %s" % sim_state.name)
+    simlog.debug("Changing SimState to %s" % sim_state.name)
     global _sim_state
     _sim_state = sim_state
 
@@ -191,7 +191,7 @@ def stop_simulation():
     """
     Stop the simulation definitely. All capsules or stations are reset
     """
-    logging.debug("Stopping simulation")
+    simlog.debug("Stopping simulation")
     capsule.reset_simulation()
     station.reset_simulation()
     change_state(SimState.KILLED)
@@ -204,7 +204,7 @@ def reset_simulation():
     global _current_tick
     global _sim_tick_variation
     global _loop_process
-    logging.warning("Resetting the simulation")
+    simlog.warn("Resetting the simulation")
     change_state(SimState.PAUSED)
     _loop_process.interrupt()
     capsule.reset_simulation()

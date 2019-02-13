@@ -1,12 +1,10 @@
-import logging
-
 import scipy.stats
 
-from simulator import sim_loop  # import simulator.sim_loop as sim_loop
 from model import station
 from settings import config
+from settings import simlog
+from simulator import sim_loop
 
-neutral_percent = int(config.model['neutral_percent'])
 city_percent = int(config.model['city_percent'])
 activity_and_residential_percent = int(config.model['activity_and_residential_percent'])
 activity_and_residential_fluctuation = int(config.model['activity_and_residential_fluctuation'])
@@ -23,6 +21,9 @@ def seconds_to_string(seconds):
     :param seconds: The amount of seconds you want to transform
     :return: The same amount in string with a HH:MM:SS format
     """
+    if seconds < 0:
+        return '--'
+
     minutes, secs = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     return '%02d:%02d:%02d' % (hours, minutes, secs)
@@ -42,6 +43,8 @@ def now_to_seconds():
     """
     :return: The current time in second
     """
+    if None in (sim_loop.get_current_tick(), sim_loop.get_sim_tick(), sim_loop.get_start_hour()):
+        return -1
     return sim_loop.get_current_tick() * sim_loop.get_sim_tick() + sim_loop.get_start_hour() * 3600
 
 
@@ -65,8 +68,8 @@ def station_probability(station_type, second, is_arrival=True):
     :param is_arrival: If the station is a departure or destination station
     :return: The probability to lead a traveler to the chosen station_type at the given time
     """
-    if neutral_percent is None or city_percent is None or activity_and_residential_percent is None or activity_and_residential_fluctuation is None:
-        logging.error("Converter hasn't been loaded")
+    if city_percent is None or activity_and_residential_percent is None or activity_and_residential_fluctuation is None:
+        simlog.error("Converter hasn't been loaded")
         return 0
 
     second = second % 86400
@@ -74,8 +77,6 @@ def station_probability(station_type, second, is_arrival=True):
     eph = evening_peak_hour
     gaussian_factor = 250 * (activity_and_residential_fluctuation / 100)
     result = 0
-    if station_type == station.Type.NEUTRAL:
-        result = neutral_percent
     if station_type == station.Type.CITY:
         result = city_percent
     if station_type == station.Type.ACTIVITY:

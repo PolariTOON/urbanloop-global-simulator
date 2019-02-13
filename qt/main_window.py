@@ -1,29 +1,31 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-import logging
+from math import ceil
 from sys import path
 from threading import Thread
 from time import sleep, time
-from math import ceil
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFileDialog, QPushButton, QHBoxLayout, \
     QVBoxLayout, QLabel, QSplitter
 
+from model import sim_record
 from qt.data_widget import DataWidget
 from qt.simulator_widget import SimulatorWidget
 from settings import network, config
+from settings import simlog
 from simulator import sim_loop as sim
-from model import sim_record
 
 window = None
 config = config.sim
 
-#to be removed
+# to be removed
 network.load()
-#to be removed
+
+
+# to be removed
 
 def get_image_path(image):
     """
@@ -48,13 +50,13 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.refresh_time = float(config["tick"])
         self.init_ui()
-    
+
     def closeEvent(self, event):
         """
         Method called when window is closed
         """
         sim.quit_endless_simulation()
-        self.state= "stopped"
+        self.state = "stopped"
         self.thd_run = None
         self.thd_refresh = None
 
@@ -106,11 +108,12 @@ class MainWindow(QMainWindow):
         """
         Build menu on UI
         """
+
         def open_file():
             """
             Method called when menu button "Open" is pressed
             """
-            logging.debug("Using custom network file")
+            simlog.debug("Using custom network file")
             file_path = self.open_file_name_dialog()
             network.load(file_path)
             self.refresh()
@@ -119,10 +122,10 @@ class MainWindow(QMainWindow):
             """
             Method called when menu button "Open sample" is pressed
             """
-            logging.debug("Using default network file")
+            simlog.debug("Using default network file")
             network.load(None)
             self.refresh()
-        
+
         menubar = self.menuBar()
         file_menu = menubar.addMenu('&File')
         open_file_act = QAction('Open file...', self)
@@ -151,6 +154,7 @@ class MainWindow(QMainWindow):
         Build buttons from right top hand corner panel
         Return buttons layout
         """
+
         # button methods
         def on_decrease_button_pressed():
             """
@@ -198,7 +202,7 @@ class MainWindow(QMainWindow):
                 self.thd_run = Thread(target=sim.run_simulation)
                 self.thd_run.start()
                 sleep(1)
-            
+
             self.thd_refresh = Thread(target=self.start_refresh)
             self.thd_refresh.start()
 
@@ -218,7 +222,7 @@ class MainWindow(QMainWindow):
             self.speed *= 2
             self.speed_label.setText(self.speed_label.text().split(" : ")[0] + " : x%f" % self.speed)
             sim.accelerate_sim()
-        
+
         self.decrease_speed_button = QPushButton(QIcon(get_image_path("minus.png")), "")
         self.decrease_speed_button.released.connect(on_decrease_button_pressed)
         self.stop_button = QPushButton(QIcon(get_image_path("stop.png")), "")
@@ -302,11 +306,11 @@ class MainWindow(QMainWindow):
             rec = sim_record.get_record()
             self.refresh(rec)
             end = time()
-            logging.debug("Execution time: %f secs" % (end - start))
+            simlog.debug("Execution time: %f secs" % (end - start))
             # if refresh has taken too much time
             if end - start >= self.refresh_time:
                 ticks = ceil((end - start) % self.refresh_time)
-                logging.warning("Skipping {0} ticks.".format(ticks))
+                simlog.warn("Skipping {0} ticks.".format(ticks))
                 for i in range(0, ticks):
                     sim_record.get_record()
                 return

@@ -1,8 +1,7 @@
-import logging
-
 from model import station
 from model import switch
 from settings import config
+from settings import simlog
 from simulator import sim_loop  # import simulator.sim_loop as sim_loop
 
 _capsules = list()
@@ -46,15 +45,15 @@ class Capsule:
             self._change_loop(current_switch)
         else:
             self._continue()
-            logging.info("Capsule n°%d stays on its loop :  %s" %
-                         (self.id, self.loop.name))
+            simlog.info("Capsule n°%d stays on its loop :  %s" %
+                        (self.id, self.loop.name))
 
     def _continue(self):
         """
         The capsule continues its road to the destination, on the same loop
         """
-        logging.info("Capsule n°%d arrives at %s from %s" %
-                     (self.id, self.next_element.name, self.current_element.name))
+        simlog.info("Capsule n°%d arrives at %s from %s" %
+                    (self.id, self.next_element.name, self.current_element.name))
         self.current_element = self.next_element
 
         if type(self.current_element) is switch.Switch and not self.current_element.is_switch_out(self.loop):
@@ -70,19 +69,15 @@ class Capsule:
         self.current_element = current_switch
         self.next_element = current_switch.next_element_other
         self.loop = current_switch.other_loop
-        logging.info("Capsule n°%d is switched to the loop :  %s" %
-                     (self.id, self.loop.name))
+        simlog.info("Capsule n°%d is switched to the loop :  %s" %
+                    (self.id, self.loop.name))
 
     def start_trip(self):
         """
         The capsule starts a trip to its destination
         """
-        if self.is_aboard():
-            contain = "aboard"
-        else :
-            contain = "empty"
-        logging.info("Capsule n°%d (%s) starts its trip from %s to %s" %
-                     (self.id, contain, self.current_element.name, self.destination.name))
+        simlog.info("Capsule n°%d (%s) starts its trip from %s to %s" %
+                    (self.id, ("Empty", "Aboard")[self.is_aboard()], self.current_element.name, self.destination.name))
         sim_loop.get_env().process(self.update_trip())
 
     def update_trip(self):
@@ -93,37 +88,39 @@ class Capsule:
         dist_to_next_element = self.loop.dist_to_next_object(self.current_element, tmp_element)[0]
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
-        #self.segment_ticks_duration = 10 * time_to_next_element * sim_loop.get_tick_per_second()
-        self.segment_ticks_duration = 100 * time_to_next_element * sim_loop.get_tick_per_second()
+        self.segment_ticks_duration = 10 * time_to_next_element * sim_loop.get_tick_per_second()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
 
     def callback_trip_event(self):
         """
-        Recursive callback that steps the trip event
+        Recursive callback that steps the trip event.
+        This function is called when the capsule arrives to the next_element which isn't
+        updated yet as the current_element.
         """
-        logging.debug(str(self.id) + str(self.destination))
         if type(self.next_element) == switch.Switch and self.next_element.is_switch_out(self.loop):
-            logging.debug("capsule" + str(self.id) + "route to " + str(self.destination))
             self.ask_route(self.next_element)
         else:
             self._continue()
 
         if self.current_element == self.destination:
             if self.current_element.capsule_queue.full():
-                logging.info("Capsule n°%d arrives to its destination %s but the station is already full !" %(self.id, self.destination.name))
+                simlog.info("Capsule n°%d arrives to its destination %s but the station is full !" %
+                            (self.id, self.destination.name))
                 self.current_element.drain()
-                # relance
-                sim_loop.get_env().process(self.update_trip())
-            else :
-                logging.info("Capsule n°%d arrives to its destination %s" %
-                             (self.id, self.destination.name))
-                self.current_element.capsule_queue.put(self)
-                self.get_out_traveler()
+            else:
+                self.end_trip()
                 return
-        else: # continue :
-            sim_loop.get_env().process(self.update_trip())
+
+        sim_loop.get_env().process(self.update_trip())
+
+    def end_trip(self):
+        simlog.info("Capsule n°%d ends its trip to the destination %s" %
+                    (self.id, self.destination.name))
+        self.current_element.capsule_queue.put_nowait(self)
+        if not self.travelers:
+            self.get_out_traveler()
 
     def get_in_traveler(self, traveler):
         """
@@ -131,18 +128,16 @@ class Capsule:
         """
         self.destination = station.get_station_by_name(traveler.destination_station_name)
         self.travelers.append(traveler)
-        logging.info("[%s] Get traveler (%s) in capsule n°%d" %
-                     (traveler.departure_station_name, self._get_travelers_id(), self.id))
+        simlog.info("[%s] Get traveler (%s) in capsule n°%d" %
+                    (traveler.departure_station_name, self._get_travelers_id(), self.id))
 
     def get_out_traveler(self):
         """
         Clear the traveler list and set the destination to None.
         """
-        logging.info("[%s] Get traveler (%s) out of capsule n°%d" %
-                     (self.destination.name, self._get_travelers_id(), self.id))
-        self.destination = None
+        simlog.info("[%s] Get traveler (%s) out of capsule n°%d" %
+                    (self.destination.name, self._get_travelers_id(), self.id))
         self.travelers.clear()
-        logging.debug("bouh"+str(self.travelers))
 
     def is_aboard(self):
         """
@@ -175,7 +170,7 @@ class Capsule:
         """
         details = "Capsule ID : " + str(self.id)
         details += "\nContains a Travelers : " + str(self.is_aboard())
-        if (self.destination != None):
+        if self.destination is not None:
             details += "\nDestination : " + self.destination.name
         details += "\nCurrent Loop : " + self.loop.name
         details += "\nLast or current element : "

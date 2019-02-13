@@ -1,7 +1,7 @@
 import json
-import logging
 import sys
-import numpy as np
+
+from settings import simlog
 
 from model import loop as model_loop
 from model import switch as model_switch
@@ -42,7 +42,8 @@ def load(file_path=None):
             e += 1
             el_type = element["type"]
             if el_type == "station":
-                elms += [model_station.Station(name=element["name"], capacity=element["capacity"], loop=the_loop, angle=element["angle"], station_type=["station_type"])]
+                elms += [model_station.Station(name=element["name"], capacity=element["capacity"], loop=the_loop,
+                                               angle=element["angle"], station_type=["station_type"])]
                 the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
@@ -70,7 +71,7 @@ def load(file_path=None):
                     elms[e].angle_other_loop = element["angle"]
                 the_loop.switches += [elms[e]]
             else:
-                logging.error("le json est mal formaté")
+                simlog.error("le json est mal formaté")
             order = []
         for i in range(len(elms)):
             # gestion des elements precedents et suivants
@@ -94,7 +95,7 @@ def load(file_path=None):
         r = np.random.randint(nb_st)
         arrivee = st.get_station_by_id(r)
         Traveler(departure.name, arrivee.name, 0)
-        departure.capsule_queue.put(Capsule(departure))
+        departure.capsule_queue.put_nowait(Capsule(departure))
         '''
     for station in model_station.get_stations():
         for i in range(station.capacity):
@@ -102,7 +103,7 @@ def load(file_path=None):
                 # creating capsules
                 caps = model_capsule.Capsule(departure_station=station)
                 # adding capsules to station
-                station.capsule_queue.put(caps)
+                station.capsule_queue.put_nowait(caps)
     # print("load done")
     return
 
@@ -111,6 +112,7 @@ def reload(file_path=None):
     model_loop.all_loops = {}
     model_capsule._capsules = list()
     load(file_path)
+
 
 '''
 def search_next_station(elements, i):

@@ -1,14 +1,14 @@
 import random
 
-from simulator import sim_loop
 from model import station
 from settings import config
+from simulator import sim_loop
 
 
 class AscentGenerator:
     def __init__(self):
         self.stations = station.get_stations()
-        self.climbing_time = int(config.capsule['climbing_time'])
+        self.ascent_time = int(config.capsule['ascent_time'])
         self.trip_limit = int(config.sim['trip_limit'])
 
     def ascent_event(self, capsule):
@@ -30,4 +30,4 @@ class AscentGenerator:
         return self.trip_limit > 0 or self.trip_limit == -1
 
     def random_ascent_duration(self):
-        return random.randrange(self.climbing_time - 2, self.climbing_time + 2, 1)
+        return random.randrange(self.ascent_time - 2, self.ascent_time + 2, 1)

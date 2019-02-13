@@ -1,9 +1,8 @@
 #! /usr/bin/env python3
 # coding: utf-8
-import logging
-
 import model.routing
 from settings import config
+from settings import simlog
 
 switch_id = 0
 timer_other = int(config.routing['timer_other'])
@@ -66,14 +65,14 @@ class Switch:
             """
         the_loop = station.loop
         if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
-            logging.debug("le switch " + str(self.id) + " aiguille la capsule voulant aller à " + station.name
-                          + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
+            # simlog.debug("le switch " + str(self.id) + " aiguille la capsule voulant aller à " + station.name
+            #              + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
             # self.is_routing_to_loop = True
             return True
             # capsule._change_loop(self.next_element)
         else:
-            logging.debug("le switch " + str(self.id) + " laisse la capsule voulant aller à " + station.name
-                          + " sur la boucle " + self.my_loop.name)
+            # simlog.debug("le switch " + str(self.id) + " laisse la capsule voulant aller à " + station.name
+            #              + " sur la boucle " + self.my_loop.name)
             # capsule._do_a_loop(self.next_element_other)
             return False
 
@@ -105,7 +104,7 @@ class Switch:
         elif the_loop is self.other_loop:
             return False
         else:
-            logging.error("Le switch " + str(self.id) + " n'est pas sur la boucle " + the_loop.name)
+            simlog.error("Le switch " + str(self.id) + " n'est pas sur la boucle " + the_loop.name)
 
 
 def init():

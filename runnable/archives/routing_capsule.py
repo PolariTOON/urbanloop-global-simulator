@@ -1,8 +1,9 @@
 import logging
-from settings import network
-from model.capsule import Capsule
-from model import station
 from sys import path
+
+from model import station
+from model.capsule import Capsule
+from settings import network
 
 "test de routage d'une capsule"
 
@@ -53,7 +54,7 @@ def promenade(c):
                 cost += dist
                 c.current_element = next_e
                 d, c.next_element = the_loop.dist_to_next_object(c.current_element)
-                # logging.debug(str(c.current_element))
+                # simlog.debug(str(c.current_element))
 
             # print(current.id, d, n)
 

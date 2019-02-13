@@ -36,7 +36,7 @@ Pour lancer le programme (après téléchargement des sources) compiler et exéc
 python3 main.py
 ```
 
-En cas d'erreur(s), vous pouvez essayer de lancer à la racine du projet `./run main.py` qui mettra à jour le *PYTHONPATH* pour vous.
+En cas d'erreur(s), vous pouvez essayer de lancer à la racine du projet ```./run main.py``` qui mettra à jour le *PYTHONPATH* pour vous.
 
 ### Dépendances
 * ```simpy```
@@ -46,11 +46,6 @@ En cas d'erreur(s), vous pouvez essayer de lancer à la racine du projet `./run 
 * ```scipy```
 * ```matplotlib```
 * ```PyQt5```
-
-## To do
-* Ajouter M. CHOLEZ au dépôt
-* Configuration SimPy 
-* Coder 
 
 ## Icons
 <div>

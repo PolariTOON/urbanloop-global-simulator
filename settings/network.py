@@ -71,7 +71,20 @@ def load(file_path=None):
                     elms[e].angle_other_loop = element["angle"]
                 the_loop.switches += [elms[e]]
             else:
-                simlog.error("le json est mal formaté")
+                simlog.error("The json file is not properly formatted. "
+                             "\n FORMAT : "
+                             "\n \t { <loop_name(String)> : { "
+                             "\n \t \t 'center'': [<x(int)>,<y(int)>], 'circonference': <size(int)>, "
+                             "\n \t \t 'content': [ {'type':<'station'/'switch_out'/'switch_in'>, ..., "
+                                            "'angle':<clockwise, 0 on the top(int[0,359)>}" 
+                             "\n \t \t \t {'type':'station','name':<station_name(String)>,'station_type': "
+                                            "<visitation(int[1-3])>, 'capacity': <number_slot(int[2-inf],default=4)>, "
+                                            "'angle':<placing(int[0,359)>}, "
+                             "\n \t \t \t {'type':'switch_out','other_loop':<loop_name(String)>, 'length': <size("
+                                            "int)>, 'angle':<placing(int[0,359)>}, "
+                             "\n \t \t \t {'type':'switch_in','other_loop':<loop_name(String)>, 'angle':<placing(int["
+                                            "0,359)>} "
+                             "\n \t ]}}")
             order = []
         for i in range(len(elms)):
             # gestion des elements precedents et suivants

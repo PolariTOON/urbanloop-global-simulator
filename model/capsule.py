@@ -45,14 +45,14 @@ class Capsule:
             self._change_loop(current_switch)
         else:
             self._continue()
-            simlog.info("Capsule n°%d stays on its loop :  %s" %
-                        (self.id, self.loop.name))
+            simlog.info("Capsule n°%d routed by Switch n°%d stays on loop %s" %
+                        (self.id, current_switch.id, self.loop.name))
 
     def _continue(self):
         """
         The capsule continues its road to the destination, on the same loop
         """
-        simlog.info("Capsule n°%d arrives at %s from %s" %
+        simlog.debug("\t Capsule n°%d arrives at %s from %s" %
                     (self.id, self.next_element.name, self.current_element.name))
         self.current_element = self.next_element
 
@@ -69,8 +69,8 @@ class Capsule:
         self.current_element = current_switch
         self.next_element = current_switch.next_element_other
         self.loop = current_switch.other_loop
-        simlog.info("Capsule n°%d is switched to the loop :  %s" %
-                    (self.id, self.loop.name))
+        simlog.info("Capsule n°%d is switched by the switch n°%d from loop %s to %s" %
+                    (self.id, current_switch.id, current_switch.my_loop.name, self.loop.name))
 
     def start_trip(self):
         """

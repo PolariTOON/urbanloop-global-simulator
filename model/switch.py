@@ -44,7 +44,7 @@ class Switch:
         self.size = size
         self.my_defects = [False, False]
         self.defects = []
-        self.name = "Switch %d" % self.id
+        self.name = "Switch n°%d" % self.id
         global switches
         switches += [self]
         global alive_timers
@@ -64,17 +64,15 @@ class Switch:
             :return: OUT : True si la capsule doit changer de loop, False sinon (boolean)
             """
         the_loop = station.loop
-        if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
-            # simlog.debug("le switch " + str(self.id) + " aiguille la capsule voulant aller à " + station.name
-            #              + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
-            # self.is_routing_to_loop = True
-            return True
-            # capsule._change_loop(self.next_element)
-        else:
-            # simlog.debug("le switch " + str(self.id) + " laisse la capsule voulant aller à " + station.name
-            #              + " sur la boucle " + self.my_loop.name)
-            # capsule._do_a_loop(self.next_element_other)
-            return False
+        return self.table[the_loop.name][0]
+        # if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
+        #     simlog.debug("le switch " + str(self.id) + " aiguille la capsule voulant aller à " + station.name
+        #                  + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
+        #     return True
+        # else:
+        #      simlog.debug("le switch " + str(self.id) + " laisse la capsule voulant aller à " + station.name
+        #                   + " sur la boucle " + self.my_loop.name)
+        #      return False
 
     def show_details(self):
         """
@@ -104,7 +102,7 @@ class Switch:
         elif the_loop is self.other_loop:
             return False
         else:
-            simlog.error("Le switch " + str(self.id) + " n'est pas sur la boucle " + the_loop.name)
+            simlog.error("The switch %d is not in the loop %s" % (str(self.id) , the_loop.name))
 
 
 def init():

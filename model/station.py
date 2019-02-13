@@ -38,7 +38,7 @@ class Station:
         self.station_type = station_type
         self.traveler_queue = queue.Queue()
         self.capsule_queue = queue.Queue(maxsize=capacity)
-        logging.debug(str(capacity))
+        # logging.debug(self.name + "'s capacity = "+ str(capacity))
         self.next_element = None
 
     def reset_simulation(self):
@@ -82,12 +82,15 @@ class Station:
         in order to make room for other capsules
         """
         if self.capsule_queue.qsize() >= round((3 * self.capacity) / 4):
+            empty = 0
             for capsule_index in range(self.capsule_queue.qsize()):
                 a_capsule = self.capsule_queue.get_nowait()
                 if not a_capsule.is_aboard():
-                    a_capsule.destination = get_almost_empty_station(self)
-                    a_capsule.start_trip()
-                    return
+                    empty += 1
+                    if empty > 2:
+                        a_capsule.destination = get_almost_empty_station(self)
+                        a_capsule.start_trip()
+                        return
                 else:
                     self.capsule_queue.put_nowait(a_capsule)
 
@@ -135,7 +138,8 @@ def get_almost_empty_station(departure_station=None):
     return random.choice(_stations)
 
 
-def drain():
+def drain_all():
+    """ Vide l'ensemble des stations 'trop pleines' """
     for station in get_stations():
-        if station.capsule_queue.full():
+        if station.capsule_queue.qsize() >= int((3*station.capacity)/4):
             station.drain()

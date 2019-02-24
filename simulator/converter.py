@@ -1,3 +1,5 @@
+import random
+
 import scipy.stats
 
 from model import station
@@ -5,14 +7,16 @@ from settings import config
 from settings import simlog
 from simulator import sim_loop
 
-city_percent = int(config.model['city_percent'])
-activity_and_residential_percent = int(config.model['activity_and_residential_percent'])
-activity_and_residential_fluctuation = int(config.model['activity_and_residential_fluctuation'])
-morning_peak_hour = int(config.model['morning_peak_hour'])
-evening_peak_hour = int(config.model['evening_peak_hour'])
+_ascent_descent_duration = int(config.capsule['ascent_descent_duration'])
+_city_percent = int(config.model['city_percent'])
+_activity_and_residential_percent = int(config.model['activity_and_residential_percent'])
+_activity_and_residential_fluctuation = int(config.model['activity_and_residential_fluctuation'])
+_morning_peak_hour = int(config.model['morning_peak_hour'])
+_evening_peak_hour = int(config.model['evening_peak_hour'])
 
-if activity_and_residential_fluctuation < 0 or activity_and_residential_fluctuation >= activity_and_residential_percent:
-    activity_and_residential_fluctuation = round(activity_and_residential_percent / 2)
+if _activity_and_residential_fluctuation < 0 \
+        or _activity_and_residential_fluctuation >= _activity_and_residential_percent:
+    _activity_and_residential_fluctuation = round(_activity_and_residential_percent / 2)
 
 
 def seconds_to_string(seconds):
@@ -68,45 +72,50 @@ def station_probability(station_type, second, is_arrival=True):
     :param is_arrival: If the station is a departure or destination station
     :return: The probability to lead a traveler to the chosen station_type at the given time
     """
-    if city_percent is None or activity_and_residential_percent is None or activity_and_residential_fluctuation is None:
+    if None in (_city_percent, _activity_and_residential_percent, _activity_and_residential_fluctuation):
         simlog.error("Converter hasn't been loaded")
         return 0
 
     second = second % 86400
-    mph = morning_peak_hour
-    eph = evening_peak_hour
-    gaussian_factor = 250 * (activity_and_residential_fluctuation / 100)
+    mph = _morning_peak_hour
+    eph = _evening_peak_hour
+    gaussian_factor = 250 * (_activity_and_residential_fluctuation / 100)
     result = 0
     if station_type == station.Type.CITY:
-        result = city_percent
+        result = _city_percent
     if station_type == station.Type.ACTIVITY:
         if is_arrival:
             if second < 43200:
-                result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
+                result = _activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), mph, 1)
             else:
-                result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(
+                result = _activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), eph, 1)
         else:
             if second < 43200:
-                result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(
+                result = _activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), mph, 1)
             else:
-                result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
+                result = _activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), eph, 1)
     if station_type == station.Type.RESIDENTIAL:
         if is_arrival:
             if second < 43200:
-                result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(
+                result = _activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), mph, 1)
             else:
-                result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
+                result = _activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), eph, 1)
         else:
             if second < 43200:
-                result = activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
+                result = _activity_and_residential_percent + gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), mph, 1)
             else:
-                result = activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(
+                result = _activity_and_residential_percent - gaussian_factor * scipy.stats.norm.pdf(
                     seconds_to_decimal_hour(second), eph, 1)
     return round(result / 100, 2)
+
+
+def random_ascent_descent_duration():
+    random_seconds = random.randrange(_ascent_descent_duration - 2, _ascent_descent_duration + 2, 1)
+    return random_seconds * sim_loop.get_tick_per_second()

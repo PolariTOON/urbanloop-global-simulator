@@ -2,12 +2,11 @@ import queue
 import random
 from enum import Enum
 
+from model import capsule
 from settings import simlog
 
-from model import capsule
-
 _stations = list()
-station_id = 0
+_station_id = 0
 
 
 class Type(Enum):
@@ -28,10 +27,10 @@ class Station:
         :param angle: Angle between the top of the loop and the position of the station - clockwise (float)
         :param station_type: Type of station compared to its affluence (Enum)
         """
-        global station_id
+        global _station_id
         global _stations
-        self.id = station_id
-        station_id += 1
+        self.id = _station_id
+        _station_id += 1
         _stations.append(self)
         self.name = "Station #{0}".format(self.id) if (name is None) else name
         self.angle = angle
@@ -40,7 +39,6 @@ class Station:
         self.station_type = station_type
         self.traveler_queue = queue.Queue()
         self.capsule_queue = queue.Queue(maxsize=capacity)
-        # logging.debug(self.name + "'s capacity = "+ str(capacity))
         self.next_element = None
 
     def reset_simulation(self):
@@ -82,25 +80,26 @@ class Station:
         """
         This function will drain the first empty capsule if the station is 3/4 full.
         in order to make room for other capsules
+        :param destination: The destination where the empty capsule should be sent
         """
-        if self.capsule_queue.qsize() >= round((3 * self.capacity) / 4):
-            compt = self.capsule_queue.qsize()
-            # empty = 0
-            for capsule_index in range(self.capsule_queue.qsize()):  # for a_capsule in self.capsule_queue.queue():
-                a_capsule = self.capsule_queue.get_nowait()
-                if not a_capsule.is_aboard():
-                    # empty += 1
-                    if True: # if empty > 2:
-                        if destination is None:
-                            destination = get_almost_empty_station(self)
-                        a_capsule.destination = destination
-                        simlog.debug("Station %s (%s/%d capsules) drained to "
-                                     "%s (%d/%d capsules)" % (self.name, compt, self.capacity, destination.name,
-                                                              destination.capsule_queue.qsize(), destination.capacity))
-                        a_capsule.start_trip()
-                        return
-                else:
-                    self.capsule_queue.put_nowait(a_capsule)
+        qsize = self.capsule_queue.qsize()
+
+        if qsize < round((3 * self.capacity) / 4):
+            return
+
+        for capsule_index in range(qsize):
+            a_capsule = self.capsule_queue.get_nowait()
+            if not a_capsule.is_aboard():
+                if destination is None:
+                    destination = get_almost_empty_station(self)
+                a_capsule.destination = destination
+                simlog.debug("Station %s (%s/%d capsules) drained to "
+                             "%s (%d/%d capsules)" % (self.name, qsize, self.capacity, destination.name,
+                                                      destination.capsule_queue.qsize(), destination.capacity))
+                a_capsule.start_trip()
+                return
+            else:
+                self.capsule_queue.put_nowait(a_capsule)
 
     def complete(self):
         """
@@ -108,8 +107,8 @@ class Station:
         in order to make complete the queue
         """
         if self.capsule_queue.qsize() <= max(1, round(self.capacity / 4)):
-            departure = get_almost_full_station(self)
-            departure.drain(self)
+            departure = get_almost_full_station(destination_station=self)
+            departure.drain(destination=self)
 
 
 def get_stations():
@@ -161,13 +160,17 @@ def get_almost_full_station(destination_station=None):
     """
     for station in random.sample(_stations, len(_stations)):
         if destination_station is not None and station is not destination_station:
-            if station.capsule_queue.qsize() > round((3 * station.capacity) / 4) :
+            if station.capsule_queue.qsize() > round((3 * station.capacity) / 4):
                 return station
     return random.choice(_stations)
 
 
 def drain_all():
+    """
+    :return:
+    """
     """ Vide l'ensemble des stations 'trop pleines' _ rempli les 'trop vides'"""
+    simlog.info("Stations drainage process launched.")
     for station in get_stations():
         if station.capsule_queue.qsize() >= (station.capacity - 1):
             station.drain()

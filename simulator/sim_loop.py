@@ -59,12 +59,6 @@ class SimLoop:
         _current_tick += 1
         yield self.tick_event.succeed()
         self.tick_event = _env.event()
-        # TODO begin To check
-        if not get_current_tick() % 1000:
-            simlog.info("Stations drainage process launched.")
-            station.drain_all()
-        # TODO end of to check
-
 
     def loop(self):
         """
@@ -79,6 +73,9 @@ class SimLoop:
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
+
+                if is_frequency(120):
+                    station.drain_all()
 
                 if self.is_recorded:
                     sim_record.put_record()

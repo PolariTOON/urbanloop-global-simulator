@@ -2,7 +2,8 @@ from model import station
 from model import switch
 from settings import config
 from settings import simlog
-from simulator import sim_loop  # import simulator.sim_loop as sim_loop
+from simulator import converter
+from simulator import sim_loop
 
 _capsules = list()
 _capsule_id = 0
@@ -26,6 +27,7 @@ class Capsule:
         self.destination = destination_station
         self.travelers = list()
         self.trip_event = None
+        self.descent_event = None
         self.speed = float(config.capsule['max_speed'])
         self.segment_start_tick = 0
         self.segment_ticks_duration = 0
@@ -45,15 +47,13 @@ class Capsule:
             self._change_loop(current_switch)
         else:
             self._continue()
-            simlog.info("Capsule n°%d routed by Switch n°%d stays on loop %s" %
-                        (self.id, current_switch.id, self.loop.name))
+            simlog.info("Capsule %d stays on its loop" % self.id, self.loop)
 
     def _continue(self):
         """
         The capsule continues its road to the destination, on the same loop
         """
-        simlog.debug("\t Capsule n°%d arrives at %s from %s" %
-                    (self.id, self.next_element.name, self.current_element.name))
+        simlog.debug("Capsule %d continues its trip" % self.id, self.next_element.name, self.current_element.name)
         self.current_element = self.next_element
 
         if type(self.current_element) is switch.Switch and not self.current_element.is_switch_out(self.loop):
@@ -69,17 +69,15 @@ class Capsule:
         self.current_element = current_switch
         self.next_element = current_switch.next_element_other
         self.loop = current_switch.other_loop
-        simlog.info("Capsule n°%d is switched by the switch n°%d from loop %s to %s" %
-                    (self.id, current_switch.id, current_switch.my_loop.name, self.loop.name))
+        simlog.info("Capsule %d is switched" % self.id, current_switch.my_loop, self.loop)
 
     def start_trip(self):
         """
         The capsule starts a trip to its destination
         """
-        simlog.info("Capsule n°%d (%s) starts its trip from %s to %s" %
-                    (self.id, ("Empty", "Aboard")[self.is_aboard()], self.current_element.name, self.destination.name))
-        simlog.debug(
-            "%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
+        simlog.info("Capsule %d (%s) starts its trip" % (self.id, self._get_capacity_state()),
+                    self.current_element, self.destination)
+        simlog.debug("Amount of capsules : %d" % self.current_element.capsule_queue.qsize(), self.current_element)
         sim_loop.get_env().process(self.update_trip())
 
     def update_trip(self):
@@ -108,24 +106,28 @@ class Capsule:
 
         if self.current_element == self.destination:
             if self.current_element.capsule_queue.full():
-                simlog.info("Capsule n°%d (%s) arrives to its destination %s but the station is full !" %
-                            (self.id, ("Empty", "Aboard")[self.is_aboard()], self.destination.name))
+                simlog.info("Capsule %d (%s) arrives to its destination but the station is full !" %
+                            (self.id, self._get_capacity_state()), self.destination.name)
                 simlog.debug("%s contains %d capsules now" % (
-                self.current_element.name, self.current_element.capsule_queue.qsize()))
+                    self.current_element.name, self.current_element.capsule_queue.qsize()))
                 self.current_element.drain()
             else:
-                self.end_trip()
+                sim_loop.get_env().process(self.end_trip())
                 return
 
         sim_loop.get_env().process(self.update_trip())
 
     def end_trip(self):
-        simlog.info("Capsule n°%d (%s) ends its trip to the destination %s" %
-                    (self.id, ("Empty", "Aboard")[self.is_aboard()], self.destination.name))
+        simlog.info("Capsule %d (%s) ends its trip" %
+                    (self.id, self._get_capacity_state()), self.destination.name)
         self.current_element.capsule_queue.put_nowait(self)
-        simlog.debug("%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
+        simlog.debug(
+            "%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
         if self.travelers:
-            self.get_out_traveler()
+            simlog.error("Start descent in capsule %d" % self.id, self.destination)
+            self.descent_event = sim_loop.get_env().timeout(converter.random_ascent_descent_duration())
+            self.descent_event.callbacks.append(lambda event: self.get_out_traveler())
+            yield self.descent_event
 
     def get_in_traveler(self, traveler):
         """
@@ -133,15 +135,14 @@ class Capsule:
         """
         self.destination = station.get_station_by_name(traveler.destination_station_name)
         self.travelers.append(traveler)
-        simlog.info("[%s] Get traveler (%s) in capsule n°%d" %
-                    (traveler.departure_station_name, self._get_travelers_id(), self.id))
+        simlog.info("Traveler %s gets in capsule %d" % (self._get_travelers_id(), self.id),
+                    traveler.departure_station_name)
 
     def get_out_traveler(self):
         """
         Clear the traveler list and set the destination to None.
         """
-        simlog.info("[%s] Get traveler (%s) out of capsule n°%d" %
-                    (self.destination.name, self._get_travelers_id(), self.id))
+        simlog.error("Traveler %s gets out capsule %d" % (self._get_travelers_id(), self.id), self.destination)
         self.travelers.clear()
 
     def is_aboard(self):
@@ -167,6 +168,14 @@ class Capsule:
         if len(self.travelers) == 1:
             return self.travelers[0].id
         return " - ".join(map(lambda traveler: traveler.id, self.travelers))
+
+    def _get_capacity_state(self):
+        """
+        Private function used to log information
+        :return: The string state of the capsule traveler_list
+        """
+        number = len(self.travelers)
+        return ((str(number) + ' traveler', str(number) + ' travelers')[number > 1], 'Empty')[number == 0]
 
     def show_details(self):
         """

@@ -110,6 +110,9 @@ class Station:
             departure = get_almost_full_station(destination_station=self)
             departure.drain(destination=self)
 
+    def estimated_capsules_number(self):
+        return self.capsule_queue.qsize() + len(capsule.get_incoming_capsule(self))
+
 
 def get_stations():
     """
@@ -129,16 +132,6 @@ def get_station_by_name(name):
             return station
 
 
-def reset_simulation():
-    """
-    This function will reset every stations of the network
-    """
-    for station in _stations:
-        station.reset_simulation()
-        station.capsule_queue.put_nowait(capsule.Capsule(departure_station=station))
-        station.capsule_queue.put_nowait(capsule.Capsule(departure_station=station))
-
-
 def get_almost_empty_station(departure_station=None):
     """
     :param departure_station: The departure_station
@@ -146,8 +139,8 @@ def get_almost_empty_station(departure_station=None):
     it will return a random station.
     """
     for station in random.sample(_stations, len(_stations)):
-        if departure_station is not None and station is not departure_station:
-            if station.capsule_queue.qsize() < max(1, round(station.capacity / 4)):
+        if station not in (None, departure_station):
+            if station.estimated_capsules_number() < max(1, round(station.capacity / 4)):
                 return station
     return random.choice(_stations)
 
@@ -160,19 +153,26 @@ def get_almost_full_station(destination_station=None):
     """
     for station in random.sample(_stations, len(_stations)):
         if destination_station is not None and station is not destination_station:
-            if station.capsule_queue.qsize() > round((3 * station.capacity) / 4):
+            if station.estimated_capsules_number() > round((3 * station.capacity) / 4):
                 return station
     return random.choice(_stations)
 
 
 def drain_all():
     """
-    :return:
+    Drain every almost full stations, fill every almost empty stations
     """
-    """ Vide l'ensemble des stations 'trop pleines' _ rempli les 'trop vides'"""
     simlog.info("Stations drainage process launched.")
     for station in get_stations():
-        if station.capsule_queue.qsize() >= (station.capacity - 1):
+        if station.estimated_capsules_number() >= (station.capacity - 1):
             station.drain()
-        if station.capsule_queue.qsize() <= 1:
+        if station.estimated_capsules_number() <= 1:
             station.complete()
+
+
+def reset_simulation():
+    """
+    This function will reset every stations of the network
+    """
+    for station in _stations:
+        station.reset_simulation()

@@ -124,7 +124,7 @@ class Capsule:
         simlog.debug(
             "%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
         if self.travelers:
-            simlog.error("Start descent in capsule %d" % self.id, self.destination)
+            simlog.debug("Start descent in capsule %d" % self.id, self.destination)
             self.descent_event = sim_loop.get_env().timeout(converter.random_ascent_descent_duration())
             self.descent_event.callbacks.append(lambda event: self.get_out_traveler())
             yield self.descent_event
@@ -133,16 +133,15 @@ class Capsule:
         """
         :param traveler: The traveler who gets in the capsule
         """
-        self.destination = station.get_station_by_name(traveler.destination_station_name)
+        self.destination = traveler.destination_station
         self.travelers.append(traveler)
-        simlog.info("Traveler %s gets in capsule %d" % (self._get_travelers_id(), self.id),
-                    traveler.departure_station_name)
+        simlog.info("Traveler %s gets in capsule %d" % (self._get_travelers_id(), self.id), traveler.departure_station)
 
     def get_out_traveler(self):
         """
         Clear the traveler list and set the destination to None.
         """
-        simlog.error("Traveler %s gets out capsule %d" % (self._get_travelers_id(), self.id), self.destination)
+        simlog.info("Traveler %s gets out capsule %d" % (self._get_travelers_id(), self.id), self.destination)
         self.travelers.clear()
 
     def is_aboard(self):
@@ -200,13 +199,23 @@ class Capsule:
         return details
 
 
+def get_incoming_capsule(destination):
+    return [capsule for capsule in _capsules if capsule.destination is destination]
+
+
+def get_capsules():
+    """
+    :return: All capsules of the network
+    """
+    return _capsules
+
+
 def reset_simulation():
+    """
+    This function will reset every capsules of the network
+    """
     global _capsules
     global _capsule_id
     _capsule_id = 0
     for capsule in _capsules:
         del capsule
-
-
-def get_capsules():
-    return _capsules

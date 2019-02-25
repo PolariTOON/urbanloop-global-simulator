@@ -37,7 +37,7 @@ class TravelerGenerator:
             total_generated += 1
             departure_station = _select_random_station()
             destination_station = _select_random_station(departure_station=departure_station)
-            traveler.Traveler(departure_station.name, destination_station.name, seconds)
+            traveler.Traveler(departure_station, destination_station, seconds)
             simlog.info("Traveler generated", departure_station, destination_station)
             yield sim_loop.get_env().timeout(int(round(sim_loop.get_tick_per_second() / traveler_number)))
 

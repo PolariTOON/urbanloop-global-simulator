@@ -34,6 +34,16 @@ def get_image_path(image):
     return "{0}/../resources/img/{1}".format(path[0], image)
 
 
+def copy_file(file_src, file_dest):
+    fs = open(file_src, 'r')
+    fd = open(file_dest, 'w')
+    for lign in fs:
+        fd.write(lign)
+    fd.close()
+    fs.close()
+    return
+
+
 class MainWindow(QMainWindow):
     def __init__(self, root):
         """
@@ -126,6 +136,35 @@ class MainWindow(QMainWindow):
             network.load(None)
             self.refresh()
 
+        def change_configuration():
+            """
+            Method called when menu button "Change configuration" is pressed
+            """
+            simlog.debug("Configuration changing")
+            # TODO changer
+            self.refresh()
+            simlog.debug("Configuration changed")
+
+        def reset_configuration():
+            """
+            Method called when menu button "Reset configuration" is pressed
+            """
+            simlog.debug("Reset configuration")
+            copy_file("{0}/../resources/default_config.ini".format(path[0]),
+                      "{0}/../resources/config.ini".format(path[0]))
+            self.refresh()
+            simlog.debug("Configuration reset")
+
+        def save_configuration():
+            """
+            Method called when menu button "Save configuration" is pressed --> the current configuration become the default one
+            """
+            simlog.debug("Configuration saving")
+            copy_file("{0}/../resources/config.ini".format(path[0]),
+                      "{0}/../resources/default_config.ini".format(path[0]))
+            self.refresh()
+            simlog.debug("Configuration saved")
+
         menubar = self.menuBar()
         file_menu = menubar.addMenu('&File')
         open_file_act = QAction('Open file...', self)
@@ -136,6 +175,24 @@ class MainWindow(QMainWindow):
         open_sample_act.setShortcut('Ctrl+Shift+O')
         open_file_act.triggered.connect(open_sample)
         file_menu.addAction(open_sample_act)
+
+        config_menu = menubar.addMenu('&Configuration')
+        change_config_act = QAction('Change COnfiguration', self)
+        change_config_act.setShortcut('Ctrl+C')
+        change_config_act.triggered.connect(change_configuration)
+        config_menu.addAction(change_config_act)
+
+        reset_config_act = QAction('Reset Default Configuration', self)
+        reset_config_act.setShortcut('Ctrl+R')
+        reset_config_act.triggered.connect(reset_configuration)
+        config_menu.addAction(reset_config_act)
+
+        save_config_act = QAction('Save current Configuration', self)
+        save_config_act.setShortcut('Ctrl+S')
+        save_config_act.triggered.connect(save_configuration)
+        config_menu.addAction(save_config_act)
+
+
 
     def open_file_name_dialog(self):
         """
@@ -148,6 +205,7 @@ class MainWindow(QMainWindow):
             self, "QFileDialog.getOpenFileName()", "", "All Files (*)", options=options)
         self.path = file_name if file_name else None
         return self.path
+
 
     def build_buttons(self):
         """

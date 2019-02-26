@@ -36,7 +36,7 @@
 | Tâches                                 |       En charge          | Deadline |Respect|
 | :------------------------------------  |: ----------------------- |:--------:|:-----:|
 | File d'attente simulateur              | Thibault                 | 12/02    |✓      |
-| File d'attente interface               |  Baptiste                | 12/02    |x      |
+| File d'attente interface               |  Baptiste                | 12/02    |✓      |
 | Gestion de la capacité d'une station   |          Charlotte       |   12/02  |✓      |
 | Drainage des stations pleine (capsules vides dans le réseau)|Charlotte| 12/02|✓      |
 | Gestion de projet                      |          Charlotte       |   _      | _     |
@@ -46,19 +46,49 @@
 * gérer les stations vides
 
 
-### Programme SPRINTs suivants
+### Programme jusqu'au 26/02 
+| Tâches                                 |       En charge          | Deadline |Respect|
+| :------------------------------------  |: ----------------------- |:--------:|:-----:|
+| Descente usagers                       | thibault                 | V 15/02  | ✓ | 
+| Vue paramètrage                        | Charlotte & Baptiste     | Ma 19/02 | x | 
+| Gestion capacités                      | Charlotte & Thibault     |  Ma19/02 | ✓ |
+| Visulisation unitaire des capsules     | Baptiste                 | Ma 26/02 | x |
+
+
+### Avant semaine banalisée 1er mars  
+| Tâches                                 |       En charge          | Deadline |Respect|
+| :------------------------------------  |: ----------------------- |:--------:|:-----:|
+| fixer nombre de capsules               | Charlotte                | 28/02    | x | 
+| récupération statistiques              |  **Thibault**, Charlotte | D 3/03   |✓ ou x |
+| Mise à l'échelle                       |     Charlotte            | 28/02    |✓ ou x |
+
+
+### Semaine Banalisée - 4 au 8 mars 
+| Tâches                                 |       En charge          | Deadline |Respect|
+| :------------------------------------  |: ----------------------- |:--------:|:-----:|
+| Gestion des approvisionnements  (entrepôts) |Charlotte  & Thibault| Ma 6/03  |✓ ou x |
+| Routage dynamique  (test unitaires)    | Charlotte                | to define|✓ ou x |
+| Défauts                                |  **Thibault**, Charlotte | V 8/03 |✓ ou x |
+| Collisions                             |  **Thibault**, Charlotte | V 8/03 |✓ ou x |
+| Interface adaptative (topologie)       |          Baptiste        | V 8/03 |✓ ou x |
+| Gestion graphique des queues et slotes stations |   *             | V 8/03 |✓ ou x |
+
+### Préparation finale 
+| Tâches                                 |       En charge          | Deadline |Respect|
+| :------------------------------------  |: ----------------------- |:--------:|:-----:|
+| Résumé                                 |      *                   | to define|✓ ou x |
+| Rapport                                |      *                   | to define|✓ ou x |
+| Soutenance & vidéo                     |      *                   | to define|✓ ou x |
+| test acceptation                       |      *                   | to define|✓ ou x |
+
+
+
+
 
 | Tâches                                 |       En charge          | Deadline |Respect|
 | :------------------------------------  |: ----------------------- |:--------:|:-----:|
-| Routage dynamique                      | Charlotte                | to define|✓ ou x |
-| Défauts                                |  **Thibault**, Charlotte | to define|✓ ou x |
 | Zoom, dézoom et déplacement            |          Baptiste        | to define|✓ ou x |
-| Gestion graphique des capacités        |          Charlotte       | to define|✓ ou x |
 
-
-###### Objectifs :
-* Ajout de fonctions graphiques 
-* Arrivée des anomalies
 
 
 

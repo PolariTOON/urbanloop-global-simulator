@@ -301,6 +301,7 @@ class MainWindow(QMainWindow):
         while self.state == "running":
             start = time()
             rec = sim_record.get_record()
+            #simlog.debug("{0}\nAngle : {1}".format(rec.stations[0].show_details(), rec.stations[0].angle))
             self.refresh(rec)
             end = time()
             # simlog.debug("Execution time: %f secs" % (end - start))

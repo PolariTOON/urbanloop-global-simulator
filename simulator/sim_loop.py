@@ -69,6 +69,7 @@ class SimLoop:
         global _current_tick
         while True:
             if _sim_state == SimState.RUNNING:
+                simlog.debug("--- Tick #{0} ---".format(_current_tick))
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):

@@ -8,7 +8,7 @@ import model.capsule as MC
 import model.loop as ML
 import model.station as MST
 import model.switch as MSW
-from settings import config
+from settings import config, simlog
 
 config = config.interface
 
@@ -54,9 +54,6 @@ class NetworkRenderer:
         """
         Draw every switch and station which belong to @param:loop with @param;paint
         """
-        if self.record != None:
-            self.modify_loops(loop, paint)
-            return
         for item_descriptor in loop.objects:
             item_type = item_descriptor[0]
             item = item_descriptor[1]
@@ -72,34 +69,21 @@ class NetworkRenderer:
                     config["station_outline_width"])
                 rect = get_rect_for_item(item, loop, outline_width, None if is_station else item_type)
                 paint.drawEllipse(rect)
+        if self.record != None:
+            self.modify_loop(loop, paint)
 
-    def modify_loops(self, loop, paint):
+    def modify_loop(self, loop, paint):
         """
-        Update stations only. Called when showing from a record
+        Update stations information only. Called when showing from a record
         """
-        # faut dessiner les switch comme d'hab
-        for item_descriptor in loop.objects:
-            item_type = item_descriptor[0]
-            item = item_descriptor[1]
-            if isinstance(item, MSW.Switch):
-                if self.root.selected_item == item:
-                    paint.setBrush(QColor(config["selected_color"]))
-                else:
-                    paint.setBrush(QColor(config["switch_color"]))
-                paint.drawEllipse(get_rect_for_item(item, loop, 0, item_type))
-                paint.setBrush(QColor("white"))
-                outline_width = int(config["switch_outline_width"])
-                paint.drawEllipse(get_rect_for_item(item, loop, outline_width, item_type))
-        # ensuite on dessine les stations depuis le record
         for station in self.record.stations:
-            if self.root.selected_item == item:
-                    paint.setBrush(QColor(config["selected_color"]))
-            else:
-                paint.setBrush(QColor(config["station_color"]))
-            paint.drawEllipse(get_rect_for_item(station, loop, 0, None))
-            paint.setBrush(QColor("white"))
-            outline_width = int(config["station_outline_width"])
-            paint.drawEllipse(get_rect_for_item(station, loop, outline_width, None))
+            if station.loop == loop:
+                for item_descriptor in loop.objects:
+                    item = item_descriptor[1]
+                    if isinstance(item, MST.Station):
+                        if station.id == item.id:
+                            item.traveler_queue = station.traveler_queue
+                            item.capsule_queue = station.capsule_queue
 
     def draw_capsules(self, paint):
         """

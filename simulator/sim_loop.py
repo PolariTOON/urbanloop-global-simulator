@@ -1,6 +1,6 @@
 from enum import Enum
 
-import simpy
+import simpy, threading as th
 
 from model import capsule
 from model import sim_record
@@ -68,8 +68,10 @@ class SimLoop:
         """
         global _current_tick
         while True:
+            if not th.main_thread().is_alive():
+                simlog.info("Main thread is dead. Exiting...")
+                return
             if _sim_state == SimState.RUNNING:
-                simlog.debug("--- Tick #{0} ---".format(_current_tick))
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):

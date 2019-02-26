@@ -218,20 +218,6 @@ def reset_simulation():
     run_simulation()
 
 
-def accelerate_sim():
-    """
-    Multiply the current sim_tick by 2, so there are more ticks per simulated second
-    """
-    _change_sim_tick(value=(_sim_tick * 2))
-
-
-def decelerate_sim():
-    """
-    Divide the current sim_tick by 2, so there are less ticks per simulated second
-    """
-    _change_sim_tick(value=(_sim_tick * 2))
-
-
 def get_env():
     """
     :return: The simulation environment

@@ -162,8 +162,6 @@ class MainWindow(QMainWindow):
             """
             self.speed /= 2
             self.speed_label.setText(self.speed_label.text().split(" : ")[0] + " : x%f" % self.speed)
-            # decrease speed
-            sim.decelerate_sim()
 
         def on_stop_button_pressed():
             """
@@ -221,7 +219,6 @@ class MainWindow(QMainWindow):
             """
             self.speed *= 2
             self.speed_label.setText(self.speed_label.text().split(" : ")[0] + " : x%f" % self.speed)
-            sim.accelerate_sim()
 
         self.decrease_speed_button = QPushButton(QIcon(get_image_path("minus.png")), "")
         self.decrease_speed_button.released.connect(on_decrease_button_pressed)
@@ -306,12 +303,12 @@ class MainWindow(QMainWindow):
             rec = sim_record.get_record()
             self.refresh(rec)
             end = time()
-            simlog.debug("Execution time: %f secs" % (end - start))
+            # simlog.debug("Execution time: %f secs" % (end - start))
             # if refresh has taken too much time
             if end - start >= self.refresh_time:
                 ticks = ceil((end - start) % self.refresh_time)
                 simlog.warn("Skipping {0} ticks.".format(ticks))
                 for i in range(0, ticks):
                     sim_record.get_record()
-                return
-            sleep(self.refresh_time)
+            else:
+                sleep(self.refresh_time / self.speed)

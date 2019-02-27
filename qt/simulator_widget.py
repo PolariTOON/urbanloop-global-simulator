@@ -41,7 +41,7 @@ class SimulatorWidget(QWidget):
 
     def reset_capsules(self):
         """
-        Reset Simulator knowledge of capsules in the network and update simulator view
+        Reset Simulator knowledge of capsules in the network and updateData simulator view
         """
         self.capsules = []
         self.refresh()

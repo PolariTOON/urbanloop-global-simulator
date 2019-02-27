@@ -121,6 +121,7 @@ class Capsule:
         simlog.info("Capsule %d (%s) ends its trip" %
                     (self.id, self._get_capacity_state()), self.destination.name)
         self.current_element.capsule_queue.put_nowait(self)
+        self.destination = None
         simlog.debug(
             "%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
         if self.travelers:
@@ -152,9 +153,9 @@ class Capsule:
 
     def get_trip_percentage(self):
         """
-        :return: The percentage travelled by the capsule on the segment road from the previous to the next element
+        :return: The segmentPercentage travelled by the capsule on the segment road from the previous to the next element
         """
-        if not self.is_aboard() or self.segment_ticks_duration == 0:
+        if not self.is_aboard() or self.destination is None or self.segment_ticks_duration == 0:
             return 0
 
         return (sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration

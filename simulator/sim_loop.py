@@ -52,7 +52,7 @@ class SimLoop:
     def tick(self):
         """
         This function triggers the tick_event
-        The tick_event update the current_tick.
+        The tick_event updateData the current_tick.
         It should be used to frequency process
         """
         global _current_tick

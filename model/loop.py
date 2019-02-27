@@ -105,3 +105,7 @@ def get_by_name(search_name):
         if name == search_name:
             return loop
     return None
+
+
+def get_loops():
+    return [loop for _, loop in all_loops.items()]

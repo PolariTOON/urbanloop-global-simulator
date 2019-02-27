@@ -1,9 +1,17 @@
 import os
+from json import dumps
+from threading import Thread
 
-from flask import Flask, render_template
+from flask import Flask, Response, redirect, url_for
+
+from model import loop
+from settings import json_serializer
+from settings import network
+from simulator import sim_loop
 
 web_directory = os.path.abspath('../resources/web')
 app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
+sim_thread = None
 
 
 @app.route("/")
@@ -11,5 +19,21 @@ def root():
     return app.send_static_file('index.html')
 
 
+@app.route("/loops")
+def generate_loops_json():
+    network.load()
+    list_loop_json = [json_serializer.serialize_loop(a_loop) for a_loop in loop.get_loops()]
+    return Response(dumps(list_loop_json), mimetype="application/json")
+
+
+@app.route("/start")
+def start():
+    global sim_thread
+    network.load()
+    sim_thread = Thread(target=sim_loop.run_simulation)
+    sim_thread.start()
+    return redirect(url_for('root'))
+
+
 if __name__ == '__main__':
-    app.run(port=8081)
+    app.run(port=8080)

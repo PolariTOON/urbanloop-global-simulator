@@ -1,6 +1,6 @@
 from enum import Enum
 
-import simpy
+import simpy, threading as th
 
 from model import capsule
 from model import sim_record
@@ -68,6 +68,9 @@ class SimLoop:
         """
         global _current_tick
         while True:
+            if not th.main_thread().is_alive():
+                simlog.info("Main thread is dead. Exiting...")
+                return
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
@@ -216,20 +219,6 @@ def reset_simulation():
     _sim_tick_variation = list()
     change_state(SimState.RUNNING)
     run_simulation()
-
-
-def accelerate_sim():
-    """
-    Multiply the current sim_tick by 2, so there are more ticks per simulated second
-    """
-    _change_sim_tick(value=(_sim_tick * 2))
-
-
-def decelerate_sim():
-    """
-    Divide the current sim_tick by 2, so there are less ticks per simulated second
-    """
-    _change_sim_tick(value=(_sim_tick * 2))
 
 
 def get_env():

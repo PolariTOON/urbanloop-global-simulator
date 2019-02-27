@@ -9,7 +9,7 @@ from simulator import sim_loop
 
 records = queue.Queue()
 _limit = int(config.sim['default_record_size'])
-_offset = 0
+_offset = 5
 
 
 class SimRecord:
@@ -57,7 +57,7 @@ def get_record():
         return None
 
     if records.qsize() <= int(_limit / 2) and sim_loop.is_paused():
-        sim_loop.run_simulation()
+        sim_loop.change_state(sim_loop.SimState.RUNNING)
 
     record = None
     for i in range(_offset + 1):

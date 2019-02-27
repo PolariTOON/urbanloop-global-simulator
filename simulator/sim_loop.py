@@ -1,6 +1,6 @@
 from enum import Enum
 
-import simpy
+import simpy, threading as th
 
 from model import capsule
 from model import sim_record
@@ -52,7 +52,7 @@ class SimLoop:
     def tick(self):
         """
         This function triggers the tick_event
-        The tick_event update the current_tick.
+        The tick_event updateData the current_tick.
         It should be used to frequency process
         """
         global _current_tick
@@ -68,6 +68,9 @@ class SimLoop:
         """
         global _current_tick
         while True:
+            if not th.main_thread().is_alive():
+                simlog.info("Main thread is dead. Exiting...")
+                return
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())

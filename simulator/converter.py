@@ -1,4 +1,5 @@
 import random
+from math import floor
 
 import scipy.stats
 
@@ -16,7 +17,7 @@ _evening_peak_hour = int(config.model['evening_peak_hour'])
 
 if _activity_and_residential_fluctuation < 0 \
         or _activity_and_residential_fluctuation >= _activity_and_residential_percent:
-    _activity_and_residential_fluctuation = round(_activity_and_residential_percent / 2)
+    _activity_and_residential_fluctuation = floor(_activity_and_residential_percent / 2)
 
 
 def seconds_to_string(seconds):
@@ -30,6 +31,7 @@ def seconds_to_string(seconds):
 
     minutes, secs = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
+    hours %= 24
     return '%02d:%02d:%02d' % (hours, minutes, secs)
 
 
@@ -58,7 +60,7 @@ def seconds_to_floor_hour(seconds):
     :param seconds: An amount of seconds
     :return: The corresponding hour
     """
-    return round((seconds % 86400) / 3600)
+    return floor((seconds % 86400) / 3600)
 
 
 # noinspection PyTypeChecker

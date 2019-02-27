@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 from model import loop as ML
 from model import capsule as MC
 from qt.network_renderer import NetworkRenderer, get_capsule_coordinates
-from settings import network, config
+from settings import network, config, simlog
 
 config = config.interface
 
@@ -26,7 +26,7 @@ class SimulatorWidget(QWidget):
     def __init__(self, data_widget):
         """
         SimulatorWidget constructor
-        @param:data_widget if the widget where data of the self.selected_item is displayed
+        @param:data_widget if the widget where setData of the self.selected_item is displayed
         """
         self.data_widget = data_widget
         # at start, nothing is selected
@@ -41,7 +41,7 @@ class SimulatorWidget(QWidget):
 
     def reset_capsules(self):
         """
-        Reset Simulator knowledge of capsules in the network and update simulator view
+        Reset Simulator knowledge of capsules in the network and updateData simulator view
         """
         self.capsules = []
         self.refresh()
@@ -66,6 +66,7 @@ class SimulatorWidget(QWidget):
         x_offset = max(x_offsets)
         y_offset = max(y_offsets)
         """
+        simlog.debug("click at [{0};{1}]".format(event.x(), event.y()))
         # WARNING
         # relative offsets to mini_network.json
         x = event.x() - 18  # - x_offset

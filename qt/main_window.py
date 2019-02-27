@@ -3,7 +3,7 @@
 import sys
 from math import ceil
 from sys import path
-from threading import Thread
+import threading as th
 from time import sleep, time
 
 from PyQt5.QtCore import Qt
@@ -92,7 +92,7 @@ class MainWindow(QMainWindow):
         # | | simulator | |  | | buttons | | |
         # | |           | |  | +---------+ | |
         # | | view      | |  | +---------+ | |
-        # | |           | |  | | data    | | |
+        # | |           | |  | | setData    | | |
         # | |           | |  | +---------+ | |
         # | +-----------+ |  +-------------+ |
         # +----------------------------------+
@@ -248,7 +248,7 @@ class MainWindow(QMainWindow):
             sim.quit_endless_simulation()
             self.thd_run = None
             self.thd_refresh = None
-            network.reload(self.path)
+            #network.reload(self.path)
 
         def on_play_button_pressed():
             """
@@ -265,11 +265,11 @@ class MainWindow(QMainWindow):
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # start or resume simulation
             if self.thd_run == None:
-                self.thd_run = Thread(target=sim.run_simulation)
+                self.thd_run = th.Thread(target=sim.run_simulation)
                 self.thd_run.start()
-                sleep(1)
+                sleep(0.25)
 
-            self.thd_refresh = Thread(target=self.start_refresh)
+            self.thd_refresh = th.Thread(target=self.start_refresh)
             self.thd_refresh.start()
 
         def on_pause_button_pressed():
@@ -320,7 +320,7 @@ class MainWindow(QMainWindow):
         Return the corresponding layout
         """
         buttons_hbox = self.build_buttons()
-        # data
+        # setData
         self.title_label = DataWidget()
         data_vbox = QVBoxLayout()
         data_vbox.addWidget(self.title_label)
@@ -368,8 +368,12 @@ class MainWindow(QMainWindow):
 
     def start_refresh(self):
         while self.state == "running":
+            if not th.main_thread().is_alive():
+                simlog.info("Main thread is dead. Exiting...")
+                return
             start = time()
             rec = sim_record.get_record()
+            #simlog.debug("refreshing...  {0}".format(sim_record.records.qsize()))
             self.refresh(rec)
             end = time()
             # simlog.debug("Execution time: %f secs" % (end - start))

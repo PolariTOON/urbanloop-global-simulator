@@ -10,6 +10,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFileDialog, QPushButton, QHBoxLayout, \
     QVBoxLayout, QLabel, QSplitter
+from PyQt5.QtCore import pyqtSignal as SIGNAL
 
 from model import sim_record
 from qt.data_widget import DataWidget
@@ -141,9 +142,9 @@ class MainWindow(QMainWindow):
             """
             Method called when menu button "Change configuration" is pressed
             """
-            simlog.debug("Configuration changing")
+            self.pause_button.click()
+            # simlog.debug("Configuration changing")
             self.open_config_dialog()
-            config.load('{0}/../resources/config.ini'.format(sys.path[0]))
 
         def reset_configuration():
             """
@@ -154,7 +155,7 @@ class MainWindow(QMainWindow):
             config.load('{0}/../resources/config.ini'.format(sys.path[0]))
             config_window.changed = {}
             network.load(None)
-            self.refresh()
+            self.stop_button.click()
             simlog.debug("Default configuration reset")
 
         def save_configuration():
@@ -166,7 +167,6 @@ class MainWindow(QMainWindow):
             config.load('{0}/../resources/config.ini'.format(sys.path[0]))
             config_window.changed = {}
             network.load(None)
-            self.refresh()
             simlog.debug("Current configuration saved as default one")
 
         menubar = self.menuBar()
@@ -213,7 +213,7 @@ class MainWindow(QMainWindow):
         Open a dialog with the configuration
         :return: Change the configuration
         """
-        self.conf_windows = ConfigWindows()
+        self.conf_windows = ConfigWindows(self)
         self.conf_windows.setWindowModality(Qt.ApplicationModal) # fenetre modale = pas touch à l'autre si elle n'est pas fermée
         self.conf_windows.show()
 
@@ -280,6 +280,7 @@ class MainWindow(QMainWindow):
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             self.play_button.setDisabled(False)
             self.pause_button.setDisabled(True)
+            #TODO mettre en pause le simulateur aussi
 
         def on_increase_button_pressed():
             """

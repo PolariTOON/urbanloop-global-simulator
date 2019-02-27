@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # coding: utf-8
-
+import sys
 from math import ceil
 from sys import path
 from threading import Thread
@@ -14,19 +14,20 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFile
 from model import sim_record
 from qt.data_widget import DataWidget
 from qt.simulator_widget import SimulatorWidget
-from settings import network, config
-from settings import simlog
+from settings import network, config, simlog
 from simulator import sim_loop as sim
 
+from qt.config_window import ConfigWindows
+from qt import config_window
+
 window = None
-config = config.sim
+config_sim = config.sim
 
 # to be removed
 network.load()
 
 
 # to be removed
-
 def get_image_path(image):
     """
     Return image path
@@ -58,7 +59,7 @@ class MainWindow(QMainWindow):
         self.thd_refresh = None
         self.path = None
         QMainWindow.__init__(self)
-        self.refresh_time = float(config["tick"])
+        self.refresh_time = float(config_sim["tick"])
         self.init_ui()
 
     def closeEvent(self, event):
@@ -141,29 +142,32 @@ class MainWindow(QMainWindow):
             Method called when menu button "Change configuration" is pressed
             """
             simlog.debug("Configuration changing")
-            # TODO changer
-            self.refresh()
-            simlog.debug("Configuration changed")
+            self.open_config_dialog()
+            config.load('{0}/../resources/config.ini'.format(sys.path[0]))
 
         def reset_configuration():
             """
             Method called when menu button "Reset configuration" is pressed
             """
-            simlog.debug("Reset configuration")
             copy_file("{0}/../resources/default_config.ini".format(path[0]),
                       "{0}/../resources/config.ini".format(path[0]))
+            config.load('{0}/../resources/config.ini'.format(sys.path[0]))
+            config_window.changed = {}
+            network.load(None)
             self.refresh()
-            simlog.debug("Configuration reset")
+            simlog.debug("Default configuration reset")
 
         def save_configuration():
             """
             Method called when menu button "Save configuration" is pressed --> the current configuration become the default one
             """
-            simlog.debug("Configuration saving")
             copy_file("{0}/../resources/config.ini".format(path[0]),
                       "{0}/../resources/default_config.ini".format(path[0]))
+            config.load('{0}/../resources/config.ini'.format(sys.path[0]))
+            config_window.changed = {}
+            network.load(None)
             self.refresh()
-            simlog.debug("Configuration saved")
+            simlog.debug("Current configuration saved as default one")
 
         menubar = self.menuBar()
         file_menu = menubar.addMenu('&File')
@@ -177,7 +181,7 @@ class MainWindow(QMainWindow):
         file_menu.addAction(open_sample_act)
 
         config_menu = menubar.addMenu('&Configuration')
-        change_config_act = QAction('Change COnfiguration', self)
+        change_config_act = QAction('Change Configuration', self)
         change_config_act.setShortcut('Ctrl+C')
         change_config_act.triggered.connect(change_configuration)
         config_menu.addAction(change_config_act)
@@ -192,8 +196,6 @@ class MainWindow(QMainWindow):
         save_config_act.triggered.connect(save_configuration)
         config_menu.addAction(save_config_act)
 
-
-
     def open_file_name_dialog(self):
         """
         Open a file dialog.
@@ -206,6 +208,14 @@ class MainWindow(QMainWindow):
         self.path = file_name if file_name else None
         return self.path
 
+    def open_config_dialog(self):
+        """
+        Open a dialog with the configuration
+        :return: Change the configuration
+        """
+        self.conf_windows = ConfigWindows()
+        self.conf_windows.setWindowModality(Qt.ApplicationModal) # fenetre modale = pas touch à l'autre si elle n'est pas fermée
+        self.conf_windows.show()
 
     def build_buttons(self):
         """

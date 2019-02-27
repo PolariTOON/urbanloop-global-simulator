@@ -1,22 +1,20 @@
 import json
 import sys
 
-from settings import simlog
-
-from model import loop as model_loop
-from model import switch as model_switch
 from model import capsule as model_capsule
-from model.loop import Loop
+from model import loop as model_loop
 from model import station as model_station
+from model import switch as model_switch
+from model.loop import Loop
 from model.switch import Switch
+from settings import simlog
 
 """
 fichier pour l'import des réseaux sur les formats json correspondant
 """
 
 
-def load(file_path=None):
-    print("LOAD")
+def load(file_path=None, web=False):
     """
     fonction qui a partir d'un fichier json récupère le réseau correspondant et le traduit en objets
         :param file_path: fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
@@ -24,6 +22,8 @@ def load(file_path=None):
     """
     if file_path is None:  # aller chercher celui par défaut
         file_path = '{0}/../resources/mini_network.json'.format(sys.path[0])
+        if web:
+            file_path = '{0}/../resources/web_mini_network.json'.format(sys.path[0])
 
     model_loop.all_loops = {}  # autrement ca foire quand on charge un autre network
     with open(file_path, 'r') as file:
@@ -77,14 +77,14 @@ def load(file_path=None):
                              "\n \t { <loop_name(String)> : { "
                              "\n \t \t 'center'': [<x(int)>,<y(int)>], 'circonference': <size(int)>, "
                              "\n \t \t 'content': [ {'type':<'station'/'switch_out'/'switch_in'>, ..., "
-                                            "'angle':<clockwise, 0 on the top(int[0,359)>}" 
+                             "'angle':<clockwise, 0 on the top(int[0,359)>}"
                              "\n \t \t \t {'type':'station','name':<station_name(String)>,'station_type': "
-                                            "<visitation(int[1-3])>, 'capacity': <number_slot(int[2-inf],default=4)>, "
-                                            "'angle':<placing(int[0,359)>}, "
+                             "<visitation(int[1-3])>, 'capacity': <number_slot(int[2-inf],default=4)>, "
+                             "'angle':<placing(int[0,359)>}, "
                              "\n \t \t \t {'type':'switch_out','other_loop':<loop_name(String)>, 'length': <size("
-                                            "int)>, 'angle':<placing(int[0,359)>}, "
+                             "int)>, 'angle':<placing(int[0,359)>}, "
                              "\n \t \t \t {'type':'switch_in','other_loop':<loop_name(String)>, 'angle':<placing(int["
-                                            "0,359)>} "
+                             "0,359)>} "
                              "\n \t ]}}")
             order = []
         for i in range(len(elms)):

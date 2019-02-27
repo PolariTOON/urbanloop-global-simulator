@@ -1,11 +1,11 @@
-from math import pi
+import math
 
 
 def serialize_loop(loop):
     return {
         'id': 1,  # TODO change name by id
         'name': loop.name,
-        'radius': round(loop.size / (2 * pi)),
+        'radius': math.floor(loop.size / (2 * math.pi)),
         'x': loop.x,
         'y': loop.y
     }
@@ -28,6 +28,11 @@ def serialize_station_var_data(station):
 
 def serialize_switch_set_data(switch):
     return {
+        'id': 1,
+        'loopIn': switch.my_loop.name,  # TODO Change name by a real id
+        'loopOut': switch.other_loop.name,
+        'angleLoopIn': switch.angle_my_loop,
+        'angleLoopOut': switch.angle_other_loop
     }
 
 

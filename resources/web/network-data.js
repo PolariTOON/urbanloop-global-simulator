@@ -58,6 +58,7 @@ class Switch {
 
 class SwitchSetData {
     constructor(switchSetDataJSON) {
+        this.id = switchSetDataJSON['id'];
         this.loopIn = switchSetDataJSON['loopIn'];
         this.loopOut = switchSetDataJSON['loopOut'];
         this.angleLoopIn = switchSetDataJSON['angleLoopIn'];
@@ -99,21 +100,23 @@ function initData() {
                 })
             )
         ).then(
-            $.get('/stationsSetData', function (listStationSetDataJSON) {
-                listStationSetDataJSON.forEach(function (stationSetDataJSON) {
-                    stations.push(new Station(new StationSetData(stationSetDataJSON)));
-                });
-            })
+            $.when(
+                $.ajax(
+                    $.get('/stationsSetData', function (listStationSetDataJSON) {
+                        listStationSetDataJSON.forEach(function (stationSetDataJSON) {
+                            stations.push(new Station(new StationSetData(stationSetDataJSON)));
+                        });
+                    })
+                )
+            ).then(
+                $.get('/switchesSetData', function (listSwitchSetDataJSON) {
+                    listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
+                        switches.push(new Switch(new SwitchSetData(switchSetDataJSON)));
+                    });
+                })
+            )
         )
     );
-    /*
-        listStationSetDataJSON.forEach(function (stationSetDataJSON) {
-            stations.push(new Station(new StationSetData(stationSetDataJSON)));
-        });
-
-        listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
-            switches.push(new Switch(new SwitchSetData(switchSetDataJSON)));
-        });*/
 }
 
 function updateData(listStationVarDataJSON, listSwitchVarDataJSON, listCapsuleJSON) {

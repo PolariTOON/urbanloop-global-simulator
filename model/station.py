@@ -1,6 +1,7 @@
 import queue
 import random
 from enum import Enum
+from math import floor
 
 from model import capsule
 from settings import simlog
@@ -84,7 +85,7 @@ class Station:
         """
         qsize = self.capsule_queue.qsize()
 
-        if qsize < round((3 * self.capacity) / 4):
+        if qsize < floor((3 * self.capacity) / 4):
             return
 
         for capsule_index in range(qsize):
@@ -106,7 +107,7 @@ class Station:
         This function will search to recover a capsule from a station 3/4 full.
         in order to make complete the queue
         """
-        if self.capsule_queue.qsize() <= max(1, round(self.capacity / 4)):
+        if self.capsule_queue.qsize() <= max(1, floor(self.capacity / 4)):
             departure = get_almost_full_station(destination_station=self)
             departure.drain(destination=self)
 
@@ -140,7 +141,7 @@ def get_almost_empty_station(departure_station=None):
     """
     for station in random.sample(_stations, len(_stations)):
         if station not in (None, departure_station):
-            if station.estimated_capsules_number() < max(1, round(station.capacity / 4)):
+            if station.estimated_capsules_number() < max(1, floor(station.capacity / 4)):
                 return station
     return random.choice(_stations)
 
@@ -153,7 +154,7 @@ def get_almost_full_station(destination_station=None):
     """
     for station in random.sample(_stations, len(_stations)):
         if destination_station is not None and station is not destination_station:
-            if station.estimated_capsules_number() > round((3 * station.capacity) / 4):
+            if station.estimated_capsules_number() > floor((3 * station.capacity) / 4):
                 return station
     return random.choice(_stations)
 

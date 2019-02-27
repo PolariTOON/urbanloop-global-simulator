@@ -15,7 +15,6 @@ function init() {
 }
 
 function initScene() {
-    console.log('initScene');
     loops.forEach(function(loop) {
         loop.object.drawInto(stage);
     });
@@ -25,6 +24,7 @@ function initScene() {
     });
 
     switches.forEach(function(switches) {
+        switches.object.drawInto(stage);
     });
 }
 

@@ -1,6 +1,6 @@
 let zoomIntensity = 0.1;
 let minScale = 0.5;
-let moveIntensity = 0.5;
+let moveIntensity = 1;
 let pressTimeout;
 let doPan = false;
 

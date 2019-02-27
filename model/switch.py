@@ -9,7 +9,7 @@ timer_other = int(config.routing['timer_other'])
 my_timer = int(config.routing['my_timer'])
 switched_cost = int(config.routing['switched_cost'])
 
-switches = []
+_switches = []
 alive_timers = []
 
 
@@ -45,8 +45,8 @@ class Switch:
         self.my_defects = [False, False]
         self.defects = []
         self.name = "Switch n°%d" % self.id
-        global switches
-        switches += [self]
+        global _switches
+        _switches += [self]
         global alive_timers
         alive_timers += [float('inf'), float('inf')]
         self.timers = []
@@ -102,7 +102,7 @@ class Switch:
         elif the_loop is self.other_loop:
             return False
         else:
-            simlog.error("The switch %d is not in the loop %s" % (str(self.id) , the_loop.name))
+            simlog.error("The switch %d is not in the loop %s" % (str(self.id), the_loop.name))
 
 
 def init():
@@ -110,14 +110,14 @@ def init():
     fonction d'initialisation de tous les switchs pour que la taille des tableaux correspondant à tous les objets prévus
         :return: 0UT : (void) modification des attributs intrinsèques aux switchs
     """
-    for s in switches:
+    for s in _switches:
         s.permanent_table = {s.my_loop.name: [False, 0, [s.id, s.my_loop.name]],
                              s.other_loop.name: [True, s.size, [s.id, s.other_loop.name]]}
         s.permanent_cover = {s.my_loop.name: s.id, s.other_loop.name: s.id}
         s.timers = [timer_other for i in range(0, switch_id)]
         s.timers[s.id] = my_timer
         s.defects = [[False, False] for i in range(switch_id)]
-    for s in switches:
+    for s in _switches:
         s.table = model.routing.dijkstra_route(s, s.permanent_table, s.permanent_cover)
         # FINAL
         s.permanent_table = s.table
@@ -130,7 +130,7 @@ def update():
      fonction qui est lancée à chaque tour pour actualiser les états des switchs et leur table (pour le routage)
         :return: (void) modifications des éléments, attributs des switches
     """
-    for s in switches:
+    for s in _switches:
         # if s.is_routing_to_loop:
         info = model.routing.update_switch(s)
         # maj des timers suivant info
@@ -146,3 +146,10 @@ def update():
             if info == "1_down":
                 alive_timers[s.id][0] += 1
                 alive_timers[s.id][1] = [float("Inf")]
+
+
+def get_switches():
+    """
+    :return: All switches of the network
+    """
+    return _switches

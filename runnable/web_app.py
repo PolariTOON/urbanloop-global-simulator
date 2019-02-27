@@ -1,4 +1,5 @@
 import os
+import sys
 from json import dumps
 from threading import Thread
 
@@ -6,6 +7,7 @@ from flask import Flask, Response, redirect, url_for
 
 from model import loop
 from model import station
+from model import switch
 from settings import json_serializer
 from settings import network
 from simulator import sim_loop
@@ -22,7 +24,7 @@ def root():
 
 @app.route('/load')  # TODO Add file parameter
 def load_network():
-    network.load()
+    network.load(web=True)
     return redirect(url_for('root'))
 
 
@@ -37,6 +39,13 @@ def generate_stations_set_data_json():
     list_stations_set_data_json = [json_serializer.serialize_station_set_data(a_station) for a_station in
                                    station.get_stations()]
     return Response(dumps(list_stations_set_data_json), mimetype="application/json")
+
+
+@app.route('/switchesSetData')
+def generate_switches_set_data_json():
+    list_switches_set_data_json = [json_serializer.serialize_switch_set_data(a_switch) for a_switch in
+                                   switch.get_switches()]
+    return Response(dumps(list_switches_set_data_json), mimetype="application/json")
 
 
 @app.route('/start')

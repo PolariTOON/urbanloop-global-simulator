@@ -3,7 +3,7 @@ allTextForScaling = [];
 class TextObject {
     constructor(x, y, text, size) {
         this.item = new PIXI.Text();
-        this.size = size - text.length / 2;
+        this.size = Math.ceil(size - text.length / 4);
         this.item.anchor.set(0.5);
         this.item.text = text;
         this.item.x = x;
@@ -22,7 +22,7 @@ class TextObject {
 class LoopObject {
     constructor(loopData, loopWidth = 4, borderWidth = 1, fontSize = 20) {
         this.data = loopData;
-        this.name = new TextObject(this.data.x, this.data.y, this.data.name, fontSize);
+        this.name = new TextObject(this.data.x, networkDiv.offsetHeight - this.data.y, this.data.name, fontSize);
         this.outerCircle = new PIXI.Graphics();
         this.innerCircle = new PIXI.Graphics();
         this.borderWidth = borderWidth;
@@ -34,7 +34,7 @@ class LoopObject {
 
     initStyle() {
         let x = this.data.x;
-        let y = this.data.y;
+        let y = networkDiv.offsetHeight - this.data.y;
         let radius = this.data.radius;
         let outerColor = 0x9C9C9C;
         let innerColor = 0xFFFFFF;
@@ -95,10 +95,11 @@ class LoopObject {
 
 
 class StationObject {
-    constructor(stationSetData, stationVarData, borderWidth = 2) {
+    constructor(stationSetData, stationVarData, stationWidth = 15, borderWidth = 2) {
         this.setData = stationSetData;
         this.varData = stationVarData;
         this.circle = new PIXI.Graphics();
+        this.stationWidth = stationWidth;
         this.borderWidth = borderWidth;
 
         this.initStyle();
@@ -107,18 +108,19 @@ class StationObject {
 
     initStyle() {
         let loop = getLoopById(this.setData.loop);
-        let conv = (2 * Math.PI) / 360;
-        let x = loop.x - Math.cos(conv * (this.setData.angle + 90)) * loop.radius;
-        let y = loop.y - Math.sin(conv * (this.setData.angle + 90)) * loop.radius;
+        let radiusAngle = -this.setData.angle * ((2 * Math.PI) / 360);
+        let x = loop.x + Math.cos(radiusAngle) * loop.radius;
+        let y = networkDiv.offsetHeight - loop.y + Math.sin(radiusAngle) * loop.radius;
 
         let color = 0xFFFFFF;
         let borderColor = 0x4672D3;
         let selectedColor = 0x86CA0F;
 
-        this.circle.lineStyle(this.borderWidth, borderColor);
-        this.circle.arc(x, y, 20 + this.borderWidth / 2, 0, 2 * Math.PI);
+        this.circle.beginFill(borderColor);
+        this.circle.drawCircle(x, y, this.stationWidth + this.borderWidth);
+        this.circle.endFill();
         this.circle.beginFill(color);
-        this.circle.drawCircle(x, y, 20);
+        this.circle.drawCircle(x, y, this.stationWidth);
         this.circle.endFill();
     }
 
@@ -141,7 +143,77 @@ class StationObject {
 
 
 class SwitchObject {
-    constructor(switchSetData, switchVarData) {
+    constructor(switchSetData, switchVarData, switchWidth = 15, borderWidth = 2, connectWidth = 2) {
+        this.setData = switchSetData;
+        this.varData = switchVarData;
+        this.inCircle = new PIXI.Graphics();
+        this.outCircle = new PIXI.Graphics();
+        this.connectLine = new PIXI.Graphics();
+        this.switchWidth = switchWidth;
+        this.borderWidth = borderWidth;
+        this.connectWidth = connectWidth;
+
+        this.initStyle();
+        this.initBehavior();
+    }
+
+    initStyle() {
+        let loopIn = getLoopById(this.setData.loopIn);
+        let loopOut = getLoopById(this.setData.loopOut);
+        let radiusAngleLoopIn = -this.setData.angleLoopIn * ((2 * Math.PI) / 360);
+        let radiusAngleLoopOut = -this.setData.angleLoopOut * ((2 * Math.PI) / 360);
+        let xIn = loopIn.x + Math.cos(radiusAngleLoopIn) * loopIn.radius;
+        let yIn = networkDiv.offsetHeight - loopIn.y + Math.sin(radiusAngleLoopIn) * loopIn.radius;
+        let xOut = loopOut.x + Math.cos(radiusAngleLoopOut) * loopOut.radius;
+        let yOut = networkDiv.offsetHeight - loopOut.y + Math.sin(radiusAngleLoopOut) * loopOut.radius;
+
+        let color = 0xFFFFFF;
+        let borderColor = 0x6B0003;
+        let connectColor = 0x000000;
+        let selectedColor = 0x86CA0F;
+
+        this.connectLine.lineStyle(this.connectWidth, connectColor);
+        this.connectLine.moveTo(xIn, yIn);
+        this.connectLine.lineTo(xOut, yOut);
+
+        this.inCircle.beginFill(borderColor);
+        this.inCircle.drawCircle(xIn, yIn, this.switchWidth + this.borderWidth);
+        this.inCircle.endFill();
+        this.inCircle.beginFill(color);
+        this.inCircle.drawCircle(xIn, yIn, this.switchWidth);
+        this.inCircle.endFill();
+
+        this.outCircle.beginFill(borderColor);
+        this.outCircle.drawCircle(xOut, yOut, this.switchWidth + this.borderWidth);
+        this.outCircle.endFill();
+        this.outCircle.beginFill(color);
+        this.outCircle.drawCircle(xOut, yOut, this.switchWidth);
+        this.outCircle.endFill();
+    }
+
+    initBehavior() {
+        this.inCircle.interactive = true;
+        this.outCircle.interactive = true;
+
+        this.inCircle.on('pointerdown', () => {
+            alert("Click on switch in");
+        });
+
+        this.outCircle.on('pointerdown', () => {
+            alert("Click on switch out ");
+        });
+    }
+
+    drawInto(stage) {
+        stage.addChild(this.connectLine);
+        stage.addChild(this.inCircle);
+        stage.addChild(this.outCircle);
+    }
+
+    remove() {
+        stage.addChild(this.connectLine);
+        stage.removeChild(this.inCircle);
+        stage.removeChild(this.outCircle);
     }
 }
 

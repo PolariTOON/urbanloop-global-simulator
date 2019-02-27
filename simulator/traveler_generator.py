@@ -1,4 +1,5 @@
 import random
+from math import floor
 
 from model import station
 from model import traveler
@@ -39,7 +40,7 @@ class TravelerGenerator:
             destination_station = _select_random_station(departure_station=departure_station)
             traveler.Traveler(departure_station, destination_station, seconds)
             simlog.info("Traveler generated", departure_station, destination_station)
-            yield sim_loop.get_env().timeout(int(round(sim_loop.get_tick_per_second() / traveler_number)))
+            yield sim_loop.get_env().timeout(floor(sim_loop.get_tick_per_second() / traveler_number))
 
 
 def _select_random_station(departure_station=None):

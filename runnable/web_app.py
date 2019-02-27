@@ -5,6 +5,7 @@ from threading import Thread
 from flask import Flask, Response, redirect, url_for
 
 from model import loop
+from model import station
 from settings import json_serializer
 from settings import network
 from simulator import sim_loop
@@ -14,19 +15,31 @@ app = Flask(__name__, static_folder=web_directory, template_folder=web_directory
 sim_thread = None
 
 
-@app.route("/")
+@app.route('/')
 def root():
     return app.send_static_file('index.html')
 
 
-@app.route("/loops")
-def generate_loops_json():
+@app.route('/load')  # TODO Add file parameter
+def load_network():
     network.load()
+    return redirect(url_for('root'))
+
+
+@app.route('/loops')
+def generate_loops_json():
     list_loop_json = [json_serializer.serialize_loop(a_loop) for a_loop in loop.get_loops()]
     return Response(dumps(list_loop_json), mimetype="application/json")
 
 
-@app.route("/start")
+@app.route('/stationsSetData')
+def generate_stations_set_data_json():
+    list_stations_set_data_json = [json_serializer.serialize_station_set_data(a_station) for a_station in
+                                   station.get_stations()]
+    return Response(dumps(list_stations_set_data_json), mimetype="application/json")
+
+
+@app.route('/start')
 def start():
     global sim_thread
     network.load()
@@ -36,4 +49,4 @@ def start():
 
 
 if __name__ == '__main__':
-    app.run(port=8080)
+    app.run(port=8090)

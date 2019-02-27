@@ -16,6 +16,7 @@ fichier pour l'import des réseaux sur les formats json correspondant
 
 
 def load(file_path=None):
+    print("LOAD")
     """
     fonction qui a partir d'un fichier json récupère le réseau correspondant et le traduit en objets
         :param file_path: fichier json (Par défaut il charge celui contenu dans settings/conf.ini)

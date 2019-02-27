@@ -13,7 +13,7 @@ networkDiv.onmousedown = function (event) {
     event.preventDefault();
     pressTimeout = setTimeout(function () {
         doPan = true;
-    }, 200);
+    }, 100);
 };
 
 networkDiv.onmouseup = function (event) {
@@ -34,11 +34,11 @@ networkDiv.onmousemove = function (event) {
 
 
 function pan(mouseEvent) {
-    let deltaX = mouseEvent.movementX || mouseEvent.mozMovementX || mouseEvent.webkitMovementX || 0;
-    let deltaY = mouseEvent.movementY || mouseEvent.mozMovementY || mouseEvent.webkitMovementY || 0;
+    let deltaX = mouseEvent.movementX || 0;
+    let deltaY = mouseEvent.movementY || 0;
 
-    app.stage.x -= moveIntensity * deltaX;
-    app.stage.y -= moveIntensity * deltaY;
+    app.stage.x += moveIntensity * deltaX;
+    app.stage.y += moveIntensity * deltaY;
 }
 
 
@@ -48,4 +48,11 @@ function zoom(mouseEvent) {
 
     app.stage.scale.x = Math.max(minScale, app.stage.scale.x + zoomValue);
     app.stage.scale.y = Math.max(minScale, app.stage.scale.y + zoomValue);
+
+    let scale = app.stage.scale.x;
+    allTextForScaling.forEach(textObject => {
+        textObject.item.style.fontSize = textObject.size + scale * 20;
+        textObject.item.scale.x = 1 / (1 + scale);
+        textObject.item.scale.y = 1 / (1 + scale);
+    });
 }

@@ -26,7 +26,7 @@ class SimulatorWidget(QWidget):
     def __init__(self, data_widget):
         """
         SimulatorWidget constructor
-        @param:data_widget if the widget where data of the self.selected_item is displayed
+        @param:data_widget if the widget where setData of the self.selected_item is displayed
         """
         self.data_widget = data_widget
         # at start, nothing is selected

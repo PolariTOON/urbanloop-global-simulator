@@ -3,7 +3,7 @@ from math import pi
 
 def serialize_loop(loop):
     return {
-        'id': 1,
+        'id': 1,  # TODO change name by id
         'name': loop.name,
         'radius': round(loop.size / (2 * pi)),
         'x': loop.x,
@@ -13,6 +13,11 @@ def serialize_loop(loop):
 
 def serialize_station_set_data(station):
     return {
+        'id': 1,
+        'name': station.name,
+        'loop': station.loop.name,  # TODO Change name by a real id
+        'angle': station.angle,
+        'capacity': station.capacity
     }
 
 

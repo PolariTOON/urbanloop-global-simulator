@@ -93,7 +93,7 @@ class NetworkRenderer:
                     item = item_descriptor[1]
                     if isinstance(item, MST.Station):
                         if station.id == item.id:
-                            # update data
+                            # update setData
                             item.traveler_queue = station.traveler_queue
                             item.capsule_queue = station.capsule_queue
 

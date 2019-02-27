@@ -15,17 +15,18 @@ function init() {
 }
 
 function initScene() {
+    console.log('initScene');
     loops.forEach(function(loop) {
         loop.object.drawInto(stage);
     });
 
     stations.forEach(function(station) {
+        station.object.drawInto(stage);
     });
 
     switches.forEach(function(switches) {
     });
 }
-
 
 
 function update() {

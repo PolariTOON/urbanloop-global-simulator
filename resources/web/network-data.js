@@ -87,13 +87,25 @@ class Capsule {
 }
 
 function initData() {
-    $.get('/loops', function (listLoopJSON) {
-        listLoopJSON.forEach(function (loopJSON) {
-            loops.push(new Loop(loopJSON));
-        });
-    });
-
-
+    $.when(
+        $.ajax($.get('/load'))
+    ).then(
+        $.when(
+            $.ajax(
+                $.get('/loops', function (listLoopJSON) {
+                    listLoopJSON.forEach(function (loopJSON) {
+                        loops.push(new Loop(loopJSON));
+                    });
+                })
+            )
+        ).then(
+            $.get('/stationsSetData', function (listStationSetDataJSON) {
+                listStationSetDataJSON.forEach(function (stationSetDataJSON) {
+                    stations.push(new Station(new StationSetData(stationSetDataJSON)));
+                });
+            })
+        )
+    );
     /*
         listStationSetDataJSON.forEach(function (stationSetDataJSON) {
             stations.push(new Station(new StationSetData(stationSetDataJSON)));
@@ -132,16 +144,16 @@ function updateCapsules(listCapsuleJSON) {
 
 
 function getStationById(stationId) {
-    stations.forEach(function (station) {
-        if (station.id === stationId) {
-            return station;
+    stations.forEach(function (a_station) {
+        if (a_station.id === stationId) {
+            return a_station;
         }
     });
 
     return null;
 }
 
-function getSwitchById(switchId) {
+function getSwitchById(switchId) { // TODO FOREACH MARCHE PAS
     switches.forEach(function (a_switch) {
         if (a_switch.id === switchId) {
             return a_switch;
@@ -149,4 +161,12 @@ function getSwitchById(switchId) {
     });
 
     return null;
+}
+
+function getLoopById(loopId) {  // TODO change name by id
+    for (let index in loops) {
+        if (loops[index].name === loopId) {
+            return loops[index];
+        }
+    }
 }

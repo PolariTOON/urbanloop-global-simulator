@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
         # | | simulator | |  | | buttons | | |
         # | |           | |  | +---------+ | |
         # | | view      | |  | +---------+ | |
-        # | |           | |  | | data    | | |
+        # | |           | |  | | setData    | | |
         # | |           | |  | +---------+ | |
         # | +-----------+ |  +-------------+ |
         # +----------------------------------+
@@ -251,7 +251,7 @@ class MainWindow(QMainWindow):
         Return the corresponding layout
         """
         buttons_hbox = self.build_buttons()
-        # data
+        # setData
         self.title_label = DataWidget()
         data_vbox = QVBoxLayout()
         data_vbox.addWidget(self.title_label)

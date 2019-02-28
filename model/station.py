@@ -7,7 +7,7 @@ from model import capsule
 from settings import simlog
 
 _stations = list()
-_station_id = 0
+_station_id = -1
 
 
 class Type(Enum):
@@ -31,7 +31,7 @@ class Station:
         global _station_id
         global _stations
         self.id = _station_id
-        _station_id += 1
+        _station_id -= 1
         _stations.append(self)
         self.name = "Station #{0}".format(self.id) if (name is None) else name
         self.angle = angle

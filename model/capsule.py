@@ -151,7 +151,7 @@ class Capsule:
         """
         return len(self.travelers) > 0
 
-    def get_trip_percentage(self):
+    def get_segment_trip_percentage(self):
         """
         :return: The segmentPercentage travelled by the capsule on the segment road from the previous to the next element
         """

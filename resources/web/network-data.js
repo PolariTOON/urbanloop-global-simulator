@@ -3,6 +3,7 @@ let stations = [];
 let switches = [];
 let capsules = [];
 
+//TODO RENAME ALL IN DATA
 class Loop {
     constructor(loopJSON) {
         this.id = loopJSON['id'];
@@ -74,96 +75,70 @@ class SwitchVarData {
 
 class Capsule {
     constructor(capsuleJSON) {
-        this.loopId = capsuleJSON['loopId'];
-        /* An element is a switch or a station */
-        this.elementId = capsuleJSON['elementId'];
-        this.segmentPercentage = capsuleJSON['segmentPercentage'];
-        this.travelerNumber = capsuleJSON['travelerNumber'];
+        this.update(capsuleJSON);
         this.object = new CapsuleObject(this);
     }
 
     isAboard() {
         return this.travelerNumber > 0;
     }
+
+    update(capsuleJSON) {
+        this.loopId = capsuleJSON['loopId'];
+        this.currentElementId = capsuleJSON['currentElementId'];
+        this.nextElementId = capsuleJSON['nextElementId'];
+        this.segmentPercentage = capsuleJSON['segmentPercentage'];
+        this.travelerNumber = capsuleJSON['travelerNumber'];
+    }
 }
 
 function initData() {
-    $.when(
-        $.ajax($.get('/load'))
-    ).then(
-        $.when(
-            $.ajax(
-                $.get('/loops', function (listLoopJSON) {
-                    listLoopJSON.forEach(function (loopJSON) {
-                        loops.push(new Loop(loopJSON));
-                    });
-                })
-            )
-        ).then(
-            $.when(
-                $.ajax(
-                    $.get('/stationsSetData', function (listStationSetDataJSON) {
-                        listStationSetDataJSON.forEach(function (stationSetDataJSON) {
-                            stations.push(new Station(new StationSetData(stationSetDataJSON)));
-                        });
-                    })
-                )
-            ).then(
-                $.get('/switchesSetData', function (listSwitchSetDataJSON) {
-                    listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
-                        switches.push(new Switch(new SwitchSetData(switchSetDataJSON)));
-                    });
-                })
-            )
-        )
-    );
-}
+    $.get('/load');
 
-function updateData(listStationVarDataJSON, listSwitchVarDataJSON, listCapsuleJSON) {
-    updateStations(listStationVarDataJSON);
-    updateSwitches(listSwitchVarDataJSON);
-    updateCapsules(listCapsuleJSON);
-}
+    $.get('/loops.json', function (listLoopJSON) {
+        listLoopJSON.forEach(function (loopJSON) {
+            loops.push(new Loop(loopJSON));
+        });
+    });
 
-function updateStations(listStationVarDataJSON) {
-    listStationVarDataJSON.forEach(function (stationVarDataJSON) {
-        getStationById(stationVarDataJSON['id']).update(stationVarDataJSON);
+    $.get('/stationsSetData.json', function (listStationSetDataJSON) {
+        listStationSetDataJSON.forEach(function (stationSetDataJSON) {
+            stations.push(new Station(new StationSetData(stationSetDataJSON)));
+        });
+    });
+
+    $.get('/switchesSetData.json', function (listSwitchSetDataJSON) {
+        listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
+            switches.push(new Switch(new SwitchSetData(switchSetDataJSON)));
+        });
     });
 }
 
-function updateSwitches(listSwitchVarDataJSON) {
-    listSwitchVarDataJSON.forEach(function (switchVarDataJSON) {
-        getSwitchById(switchVarDataJSON['id']).update(switchVarDataJSON);
-    });
-}
-
-function updateCapsules(listCapsuleJSON) {
-    capsules = [];
-
-    listCapsuleJSON.forEach(function (capsuleJSON) {
-        capsules.push(new Capsule(capsuleJSON));
-    });
-}
-
-
-function getStationById(stationId) {
-    stations.forEach(function (a_station) {
-        if (a_station.id === stationId) {
-            return a_station;
-        }
+function updateData() {
+    /*$.get('/stationsVarData.json', function (listStationVarDataJSON) {
+        listStationVarDataJSON.forEach(function (stationVarDataJSON) {
+            getStationById(stationVarDataJSON['id']).update(stationVarDataJSON);
+        });
     });
 
-    return null;
-}
+    $.get('/switchesVarData.json', function (listSwitchVarDataJSON) {
+        listSwitchVarDataJSON.forEach(function (switchVarDataJSON) {
+            getSwitchById(switchVarDataJSON['id']).update(switchVarDataJSON);
+        });
+    });*/
 
-function getSwitchById(switchId) { // TODO FOREACH MARCHE PAS
-    switches.forEach(function (a_switch) {
-        if (a_switch.id === switchId) {
-            return a_switch;
-        }
+    $.get('/capsules.json', function (listCapsuleJSON) {
+        console.log(capsules.length);
+        listCapsuleJSON.forEach(function (capsuleJSON) {
+            let aCapsule = getCapsuleById(capsuleJSON['id']);
+
+            if (aCapsule === undefined) {
+                capsules.push(new Capsule(capsuleJSON));
+            } else {
+                aCapsule.update();
+            }
+        });
     });
-
-    return null;
 }
 
 function getLoopById(loopId) {  // TODO change name by id
@@ -172,4 +147,37 @@ function getLoopById(loopId) {  // TODO change name by id
             return loops[index];
         }
     }
+    return undefined;
+}
+
+function getStationById(stationId) {
+    for (let index in stations) {
+        if (stations[index].id === stationId) {
+            return stations[index];
+        }
+    }
+    return undefined;
+}
+
+function getSwitchById(switchId) {
+    for (let index in switches) {
+        if (switches[index].id === switchId) {
+            return switches[index];
+        }
+    }
+    return undefined;
+}
+
+function getElementById(elementId) {
+    let element = getStationById(elementId);
+    return element === undefined ? getSwitchById(elementId) : element;
+}
+
+function getCapsuleById(capsuleId) {
+    for (let index in capsules) {
+        if (capsules[index].id === capsuleId) {
+            return capsules[index];
+        }
+    }
+    return undefined;
 }

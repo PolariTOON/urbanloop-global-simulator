@@ -1,6 +1,8 @@
 import math
 
 
+# TODO place 'id' in all id vars
+
 def serialize_loop(loop):
     return {
         'id': 1,  # TODO change name by id
@@ -13,7 +15,7 @@ def serialize_loop(loop):
 
 def serialize_station_set_data(station):
     return {
-        'id': 1,
+        'id': station.id,
         'name': station.name,
         'loop': station.loop.name,  # TODO Change name by a real id
         'angle': station.angle,
@@ -28,7 +30,7 @@ def serialize_station_var_data(station):
 
 def serialize_switch_set_data(switch):
     return {
-        'id': 1,
+        'id': switch.id,
         'loopIn': switch.my_loop.name,  # TODO Change name by a real id
         'loopOut': switch.other_loop.name,
         'angleLoopIn': switch.angle_my_loop,
@@ -43,4 +45,10 @@ def serialize_switch_var_data(switch):
 
 def serialize_capsule(capsule):
     return {
+        'id': capsule.id,
+        'loopId': capsule.loop.name,  # TODO change name by real id
+        'currentElementId': capsule.current_element.id,
+        'nextElementId': capsule.next_element.id,
+        'segmentPercentage': capsule.get_segment_trip_percentage(),
+        'travelerNumber': len(capsule.travelers)
     }

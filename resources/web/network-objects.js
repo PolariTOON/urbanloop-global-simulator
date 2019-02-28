@@ -218,6 +218,97 @@ class SwitchObject {
 }
 
 class CapsuleObject {
-    constructor(capsuleData) {
+    constructor(capsuleData, capsuleWidth = 5, borderWidth = 1) {
+        this.data = capsuleData;
+        this.circle = new PIXI.Graphics();
+        this.capsuleWidth = capsuleWidth;
+        this.borderWidth = borderWidth;
+
+        this.initBehavior();
+    }
+
+    initBehavior() {
+        this.circle.interactive = true;
+
+        this.circle.on('pointerdown', () => {
+            alert("Click on capsule " + this.data.id);
+        });
+    }
+
+    updateStyle() {
+        let loop = getLoopById(this.data.loopId);
+        let currentElement = getElementById(this.data.currentElementId);
+        let nextElement = getElementById(this.data.nextElementId);
+        let segmentTripAngle = Math.ceil(this.data.segmentPercentage * CapsuleObject.getSegmentTripAngle(loop, currentElement, nextElement));
+        let angle = CapsuleObject.getElementAngle(loop, currentElement);
+
+        let radiusAngle = -(angle + segmentTripAngle) * ((2 * Math.PI) / 360);
+        let x = loop.x + Math.cos(radiusAngle) * loop.radius;
+        let y = networkDiv.offsetHeight - loop.y + Math.sin(radiusAngle) * loop.radius;
+
+        let color;
+        if (this.data.isAboard()) {
+            color = 0xADC50F;
+        } else {
+            color = 0xFFAE15;
+        }
+
+        let borderColor = 0x000000;
+        let selectedColor = 0x86CA0F;
+
+        this.circle.lineStyle(this.borderWidth, borderColor);
+        this.circle.arc(x, y, this.capsuleWidth + this.borderWidth / 2, 0, 2 * Math.PI);
+        this.circle.beginFill(color);
+        this.circle.drawCircle(x, y, this.capsuleWidth);
+        this.circle.endFill();
+    }
+
+    static getSegmentTripAngle(loop, currentElement, nextElement) {
+        let currentElementAngle = 0;
+        let nextElementAngle = 0;
+
+
+        if (currentElement instanceof Switch) {
+            currentElementAngle = CapsuleObject.getSwitchAngle(loop, currentElement);
+        } else {
+            currentElementAngle = currentElement.stationSetData.angle;
+        }
+
+        if (nextElement instanceof Switch) {
+            nextElementAngle = CapsuleObject.getSwitchAngle(loop, nextElement);
+        } else {
+            nextElementAngle = nextElement.stationSetData.angle;
+        }
+
+        return Math.abs(currentElementAngle - nextElementAngle)
+    }
+
+    static getElementAngle(loop, element) {
+        if (element instanceof Switch) {
+            return this.getSwitchAngle(loop, element);
+        }
+
+        return element.stationSetData.angle;
+    }
+
+
+    static getSwitchAngle(loop, aSwitch) {
+        if (aSwitch.switchSetData.loopIn === loop) {
+            return aSwitch.switchSetData.angleLoopIn;
+        }
+
+        if (aSwitch.switchSetData.loopOut === loop) {
+            return aSwitch.switchSetData.loopOut;
+        }
+    }
+
+    drawInto(stage) {
+        this.updateStyle();
+        stage.addChild(this.circle);
+    }
+
+    remove() {
+        stage.removeChild(this.circle);
     }
 }
+

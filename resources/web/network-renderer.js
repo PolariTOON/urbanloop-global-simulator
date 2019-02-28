@@ -10,30 +10,72 @@ let app = new PIXI.Application({
 let stage = app.stage;
 networkDiv.appendChild(app.view);
 
-function init() {
-    $.when($.ajax(initData())).then(initScene);
+function init(scene) {
+    $.ajaxSetup({async: false});
+
+    $.when(
+        initData(),
+    ).then(
+        initScene(scene)
+    );
+
+    $.ajaxSetup({async: true});
 }
 
-function initScene() {
-    loops.forEach(function(loop) {
-        loop.object.drawInto(stage);
+function initScene(scene) {
+    loops.forEach(function (aLoop) {
+        aLoop.object.drawInto(scene);
     });
 
-    stations.forEach(function(station) {
-        station.object.drawInto(stage);
+    stations.forEach(function (aStation) {
+        aStation.object.drawInto(scene);
     });
 
-    switches.forEach(function(switches) {
-        switches.object.drawInto(stage);
+    switches.forEach(function (aSwitch) {
+        aSwitch.object.drawInto(scene);
     });
 }
 
+function update(scene) {
+    console.log('update');
+    $.ajaxSetup({async: false});
 
-function update() {
+    $.when(
+        updateData()
+    ).then(
+        updateScene(scene)
+    );
 
+    $.ajaxSetup({async: true});
 }
 
-init();
+function updateScene(scene) {
+    /*stations.forEach(function (aStation) {
+    });
+
+    switches.forEach(function (aSwitch) {
+    });*/
+
+    capsules.forEach(function (aCapsule) {
+        aCapsule.object.drawInto(scene);
+    });
+}
+
+init(stage);
+
+setInterval(() => {
+    updateData();
+}, 50);
+/*
+for (let i = 0; i < 2; i++) {
+    if (scene !== undefined)
+        app.stage.removeChild(scene);
+
+    scene = new PIXI.Container();
+
+    app.stage.addChild(scene);
+    console.log(scene.children.length)
+}*/
 
 
 

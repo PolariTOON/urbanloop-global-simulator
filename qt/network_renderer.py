@@ -233,7 +233,7 @@ def get_capsule_coordinates(capsule):
     Return @param:capsule's coordinates
     """
     loop = capsule.loop
-    percentage = capsule.get_trip_percentage()
+    percentage = capsule.get_segment_trip_percentage()
     # compute capsule coords
     lx, ly, lr = loop.x, loop.y, loop.size / 2 / pi
 

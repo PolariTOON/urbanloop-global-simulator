@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # coding: utf-8
-
+import sys
 from math import ceil
 from sys import path
 import threading as th
@@ -10,28 +10,40 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFileDialog, QPushButton, QHBoxLayout, \
     QVBoxLayout, QLabel, QSplitter
+from PyQt5.QtCore import pyqtSignal as SIGNAL
 
 from model import sim_record
 from qt.data_widget import DataWidget
 from qt.simulator_widget import SimulatorWidget
-from settings import network, config
-from settings import simlog
+from settings import network, config, simlog
 from simulator import sim_loop as sim
 
+from qt.config_window import ConfigWindows
+from qt import config_window
+
 window = None
-config = config.sim
+config_sim = config.sim
 
 # to be removed
 network.load()
 
 
 # to be removed
-
 def get_image_path(image):
     """
     Return image path
     """
     return "{0}/../resources/img/{1}".format(path[0], image)
+
+
+def copy_file(file_src, file_dest):
+    fs = open(file_src, 'r')
+    fd = open(file_dest, 'w')
+    for lign in fs:
+        fd.write(lign)
+    fd.close()
+    fs.close()
+    return
 
 
 class MainWindow(QMainWindow):
@@ -48,7 +60,7 @@ class MainWindow(QMainWindow):
         self.thd_refresh = None
         self.path = None
         QMainWindow.__init__(self)
-        self.refresh_time = float(config["tick"])
+        self.refresh_time = float(config_sim["tick"])
         self.init_ui()
 
     def closeEvent(self, event):
@@ -126,6 +138,37 @@ class MainWindow(QMainWindow):
             network.load(None)
             self.refresh()
 
+        def change_configuration():
+            """
+            Method called when menu button "Change configuration" is pressed
+            """
+            self.pause_button.click()
+            # simlog.debug("Configuration changing")
+            self.open_config_dialog()
+
+        def reset_configuration():
+            """
+            Method called when menu button "Reset configuration" is pressed
+            """
+            copy_file("{0}/../resources/default_config.ini".format(path[0]),
+                      "{0}/../resources/config.ini".format(path[0]))
+            config.load('{0}/../resources/config.ini'.format(sys.path[0]))
+            config_window.changed = {}
+            network.load(None)
+            self.stop_button.click()
+            simlog.debug("Default configuration reset")
+
+        def save_configuration():
+            """
+            Method called when menu button "Save configuration" is pressed --> the current configuration become the default one
+            """
+            copy_file("{0}/../resources/config.ini".format(path[0]),
+                      "{0}/../resources/default_config.ini".format(path[0]))
+            config.load('{0}/../resources/config.ini'.format(sys.path[0]))
+            config_window.changed = {}
+            network.load(None)
+            simlog.debug("Current configuration saved as default one")
+
         menubar = self.menuBar()
         file_menu = menubar.addMenu('&File')
         open_file_act = QAction('Open file...', self)
@@ -136,6 +179,22 @@ class MainWindow(QMainWindow):
         open_sample_act.setShortcut('Ctrl+Shift+O')
         open_file_act.triggered.connect(open_sample)
         file_menu.addAction(open_sample_act)
+
+        config_menu = menubar.addMenu('&Configuration')
+        change_config_act = QAction('Change Configuration', self)
+        change_config_act.setShortcut('Ctrl+C')
+        change_config_act.triggered.connect(change_configuration)
+        config_menu.addAction(change_config_act)
+
+        reset_config_act = QAction('Reset Default Configuration', self)
+        reset_config_act.setShortcut('Ctrl+R')
+        reset_config_act.triggered.connect(reset_configuration)
+        config_menu.addAction(reset_config_act)
+
+        save_config_act = QAction('Save current Configuration', self)
+        save_config_act.setShortcut('Ctrl+S')
+        save_config_act.triggered.connect(save_configuration)
+        config_menu.addAction(save_config_act)
 
     def open_file_name_dialog(self):
         """
@@ -148,6 +207,15 @@ class MainWindow(QMainWindow):
             self, "QFileDialog.getOpenFileName()", "", "All Files (*)", options=options)
         self.path = file_name if file_name else None
         return self.path
+
+    def open_config_dialog(self):
+        """
+        Open a dialog with the configuration
+        :return: Change the configuration
+        """
+        self.conf_windows = ConfigWindows(self)
+        self.conf_windows.setWindowModality(Qt.ApplicationModal) # fenetre modale = pas touch à l'autre si elle n'est pas fermée
+        self.conf_windows.show()
 
     def build_buttons(self):
         """
@@ -212,6 +280,7 @@ class MainWindow(QMainWindow):
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             self.play_button.setDisabled(False)
             self.pause_button.setDisabled(True)
+            #TODO mettre en pause le simulateur aussi
 
         def on_increase_button_pressed():
             """

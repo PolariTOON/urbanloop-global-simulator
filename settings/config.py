@@ -33,7 +33,8 @@ def load(file_name):
     capsule = config['CAPSULE']
     routing = config['ROUTING']
     sim = config['SIM']
+    # print(default['travelers_per_day'])
 
 
 if loaded is False:
-    load('{0}/../resources/config.ini'.format(sys.path[0]))
+    load('{0}/../resources/default_config.ini'.format(sys.path[0]))

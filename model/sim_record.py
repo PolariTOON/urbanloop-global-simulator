@@ -1,23 +1,22 @@
 import copy
 
-from model import queue
 from model import capsule
-from model import station
-from model import switch
+from model import queue
 from settings import config
+from settings import json_serializer
 from settings import simlog
 from simulator import sim_loop
 
 records = queue.Queue()
 _limit = int(config.sim['default_record_size'])
-_offset = 0
+_offset = 500
 
 
 class SimRecord:
     def __init__(self):
-        self.stations = copy.deepcopy(station.get_stations())
-        self.switches = copy.deepcopy(switch.get_switches())
-        self.capsules = copy.deepcopy(capsule.get_capsules())
+        self.stations_records = []
+        self.switches_record = []
+        self.capsules_record = [CapsuleRecord(a_capsule) for a_capsule in capsule.get_capsules()]
 
 
 def change_queue_size(limit=_limit):
@@ -47,6 +46,11 @@ def put_record():
 
     if records.qsize() >= _limit:
         sim_loop.pause_simulation()
+        # index = 0
+        # for rec in records.list():
+        #     print("record %d" % index)
+        #     print((rec.capsules_record[0].x, rec.capsules_record[0].y))
+        #     index += 1
 
 
 def get_record():
@@ -71,3 +75,24 @@ def get_record():
 
 def is_empty():
     return records.empty()
+
+
+#
+# class StationRecord:
+#     def __init__(self, a_station):
+#         self.id = a_station.id
+#         self.loop_size = a_station.loop.size
+#
+#
+# class SwitchRecord:
+#     def __init__(self, a_switch):
+#         self.id = a_switch.id
+
+
+class CapsuleRecord:
+    def __init__(self, a_capsule):
+        self.id = copy.copy(a_capsule.id)
+        capsule_position = json_serializer.get_capsule_position(a_capsule)
+        self.x = capsule_position[0]
+        self.y = capsule_position[1]
+        self.traveler_number = copy.copy(len(a_capsule.travelers))

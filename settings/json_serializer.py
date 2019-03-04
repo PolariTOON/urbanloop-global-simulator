@@ -31,8 +31,19 @@ def serialize_station_set_data(station):
         'x': station.loop.x + loop_radius * math.cos(radius_angle),
         'y': station.loop.y + loop_radius * math.sin(radius_angle),
         'name': station.name,
-        'capacity': station.capacity
+        'capacity': station.capacity,
+        'loop': station.loop.name,
+        'type': station.station_type,
+        'next_element': station.next_element.name,
+        'capsules': serialize_capsule_queue(station.capsule_queue)
     }
+
+def serialize_capsule_queue(queue):
+    capsules = {}
+    capsules_list = queue.list()
+    for i in range(0, len(capsules_list)):
+        capsules[i] = capsules_list[i].id
+    return capsules
 
 def serialize_station_var_data(station):
     return {
@@ -56,11 +67,9 @@ def serialize_switch_set_data(a_switch):
         'table': str(a_switch.table)
     }
 
-
 def serialize_switch_var_data(a_switch):
     return {
     }
-
 
 # def serialize_capsule(capsule_record):
 #     return {
@@ -83,7 +92,6 @@ def serialize_capsule(a_capsule):
         'next_element': a_capsule.next_element.name
     }
 
-
 def get_segment_trip_angle(loop, current_element, next_element):
     if type(current_element) is switch.Switch:
         current_element_angle = get_switch_angle(loop, current_element)
@@ -101,7 +109,6 @@ def get_segment_trip_angle(loop, current_element, next_element):
     abs_difference = math.fabs(current_element_angle - next_element_angle)
     return min(abs_difference % 360, math.fabs(360 - abs_difference) % 360)
 
-
 def get_element_angle(loop, element):
     if type(element) is switch.Switch:
         angle = get_switch_angle(loop, element)
@@ -109,14 +116,12 @@ def get_element_angle(loop, element):
 
     return element.angle
 
-
 def get_switch_angle(loop, a_switch):
     if a_switch.my_loop == loop:
         return a_switch.angle_my_loop
 
     if a_switch.other_loop == loop:
         return a_switch.angle_other_loop
-
 
 def get_capsule_position(capsule):
     """
@@ -139,7 +144,6 @@ def get_capsule_position(capsule):
         loop_radius = math.floor(capsule.loop.size / (2 * math.pi))
         return capsule.loop.x + math.cos(radius_angle) * loop_radius, capsule.loop.y + math.sin(
             radius_angle) * loop_radius
-
 
 def get_switch_positions(a_switch):
     """

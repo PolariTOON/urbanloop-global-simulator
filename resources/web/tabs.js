@@ -65,7 +65,31 @@ function generateDataPanel() {
     data += "<p>Size of the link: " + selectedObject.json["size"] + "</p>";
     data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
   } else if (selectedObject instanceof Station) {
-    data += "Station #" + selectedObject.json["id"];
+    data += "<p>Station " + selectedObject.json["name"] + "</p>";
+    data += "<p>Loop: " + selectedObject.json["loop"] + "</p>";
+    /* WARNING station_type attribute is weird
+    data += "<p>Station type: ";
+    switch (selectedObject.json["type"]) {
+      case 0:
+        data += "neutral</p>";
+        break;
+      case 1:
+        data += "activity zone</p>";
+        break;
+      case 2:
+        data += "residential zone</p>";
+        break;
+      case 3:
+        data += "down town</p>";
+        break;
+    }*/
+    data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
+    data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
+    data += "<p>Capsules:";
+    for (k in selectedObject.json["capsules"]) {
+      data += "<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
+    }
+    data += "</p>";
   } else if (selectedObject instanceof Capsule) {
     data += "Capsule #" + selectedObject.json["id"];
     data += "<p>Contains a traveler: " + selectedObject.json["travelerNumber"] !== 0 + "</p>";

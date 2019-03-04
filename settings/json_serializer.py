@@ -18,7 +18,7 @@ def serialize_loop(loop):
 
 def serialize_objects_list(objects):
     data = {}
-    for i in range(0, len(objects)-1):
+    for i in range(0, len(objects)):
         true_obj = objects[i][1]
         data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch) else serialize_station_set_data(true_obj)
     return data

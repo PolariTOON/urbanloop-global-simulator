@@ -50,13 +50,21 @@ def serialize_switch_var_data(a_switch):
     }
 
 
-def serialize_capsule(capsule):
-    capsule_position = get_capsule_position(capsule)
+# def serialize_capsule(capsule_record):
+#     return {
+#         'id': capsule_record.id,
+#         'x': capsule_record.x,
+#         'y': capsule_record.y,
+#         'travelerNumber': capsule_record.traveler_number
+#     }
+
+def serialize_capsule(a_capsule):
+    x, y = get_capsule_position(a_capsule)
     return {
-        'id': capsule.id,
-        'x': capsule_position[0],
-        'y': capsule_position[1],
-        'travelerNumber': len(capsule.travelers)
+        'id': a_capsule.id,
+        'x': x,
+        'y': y,
+        'travelerNumber': len(a_capsule.travelers)
     }
 
 
@@ -110,7 +118,7 @@ def get_capsule_position(capsule):
         angle = (angle, 0)[angle is None]
         segment_trip_angle = get_segment_trip_angle(capsule.loop, capsule.current_element, capsule.next_element)
         segment_trip_angle = (segment_trip_angle, 0)[segment_trip_angle is None]
-        percent_trip_angle = math.ceil(capsule.get_segment_trip_percentage() * segment_trip_angle)
+        percent_trip_angle = capsule.get_segment_trip_percentage() * segment_trip_angle
         radius_angle = math.radians(angle - percent_trip_angle)
         loop_radius = math.floor(capsule.loop.size / (2 * math.pi))
         return capsule.loop.x + math.cos(radius_angle) * loop_radius, capsule.loop.y + math.sin(

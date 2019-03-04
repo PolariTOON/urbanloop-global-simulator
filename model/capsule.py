@@ -85,6 +85,7 @@ class Capsule:
         :return: Trip event generator
         """
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
+
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
         self.segment_ticks_duration = time_to_next_element * sim_loop.get_tick_per_second()

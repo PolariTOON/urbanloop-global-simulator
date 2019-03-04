@@ -39,7 +39,9 @@ def load_network():
 
 @app.route('/start')
 def start_simulation():
-    sim_loop.run_simulation(is_recorded=True)
+    global sim_thread
+    sim_thread = Thread(target=sim_loop.run_simulation, args=(None, False))
+    sim_thread.start()
     return redirect(url_for('root'))
 
 
@@ -69,7 +71,7 @@ def generate_stations_var_data_json():
         return Response(mimetype="application/json")
 
     list_stations_var_data_json = [json_serializer.serialize_station_var_data(a_station) for a_station in
-                                   last_record.stations]
+                                   last_record.stations_record]
     return Response(dumps(list_stations_var_data_json), mimetype="application/json")
 
 
@@ -79,20 +81,20 @@ def generate_switches_var_data_json():
         return Response(mimetype="application/json")
 
     list_switches_var_data_json = [json_serializer.serialize_switch_var_data(a_switch) for a_switch in
-                                   last_record.switches]
+                                   last_record.switches_record]
     return Response(dumps(list_switches_var_data_json), mimetype="application/json")
 
 
 @app.route('/capsules.json')
 def generate_capsules_json():
-    if sim_record.is_empty():
-        return Response(mimetype="application/json")
+    # if sim_record.is_empty():
+    #     return Response(mimetype="application/json")
+    #
+    # global last_record  # TODO remove after place in station var data
+    # last_record = sim_record.get_record()
 
-    global last_record  # TODO remove after place in station var data
-    last_record = sim_record.get_record()
-
-    list_capsules_json = [json_serializer.serialize_capsule(a_capsule) for a_capsule in
-                          last_record.capsules]
+    list_capsules_json = [json_serializer.serialize_capsule(capsule_record) for capsule_record in
+                          capsule.get_capsules()]
 
     return Response(dumps(list_capsules_json), mimetype="application/json")
 

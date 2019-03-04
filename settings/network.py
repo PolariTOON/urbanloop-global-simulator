@@ -5,9 +5,10 @@ from model import capsule as model_capsule
 from model import loop as model_loop
 from model import station as model_station
 from model import switch as model_switch
+from model import warehouse as model_warehouse
 from model.loop import Loop
 from model.switch import Switch
-from settings import simlog
+from settings import simlog, config
 
 """
 fichier pour l'import des réseaux sur les formats json correspondant
@@ -44,7 +45,7 @@ def load(file_path=None, web=False):
             el_type = element["type"]
             if el_type == "station":
                 elms += [model_station.Station(name=element["name"], capacity=element["capacity"], loop=the_loop,
-                                               angle=element["angle"], station_type=["station_type"])]
+                                               angle=element["angle"], station_type=element["station_type"])]
                 the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
@@ -71,6 +72,8 @@ def load(file_path=None, web=False):
                         elms += [Switch(loop=other_l, other_loop=the_loop)]
                     elms[e].angle_other_loop = element["angle"]
                 the_loop.switches += [elms[e]]
+            elif el_type == "warehouse" :
+                elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"])]
             else:
                 simlog.error("The json file is not properly formatted. "
                              "\n FORMAT : "
@@ -111,14 +114,21 @@ def load(file_path=None, web=False):
         Traveler(departure.name, arrivee.name, 0)
         departure.capsule_queue.put(Capsule(departure))
         '''
-    for station in model_station.get_stations():
-        for i in range(station.capacity):
-            if station.capsule_queue.qsize() < (station.capacity - 1):
+    capsules = int(config.routing['number_of_capsules'])
+    for i in range(6):
+        for station in model_station.get_stations():
+            if station.capsule_queue.qsize() < min(station.capacity - 1, 2) and capsules > 0:
                 # creating capsules
                 caps = model_capsule.Capsule(departure_station=station)
                 # adding capsules to station
                 station.capsule_queue.put(caps)
-    # print("load done")
+                capsules -= 1
+    while capsules > 0:
+        for warehouse in model_warehouse.get_warehouses():
+            if capsules > 0 and warehouse.capsule_queue.qsize() < warehouse.capacity and capsules > 0:
+                caps = model_capsule.Capsule(departure_station=warehouse)
+                warehouse.capsule_queue.put(caps)
+                capsules -= 1
     return
 
 

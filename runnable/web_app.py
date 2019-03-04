@@ -121,4 +121,6 @@ def update_record():
 
 
 if __name__ == '__main__':
+    logging.info("http://127.0.0.1:8090")
     app.run(port=8090)
+

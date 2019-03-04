@@ -30,7 +30,7 @@ for name, l in ML.all_loops.items():
             logging.info("\t \t Table of the switch n°%d: %s" %(sw.id, str(sw.table)))
     # simlog.debug(l.lengths)
 
-'''loop_nancy = ML.get_by_name("Nancy")
+'''loop_nancy = model_loop.get_by_name("Nancy")
 o = loop_nancy.objects[2][1]
 dist, next_elm = loop_nancy.dist_to_next_object(o)
 simlog.debug("\n Next object after " + o + " is " + str(next_elm) + " at " + str(dist))

@@ -84,14 +84,6 @@
 
 
 
-
-| Tâches                                 |       En charge          | Deadline |Respect|
-| :------------------------------------  |: ----------------------- |:--------:|:-----:|
-| Zoom, dézoom et déplacement            |          Baptiste        | to define|✓ ou x |
-
-
-
-
 ### Tâches restantes au 12/02 : 
 * rapport   
     * x Introduction 

@@ -4,13 +4,15 @@ from math import pi, cos, sin
 from PyQt5.QtCore import QRect, QLine
 from PyQt5.QtGui import QPainter, QColor
 
-import model.capsule as MC
-import model.loop as ML
-import model.station as MST
-import model.switch as MSW
+import model.capsule as model_capsule
+import model.loop as model_loop
+import model.station as model_station
+import model.switch as model_switch
+import model.warehouse as model_warehouse
 from settings import config, simlog
 
 config = config.interface
+
 
 class NetworkRenderer:
     def __init__(self, root, record=None):
@@ -29,19 +31,19 @@ class NetworkRenderer:
         paint = QPainter()
         paint.begin(self.root.image)
         paint.setRenderHint(QPainter.Antialiasing)
-        for name in ML.all_loops:
-            loop = self.draw_loop(name, paint) # draw every station
-            self.fill_loop(loop, paint) # and fill it
-        join_loops(paint) # them join loops between themselves
-        self.draw_capsules(paint) # finally draw capsules
+        for name in model_loop.all_loops:
+            loop = self.draw_loop(name, paint)  # draw every station
+            self.fill_loop(loop, paint)  # and fill it
+        join_loops(paint)  # them join loops between themselves
+        self.draw_capsules(paint)  # finally draw capsules
         # draw frame
         self.draw_frame(paint)
-    
+
     def draw_loop(self, name, paint):
         """
         Draw an empty station and its name with @param:paint
         """
-        loop = ML.get_by_name(name)
+        loop = model_loop.get_by_name(name)
         paint.setBrush(
             QColor(config["selected_color"] if self.root.selected_item == loop else config["loop_color"]))
         paint.drawEllipse(get_rect_for_loop(loop, 0))
@@ -56,20 +58,25 @@ class NetworkRenderer:
         """
         Draw every switch and station which belong to @param:station with @param;paint
         """
-        if self.record != None:
+        if self.record is not None:
             self.modify_loop(loop, paint)
         for item_descriptor in loop.objects:
             item_type = item_descriptor[0]
             item = item_descriptor[1]
-            if item is not None:
-                is_station = isinstance(item, MST.Station)
+            if item is not None and isinstance(item, model_warehouse.Warehouse):
+                paint.setBrush(QColor("black"))
+                paint.drawRect(get_rect_for_item(item, loop, 0, None))
+                paint.setBrush(QColor("white"))
+                paint.drawRect(get_rect_for_item(item, loop, int(config["switch_outline_width"]), None))
+            elif item is not None:
+                is_station = isinstance(item, model_station.Station)
                 if self.root.selected_item == item:
                     paint.setBrush(QColor(config["selected_color"]))
                 else:
                     paint.setBrush(QColor(config["station_color" if is_station else "switch_color"]))
                 paint.drawEllipse(get_rect_for_item(item, loop, 0, None if is_station else item_type))
                 paint.setBrush(QColor("white"))
-                outline_width = int(config["switch_outline_width"]) if isinstance(item, MSW.Switch) else int(
+                outline_width = int(config["switch_outline_width"]) if isinstance(item, model_switch.Switch) else int(
                     config["station_outline_width"])
                 rect = get_rect_for_item(item, loop, outline_width, None if is_station else item_type)
                 paint.drawEllipse(rect)
@@ -91,7 +98,7 @@ class NetworkRenderer:
             if station.loop == loop:
                 for item_descriptor in loop.objects:
                     item = item_descriptor[1]
-                    if isinstance(item, MST.Station):
+                    if isinstance(item, model_station.Station):
                         if station.id == item.id:
                             # update setData
                             item.traveler_queue = station.traveler_queue
@@ -101,7 +108,7 @@ class NetworkRenderer:
         """
         Draw capsules with @param:paint
         """
-        capsules = MC.get_capsules() if self.record == None else self.record.capsules
+        capsules = model_capsule.get_capsules() if self.record == None else self.record.capsules
         for capsule in capsules:
             rect = get_rect_for_capsule(capsule, 0)
             if capsule == self.root.selected_item:
@@ -115,22 +122,22 @@ class NetworkRenderer:
         """
         Draw frame around the simulator view with @param:paint
         """
-        x,y = float('inf'), float('inf')
+        x, y = float('inf'), float('inf')
         loop_x, loop_y = None, None
-        for ln in ML.all_loops:
-            l=ML.get_by_name(ln)
+        for ln in model_loop.all_loops:
+            l = model_loop.get_by_name(ln)
             if l.x < x:
                 x = l.x
                 loop_x = l
             if l.y < y:
                 y = l.y
                 loop_y = l
-        x-= loop_x.size / 2 / pi
-        y-= loop_y.size / 2 / pi
+        x -= loop_x.size / 2 / pi
+        y -= loop_y.size / 2 / pi
         offset_x = int(config["station_width"]) * 0.75
         offset_y = int(config["station_height"]) * 0.75
-        x-= offset_x
-        y-= offset_y
+        x -= offset_x
+        y -= offset_y
         img_width = self.root.image.width() + offset_x
         img_height = self.root.image.height() + offset_y
         color = QColor("blue")
@@ -138,18 +145,20 @@ class NetworkRenderer:
         paint.setBrush(color)
         paint.drawRect(x, y, img_width, img_height)
 
+
 def join_loops(paint):
     """
     Draw a line between every switch_in and its associated switch_out with @param:paint
     """
-    for name in ML.all_loops:
-        loop = ML.get_by_name(name)
+    for name in model_loop.all_loops:
+        loop = model_loop.get_by_name(name)
         for obj in loop.objects:
-            if isinstance(obj[1], MSW.Switch):
+            if isinstance(obj[1], model_switch.Switch):
                 if obj[0] == "switch_out":
                     sw = obj[1]
                     line = get_line_for_switch(sw)
                     paint.drawLine(line)
+
 
 def get_rect_for_loop(loop, i):
     """
@@ -165,19 +174,22 @@ def get_rect_for_loop(loop, i):
     rh = d - i * 2
     return QRect(rx, ry, rw, rh)
 
+
 def get_rect_for_item(item, loop, i, item_type=None):
     """
     Return the rect in which @param:item will be displayed, relatively the the @param:station
     @param:i is an absolute offset
     @param:item_type is useful for switches (_out or _in)
     """
-    is_station = isinstance(item, MST.Station)
+    is_station = isinstance(item, model_station.Station)
     # station
     xl = loop.x
     yl = loop.y
     dl = loop.size / pi
     rl = dl / 2
     if is_station:
+        angle = item.angle
+    elif type(item) is model_warehouse.Warehouse:
         angle = item.angle
     elif item_type == "switch_out":
         angle = item.angle_my_loop
@@ -198,17 +210,19 @@ def get_rect_for_item(item, loop, i, item_type=None):
     hr = item_height - i * 2
     return QRect(xr, yr, wr, hr)
 
+
 def get_rect_for_capsule(capsule, i):
     """
     Return the rect in which @param:capsule will be displayed
     @param:i is an absolute offset
     """
-    [cx,cy] = get_capsule_coordinates(capsule)
+    [cx, cy] = get_capsule_coordinates(capsule)
     # compute rectangle coord
     cw = int(config["capsule_width"])
     ch = int(config["capsule_height"])
 
     return QRect(cx - cw / 2 - i, cy - ch / 2 - i, cw, ch)
+
 
 def get_line_for_switch(switch):
     """
@@ -228,6 +242,7 @@ def get_line_for_switch(switch):
     y2 = switch.other_loop.y - sin(a) * r
     return QLine(x1, y1, x2, y2)
 
+
 def get_capsule_coordinates(capsule):
     """
     Return @param:capsule's coordinates
@@ -237,11 +252,11 @@ def get_capsule_coordinates(capsule):
     # compute capsule coords
     lx, ly, lr = loop.x, loop.y, loop.size / 2 / pi
 
-    if isinstance(capsule.current_element, MSW.Switch):
+    if isinstance(capsule.current_element, model_switch.Switch):
         sa = capsule.current_element.angle_my_loop
     else:
         sa = capsule.current_element.angle
-    if isinstance(capsule.next_element, MSW.Switch):
+    if isinstance(capsule.next_element, model_switch.Switch):
         nsa = capsule.next_element.angle_my_loop
     else:
         nsa = capsule.next_element.angle
@@ -251,7 +266,8 @@ def get_capsule_coordinates(capsule):
     ca += 90
     ca = ca * 2 * pi / 360
     cx, cy = lx - lr * cos(ca), ly - lr * sin(ca)
-    return [cx,cy]
+    return [cx, cy]
+
 
 def get_station_coordinates(station):
     """

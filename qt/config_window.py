@@ -3,6 +3,9 @@ from PyQt5.QtGui import QFont
 from settings import config, simlog
 from sys import path
 
+from model import capsule as model_capsule
+from settings import network
+
 changed = {}
 saved = None
 
@@ -31,6 +34,7 @@ class ConfigWindows(QWidget):
         self.posit.addWidget(title, self.lign, 0)
         self.lign += 1
         self.add_lign("travelers per day", config.default['travelers_per_day'], 'travelers_per_day')
+        self.add_lign("number of capsules in the network", config.default['number_of_capsules'], 'number_of_capsules')
         self.add_lign("maximum number of trips", config.default['trip_limit'], 'trip_limit')
         self.add_lign("maximum number of travelers", config.default['traveler_limit'], 'traveler_limit')
         self.add_lign("average time of descent and ascent", config.capsule['ascent_descent_duration'], 'ascent_descent_duration')
@@ -103,25 +107,28 @@ class ConfigWindows(QWidget):
             global changed
             for label, value in self.new_changed.items():
                 changed[label] = value
-            update_config()
+            update_config(self.main_window)
             self.main_window.stop_button.click()
         else:
             simlog.info("Configuration changements canceled")
         self.close()
 
 
-def update_config():
+def update_config(main_win):
     default = "{0}/../resources/default_config.ini".format(path[0])
     config_file = "{0}/../resources/config.ini".format(path[0])
     fs = open(default, 'r')
     fd = open(config_file, 'w')
     for line in fs:
         label = line.split(" = ")[0]
-        if label in changed :
+        if label in changed:
             fd.write(label + " = " + changed[label] + "\n")
         else:
             fd.write(line)
     fd.close()
     fs.close()
     simlog.info("Configuration was changed")
+    model_capsule.reset_simulation()
+    network.load()
     config.load(config_file)
+    main_win.init_ui()

@@ -57,17 +57,24 @@ function generateDataPanel() {
   } else if (selectedObject instanceof Switch) {
     data += "<p>Switch #" + selectedObject.json["id"] + "</p>";
     data += "<p>Loop of the switch: " + selectedObject.json["my_loop_name"] + "</p>";
-    data += "<p>&nbspNext element:";
-    data += "<br>&nbsp&nbsp" + selectedObject.json["next_element_name"] + "</p>";
+    data += "<p>Next element:";
+    data += "<br>&nbsp;" + selectedObject.json["next_element_name"] + "</p>";
     data += "<p>Loop switched: " + selectedObject.json["other_loop_name"] + "</p>";
-    data += "<p>&nbspNext element:";
-    data += "<br>&nbsp&nbsp" + selectedObject.json["next_other_element_name"] + "</p>";
+    data += "<p>Next element:";
+    data += "<br>&nbsp;" + selectedObject.json["next_other_element_name"] + "</p>";
     data += "<p>Size of the link: " + selectedObject.json["size"] + "</p>";
     data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
   } else if (selectedObject instanceof Station) {
     data += "Station #" + selectedObject.json["id"];
   } else if (selectedObject instanceof Capsule) {
     data += "Capsule #" + selectedObject.json["id"];
+    data += "<p>Contains a traveler: " + selectedObject.json["travelerNumber"] !== 0 + "</p>";
+    if (selectedObject.json["destination"] !== undefined) {
+        data += "<p>Destination: " + selectedObject.json["destination"] + "</p>";
+    }
+    data += "<p>Current Loop: " + selectedObject.json["loop"] + "</p>";
+    data += "<p>Last or current element: " + selectedObject.json["current_element"] + "</p>";
+    data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
   } else {
     data += "Nothing selected.";
   }

@@ -76,7 +76,11 @@ def serialize_capsule(a_capsule):
         'id': a_capsule.id,
         'x': x,
         'y': y,
-        'travelerNumber': len(a_capsule.travelers)
+        'travelerNumber': len(a_capsule.travelers),
+        'destination': a_capsule.destination.name if a_capsule.destination is not None else "None",
+        'loop': a_capsule.loop.name,
+        'current_element': a_capsule.current_element.name,
+        'next_element': a_capsule.next_element.name
     }
 
 

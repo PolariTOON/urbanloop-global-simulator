@@ -16,8 +16,9 @@ class Loop {
         let y = networkDiv.offsetHeight - loopJSON['y'];
         let semiWidth = Math.floor(loopWidth / 2);
 
+        this.json = loopJSON;
         this.networkLayer = networkLayer;
-        this.id = 'station:' + loopJSON['id'];
+        this.id = 'loop:' + loopJSON['id'];
         this.color = 'rgb(156, 156, 156)';
         this.selectedColor = 'rgb(255, 200, 20)';
 
@@ -116,6 +117,7 @@ class Station {
         let y = networkDiv.offsetHeight - stationJSON['y'];
         let semiWidth = Math.floor(stationWidth / 2);
 
+        this.json = stationJSON;
         this.networkLayer = networkLayer;
         this.infoLayer = infoLayer;
         this.id = 'station:' + stationJSON['id'];
@@ -221,6 +223,7 @@ class Switch {
         let yOut = networkDiv.offsetHeight - switchJSON['yOut'];
         let semiWidth = Math.floor(switchWidth / 2);
 
+        this.json = switchJSON;
         this.networkLayer = networkLayer;
         this.infoLayer = infoLayer;
         this.id = 'switch:' + switchJSON['id'];
@@ -412,6 +415,7 @@ class Capsule {
         this.networkLayer = networkLayer;
         this.infoLayer = infoLayer;
 
+        this.json = capsuleJSON;
         this.id = 'capsule:' + capsuleJSON['id'];
         this.travelerNumber = capsuleJSON['travelerNumber'];
 

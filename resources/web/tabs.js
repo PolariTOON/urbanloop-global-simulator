@@ -1,0 +1,109 @@
+let dataTab = document.getElementById("data-tab");
+let configTab = document.getElementById("config-tab");
+let interractTab = document.getElementById("interract-tab");
+let viewTab = document.getElementById("view-tab");
+
+let selectedTab = dataTab;
+
+generateSelectedTab();
+
+function generateSelectedTab() {
+  switch (selectedTab) {
+    case dataTab:
+      generateDataPanel();
+      break;
+    case configTab:
+      generateConfigPanel();
+      break;
+    case interractTab:
+      generateDataPanel();
+      break;
+    case viewTab:
+      generateViewPanel()
+      break;
+  }
+}
+
+function generateDataPanel() {
+  // update navbar
+  selectedTab.classList.remove("active");
+  dataTab.classList.add("active");
+  selectedTab = dataTab;
+  
+  let div = document.createElement("div");
+  div.id = "tab-content";
+  let data = "";
+  // gather data
+  if (selectedObject instanceof Loop) {
+    data += "<p>Loop " + selectedObject.json["name"] + "</p>";
+    data += "<p>Circumference : " + selectedObject.json["size"] + "</p>";
+    data += "<p>Center coordinates : [" + selectedObject.json["x"] + ";" + selectedObject.json["y"] + "]</p>";
+    data += "<p>Elements :"
+    let elements = selectedObject.json["objects"];
+    for (key in elements) {
+      element = elements[key];
+      console.log(element);
+      if (element["name"] !== undefined) {
+        data += "<br>&nbsp;Station " + element["name"];
+      } else {
+        if (element["nameIn"].includes("=>")) {
+          data += "<br>&nbsp;Switch out " + element["id"] + " to " + element["other_loop_name"];
+        } else {
+          data += "<br>&nbsp;Switch in " + element["id"] + " from " + element["my_loop_name"]
+        }
+      }
+    }
+    data += "</p>";
+  } else if (selectedObject instanceof Switch) {
+    data += "Switch #" + selectedObject.json["id"];
+  } else if (selectedObject instanceof Station) {
+    data += "Station #" + selectedObject.json["id"];
+  } else if (selectedObject instanceof Capsule) {
+    data += "Capsule #" + selectedObject.json["id"];
+  } else {
+    data += "Nothing selected.";
+  }
+  div.innerHTML = data;
+  document.getElementById("panel-div").replaceChild(div, document.getElementById("tab-content"));
+}
+
+function generateConfigPanel() {
+  // update navbar
+  selectedTab.classList.remove("active");
+  configTab.classList.add("active");
+  selectedTab = configTab;
+  // show current config
+  let configForm = document.createElement("form");
+  configForm.id = "tab-content";
+  // TODO
+  /*
+  // load config
+
+  // TRAVELERS category
+  let content = `
+  <p>TRAVELERS</p>
+  <div class="form-group row">
+    <label for="travalersPerDay" class="offset-sm-1 col-sm-5 col-form-label">Email</label>
+    <input type="text" class="col-sm-5 form-control" id="travalersPerDay" value="alo"/>
+  </div>
+  `;
+  configForm.innerHTML = content;
+  document.getElementById("panel-div").replaceChild(configForm, document.getElementById("tab-content"));
+  */
+}
+
+function generateInterractPanel() {
+  // update navbar
+  selectedTab.classList.remove("active");
+  interractTab.classList.add("active");
+  selectedTab = interractTab;
+  // TODO
+}
+
+function generateViewPanel() {
+  // update navbar
+  selectedTab.classList.remove("active");
+  viewTab.classList.add("active");
+  selectedTab = viewTab;
+  // TODO
+}

@@ -11,9 +11,17 @@ def serialize_loop(loop):
         'name': loop.name,
         'x': loop.x,
         'y': loop.y,
-        'radius': math.floor(loop.size / (2 * math.pi))
+        'radius': math.floor(loop.size / (2 * math.pi)),
+        'size': loop.size,
+        'objects': serialize_objects_list(loop.objects)
     }
 
+def serialize_objects_list(objects):
+    data = {}
+    for i in range(0, len(objects)-1):
+        true_obj = objects[i][1]
+        data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch) else serialize_station_set_data(true_obj)
+    return data
 
 def serialize_station_set_data(station):
     radius_angle = math.radians(station.angle)
@@ -42,6 +50,8 @@ def serialize_switch_set_data(a_switch):
         'yIn': switch_positions[1],
         'xOut': switch_positions[2],
         'yOut': switch_positions[3],
+        'my_loop_name': a_switch.my_loop.name,
+        'other_loop_name': a_switch.other_loop.name
     }
 
 

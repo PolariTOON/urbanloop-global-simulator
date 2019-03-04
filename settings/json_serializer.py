@@ -34,11 +34,9 @@ def serialize_station_set_data(station):
         'capacity': station.capacity
     }
 
-
 def serialize_station_var_data(station):
     return {
     }
-
 
 def serialize_switch_set_data(a_switch):
     switch_positions = get_switch_positions(a_switch)
@@ -51,7 +49,11 @@ def serialize_switch_set_data(a_switch):
         'xOut': switch_positions[2],
         'yOut': switch_positions[3],
         'my_loop_name': a_switch.my_loop.name,
-        'other_loop_name': a_switch.other_loop.name
+        'other_loop_name': a_switch.other_loop.name,
+        'next_element_name': a_switch.next_element.name,
+        'next_other_element_name': a_switch.next_element_other.name,
+        'size': a_switch.size,
+        'table': str(a_switch.table)
     }
 
 

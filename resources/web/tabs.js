@@ -55,7 +55,15 @@ function generateDataPanel() {
     }
     data += "</p>";
   } else if (selectedObject instanceof Switch) {
-    data += "Switch #" + selectedObject.json["id"];
+    data += "<p>Switch #" + selectedObject.json["id"] + "</p>";
+    data += "<p>Loop of the switch: " + selectedObject.json["my_loop_name"] + "</p>";
+    data += "<p>&nbspNext element:";
+    data += "<br>&nbsp&nbsp" + selectedObject.json["next_element_name"] + "</p>";
+    data += "<p>Loop switched: " + selectedObject.json["other_loop_name"] + "</p>";
+    data += "<p>&nbspNext element:";
+    data += "<br>&nbsp&nbsp" + selectedObject.json["next_other_element_name"] + "</p>";
+    data += "<p>Size of the link: " + selectedObject.json["size"] + "</p>";
+    data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
   } else if (selectedObject instanceof Station) {
     data += "Station #" + selectedObject.json["id"];
   } else if (selectedObject instanceof Capsule) {

@@ -117,7 +117,7 @@ def load(file_path=None, web=False):
     capsules = int(config.routing['number_of_capsules'])
     for i in range(6):
         for station in model_station.get_stations():
-            if station.capsule_queue.qsize() < min(station.capacity - 1, 2):
+            if station.capsule_queue.qsize() < min(station.capacity - 1, 2) and capsules > 0:
                 # creating capsules
                 caps = model_capsule.Capsule(departure_station=station)
                 # adding capsules to station
@@ -125,7 +125,7 @@ def load(file_path=None, web=False):
                 capsules -= 1
     while capsules > 0:
         for warehouse in model_warehouse.get_warehouses():
-            if capsules > 0 and warehouse.capsule_queue.qsize() < warehouse.capacity:
+            if capsules > 0 and warehouse.capsule_queue.qsize() < warehouse.capacity and capsules > 0:
                 caps = model_capsule.Capsule(departure_station=warehouse)
                 warehouse.capsule_queue.put(caps)
                 capsules -= 1

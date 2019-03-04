@@ -15,6 +15,39 @@ canvas {
 }
 
 #panel-div {
-    background-color: bisque;
+    background-color: #eee;
+    padding: 1.5rem;
 }
 
+hr {
+    margin: .8rem 10%;
+}
+
+buttons-div {
+    display: flex;
+    padding: 1.5rem;
+}
+
+.nav-link {
+    padding: .3rem .4rem;
+}
+
+.nav-link:hover {
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+#tab-content {
+    background-color: #fff;
+    font-size: 0.8rem;
+    margin: 0.3rem;
+}
+
+#tab-content > p {
+    margin: 0;
+}
+
+#tab-content input {
+    font-size: 0.8rem;
+    height: inherit;
+}

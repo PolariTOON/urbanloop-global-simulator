@@ -1,8 +1,6 @@
-#! /usr/bin/env python3
-# coding: utf-8
+from model import identifier
 from settings import simlog
 
-_loop_id = 0
 all_loops = {}
 default_size = 100
 
@@ -16,9 +14,8 @@ class Loop:
         :param coordinates : tableau des coordonees sous la forme [x,y] ([float, float])
         :return:0UT : un objet Loop (Loop)
         """
-        global _loop_id
-        self.id = _loop_id
-        _loop_id += 1
+        self.uuid = identifier.generate_unique()
+        self.id = identifier.generate_loop_id()
         self.name = name
         simlog.info("Create station " + self.name)
         if coordinates is not None:
@@ -64,7 +61,7 @@ class Loop:
                 for j in range(i + 1, len(self.objects) + i + 1):
                     index = j % len(self.objects)
                     element = self.objects[index][1]
-                    distance += self.lengths[index-1]
+                    distance += self.lengths[index - 1]
                     if element is element2:
                         return distance
         return 0

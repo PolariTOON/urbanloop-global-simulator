@@ -7,9 +7,9 @@ from model import capsule
 from model import warehouse
 from settings import simlog
 from simulator import converter
+from model import identifier
 
 _stations = list()
-_station_id = -1
 
 
 class Type(Enum):
@@ -30,11 +30,10 @@ class Station:
         :param angle: Angle between the top of the station and the position of the station - clockwise (float)
         :param station_type: Type of station compared to its affluence (Enum)
         """
-        global _station_id
         global _stations
-        self.id = _station_id
-        _station_id -= 1
         _stations.append(self)
+        self.uuid = identifier.generate_unique()
+        self.id = identifier.generate_station_id()
         self.name = "Station #{0}".format(self.id) if (name is None) else name
         self.angle = angle
         self.capacity = capacity
@@ -82,7 +81,6 @@ class Station:
         :param destination: The destination where the empty capsule should be sent
         """
         qsize = self.capsule_queue.qsize()
-        print("bouh")
 
         '''if qsize < floor((3 * self.capacity) / 4):
             return

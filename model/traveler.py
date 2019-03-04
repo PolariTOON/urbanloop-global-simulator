@@ -1,6 +1,4 @@
-from model import station
-
-_traveler_id = 0
+from model import identifier
 
 
 class Traveler:
@@ -11,10 +9,9 @@ class Traveler:
         :param destination_station_name: nom de la station d'arrivée souhaitée par le voyageur (String)
         :param waiting_since: The time since the Traveler is waiting at departure_station (in seconds)
         """
-        global _traveler_id
-        self.id = _traveler_id
-        _traveler_id += 1
+        self.uuid = identifier.generate_unique()
+        self.id = identifier.generate_traveler_id()
         self.departure_station = departure_station
         self.destination_station = destination_station
         self.waiting_since = waiting_since
-        self.departure_station.traveler_queue.put(self, test='trav')
+        self.departure_station.traveler_queue.put(self)

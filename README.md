@@ -46,6 +46,7 @@ En cas d'erreur(s), vous pouvez essayer de lancer à la racine du projet ```./ru
 * ```scipy```
 * ```matplotlib```
 * ```PyQt5```
+* ```flask```
 
 ## Icons
 <div>

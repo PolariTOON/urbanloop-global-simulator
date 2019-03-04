@@ -81,24 +81,22 @@ class Station:
         :param destination: The destination where the empty capsule should be sent
         """
         qsize = self.capsule_queue.qsize()
-
         '''if qsize < floor((3 * self.capacity) / 4):
-            return
-
+            return'''
         for capsule_index in range(qsize):
             a_capsule = self.capsule_queue.get()
             if not a_capsule.is_aboard():
                 if destination is None:
                     destination = get_almost_empty_station(self)
                 a_capsule.destination = destination
-                simlog.debug("Station %s (%s/%d capsules) drained to "
-                             "%s (%d/%d capsules)" % (self.name, qsize, self.capacity, destination.name,
-                                                      destination.capsule_queue.qsize(), destination.capacity))
+                # simlog.debug("Station %s (%s/%d capsules) drained to %s (%d/%d capsules)" % (self.name, qsize, self.capacity, destination.name, destination.capsule_queue.qsize(), destination.capacity))
+                simlog.debug("Station %s (%s/%d capsules) drained to %s" % (self.name, qsize, self.capacity, destination.name))
                 a_capsule.start_trip()
                 return
             else:
                 self.capsule_queue.put(a_capsule)
-    
+
+    '''    
     def complete(self):
         """
         This function will search to recover a capsule from a station 3/4 full.
@@ -131,7 +129,7 @@ def get_station_by_name(name):
             return station
 
 
-'''def get_almost_empty_station(departure_station=None):
+def get_almost_empty_station(departure_station=None):
     """
     :param departure_station: The departure_station
     :return: An almost empty station (3/4 empty). If there is no almost empty station,
@@ -143,7 +141,7 @@ def get_station_by_name(name):
                 return station
     return random.choice(_stations)
 
-
+'''
 def get_almost_full_station(destination_station=None):
     """
     :param destination_station: The destination_station
@@ -182,20 +180,30 @@ def fill_and_full_stations():
             nb_to_send = station.capacity - station.estimated_capsules_number() - 1
             nearer_warehouse = warehouse.which_warehouse_before(station)
         # j'en envoie une depuis un entrepot
-            nearer_warehouse.send_capsule(station)
+            if nearer_warehouse is not None :
+                nearer_warehouse.send_capsule(station)
         # vérifier que la station n'est pas sujette à être la destination de plein de capsules
             proba = converter.station_probability(station.get_type(), now_second, True)
-            if proba < 0.3 and nb_to_send>1: # je ne prends pas trop de risque à en renvoyer d'autres
+            if proba < 0.3 and nb_to_send>1 and nearer_warehouse is not None: # je ne prends pas trop de risque à en renvoyer d'autres
                 for i in range(min(nb_to_send-1, 1)):
                     nearer_warehouse.send_capsule(station)
 
-        if station.estimated_capsules_number() >= min(station.capacity - 1, floor(3 *station.capacity /4)):
+        if station.estimated_capsules_number() >= min(station.capacity - 1, floor(3 * station.capacity /4)):
             # quasi pleine --> station à vider
-            simlog.debug( "Station %s almost full (caps_numb = %d, travelers)." % (station.name, station.estimated_capsules_number()))
-
+            simlog.debug("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
+            nb_to_send = 1
+            if station.capsule_queue.qsize() > station.traveler_queue.qsize():
+                nb_to_send = max(station.capsule_queue.qsize() - station.traveler_queue.qsize() - 1, 1)
+            nearer_warehouse = warehouse.which_warehouse_after(station)
+            # j'en envoie une vide (si pas de voyageur) attente vers un entrepot
+            station.drain(nearer_warehouse)
+            if nearer_warehouse is not None and station.traveler_queue.qsize() <= 1:
+                station.drain(nearer_warehouse)
             # vérifier que la station n'est pas sujette à voir partir plein de voyageurs
             proba = converter.station_probability(station.get_type(), now_second, False)
-            print(station.name, station.station_type, proba)
+            if proba > 0.3 and nb_to_send > 1 and nearer_warehouse is not None:
+                for i in range(min(nb_to_send - 1, 1)):
+                    nearer_warehouse.send_capsule(station)
 
 
 def reset_simulation():

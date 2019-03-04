@@ -13,7 +13,7 @@ from settings import json_serializer
 from settings import network
 from simulator import sim_loop
 
-web_directory = os.path.abspath('../resources/web')
+web_directory = os.path.abspath('resources/web')
 app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)

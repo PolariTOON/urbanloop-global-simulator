@@ -83,4 +83,5 @@ stage.on('mousedown', event => {
     if (selectedObject !== undefined && shape === null) {
         selectedObject.unselect();
     }
+    generateDataPanel();
 });

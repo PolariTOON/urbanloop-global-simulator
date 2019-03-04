@@ -1,10 +1,8 @@
-#! /usr/bin/env python3
-# coding: utf-8
-import model.routing
+from model import identifier
+from model import routing
 from settings import config
 from settings import simlog
 
-switch_id = 0
 timer_other = int(config.routing['timer_other'])
 my_timer = int(config.routing['my_timer'])
 switched_cost = int(config.routing['switched_cost'])
@@ -14,10 +12,6 @@ alive_timers = []
 
 
 class Switch:
-    # network
-    network = None
-    is_routing_to_loop = False
-
     def __init__(self, loop=None, angle=None, other_loop=None, previous_element=None, next_element=None,
                  next_element_other=None, size=switched_cost):
         """
@@ -30,9 +24,13 @@ class Switch:
         :param  size : la taille de l'aiguillage
         :return: 0UT : un objet aiguillage (Switch)
         """
-        global switch_id
-        self.id = switch_id
-        switch_id += 1
+        global _switches
+        global alive_timers
+        _switches.append(self)
+        alive_timers += [float('inf'), float('inf')]
+
+        self.uuid = identifier.generate_unique()
+        self.id = identifier.generate_switch_id()
         self.my_loop = loop
         self.angle = angle
         self.last_element = previous_element
@@ -45,17 +43,8 @@ class Switch:
         self.my_defects = [False, False]
         self.defects = []
         self.name = "Switch n°%d" % self.id
-        global _switches
-        _switches += [self]
-        global alive_timers
-        alive_timers += [float('inf'), float('inf')]
         self.timers = []
         self.table = {}
-
-    '''def _change_state(self):
-        self.isRoutingToLoop = not self.is_routing_to_loop
-        return
-    '''
 
     def route_capsule_to_station(self, station):
         """
@@ -110,17 +99,18 @@ def init():
     fonction d'initialisation de tous les switchs pour que la taille des tableaux correspondant à tous les objets prévus
         :return: 0UT : (void) modification des attributs intrinsèques aux switchs
     """
-    for s in _switches:
-        s.permanent_table = {s.my_loop.name: [False, 0, [s.id, s.my_loop.name]],
-                             s.other_loop.name: [True, s.size, [s.id, s.other_loop.name]]}
-        s.permanent_cover = {s.my_loop.name: s.id, s.other_loop.name: s.id}
-        s.timers = [timer_other for i in range(0, switch_id)]
-        s.timers[s.id] = my_timer
-        s.defects = [[False, False] for i in range(switch_id)]
-    for s in _switches:
-        s.table = model.routing.dijkstra_route(s, s.permanent_table, s.permanent_cover)
+    for a_switch in _switches:
+        a_switch.permanent_table = {a_switch.my_loop.name: [False, 0, [a_switch.id, a_switch.my_loop.name]],
+                                    a_switch.other_loop.name: [True, a_switch.size,
+                                                               [a_switch.id, a_switch.other_loop.name]]}
+        a_switch.permanent_cover = {a_switch.my_loop.name: a_switch.id, a_switch.other_loop.name: a_switch.id}
+        a_switch.timers = [timer_other for _ in range(len(_switches))]
+        a_switch.timers[a_switch.id] = my_timer
+        a_switch.defects = [[False, False] for _ in range(len(_switches))]
+    for a_switch in _switches:
+        a_switch.table = routing.dijkstra_route(a_switch, a_switch.permanent_table, a_switch.permanent_cover)
         # FINAL
-        s.permanent_table = s.table
+        a_switch.permanent_table = a_switch.table
 
         # anomalies des switches : [boucle presente, boucle aiguillee] True ==> anomalies
 
@@ -132,7 +122,7 @@ def update():
     """
     for s in _switches:
         # if s.is_routing_to_loop:
-        info = model.routing.update_switch(s)
+        info = routing.update_switch(s)
         # maj des timers suivant infoIn
         if info == "alive":
             alive_timers[s.id] = [0, 0]

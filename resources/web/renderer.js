@@ -26,7 +26,6 @@ function applyNetworkScene() {
 initNetworkScene(networkLayer, infoLayer);
 applyNetworkScene(networkLayer);
 
-
 setInterval(() => {
     updateNetworkScene(networkLayer, infoLayer);
 }, 50);

@@ -1,3 +1,4 @@
+from model import identifier
 from model import station
 from model import switch
 from settings import config
@@ -6,7 +7,6 @@ from simulator import converter
 from simulator import sim_loop
 
 _capsules = list()
-_capsule_id = 0
 
 
 class Capsule:
@@ -16,11 +16,10 @@ class Capsule:
         :param destination_station: The destination station of the capsule (optional - Station)
         """
         global _capsules
-        global _capsule_id
-        self.id = _capsule_id
-        _capsule_id += 1
         _capsules.append(self)
 
+        self.uuid = identifier.generate_unique()
+        self.id = identifier.generate_capsule_id()
         self.current_element = None
         self.next_element = None
         self.loop = None
@@ -85,7 +84,6 @@ class Capsule:
         :return: Trip event generator
         """
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
-
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
         self.segment_ticks_duration = time_to_next_element * sim_loop.get_tick_per_second()
@@ -216,8 +214,5 @@ def reset_simulation():
     """
     This function will reset every capsules of the network
     """
-    global _capsules
-    global _capsule_id
-    _capsule_id = 0
     for capsule in _capsules:
         del capsule

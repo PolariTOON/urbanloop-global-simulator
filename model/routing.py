@@ -1,6 +1,3 @@
-#! /usr/bin/env python3
-# coding: utf-8
-
 import model.loop
 from settings import config
 
@@ -53,7 +50,8 @@ def dijkstra_route(switch, table, to_cover):
                             # print(distance)
                             table_temp[next_switch.my_loop.name] = [step[2],
                                                                     step[3] + distance,
-                                                                    step[4] + [next_switch.id, next_switch.my_loop.name]]
+                                                                    step[4] + [next_switch.id,
+                                                                               next_switch.my_loop.name]]
                             if next_switch.my_loop.name not in table_to_cover:
                                 table_to_cover[next_switch.my_loop.name] = [next_switch.id] + table_temp[
                                     next_switch.my_loop.name]
@@ -70,14 +68,14 @@ def dijkstra_route(switch, table, to_cover):
                             if next_switch.my_loop.name not in table_to_cover:
                                 table_to_cover[next_switch.other_loop.name] = [next_switch.id] + table_temp[
                                     next_switch.other_loop.name]
-                            else :
+                            else:
                                 # on regarde si c'est plus faible
                                 if table_temp[next_switch.other_loop.name][1] > table_to_cover[3]:
                                     table_to_cover[next_switch.other_loop.name] = [next_switch.id] + table_temp[
                                         next_switch.other_loop.name]
 
                 # else :
-                    # le calcul n'a pas à se faire maintenant
+                # le calcul n'a pas à se faire maintenant
     # print(table_temp)
     return table_temp
 

@@ -530,6 +530,10 @@ function initNetworkScene(networkLayer, infoLayer) {
 }
 
 function updateNetworkScene(networkLayer, infoLayer) {
+    $.get('/time.json', function (timeJSON) {
+        document.getElementById('time-span').innerHTML = timeJSON['time']
+    });
+
     $.get('/capsules.json', function (listCapsuleJSON) {
         listCapsuleJSON.forEach(function (capsuleJSON) {
             let targetCapsules = capsules.filter(capsule => capsule.id.includes(capsuleJSON['id']));

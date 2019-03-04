@@ -15,12 +15,10 @@ class Queue:
             return None
         return self.items.pop(0)
 
-    def put(self, item, test='caps'):
+    def put(self, item):
         if len(self.items) > 0 and type(self.items[0]) is not type(item):
-            print(test)
             return None
         if self._is_bounded and self._maxsize <= len(self.items) + 1:
-            print(test)
             return None
         return self.items.append(item)
 

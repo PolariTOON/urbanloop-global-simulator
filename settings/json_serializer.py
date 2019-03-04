@@ -1,9 +1,16 @@
 import math
 
 from model import switch
+from simulator import converter
 
 
 # CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
+
+def serialize_time():
+    return {
+        'time': converter.seconds_to_string(converter.now_to_seconds())
+    }
+
 
 def serialize_loop(loop):
     return {

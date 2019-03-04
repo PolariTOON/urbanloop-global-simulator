@@ -22,7 +22,7 @@ network.load(network_path)
 for name, l in ML.all_loops.items():
     logging.info("\t %s: circumference %d ; coordinates of the center : x = %d, y=%d ;" % (l.name, l.size, l.x, l.y))
     logging.debug("\t Stations : " + str([[st.name, st.id] for st in l.stations]))
-    logging.debug("\t  -- an object in the loop = [[nature, id, angle in the loop]] -- ")
+    logging.debug("\t  -- an object in the station = [[nature, objectId, angle in the station]] -- ")
     # objects est un attributs des loops qui contient la succession des éléments
     logging.debug("\t" + str([[o[0], o[1].id, o[2]] for o in l.objects]))
     for sw in l.switches:

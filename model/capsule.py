@@ -39,19 +39,19 @@ class Capsule:
 
     def ask_route(self, current_switch):
         """
-        Ask to the selected switch if the capsule should switch or not to another loop to reach its destination.
-        :param current_switch: The current switch which decide whether the capsule needs to go on another loop
+        Ask to the selectedObject switch if the capsule should switch or not to another station to reach its destination.
+        :param current_switch: The current switch which decide whether the capsule needs to go on another station
         """
         change = current_switch.route_capsule_to_station(self.destination)
         if change:
             self._change_loop(current_switch)
         else:
             self._continue()
-            simlog.info("Capsule %d stays on its loop" % self.id, self.loop)
+            simlog.info("Capsule %d stays on its station" % self.id, self.loop)
 
     def _continue(self):
         """
-        The capsule continues its road to the destination, on the same loop
+        The capsule continues its road to the destination, on the same station
         """
         simlog.debug("Capsule %d continues its trip" % self.id, self.next_element.name, self.current_element.name)
         self.current_element = self.next_element
@@ -63,11 +63,11 @@ class Capsule:
 
     def _change_loop(self, current_switch):
         """
-        The capsule goes to another loop to reach its destination
-        :param current_switch: The current switch which has decided to lead the capsule on another loop
+        The capsule goes to another station to reach its destination
+        :param current_switch: The current switch which has decided to lead the capsule on another station
         """
         self.current_element = current_switch
-        self.next_element = current_switch.next_element_other
+        self.next_element = current_switch
         self.loop = current_switch.other_loop
         simlog.info("Capsule %d is switched" % self.id, current_switch.my_loop, self.loop)
 
@@ -84,11 +84,10 @@ class Capsule:
         """
         :return: Trip event generator
         """
-        tmp_element = (None, self.current_element)[type(self.current_element) == switch.Switch]
-        dist_to_next_element = self.loop.dist_to_next_object(self.current_element, tmp_element)[0]
+        dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
-        self.segment_ticks_duration = 10 * time_to_next_element * sim_loop.get_tick_per_second()
+        self.segment_ticks_duration = time_to_next_element * sim_loop.get_tick_per_second()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
@@ -120,7 +119,7 @@ class Capsule:
     def end_trip(self):
         simlog.info("Capsule %d (%s) ends its trip" %
                     (self.id, self._get_capacity_state()), self.destination.name)
-        self.current_element.capsule_queue.put_nowait(self)
+        self.current_element.capsule_queue.put(self)
         self.destination = None
         simlog.debug(
             "%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
@@ -155,7 +154,7 @@ class Capsule:
         """
         :return: The segmentPercentage travelled by the capsule on the segment road from the previous to the next element
         """
-        if not self.is_aboard() or self.destination is None or self.segment_ticks_duration == 0:
+        if self.destination is None or self.segment_ticks_duration == 0:
             return 0
 
         return (sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration
@@ -167,7 +166,8 @@ class Capsule:
         """
         if len(self.travelers) == 1:
             return self.travelers[0].id
-        return " - ".join(map(lambda traveler: traveler.id, self.travelers))
+        # TODO DEBUG return " - ".join(map(lambda traveler: traveler.objectId, self.travelers))
+        return self.travelers[0].id
 
     def _get_capacity_state(self):
         """

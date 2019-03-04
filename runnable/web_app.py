@@ -1,20 +1,26 @@
+import logging
 import os
 from json import dumps
 from threading import Thread
 
 from flask import Flask, Response, redirect, url_for
 
-from model import capsule
 from model import loop
+from model import sim_record
 from model import station
 from model import switch
+from model import capsule
 from settings import json_serializer
 from settings import network
 from simulator import sim_loop
 
 web_directory = os.path.abspath('../resources/web')
 app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 sim_thread = None
+last_record = None
+is_network_loaded = False
 
 
 @app.route('/')
@@ -24,7 +30,16 @@ def root():
 
 @app.route('/load')  # TODO Add file parameter
 def load_network():
-    network.load(web=True)
+    global is_network_loaded
+    if not is_network_loaded:
+        is_network_loaded = True
+        network.load(web=True)
+    return redirect(url_for('root'))
+
+
+@app.route('/start')
+def start_simulation():
+    sim_loop.run_simulation(is_recorded=True)
     return redirect(url_for('root'))
 
 
@@ -48,20 +63,38 @@ def generate_switches_set_data_json():
     return Response(dumps(list_switches_set_data_json), mimetype="application/json")
 
 
+@app.route('/stationsVarData.json')
+def generate_stations_var_data_json():
+    if sim_record.is_empty():
+        return Response(mimetype="application/json")
+
+    list_stations_var_data_json = [json_serializer.serialize_station_var_data(a_station) for a_station in
+                                   last_record.stations]
+    return Response(dumps(list_stations_var_data_json), mimetype="application/json")
+
+
+@app.route('/switchesVarData.json')
+def generate_switches_var_data_json():
+    if sim_record.is_empty():
+        return Response(mimetype="application/json")
+
+    list_switches_var_data_json = [json_serializer.serialize_switch_var_data(a_switch) for a_switch in
+                                   last_record.switches]
+    return Response(dumps(list_switches_var_data_json), mimetype="application/json")
+
+
 @app.route('/capsules.json')
 def generate_capsules_json():
+    if sim_record.is_empty():
+        return Response(mimetype="application/json")
+
+    global last_record  # TODO remove after place in station var data
+    last_record = sim_record.get_record()
+
     list_capsules_json = [json_serializer.serialize_capsule(a_capsule) for a_capsule in
-                          capsule.get_capsules()]
+                          last_record.capsules]
+
     return Response(dumps(list_capsules_json), mimetype="application/json")
-
-
-@app.route('/start')
-def start():
-    global sim_thread
-    network.load()
-    sim_thread = Thread(target=sim_loop.run_simulation)
-    sim_thread.start()
-    return redirect(url_for('root'))
 
 
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ def promenade(c):
     logging.info("capsule n°%d start its trip from %s to %s" % (c.id, c.current_element.name, c.destination.name))
     while 1:
         current = c.current_element
-        # logging.debug("capsule n°%d goes through %s" % (c.id, str(current)))
+        # logging.debug("capsule n°%d goes through %s" % (c.objectId, str(current)))
         the_loop = c.loop
         dist, next_e = the_loop.dist_to_next_object(current)
         # logging.debug("si pas routée, next element = " + str(next_e))
@@ -53,7 +53,7 @@ def promenade(c):
                 d, c.next_element = the_loop.dist_to_next_object(c.current_element)
                 # simlog.debug(str(c.current_element))
 
-            # print(current.id, d, n)
+            # print(current.objectId, d, n)
 
 
 promenade(capsule)

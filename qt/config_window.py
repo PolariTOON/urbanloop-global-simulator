@@ -46,7 +46,7 @@ class ConfigWindows(QWidget):
         title = QLabel(" \n \t ROUTING")
         self.posit.addWidget(title, self.lign, 0)
         self.lign += 1
-        self.add_lign("cost added if changing loop", config.routing['switched_cost'], 'switched_cost')
+        self.add_lign("cost added if changing station", config.routing['switched_cost'], 'switched_cost')
         self.add_lign("timer to send 'alive' message", config.routing['my_timer'], 'my_timer')
         self.add_lign("timer to wait news from other switches", config.routing['timer_other'], 'timer_other')
         self.add_lign("maximum number of travelers", config.default['traveler_limit'], 'traveler_limit')

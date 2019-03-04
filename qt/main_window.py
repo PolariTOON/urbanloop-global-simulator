@@ -1,25 +1,23 @@
 #! /usr/bin/env python3
 # coding: utf-8
 import sys
+import threading as th
 from math import ceil
 from sys import path
-import threading as th
 from time import sleep, time
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QDesktopWidget, QAction, QFileDialog, QPushButton, QHBoxLayout, \
     QVBoxLayout, QLabel, QSplitter
-from PyQt5.QtCore import pyqtSignal as SIGNAL
 
 from model import sim_record
+from qt import config_window
+from qt.config_window import ConfigWindows
 from qt.data_widget import DataWidget
 from qt.simulator_widget import SimulatorWidget
 from settings import network, config, simlog
 from simulator import sim_loop as sim
-
-from qt.config_window import ConfigWindows
-from qt import config_window
 
 window = None
 config_sim = config.sim
@@ -143,7 +141,7 @@ class MainWindow(QMainWindow):
             Method called when menu button "Change configuration" is pressed
             """
             self.pause_button.click()
-            # simlog.debug("Configuration changing")
+            #  simlog.debug("Configuration changing")
             self.open_config_dialog()
 
         def reset_configuration():
@@ -199,7 +197,7 @@ class MainWindow(QMainWindow):
     def open_file_name_dialog(self):
         """
         Open a file dialog.
-        Return the selected file's path if it exists, else return None
+        Return the selectedObject file's path if it exists, else return None
         """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
@@ -214,7 +212,8 @@ class MainWindow(QMainWindow):
         :return: Change the configuration
         """
         self.conf_windows = ConfigWindows(self)
-        self.conf_windows.setWindowModality(Qt.ApplicationModal) # fenetre modale = pas touch à l'autre si elle n'est pas fermée
+        self.conf_windows.setWindowModality(
+            Qt.ApplicationModal)  # fenetre modale = pas touch à l'autre si elle n'est pas fermée
         self.conf_windows.show()
 
     def build_buttons(self):
@@ -248,7 +247,7 @@ class MainWindow(QMainWindow):
             sim.quit_endless_simulation()
             self.thd_run = None
             self.thd_refresh = None
-            #network.reload(self.path)
+            # network.reload(self.path)
 
         def on_play_button_pressed():
             """
@@ -265,7 +264,7 @@ class MainWindow(QMainWindow):
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             # start or resume simulation
             if self.thd_run == None:
-                self.thd_run = th.Thread(target=sim.run_simulation)
+                self.thd_run = th.Thread(target=sim.run_simulation, args=(None, True))
                 self.thd_run.start()
                 sleep(0.25)
 
@@ -280,7 +279,7 @@ class MainWindow(QMainWindow):
             self.state_label.setText(self.state_label.text().split(" : ")[0] + " : %s" % self.state)
             self.play_button.setDisabled(False)
             self.pause_button.setDisabled(True)
-            #TODO mettre en pause le simulateur aussi
+            # TODO mettre en pause le simulateur aussi
 
         def on_increase_button_pressed():
             """
@@ -373,7 +372,7 @@ class MainWindow(QMainWindow):
                 return
             start = time()
             rec = sim_record.get_record()
-            #simlog.debug("refreshing...  {0}".format(sim_record.records.qsize()))
+            # simlog.debug("refreshing...  {0}".format(sim_record.records.qsize()))
             self.refresh(rec)
             end = time()
             # simlog.debug("Execution time: %f secs" % (end - start))

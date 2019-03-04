@@ -14,8 +14,8 @@ class AscentGenerator:
             if not a_station.traveler_queue.empty() and not a_station.capsule_queue.empty() and self.can_generate():
                 if self.trip_limit != -1:
                     self.trip_limit -= 1
-                traveler = a_station.traveler_queue.get_nowait()
-                capsule = a_station.capsule_queue.get_nowait()
+                traveler = a_station.traveler_queue.get()
+                capsule = a_station.capsule_queue.get()
                 capsule.get_in_traveler(traveler=traveler)
                 yield sim_loop.get_env().process(ascent_event(capsule))
 

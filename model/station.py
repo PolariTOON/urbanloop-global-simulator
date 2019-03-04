@@ -1,8 +1,8 @@
-import queue
 import random
 from enum import Enum
 from math import floor
 
+from model import queue
 from model import capsule
 from settings import simlog
 
@@ -25,7 +25,7 @@ class Station:
         :param name: Name of the station
         :param capacity: Loop circumference (float)
         :param loop: Loop to which the station belongs
-        :param angle: Angle between the top of the loop and the position of the station - clockwise (float)
+        :param angle: Angle between the top of the station and the position of the station - clockwise (float)
         :param station_type: Type of station compared to its affluence (Enum)
         """
         global _station_id
@@ -52,7 +52,7 @@ class Station:
         :return: String
         """
         details = "Station name : " + self.name
-        details += "\nStation id : " + str(self.id)
+        details += "\nStation objectId : " + str(self.id)
         details += "\nLoop : " + self.loop.name
         details += "\nStation Type : "
         t = self.station_type
@@ -72,7 +72,7 @@ class Station:
             details += "Switch " + str(self.next_element.id)
         if self.capsule_queue.qsize() != 0:
             details += "\nCapsules (%d): " % self.capsule_queue.qsize()
-            l = list(self.capsule_queue.queue)
+            l = self.capsule_queue.list()
             for c in l:
                 details += "\n    Capsule #{0}".format(c.id)
         return details
@@ -89,7 +89,7 @@ class Station:
             return
 
         for capsule_index in range(qsize):
-            a_capsule = self.capsule_queue.get_nowait()
+            a_capsule = self.capsule_queue.get()
             if not a_capsule.is_aboard():
                 if destination is None:
                     destination = get_almost_empty_station(self)
@@ -100,7 +100,7 @@ class Station:
                 a_capsule.start_trip()
                 return
             else:
-                self.capsule_queue.put_nowait(a_capsule)
+                self.capsule_queue.put(a_capsule)
 
     def complete(self):
         """

@@ -29,7 +29,7 @@ class SimulatorWidget(QWidget):
         @param:data_widget if the widget where setData of the self.selected_item is displayed
         """
         self.data_widget = data_widget
-        # at start, nothing is selected
+        # at start, nothing is selectedObject
         self.selected_item = None
         # creating widget
         QWidget.__init__(self)
@@ -58,10 +58,10 @@ class SimulatorWidget(QWidget):
         x_offsets = []
         y_offsets = []
         for name in loops:
-            loop = ML.get_by_name(name)
-            loop_r = loop.size / 2 / pi
-            x_offsets.append(loop_r - loop.x)
-            y_offsets.append(loop_r - loop.y)
+            station = ML.get_by_name(name)
+            loop_r = station.size / 2 / pi
+            x_offsets.append(loop_r - station.x)
+            y_offsets.append(loop_r - station.y)
         print(x_offsets, y_offsets)
         x_offset = max(x_offsets)
         y_offset = max(y_offsets)
@@ -107,10 +107,10 @@ class SimulatorWidget(QWidget):
                     self.data_widget.refresh(item)
                     self.refresh()
                     return
-                # if you get here, click did not happened on something on this loop
-            # computing if click happened inside a loop
+                # if you get here, click did not happened on something on this station
+            # computing if click happened inside a station
             if (x - loop.x) ** 2 + (y - loop.y) ** 2 <= loop_r ** 2:
-                # click happened inside loop
+                # click happened inside station
                 self.selected_item = loop
                 self.data_widget.refresh(loop)
                 self.refresh()

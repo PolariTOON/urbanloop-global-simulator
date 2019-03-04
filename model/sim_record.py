@@ -1,21 +1,23 @@
 import copy
-import queue
 
+from model import queue
 from model import capsule
 from model import station
+from model import switch
 from settings import config
 from settings import simlog
 from simulator import sim_loop
 
 records = queue.Queue()
 _limit = int(config.sim['default_record_size'])
-_offset = 5
+_offset = 0
 
 
 class SimRecord:
     def __init__(self):
-        self.stations = copy.copy(station.get_stations())
-        self.capsules = copy.copy(capsule.get_capsules())
+        self.stations = copy.deepcopy(station.get_stations())
+        self.switches = copy.deepcopy(switch.get_switches())
+        self.capsules = copy.deepcopy(capsule.get_capsules())
 
 
 def change_queue_size(limit=_limit):
@@ -41,7 +43,7 @@ def put_record():
     """
     Put a new record of the simulation in the record queue. If the limit is reached, the simulation is paused.
     """
-    records.put_nowait(SimRecord())
+    records.put(SimRecord())
 
     if records.qsize() >= _limit:
         sim_loop.pause_simulation()
@@ -52,7 +54,7 @@ def get_record():
     Get a record of the simulation from the record queue. If the simulation was paused and the record queue is
     mid-empty, the simulation will restart in order to refill the record queue.
     """
-    if records.empty():
+    if is_empty():
         simlog.error("The record queue is empty, impossible to get any")
         return None
 
@@ -61,7 +63,11 @@ def get_record():
 
     record = None
     for i in range(_offset + 1):
-        record = records.get_nowait()
-        if records.empty():
+        record = records.get()
+        if is_empty:
             return record
     return record
+
+
+def is_empty():
+    return records.empty()

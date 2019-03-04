@@ -17,4 +17,4 @@ class Traveler:
         self.departure_station = departure_station
         self.destination_station = destination_station
         self.waiting_since = waiting_since
-        self.departure_station.traveler_queue.put_nowait(self)
+        self.departure_station.traveler_queue.put(self, test='trav')

@@ -30,7 +30,7 @@ class NetworkRenderer:
         paint.begin(self.root.image)
         paint.setRenderHint(QPainter.Antialiasing)
         for name in ML.all_loops:
-            loop = self.draw_loop(name, paint) # draw every loop
+            loop = self.draw_loop(name, paint) # draw every station
             self.fill_loop(loop, paint) # and fill it
         join_loops(paint) # them join loops between themselves
         self.draw_capsules(paint) # finally draw capsules
@@ -39,7 +39,7 @@ class NetworkRenderer:
     
     def draw_loop(self, name, paint):
         """
-        Draw an empty loop and its name with @param:paint
+        Draw an empty station and its name with @param:paint
         """
         loop = ML.get_by_name(name)
         paint.setBrush(
@@ -47,14 +47,14 @@ class NetworkRenderer:
         paint.drawEllipse(get_rect_for_loop(loop, 0))
         paint.setBrush(QColor("white"))
         paint.drawEllipse(get_rect_for_loop(loop, int(config["loop_outline_width"])))
-        # display loop's name
+        # display station's name
         paint.setBrush(QColor("black"))
         paint.drawText(loop.x - len(name) / 2 * 8, loop.y, name)
         return loop
 
     def fill_loop(self, loop, paint):
         """
-        Draw every switch and station which belong to @param:loop with @param;paint
+        Draw every switch and station which belong to @param:station with @param;paint
         """
         if self.record != None:
             self.modify_loop(loop, paint)
@@ -81,7 +81,7 @@ class NetworkRenderer:
                     offset = int(config["station_width"]) / 1.3
                     tx = int(station_pos[0] + offset * cos(a))
                     ty = int(station_pos[1] + offset * sin(a))
-                    paint.drawText(tx, ty, "{0}".format(len(item.capsule_queue.queue)))
+                    paint.drawText(tx, ty, "{0}".format(item.capsule_queue.qsize()))
 
     def modify_loop(self, loop, paint):
         """
@@ -153,7 +153,7 @@ def join_loops(paint):
 
 def get_rect_for_loop(loop, i):
     """
-    Return the rect in which @param loop will be displayed
+    Return the rect in which @param station will be displayed
     @param i is an absolute offset
     """
     x = loop.x
@@ -167,12 +167,12 @@ def get_rect_for_loop(loop, i):
 
 def get_rect_for_item(item, loop, i, item_type=None):
     """
-    Return the rect in which @param:item will be displayed, relatively the the @param:loop
+    Return the rect in which @param:item will be displayed, relatively the the @param:station
     @param:i is an absolute offset
     @param:item_type is useful for switches (_out or _in)
     """
     is_station = isinstance(item, MST.Station)
-    # loop
+    # station
     xl = loop.x
     yl = loop.y
     dl = loop.size / pi
@@ -214,13 +214,13 @@ def get_line_for_switch(switch):
     """
     Return the QLine to join two loops between @param:switch in/out
     """
-    # first loop
+    # first station
     r = switch.my_loop.size / 2 / pi
     a = switch.angle_my_loop + 90
     a *= 2 * pi / 360
     x1 = switch.my_loop.x - cos(a) * r
     y1 = switch.my_loop.y - sin(a) * r
-    # second loop
+    # second station
     r = switch.other_loop.size / 2 / pi
     a = switch.angle_other_loop + 90
     a *= 2 * pi / 360

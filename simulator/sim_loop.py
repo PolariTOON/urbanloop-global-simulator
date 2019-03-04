@@ -1,6 +1,7 @@
+import threading as th
 from enum import Enum
 
-import simpy, threading as th
+import simpy
 
 from model import capsule
 from model import sim_record
@@ -28,7 +29,7 @@ _endless_quit_event = None
 
 
 class SimLoop:
-    def __init__(self):
+    def __init__(self, is_recorded=False):
         global _env
         global _sim_state
         global _sim_tick
@@ -41,13 +42,11 @@ class SimLoop:
         self.ascent_generator = ascent_generator.AscentGenerator()
         self.tick_event = _env.event()
         self.is_endless = False
-        self.is_recorded = False
+        self.is_recorded = is_recorded
         _endless_quit_event = _env.event()
 
         if config.sim['endless'] in ['true', 'True']:
             self.is_endless = True
-        if config.sim['recorded'] in ['true', 'True']:
-            self.is_recorded = True
 
     def tick(self):
         """
@@ -62,7 +61,7 @@ class SimLoop:
 
     def loop(self):
         """
-        This function is the main process loop of the simulation.
+        This function is the main process station of the simulation.
         You can create several independents process while the
         SimState is RUNNING.
         """
@@ -77,7 +76,7 @@ class SimLoop:
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
 
-                if is_frequency(120):
+                if not _current_tick == 0 and is_frequency(120):
                     station.drain_all()
 
                 if self.is_recorded:
@@ -90,7 +89,7 @@ class SimLoop:
 
 def _process_loop(sim_loop):
     """
-    This function processes the loop function of the sim_loop instance on the simulation environment _env
+    This function processes the station function of the sim_loop instance on the simulation environment _env
     :param sim_loop: The sim_loop instance
     """
     global _env
@@ -153,14 +152,14 @@ def change_state(sim_state=SimState.RUNNING):
     _sim_state = sim_state
 
 
-def run_simulation(sim_loop=None):
+def run_simulation(sim_loop=None, is_recorded=False):
     """
     Run the simulation with the loop_process
     """
     global _env
 
     if sim_loop is None:
-        sim_loop = SimLoop()
+        sim_loop = SimLoop(is_recorded=is_recorded)
 
     _process_loop(sim_loop)
 
@@ -193,7 +192,7 @@ def pause_simulation():
     change_state(SimState.PAUSED)
 
 
-def stop_simulation():
+def stop_simulation():  # TODO Make switch case to quit simulation if it's endless
     """
     Stop the simulation definitely. All capsules or stations are reset
     """
@@ -203,7 +202,7 @@ def stop_simulation():
     change_state(SimState.KILLED)
 
 
-def reset_simulation():
+def reset_simulation():  # TODO Make possible to reset simulation from graphic interface
     """
     Reset the current simulation at
     """
@@ -235,11 +234,11 @@ def get_current_tick():
     return _current_tick
 
 
-def get_state():
+def is_running():
     """
-    :return: The simulation state
+    :return: True if the simulation is currently started
     """
-    return _sim_state
+    return _sim_state == SimState.RUNNING
 
 
 def is_paused():

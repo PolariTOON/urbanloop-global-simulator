@@ -2,6 +2,7 @@
 # coding: utf-8
 from settings import simlog
 
+_loop_id = 0
 all_loops = {}
 default_size = 100
 
@@ -9,14 +10,17 @@ default_size = 100
 class Loop:
     def __init__(self, name, size=default_size, coordinates=None):
         """
-        initialisation d'une loop
+        initialisation d'une station
         :param name : Nom de la boucle /!\ fait office d'identifiant (String) OBLIGATOIRE
         :param size : Circonference de la boucle (float)
         :param coordinates : tableau des coordonees sous la forme [x,y] ([float, float])
         :return:0UT : un objet Loop (Loop)
         """
+        global _loop_id
+        self.id = _loop_id
+        _loop_id += 1
         self.name = name
-        simlog.info("Create loop " + self.name)
+        simlog.info("Create station " + self.name)
         if coordinates is not None:
             self.x = coordinates[0]
             self.y = coordinates[1]
@@ -49,6 +53,21 @@ class Loop:
             self.lengths += [float(angle_next / 360) * self.size]  # arc = 2*D*pi*angle/360  et D = circonference/pi
             if self.size is None:
                 self.size = sum(self.lengths)
+
+    def distance_between(self, element1, element2):
+        for i in range(len(self.objects)):
+            element = self.objects[i][1]
+            if element is element1:
+                if element is element2:
+                    return element.size
+                distance = 0
+                for j in range(i + 1, len(self.objects) + i + 1):
+                    index = j % len(self.objects)
+                    element = self.objects[index][1]
+                    distance += self.lengths[index-1]
+                    if element is element2:
+                        return distance
+        return 0
 
     def dist_to_next_object(self, element, element2=None):
         """
@@ -97,7 +116,7 @@ class Loop:
 
 def get_by_name(search_name):
     """
-    cette fonction indépendante d'une boucle permet de récupérer un objet loop en ne connaissant que son nom
+    cette fonction indépendante d'une boucle permet de récupérer un objet station en ne connaissant que son nom
         :param  search_name : le nom de la boucle cherchée (String) OBLIGATOIRE
         :return: 0UT : la Loop (si elle existe) ayant le nom voulu (Loop)
     """

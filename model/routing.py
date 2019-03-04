@@ -14,10 +14,10 @@ def dijkstra_route(switch, table, to_cover):
         :param  switch : switch auquel est rataché la table (Switch) OBLIGATOIRE
         :param  table : état actuel de la table a recalculer contenant pour chaque boucle son nom, le fait qu'il faille
                         ou non switcher, le cout du chemin, un tableau du chemin
-                        (Dictionnary : {string : [bool, float, [id/String]]}) OBLIGATOIRE
+                        (Dictionnary : {string : [bool, float, [objectId/String]]}) OBLIGATOIRE
         :param  to_cover : le reste des boucle à explorer au format {boucle : ID aiguillage d'arrivée} ({String:int}
                         OBLIGATOIRE
-        :return: 0UT : la table (re)calculée ({string : [bool, float, [id/String]]})
+        :return: 0UT : la table (re)calculée ({string : [bool, float, [objectId/String]]})
     """
     table_temp = table
     table_to_cover = {}
@@ -27,15 +27,15 @@ def dijkstra_route(switch, table, to_cover):
 
     # on veut calculer tous les chemins
     while table_to_cover != {}:
-        # print(switch.id, table_to_cover)
-        # on récupère dans step la table vers la loop qu'il reste à visiter avec le cout le plus faible
+        # print(switch.objectId, table_to_cover)
+        # on récupère dans step la table vers la station qu'il reste à visiter avec le cout le plus faible
         step = []
         min_cost = float('Inf')
         for l, t in table_to_cover.items():
             if t[2] < min_cost:
                 step = [l] + t
                 min_cost = t[2]
-        # format de step : ['loop XX', switch_id, to_switch, cost, [path]]
+        # format de step : ['station XX', switch_id, to_switch, cost, [path]]
         del table_to_cover[step[0]]
 
         # on ajoute la découverte à la table

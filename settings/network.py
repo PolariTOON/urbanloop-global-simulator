@@ -109,7 +109,7 @@ def load(file_path=None, web=False):
         r = np.random.randint(nb_st)
         arrivee = st.get_station_by_id(r)
         Traveler(departure.name, arrivee.name, 0)
-        departure.capsule_queue.put_nowait(Capsule(departure))
+        departure.capsule_queue.put(Capsule(departure))
         '''
     for station in model_station.get_stations():
         for i in range(station.capacity):
@@ -117,7 +117,7 @@ def load(file_path=None, web=False):
                 # creating capsules
                 caps = model_capsule.Capsule(departure_station=station)
                 # adding capsules to station
-                station.capsule_queue.put_nowait(caps)
+                station.capsule_queue.put(caps)
     # print("load done")
     return
 
@@ -157,12 +157,12 @@ def search_previous_station(elements, i):
             return e
 
 
-def search_next_switch(elements, i, loop):
+def search_next_switch(elements, i, station):
     """
     recherche le premier switch "out" après un élément parmis les éléments dans une boucle
         :param  elements: liste des objets sur la boucle ([Stations/Switchs])
         :param  i: indice de l'élément dont on cherche la station précédente (int)
-        :param  loop: boucle dans laquelle on cherche (il faut que le switch soit dans la boucle et non pas que ce
+        :param  station: boucle dans laquelle on cherche (il faut que le switch soit dans la boucle et non pas que ce
                         soit un switch qui aiguille vers cette boucle) (Loop)
         :return: le switch suivant qui aiguille depuis la boucle choisie (Switch)
     """
@@ -170,6 +170,6 @@ def search_next_switch(elements, i, loop):
     for index in range(length):
         e = elements[(index + i) % length]
         if type(e) == Switch:
-            if e.my_loop == loop:
+            if e.my_loop == station:
                 return e
 '''

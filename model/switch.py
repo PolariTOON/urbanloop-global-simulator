@@ -24,9 +24,9 @@ class Switch:
         initialisation d'un aiguillage
         :param  loop : boucle où le switch est présent (Loop)
         :param  other_loop : boucle aiguillée (Loop)
-        :param  previous_element : l'element avant le switch de la loop où le switch est (Station/Switch)
-        :param  next_element : la station après le switch sur la loop où le switch est (Station/Switch)
-        :param  next_element_other : la station après le switch sur la loop aiguillée (Station/Switch)
+        :param  previous_element : l'element avant le switch de la station où le switch est (Station/Switch)
+        :param  next_element : la station après le switch sur la station où le switch est (Station/Switch)
+        :param  next_element_other : la station après le switch sur la station aiguillée (Station/Switch)
         :param  size : la taille de l'aiguillage
         :return: 0UT : un objet aiguillage (Switch)
         """
@@ -61,16 +61,16 @@ class Switch:
         """
         la fonction qu'une capsule déclenche lorsqu'elle arrive sur le switch et souhaite être routée
             :param  station: la station de destination vers laquelle la capsule souhaite aller (Station) OBLIGATOIRE
-            :return: OUT : True si la capsule doit changer de loop, False sinon (boolean)
+            :return: OUT : True si la capsule doit changer de station, False sinon (boolean)
             """
         the_loop = station.loop
         return self.table[the_loop.name][0]
         # if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
-        #     simlog.debug("le switch " + str(self.id) + " aiguille la capsule voulant aller à " + station.name
+        #     simlog.debug("le switch " + str(self.objectId) + " aiguille la capsule voulant aller à " + station.name
         #                  + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
         #     return True
         # else:
-        #      simlog.debug("le switch " + str(self.id) + " laisse la capsule voulant aller à " + station.name
+        #      simlog.debug("le switch " + str(self.objectId) + " laisse la capsule voulant aller à " + station.name
         #                   + " sur la boucle " + self.my_loop.name)
         #      return False
 
@@ -102,7 +102,7 @@ class Switch:
         elif the_loop is self.other_loop:
             return False
         else:
-            simlog.error("The switch %d is not in the loop %s" % (str(self.id), the_loop.name))
+            simlog.error("The switch %d is not in the station %s" % (str(self.id), the_loop.name))
 
 
 def init():
@@ -133,7 +133,7 @@ def update():
     for s in _switches:
         # if s.is_routing_to_loop:
         info = model.routing.update_switch(s)
-        # maj des timers suivant info
+        # maj des timers suivant infoIn
         if info == "alive":
             alive_timers[s.id] = [0, 0]
         elif info is None:

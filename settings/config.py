@@ -37,4 +37,4 @@ def load(file_name):
 
 
 if loaded is False:
-    load('{0}/../resources/default_config.ini'.format(sys.path[0]))
+    load('{0}/../resources/config.ini'.format(sys.path[0]))

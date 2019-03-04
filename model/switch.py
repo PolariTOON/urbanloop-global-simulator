@@ -34,6 +34,7 @@ class Switch:
         self.id = switch_id
         switch_id += 1
         self.my_loop = loop
+        self.loop = self.my_loop
         self.angle = angle
         self.last_element = previous_element
         self.next_element = next_element
@@ -153,3 +154,27 @@ def get_switches():
     :return: All switches of the network
     """
     return _switches
+
+
+def cost_between(element1, element2):
+    boucle1 = element1.loop
+    boucle2 = element2.loop
+    if boucle1 is boucle2:
+        return boucle1.distance_between(element1, element2)
+    # aller au premier switch sur boucle1
+    cost = float('inf')
+    switch = None
+    for cand_switch in boucle1.switches:
+        d = boucle1.distance_between(element1, cand_switch)
+        if d < cost:
+            switch = cand_switch
+            cost = d
+    # ajout du cout de routage jusqu'à la boucle2
+    cost += switch.table[boucle2.name][1]
+    # trajet entre le switch in de fin et l'élément2
+    last_switch = switch.table[boucle2.name][2][len(switch.table[boucle2.name][2])-1]
+    for s in _switches:
+        if s.id == last_switch :
+            last_switch = s
+    cost += boucle2.distance_between(s, element2)
+    return cost

@@ -31,6 +31,7 @@ class ConfigWindows(QWidget):
         self.posit.addWidget(title, self.lign, 0)
         self.lign += 1
         self.add_lign("travelers per day", config.default['travelers_per_day'], 'travelers_per_day')
+        self.add_lign("number of capsules in the network", config.default['number_of_capsules'], 'number_of_capsules')
         self.add_lign("maximum number of trips", config.default['trip_limit'], 'trip_limit')
         self.add_lign("maximum number of travelers", config.default['traveler_limit'], 'traveler_limit')
         self.add_lign("average time of descent and ascent", config.capsule['ascent_descent_duration'], 'ascent_descent_duration')

@@ -17,6 +17,7 @@
                 {"type":"station","name":"Velodrome", "angle":90, "station_type": 3, "capacity": 5},
                 {"type":"station","name":"TELECOM Nancy", "angle":140, "station_type": 1, "capacity": 4},
                 {"type":"station","name":"Eglise", "angle":225, "station_type": 2, "capacity": 3},
+                {"type":"warehouse", "angle":250, "capacity": 50},
                 {"type":"switch_out","other_loop":"Laxou", "length": 60, "angle":310}
     ]
   },
@@ -27,7 +28,8 @@
                 {"type":"switch_in","other_loop":"Nancy", "angle":150 },
                 {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":210 },
                 {"type":"station","name":"Auchan", "angle":270, "station_type": 1, "capacity": 3},
-                {"type":"station","name":"Sapiniere", "angle":340, "station_type": 2, "capacity": 3}
+                {"type":"station","name":"Sapiniere", "angle":340, "station_type": 2, "capacity": 3},
+                {"type":"warehouse", "angle":2, "capacity": 1000}
     ]
   }
 }

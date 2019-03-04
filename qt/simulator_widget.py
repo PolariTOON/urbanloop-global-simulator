@@ -58,7 +58,7 @@ class SimulatorWidget(QWidget):
         x_offsets = []
         y_offsets = []
         for name in loops:
-            station = ML.get_by_name(name)
+            station = model_loop.get_by_name(name)
             loop_r = station.size / 2 / pi
             x_offsets.append(loop_r - station.x)
             y_offsets.append(loop_r - station.y)

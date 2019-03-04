@@ -4,8 +4,8 @@ let stage = new Konva.Stage({
     height: networkDiv.offsetHeight
 });
 
-let networkLayer = new Konva.Layer();
-let infoLayer = new Konva.Layer();
+networkLayer = new Konva.Layer();
+infoLayer = new Konva.Layer();
 
 function clearScene() {
     if (stage.getLayer() === null) {
@@ -23,11 +23,11 @@ function applyNetworkScene() {
     stage.add(infoLayer);
 }
 
-initNetworkScene(networkLayer, infoLayer);
-applyNetworkScene(networkLayer);
+initNetworkScene();
+applyNetworkScene();
 
 setInterval(() => {
-    updateNetworkScene(networkLayer, infoLayer);
+    updateNetworkScene();
 }, 50);
 
 

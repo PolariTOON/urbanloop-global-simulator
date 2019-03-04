@@ -1,8 +1,17 @@
 let networkDiv = document.getElementById('network-div');
 
+let networkLayer;
+let infoLayer;
+
 let selectedObject = undefined;
 let capsules;
 
+const loopColor = 'rgb(156, 156, 156)';
+const loopSelectedColor = 'rgb(255, 200, 20)';
+const stationColor = 'rgb(40, 40, 200)';
+const stationSelectedColor = 'rgb(255, 200, 20)';
+const switchColor = 'rgb(200, 40, 40)';
+const switchSelectedColor = 'rgb(255, 200, 20)';
 const capsuleInnerEmptyColor = 'rgb(173, 72, 45)';
 const capsuleOuterEmptyColor = 'rgb(255, 100, 63)';
 const capsuleInnerAboardColor = 'rgb(96, 167, 27)';
@@ -11,43 +20,33 @@ const capsuleInnerSelectedColor = 'rgb(255, 200, 20)';
 const capsuleOuterSelectedColor = 'rgb(255, 234, 87)';
 
 class Loop {
-    constructor(loopJSON, networkLayer, loopWidth = 4, strokeWidth = 2) {
+    constructor(loopJSON, loopWidth = 6, strokeWidth = 2) {
+        this.json = loopJSON;
+        this.uuid = loopJSON['uuid'];
+        this.id = loopJSON['id'];
+
         let x = loopJSON['x'];
         let y = networkDiv.offsetHeight - loopJSON['y'];
         let semiWidth = Math.floor(loopWidth / 2);
 
-        this.json = loopJSON;
-        this.networkLayer = networkLayer;
-        this.id = 'loop:' + loopJSON['id'];
-        this.color = 'rgb(156, 156, 156)';
-        this.selectedColor = 'rgb(255, 200, 20)';
-
-        this.background = new Konva.Circle({
+        this.innerCircle = new Konva.Circle({
+            name: this.uuid,
             x: x,
             y: y,
-            radius: loopJSON['radius'],
-            fill: 'white'
-        });
-
-        this.loop = new Konva.Arc({
-            name: this.id,
-            x: x,
-            y: y,
-            innerRadius: loopJSON['radius'] - semiWidth,
-            outerRadius: loopJSON['radius'] + semiWidth,
-            fill: this.color,
-            angle: 360
-        });
-
-        this.stroke = new Konva.Arc({
-            name: this.id,
-            x: x,
-            y: y,
-            innerRadius: loopJSON['radius'] - semiWidth - Math.floor(strokeWidth / 2),
-            outerRadius: loopJSON['radius'] + semiWidth + Math.floor(strokeWidth / 2),
+            radius: loopJSON['radius'] - semiWidth,
+            fill: 'white',
             stroke: 'black',
-            strokeWidth: strokeWidth,
-            angle: 360
+            strokeWidth: strokeWidth
+        });
+
+        this.outerCircle = new Konva.Circle({
+            name: this.uuid,
+            x: x,
+            y: y,
+            radius: loopJSON['radius'] + semiWidth,
+            fill: loopColor,
+            stroke: 'black',
+            strokeWidth: strokeWidth
         });
 
         this.text = new Konva.Text({
@@ -62,34 +61,11 @@ class Loop {
         this.text.offsetX(this.text.width() / 2);
         this.text.offsetY(this.text.height() / 2);
 
-        this.loop.on('mousedown', () => {
-            this.select();
-        });
+        initBehaviors(this, this.innerCircle, this.outerCircle);
 
-        this.stroke.on('mousedown', () => {
-            this.select();
-        });
-
-        this.loop.on('mouseover', () => {
-            handCursor();
-        });
-
-        this.stroke.on('mouseover', () => {
-            handCursor();
-        });
-
-        this.loop.on('mouseout', () => {
-            resetCursor();
-        });
-
-        this.stroke.on('mouseout', () => {
-            resetCursor();
-        });
-
-        this.networkLayer.add(this.background);
-        this.networkLayer.add(this.text);
-        this.networkLayer.add(this.stroke);
-        this.networkLayer.add(this.loop);
+        networkLayer.add(this.outerCircle);
+        networkLayer.add(this.innerCircle);
+        networkLayer.add(this.text);
     }
 
     select() {
@@ -98,33 +74,31 @@ class Loop {
         }
 
         selectedObject = this;
-        this.loop.fill(this.selectedColor);
-        this.networkLayer.batchDraw();
+        this.outerCircle.fill(loopSelectedColor);
+        networkLayer.batchDraw();
     }
 
     unselect() {
         if (selectedObject === this) {
             selectedObject = undefined;
         }
-        this.loop.fill(this.color);
-        this.networkLayer.batchDraw();
+        this.outerCircle.fill(loopColor);
+        networkLayer.batchDraw();
     }
 }
 
 class Station {
-    constructor(stationJSON, networkLayer, infoLayer, stationRadius = 12, stationWidth = 4) {
+    constructor(stationJSON, stationRadius = 12, stationWidth = 4) {
+        this.json = stationJSON;
+        this.uuid = stationJSON['uuid'];
+        this.id = stationJSON['id'];
+
         let x = stationJSON['x'];
         let y = networkDiv.offsetHeight - stationJSON['y'];
         let semiWidth = Math.floor(stationWidth / 2);
 
-        this.json = stationJSON;
-        this.networkLayer = networkLayer;
-        this.infoLayer = infoLayer;
-        this.id = 'station:' + stationJSON['id'];
-        this.color = 'rgb(40, 40, 200)';
-        this.selectedColor = 'rgb(255, 200, 20)';
-
         this.innerCircle = new Konva.Circle({
+            name: this.uuid,
             x: x,
             y: y,
             radius: stationRadius - semiWidth,
@@ -134,11 +108,11 @@ class Station {
         });
 
         this.outerCircle = new Konva.Circle({
-            name: this.id,
+            name: this.uuid,
             x: x,
             y: y,
             radius: stationRadius + semiWidth,
-            fill: this.color,
+            fill: stationColor,
             stroke: 'black',
             strokeWidth: 0.3,
         });
@@ -175,25 +149,11 @@ class Station {
             })
         );
 
-        this.outerCircle.on('mousedown', () => {
-            this.select();
-        });
+        initBehaviors(this, this.innerCircle, this.outerCircle, this.info);
 
-        this.outerCircle.on('mouseover', () => {
-            handCursor();
-            this.info.show();
-            this.infoLayer.batchDraw();
-        });
-
-        this.outerCircle.on('mouseout', () => {
-            resetCursor();
-            this.info.hide();
-            this.infoLayer.batchDraw();
-        });
-
-        this.networkLayer.add(this.outerCircle);
-        this.networkLayer.add(this.innerCircle);
-        this.infoLayer.add(this.info);
+        networkLayer.add(this.outerCircle);
+        networkLayer.add(this.innerCircle);
+        infoLayer.add(this.info);
     }
 
     select() {
@@ -202,33 +162,30 @@ class Station {
         }
 
         selectedObject = this;
-        this.outerCircle.fill(this.selectedColor);
-        this.networkLayer.batchDraw();
+        this.outerCircle.fill(stationSelectedColor);
+        networkLayer.batchDraw();
     }
 
     unselect() {
         if (selectedObject === this) {
             selectedObject = undefined;
         }
-        this.outerCircle.fill(this.color);
-        this.networkLayer.batchDraw();
+        this.outerCircle.fill(stationColor);
+        networkLayer.batchDraw();
     }
 }
 
 class Switch {
-    constructor(switchJSON, networkLayer, infoLayer, switchRadius = 12, switchWidth = 4) {
+    constructor(switchJSON, switchRadius = 12, switchWidth = 4) {
+        this.json = switchJSON;
+        this.uuid = switchJSON['uuid'];
+        this.id = switchJSON['id'];
+
         let xIn = switchJSON['xIn'];
         let yIn = networkDiv.offsetHeight - switchJSON['yIn'];
         let xOut = switchJSON['xOut'];
         let yOut = networkDiv.offsetHeight - switchJSON['yOut'];
         let semiWidth = Math.floor(switchWidth / 2);
-
-        this.json = switchJSON;
-        this.networkLayer = networkLayer;
-        this.infoLayer = infoLayer;
-        this.id = 'switch:' + switchJSON['id'];
-        this.color = 'rgb(200, 40, 40)';
-        this.selectedColor = 'rgb(255, 200, 20)';
 
         this.innerInCircle = new Konva.Circle({
             x: xIn,
@@ -240,11 +197,11 @@ class Switch {
         });
 
         this.outerInCircle = new Konva.Circle({
-            name: this.id,
+            name: this.uuid,
             x: xIn,
             y: yIn,
             radius: switchRadius + semiWidth,
-            fill: this.color,
+            fill: switchColor,
             stroke: 'black',
             strokeWidth: 0.3,
         });
@@ -259,11 +216,11 @@ class Switch {
         });
 
         this.outerOutCircle = new Konva.Circle({
-            name: this.id,
+            name: this.uuid,
             x: xOut,
             y: yOut,
             radius: switchRadius + semiWidth,
-            fill: this.color,
+            fill: switchColor,
             stroke: 'black',
             strokeWidth: 0.3,
         });
@@ -343,46 +300,17 @@ class Switch {
             })
         );
 
-        this.outerInCircle.on('mousedown', () => {
-            this.select();
-        });
+        initBehaviors(this, this.innerInCircle, this.outerInCircle, this.infoIn);
+        initBehaviors(this, this.innerOutCircle, this.outerOutCircle, this.infoOut);
 
-        this.outerOutCircle.on('mousedown', () => {
-            this.select();
-        });
-
-        this.outerInCircle.on('mouseover', () => {
-            handCursor();
-            this.infoIn.show();
-            this.infoLayer.batchDraw();
-        });
-
-        this.outerOutCircle.on('mouseover', () => {
-            handCursor();
-            this.infoOut.show();
-            this.infoLayer.batchDraw();
-        });
-
-        this.outerInCircle.on('mouseout', () => {
-            resetCursor();
-            this.infoIn.hide();
-            this.infoLayer.batchDraw();
-        });
-
-        this.outerOutCircle.on('mouseout', () => {
-            resetCursor();
-            this.infoOut.hide();
-            this.infoLayer.batchDraw();
-        });
-
-        this.networkLayer.add(this.arrow);
-        this.networkLayer.add(this.link);
-        this.networkLayer.add(this.outerInCircle);
-        this.networkLayer.add(this.innerInCircle);
-        this.networkLayer.add(this.outerOutCircle);
-        this.networkLayer.add(this.innerOutCircle);
-        this.infoLayer.add(this.infoIn);
-        this.infoLayer.add(this.infoOut);
+        networkLayer.add(this.arrow);
+        networkLayer.add(this.link);
+        networkLayer.add(this.outerInCircle);
+        networkLayer.add(this.innerInCircle);
+        networkLayer.add(this.outerOutCircle);
+        networkLayer.add(this.innerOutCircle);
+        infoLayer.add(this.infoIn);
+        infoLayer.add(this.infoOut);
     }
 
     select() {
@@ -391,11 +319,11 @@ class Switch {
         }
 
         selectedObject = this;
-        this.arrow.stroke(this.selectedColor);
-        this.arrow.fill(this.selectedColor);
-        this.outerInCircle.fill(this.selectedColor);
-        this.outerOutCircle.fill(this.selectedColor);
-        this.networkLayer.batchDraw();
+        this.arrow.stroke(switchSelectedColor);
+        this.arrow.fill(switchSelectedColor);
+        this.outerInCircle.fill(switchSelectedColor);
+        this.outerOutCircle.fill(switchSelectedColor);
+        networkLayer.batchDraw();
     }
 
     unselect() {
@@ -404,40 +332,33 @@ class Switch {
         }
         this.arrow.stroke('black');
         this.arrow.fill('black');
-        this.outerInCircle.fill(this.color);
-        this.outerOutCircle.fill(this.color);
-        this.networkLayer.batchDraw();
+        this.outerInCircle.fill(switchColor);
+        this.outerOutCircle.fill(switchColor);
+        networkLayer.batchDraw();
     }
 }
 
 class Capsule {
-    constructor(capsuleJSON, networkLayer, infoLayer, capsuleWidth = 5) {
-        this.networkLayer = networkLayer;
-        this.infoLayer = infoLayer;
-
+    constructor(capsuleJSON, capsuleWidth = 5) {
         this.json = capsuleJSON;
-        this.id = 'capsule:' + capsuleJSON['id'];
+        this.uuid = capsuleJSON['uuid'];
+        this.id = capsuleJSON['id'];
         this.travelerNumber = capsuleJSON['travelerNumber'];
 
         this.innerCircle = new Konva.Circle({
-            name: this.id + ':inner',
+            name: this.uuid,
             radius: capsuleWidth - Math.sqrt(capsuleWidth),
         });
 
         this.outerCircle = new Konva.Circle({
-            name: this.id + ':outer',
+            name: this.uuid,
             radius: capsuleWidth,
         });
 
-        this.outerCircle.on('mousedown', () => {
-            this.select();
-        });
-        this.innerCircle.on('mousedown', () => {
-            this.select();
-        });
+        initBehaviors(this, this.innerCircle, this.outerCircle);
 
-        this.networkLayer.add(this.outerCircle);
-        this.networkLayer.add(this.innerCircle);
+        networkLayer.add(this.outerCircle);
+        networkLayer.add(this.innerCircle);
         this.update(capsuleJSON);
 
         capsules.push(this);
@@ -451,7 +372,7 @@ class Capsule {
         selectedObject = this;
         this.innerCircle.fill(capsuleInnerSelectedColor);
         this.outerCircle.fill(capsuleOuterSelectedColor);
-        this.networkLayer.batchDraw();
+        networkLayer.batchDraw();
     }
 
     unselect() {
@@ -460,7 +381,7 @@ class Capsule {
         }
 
         this.updateColor();
-        this.networkLayer.batchDraw();
+        networkLayer.batchDraw();
     }
 
     update(capsuleJSON) {
@@ -502,26 +423,70 @@ function resetCursor() {
     document.body.style.cursor = 'auto';
 }
 
-function initNetworkScene(networkLayer, infoLayer) {
+function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
+    let hasInfo = info !== undefined;
+
+    innerCircle.on('mousedown', () => {
+        object.select();
+    });
+
+    outerCircle.on('mousedown', () => {
+        object.select();
+    });
+
+    innerCircle.on('mouseover', () => {
+        handCursor();
+        if (hasInfo) {
+            info.show();
+            infoLayer.batchDraw();
+        }
+    });
+
+    outerCircle.on('mouseover', () => {
+        handCursor();
+        if (hasInfo) {
+            info.show();
+            infoLayer.batchDraw();
+        }
+    });
+
+    innerCircle.on('mouseout', () => {
+        resetCursor();
+        if (hasInfo) {
+            info.hide();
+            infoLayer.batchDraw();
+        }
+    });
+
+    outerCircle.on('mouseout', () => {
+        resetCursor();
+        if (hasInfo) {
+            info.hide();
+            infoLayer.batchDraw();
+        }
+    });
+}
+
+function initNetworkScene() {
     $.ajaxSetup({async: false});
 
     $.get('/load');
 
     $.get('/loops.json', function (listLoopJSON) {
         listLoopJSON.forEach(function (loopJSON) {
-            new Loop(loopJSON, networkLayer);
+            new Loop(loopJSON);
         });
     });
 
     $.get('/stationsSetData.json', function (listStationSetDataJSON) {
         listStationSetDataJSON.forEach(function (stationSetDataJSON) {
-            new Station(stationSetDataJSON, networkLayer, infoLayer);
+            new Station(stationSetDataJSON);
         });
     });
 
     $.get('/switchesSetData.json', function (listSwitchSetDataJSON) {
         listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
-            new Switch(switchSetDataJSON, networkLayer, infoLayer);
+            new Switch(switchSetDataJSON);
         });
     });
 
@@ -533,17 +498,17 @@ function initNetworkScene(networkLayer, infoLayer) {
     infoLayer.batchDraw();
 }
 
-function updateNetworkScene(networkLayer, infoLayer) {
-    $.get('/time.json', function (timeJSON) {
+function updateNetworkScene() {
+    /*$.get('/time.json', function (timeJSON) {
         document.getElementById('time-span').innerHTML = timeJSON['time']
-    });
+    });*/
 
     $.get('/capsules.json', function (listCapsuleJSON) {
         listCapsuleJSON.forEach(function (capsuleJSON) {
-            let targetCapsules = capsules.filter(capsule => capsule.id.includes(capsuleJSON['id']));
+            let targetCapsules = capsules.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
 
             if (targetCapsules.length <= 0) {
-                new Capsule(capsuleJSON, networkLayer, infoLayer);
+                new Capsule(capsuleJSON);
             } else {
                 targetCapsules.forEach(capsule => capsule.update(capsuleJSON));
             }

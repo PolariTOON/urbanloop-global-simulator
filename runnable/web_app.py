@@ -12,8 +12,9 @@ from model import switch
 from settings import json_serializer
 from settings import network
 from simulator import sim_loop
+from sys import path
 
-web_directory = os.path.abspath('../resources/web')
+web_directory = os.path.abspath('%s/../resources/web' % (path[0]))
 app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)

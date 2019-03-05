@@ -12,15 +12,16 @@ def serialize_time():
     }
 
 
-def serialize_loop(loop):
+def serialize_loop(a_loop):
     return {
-        'id': loop.id,
-        'name': loop.name,
-        'x': loop.x,
-        'y': loop.y,
-        'radius': math.floor(loop.size / (2 * math.pi)),
-        'size': loop.size,
-        'objects': serialize_objects_list(loop.objects)
+        'uuid': str(a_loop.uuid),
+        'id': a_loop.id,
+        'name': a_loop.name,
+        'x': a_loop.x,
+        'y': a_loop.y,
+        'radius': math.floor(a_loop.size / (2 * math.pi)),
+        'size': a_loop.size,
+        'objects': serialize_objects_list(a_loop.objects)
     }
 
 
@@ -31,38 +32,42 @@ def serialize_objects_list(objects):
         if isinstance(true_obj, warehouse.Warehouse):
             data[i] = serialize_warehouse_set_data(true_obj)
         else:
-            data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch) else serialize_station_set_data(true_obj)
+            data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch) \
+                else serialize_station_set_data(true_obj)
     return data
 
 
-def serialize_station_set_data(station):
-    radius_angle = math.radians(station.angle)
-    loop_radius = math.floor(station.loop.size / (2 * math.pi))
+def serialize_station_set_data(a_station):
+    radius_angle = math.radians(a_station.angle)
+    loop_radius = math.floor(a_station.loop.size / (2 * math.pi))
     return {
-        'id': station.id,
-        'x': station.loop.x + loop_radius * math.cos(radius_angle),
-        'y': station.loop.y + loop_radius * math.sin(radius_angle),
-        'name': station.name,
-        'capacity': station.capacity,
-        'loop': station.loop.name,
-        'type': station.station_type,
-        'next_element': station.next_element.name,
-        'capsules': serialize_capsule_queue(station.capsule_queue)
+        'uuid': str(a_station.uuid),
+        'id': a_station.id,
+        'x': a_station.loop.x + loop_radius * math.cos(radius_angle),
+        'y': a_station.loop.y + loop_radius * math.sin(radius_angle),
+        'name': a_station.name,
+        'capacity': a_station.capacity,
+        'outerCircle': a_station.loop.name,
+        'type': a_station.station_type,
+        'next_element': a_station.next_element.name,
+        'capsules': serialize_capsule_queue(a_station.capsule_queue)
     }
 
 
-def serialize_warehouse_set_data(warehouse):
-    radius_angle = math.radians(warehouse.angle)
-    loop_radius = math.floor(warehouse.loop.size / (2 * math.pi))
+
+def serialize_warehouse_set_data(a_warehouse):
+    radius_angle = math.radians(a_warehouse.angle)
+    loop_radius = math.floor(a_warehouse.loop.size / (2 * math.pi))
     return {
-        'id': warehouse.id,
-        'x': warehouse.loop.x + loop_radius * math.cos(radius_angle),
-        'y': warehouse.loop.y + loop_radius * math.sin(radius_angle),
-        'name': warehouse.name,
-        'capacity': warehouse.capacity,
-        'loop': warehouse.loop.name,
-        'next_element': warehouse.next_element.name,
-        'capsules': serialize_capsule_queue(warehouse.capsule_queue)
+        'uuid': str(a_warehouse.uuid),
+        'id': a_warehouse.id,
+        'x': a_warehouse.loop.x + loop_radius * math.cos(radius_angle),
+        'y': a_warehouse.loop.y + loop_radius * math.sin(radius_angle),
+        'name': a_warehouse.name,
+        'capacity': a_warehouse.capacity,
+        'outerCircle': a_warehouse.loop.name,
+        'next_element': a_warehouse.next_element.name,
+        'capsules': serialize_capsule_queue(a_warehouse.capsule_queue)
     }
 
 
@@ -87,6 +92,7 @@ def serialize_warehouse_var_data(warehouse):
 def serialize_switch_set_data(a_switch):
     switch_positions = get_switch_positions(a_switch)
     return {
+        'uuid': str(a_switch.uuid),
         'id': a_switch.id,
         'nameIn': a_switch.my_loop.name + ' <= ' + a_switch.other_loop.name,
         'nameOut': a_switch.other_loop.name + ' => ' + a_switch.my_loop.name,
@@ -108,23 +114,16 @@ def serialize_switch_var_data(a_switch):
     }
 
 
-# def serialize_capsule(capsule_record):
-#     return {
-#         'id': capsule_record.id,
-#         'x': capsule_record.x,
-#         'y': capsule_record.y,
-#         'travelerNumber': capsule_record.traveler_number
-#     }
-
 def serialize_capsule(a_capsule):
     x, y = get_capsule_position(a_capsule)
     return {
+        'uuid': str(a_capsule.uuid),
         'id': a_capsule.id,
         'x': x,
         'y': y,
         'travelerNumber': len(a_capsule.travelers),
         'destination': a_capsule.destination.name if a_capsule.destination is not None else "None",
-        'loop': a_capsule.loop.name,
+        'outerCircle': a_capsule.loop.name,
         'current_element': a_capsule.current_element.name,
         'next_element': a_capsule.next_element.name
     }

@@ -66,7 +66,7 @@ function generateDataPanel() {
     data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
   } else if (selectedObject instanceof Station) {
     data += "<p>Station " + selectedObject.json["name"] + "</p>";
-    data += "<p>Loop: " + selectedObject.json["loop"] + "</p>";
+    data += "<p>Loop: " + selectedObject.json["outerCircle"] + "</p>";
     /* WARNING station_type attribute is weird
     data += "<p>Station type: ";
     switch (selectedObject.json["type"]) {
@@ -96,7 +96,7 @@ function generateDataPanel() {
     if (selectedObject.json["destination"] !== undefined) {
         data += "<p>Destination: " + selectedObject.json["destination"] + "</p>";
     }
-    data += "<p>Current Loop: " + selectedObject.json["loop"] + "</p>";
+    data += "<p>Current Loop: " + selectedObject.json["outerCircle"] + "</p>";
     data += "<p>Last or current element: " + selectedObject.json["current_element"] + "</p>";
     data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
   } else {
@@ -123,7 +123,7 @@ function generateConfigPanel() {
   <p>TRAVELERS</p>
   <div class="form-group row">
     <label for="travalersPerDay" class="offset-sm-1 col-sm-5 col-form-label">Email</label>
-    <input type="text" class="col-sm-5 form-control" id="travalersPerDay" value="alo"/>
+    <input type="text" class="col-sm-5 form-control" uuid="travalersPerDay" value="alo"/>
   </div>
   `;
   configForm.innerHTML = content;

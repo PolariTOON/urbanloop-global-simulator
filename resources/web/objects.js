@@ -4,7 +4,7 @@ let networkLayer;
 let infoLayer;
 
 let selectedObject = undefined;
-let objects;
+let capsules;
 
 const loopColor = 'rgb(156, 156, 156)';
 const loopSelectedColor = 'rgb(255, 200, 20)';
@@ -69,7 +69,7 @@ class Loop {
         networkLayer.add(this.innerCircle);
         networkLayer.add(this.text);
 
-        objects.push(this);
+        capsules.push(this);
     }
 
     select() {
@@ -166,7 +166,7 @@ class Station {
         networkLayer.add(this.innerCircle);
         infoLayer.add(this.info);
 
-        objects.push(this);
+        capsules.push(this);
     }
 
     select() {
@@ -433,7 +433,7 @@ class Switch {
         infoLayer.add(this.infoIn);
         infoLayer.add(this.infoOut);
 
-        objects.push(this);
+        capsules.push(this);
     }
 
     select() {
@@ -501,7 +501,7 @@ class Capsule {
         networkLayer.add(this.innerCircle);
         this.update(capsuleJSON);
 
-        objects.push(this);
+        capsules.push(this);
     }
 
     select() {
@@ -611,7 +611,7 @@ function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
 function initNetworkScene() {
     $.ajaxSetup({async: false});
 
-    objects = [];
+    capsules = [];
 
     $.get('/load');
 
@@ -653,7 +653,7 @@ function updateNetworkScene() {
 
     $.get('/capsules.json', function (listCapsuleJSON) {
         listCapsuleJSON.forEach(function (capsuleJSON) {
-            let targetCapsules = objects.filter(object => object.uuid.includes(capsuleJSON['uuid']));
+            let targetCapsules = capsules.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
 
             if (targetCapsules.length <= 0) {
                 new Capsule(capsuleJSON);

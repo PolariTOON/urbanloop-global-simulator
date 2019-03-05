@@ -33,9 +33,9 @@ class Queue:
             return False
         return len(self.items) == self._maxsize
 
-    def empty(self):
+    def is_empty(self):
         return len(self.items) == 0
     
-    def is_empty(self):
+    def empty(self):
         self.items = []
         return

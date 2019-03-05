@@ -57,7 +57,7 @@ def stop_simulation():
     if is_simulation_started:
         is_simulation_started = False
         # sim_loop.change_state(sim_loop.SimState.KILLED)
-        # sim_record.records.is_empty()
+        # sim_record.records.empty()
     return redirect(url_for('root'))
 
 @app.route('/pause')

@@ -29,7 +29,7 @@
                 {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":240 },
                 {"type":"station","name":"Auchan", "angle":180, "station_type": 1, "capacity": 3},
                 {"type":"station","name":"Sapiniere", "angle":110, "station_type": 2, "capacity": 3},
-                {"type":"warehouse", "capacity": 50, "angle":80}
+                {"type":"warehouse", "capacity": 100, "angle":80}
     ]
   }
 }

@@ -10,6 +10,8 @@ const loopColor = 'rgb(156, 156, 156)';
 const loopSelectedColor = 'rgb(255, 200, 20)';
 const stationColor = 'rgb(40, 40, 200)';
 const stationSelectedColor = 'rgb(255, 200, 20)';
+const warehouseColor = 'rgb(40, 40, 40)';
+const warehouseSelectedColor = 'rgb(255, 200, 20)';
 const switchColor = 'rgb(200, 40, 40)';
 const switchSelectedColor = 'rgb(255, 200, 20)';
 const capsuleInnerEmptyColor = 'rgb(173, 72, 45)';
@@ -177,20 +179,18 @@ class Station {
 
 
 
-class Station {
-    constructor(warehouseJSON, networkLayer, infoLayer, warehouseRadius = 20, warehouseWidth = 20) {
+class Warehouse {
+    constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
+        this.json = warehouseJSON;
+        this.uuid = warehouseJSON['uuid'];
+        this.id = warehouseJSON['id'];
+
         let x = warehouseJSON['x'];
         let y = networkDiv.offsetHeight - warehouseJSON['y'];
         let semiWidth = Math.floor(warehouseWidth / 2);
 
-        this.json = warehouseJSON;
-        this.networkLayer = networkLayer;
-        this.infoLayer = infoLayer;
-        this.id = 'warehouse:' + warehouseJSON['id'];
-        this.color = 'rgb(40, 40, 40)';
-        this.selectedColor = 'rgb(255, 200, 20)';
-
         this.innerCircle = new Konva.Circle({
+            name: this.uuid,
             x: x,
             y: y,
             radius: warehouseRadius - semiWidth,
@@ -200,11 +200,11 @@ class Station {
         });
 
         this.outerCircle = new Konva.Circle({
-            name: this.id,
+            name: this.uuid,
             x: x,
             y: y,
             radius: warehouseRadius + semiWidth,
-            fill: this.color,
+            fill: warehouseColor,
             stroke: 'black',
             strokeWidth: 0.3,
         });
@@ -241,25 +241,11 @@ class Station {
             })
         );
 
-        this.outerCircle.on('mousedown', () => {
-            this.select();
-        });
+        initBehaviors(this, this.innerCircle, this.outerCircle, this.info);
 
-        this.outerCircle.on('mouseover', () => {
-            handCursor();
-            this.info.show();
-            this.infoLayer.batchDraw();
-        });
-
-        this.outerCircle.on('mouseout', () => {
-            resetCursor();
-            this.info.hide();
-            this.infoLayer.batchDraw();
-        });
-
-        this.networkLayer.add(this.outerCircle);
-        this.networkLayer.add(this.innerCircle);
-        this.infoLayer.add(this.info);
+        networkLayer.add(this.outerCircle);
+        networkLayer.add(this.innerCircle);
+        infoLayer.add(this.info);
     }
 
     select() {
@@ -268,16 +254,16 @@ class Station {
         }
 
         selectedObject = this;
-        this.outerCircle.fill(this.selectedColor);
-        this.networkLayer.batchDraw();
+        this.outerCircle.fill(warehouseSelectedColor);
+        networkLayer.batchDraw();
     }
 
     unselect() {
         if (selectedObject === this) {
             selectedObject = undefined;
         }
-        this.outerCircle.fill(this.color);
-        this.networkLayer.batchDraw();
+        this.outerCircle.fill(warehouseColor);
+        networkLayer.batchDraw();
     }
 }
 

@@ -2,6 +2,7 @@ import math
 
 from model import switch, warehouse
 from simulator import converter
+from settings import simlog
 
 
 # CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
@@ -28,13 +29,21 @@ def serialize_loop(a_loop):
 
 def serialize_objects_list(objects):
     data = {}
+    simlog.error(str(len(objects)))
     for i in range(0, len(objects)):
-        true_obj = objects[i][1]
-        if isinstance(true_obj, warehouse.Warehouse):
-            data[i] = serialize_warehouse_set_data(true_obj)
-        else:
-            data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch) \
-                else serialize_station_set_data(true_obj)
+        obj = objects[i][1]
+        obj_type = objects[i][0]
+        if "station" in obj_type:
+            data[i] = "Station " + obj.name
+            # data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch)
+            # else serialize_station_set_data(true_obj)            #
+        elif "warehouse" in obj_type:
+            data[i] = "Warehouse " + obj.id + " in " + obj.loop
+            # data[i] = serialize_warehouse_set_data(obj)
+        elif "out" in obj_type:
+            data[i] = "Switch out" + obj.next_element.name + " to " + obj.next_element_other.name
+        elif "in" in obj_type:
+            data[i] = "Switch in " + obj.next_element_other.name + " from " + obj.next_element.name
     return data
 
 

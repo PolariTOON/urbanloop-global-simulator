@@ -178,7 +178,6 @@ class Station {
 }
 
 
-
 class Warehouse {
     constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
         this.json = warehouseJSON;
@@ -579,6 +578,7 @@ function initNetworkScene() {
 
     $.get('/warehousesSetData.json', function(listWarehouseSetDataJSON) {
         listWarehouseSetDataJSON.forEach(function (warehouseSetDataJSON){
+            console.log('warehouse');
             new Warehouse(warehouseSetDataJSON, networkLayer, infoLayer);
         });
     });

@@ -77,8 +77,8 @@ function generateDataPanel() {
     data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
     data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
     data += "<p>Capsules:";
-    for (k in selectedObject.json["capsules"]) {
-      data += "<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
+    for (k in selectedObject.json["objects"]) {
+      data += "<br>&nbsp;Capsule #" + selectedObject.json["objects"][k];
     }
     data += "</p>";
   } else if (selectedObject instanceof Capsule) {

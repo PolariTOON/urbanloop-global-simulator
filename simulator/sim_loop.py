@@ -1,4 +1,3 @@
-import threading as th
 from enum import Enum
 
 import simpy
@@ -43,10 +42,10 @@ class SimLoop:
         self.tick_event = _env.event()
         self.is_endless = False
         self.is_recorded = is_recorded
-        _endless_quit_event = _env.event()
 
         if config.sim['endless'] in ['true', 'True']:
             self.is_endless = True
+            _endless_quit_event = _env.event()
 
     def tick(self):
         """
@@ -67,17 +66,14 @@ class SimLoop:
         """
         global _current_tick
         while True:
-            if not th.main_thread().is_alive():
-                simlog.info("Main thread is dead. Exiting...")
-                return
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
 
-                if not _current_tick == 0 and is_frequency(120):
-                    station.fill_and_full_stations()
+                # if not _current_tick == 0 and is_frequency(120):
+                # station.fill_and_full_stations()
 
                 if self.is_recorded:
                     sim_record.put_record()
@@ -164,7 +160,6 @@ def run_simulation(sim_loop=None, is_recorded=False):
     _process_loop(sim_loop)
 
     if sim_loop.is_endless:
-        global _endless_quit_event
         _env.run(_endless_quit_event)
         return
 
@@ -176,7 +171,6 @@ def quit_endless_simulation():
     Stop an endless simulation by triggering the _endless_quit_event
     """
     global _env
-    global _endless_quit_event
 
     def _trigger():
         yield _endless_quit_event.succeed()
@@ -192,17 +186,20 @@ def pause_simulation():
     change_state(SimState.PAUSED)
 
 
-def stop_simulation():  # TODO Make switch case to quit simulation if it's endless
+def stop_simulation():
     """
-    Stop the simulation definitely. All capsules or stations are reset
+    Stop the simulation definitely. All objects or stations are reset
     """
     simlog.debug("Stopping simulation")
     capsule.reset_simulation()
     station.reset_simulation()
     change_state(SimState.KILLED)
+    if _endless_quit_event is not None:
+        quit_endless_simulation()
+        return
 
 
-def reset_simulation():  # TODO Make possible to reset simulation from graphic interface
+def reset_simulation():
     """
     Reset the current simulation at
     """

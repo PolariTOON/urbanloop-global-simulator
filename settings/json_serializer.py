@@ -1,7 +1,9 @@
 import math
 
 from model import switch
+from settings import simlog
 from simulator import converter
+from simulator import sim_loop
 
 
 # CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
@@ -37,7 +39,7 @@ def serialize_objects_list(objects):
 
 def serialize_station_set_data(a_station):
     radius_angle = math.radians(a_station.angle)
-    loop_radius = math.floor(a_station.loop.size / (2 * math.pi))
+    loop_radius = get_loop_radius(a_station.loop)
     return {
         'uuid': str(a_station.uuid),
         'id': a_station.id,
@@ -48,7 +50,7 @@ def serialize_station_set_data(a_station):
         'outerCircle': a_station.loop.name,
         'type': a_station.station_type,
         'next_element': a_station.next_element.name,
-        'capsules': serialize_capsule_queue(a_station.capsule_queue)
+        'objects': serialize_capsule_queue(a_station.capsule_queue)
     }
 
 
@@ -70,8 +72,8 @@ def serialize_switch_set_data(a_switch):
     return {
         'uuid': str(a_switch.uuid),
         'id': a_switch.id,
-        'nameIn': a_switch.my_loop.name + ' <= ' + a_switch.other_loop.name,
-        'nameOut': a_switch.other_loop.name + ' => ' + a_switch.my_loop.name,
+        'nameIn': a_switch.my_loop.name + ' => ' + a_switch.other_loop.name,
+        'nameOut': a_switch.other_loop.name + ' <= ' + a_switch.my_loop.name,
         'xIn': switch_positions[0],
         'yIn': switch_positions[1],
         'xOut': switch_positions[2],
@@ -139,25 +141,35 @@ def get_switch_angle(loop, a_switch):
         return a_switch.angle_other_loop
 
 
+def get_loop_radius(loop):
+    return loop.size / (2 * math.pi)
+
+
+def get_loop_segment_angle(loop, distance):
+    return distance / get_loop_radius(loop)
+
+
 def get_capsule_position(capsule):
     """
     :param capsule:
     :return: (x, y)
     """
     if capsule.current_element is capsule.next_element:
-        # In this case, current_element can only be a switch
-        t = capsule.get_segment_trip_percentage()
+        # In this case, current_element and next_element can only be switches
+        t = capsule.get_segment_traveled_distance() / capsule.current_element.size
         x_in, y_in, x_out, y_out = get_switch_positions(capsule.current_element)
         return x_in * (1 - t) + x_out * t, y_in * (1 - t) + y_out * t
     else:
         # In this case, current_element and next_element can be station or switch
         angle = get_element_angle(capsule.loop, capsule.current_element)
-        angle = (angle, 0)[angle is None]
-        segment_trip_angle = get_segment_trip_angle(capsule.loop, capsule.current_element, capsule.next_element)
-        segment_trip_angle = (segment_trip_angle, 0)[segment_trip_angle is None]
-        percent_trip_angle = capsule.get_segment_trip_percentage() * segment_trip_angle
-        radius_angle = math.radians(angle - percent_trip_angle)
-        loop_radius = math.floor(capsule.loop.size / (2 * math.pi))
+        trip_angle = capsule.get_segment_traveled_angle()
+        radius_angle = math.radians(angle) - trip_angle
+        if capsule.id == 0:
+            # simlog.error(str(capsule.id) + "current : " + capsule.current_element.name + " next : " + capsule.next_element.name + "angle: " + str(angle) + " trip_angle : " + str(math.degrees(trip_angle)))
+            simlog.error("tick " + str(
+                sim_loop.get_current_tick() - capsule.segment_start_tick) + "  - current : " + capsule.current_element.name + " next : " + capsule.next_element.name + " distance: " + str(
+                capsule.get_segment_traveled_distance()))
+        loop_radius = get_loop_radius(capsule.loop)
         return capsule.loop.x + math.cos(radius_angle) * loop_radius, capsule.loop.y + math.sin(
             radius_angle) * loop_radius
 

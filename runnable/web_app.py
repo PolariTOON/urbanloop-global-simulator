@@ -1,10 +1,12 @@
 import logging
 import os
 from json import dumps
+from sys import path
 from threading import Thread
 
 from flask import Flask, Response, redirect, url_for
 
+from model import capsule
 from model import loop
 from model import sim_record
 from model import station
@@ -12,7 +14,6 @@ from model import switch
 from settings import json_serializer
 from settings import network
 from simulator import sim_loop
-from sys import path
 
 web_directory = os.path.abspath('%s/../resources/web' % (path[0]))
 app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
@@ -49,6 +50,7 @@ def start_simulation():
         sim_thread.start()
     return redirect(url_for('root'))
 
+
 @app.route('/stop')
 def stop_simulation():
     global sim_thread
@@ -58,6 +60,7 @@ def stop_simulation():
         # sim_loop.change_state(sim_loop.SimState.KILLED)
         # sim_record.records.is_empty()
     return redirect(url_for('root'))
+
 
 @app.route('/time.json')
 def generate_time_json():
@@ -133,4 +136,3 @@ def update_record():
 if __name__ == '__main__':
     logging.info("http://127.0.0.1:8090")
     app.run(port=8090)
-

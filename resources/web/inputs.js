@@ -65,6 +65,13 @@ stage.on('wheel', event => {
 function fitStageIntoParentContainer() {
     stage.width(networkDiv.offsetWidth);
     stage.height(networkDiv.offsetWidth);
+
+    objects.forEach(object => {
+       if (!(object instanceof Capsule)) {
+           object.updatePosition();
+       }
+    });
+
     stage.draw();
 }
 

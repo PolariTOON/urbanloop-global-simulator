@@ -69,4 +69,4 @@ def get_record():
 
 
 def is_empty():
-    return records.empty()
+    return records.is_empty()

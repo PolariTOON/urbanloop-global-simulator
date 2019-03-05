@@ -41,57 +41,41 @@ function generateDataPanel() {
     data += "<p>Elements :"
     let elements = selectedObject.json["objects"];
     for (key in elements) {
-      element = elements[key];
-      console.log(element);
-      if (element["name"] !== undefined) {
-        data += "<br>&nbsp;Station " + element["name"];
-      } else {
-        if (element["nameIn"].includes("=>")) {
-          data += "<br>&nbsp;Switch out " + element["id"] + " to " + element["other_loop_name"];
-        } else {
-          data += "<br>&nbsp;Switch in " + element["id"] + " from " + element["my_loop_name"]
-        }
-      }
+      data += "<br>&nbsp;" + elements[key];
     }
     data += "</p>";
   } else if (selectedObject instanceof Switch) {
     data += "<p>Switch #" + selectedObject.json["id"] + "</p>";
     data += "<p>Loop of the switch: " + selectedObject.json["my_loop_name"] + "</p>";
-    data += "<p>Next element:";
-    data += "<br>&nbsp;" + selectedObject.json["next_element_name"] + "</p>";
+    data += "<p><br>&nbsp; Next element:" + selectedObject.json["next_element_name"] + "</p>";
     data += "<p>Loop switched: " + selectedObject.json["other_loop_name"] + "</p>";
-    data += "<p>Next element:";
-    data += "<br>&nbsp;" + selectedObject.json["next_other_element_name"] + "</p>";
+    data += "<p><br>&nbsp; Next element:" + selectedObject.json["next_other_element_name"] + "</p>";
     data += "<p>Size of the link: " + selectedObject.json["size"] + "</p>";
     data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
   } else if (selectedObject instanceof Station) {
-    data += "<p>Station " + selectedObject.json["name"] + "</p>";
-    data += "<p>Loop: " + selectedObject.json["outerCircle"] + "</p>";
-    /* WARNING station_type attribute is weird
-    data += "<p>Station type: ";
-    switch (selectedObject.json["type"]) {
-      case 0:
-        data += "neutral</p>";
-        break;
-      case 1:
-        data += "activity zone</p>";
-        break;
-      case 2:
-        data += "residential zone</p>";
-        break;
-      case 3:
-        data += "down town</p>";
-        break;
-    }*/
-    data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
-    data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
-    data += "<p>Capsules:";
-    for (k in selectedObject.json["objects"]) {
-      data += "<br>&nbsp;Capsule #" + selectedObject.json["objects"][k];
-    }
-    data += "</p>";
+      data += "<p>Station " + selectedObject.json["name"] + "</p>";
+      data += "<p>Type de station: " + selectedObject.json["type"] + "</p>";
+      data += "<p>Loop: " + selectedObject.json["outerCircle"] + "</p>";
+      data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
+      data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
+      data += "<p>Waiting travelers: " + selectedObject.json["nb_travelers"] + "</p>";
+      data += "<p>Capsules:" + selectedObject.json["nb_capsules"] ;
+      for (k in selectedObject.json["capsules"]) {
+          data += "<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
+      }
+      data += "</p>";
+  } else if (selectedObject instanceof Warehouse){
+      data += "<p>Warehouse #" + selectedObject.json["id"] + "</p>";
+      data += "<p>Loop: " + selectedObject.json["outerCircle"] + "</p>";
+      data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
+      data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
+      data += "<p>Capsules:" + selectedObject.json["nb_capsules"];
+      for (k in selectedObject.json["capsules"]) {
+          data += "<br>&nbsp;<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
+      }
+      data += "</p>";
   } else if (selectedObject instanceof Capsule) {
-    data += "<p>Capsule #" + selectedObject.json["id"] + "</p>";
+    data += "<p> Capsule #" + selectedObject.json["id"]  + "</p>";
     data += "<p>Contains a traveler: " + (selectedObject.json["travelerNumber"] !== 0) + "</p>";
     if (selectedObject.json["destination"] !== undefined) {
         data += "<p>Destination: " + selectedObject.json["destination"] + "</p>";
@@ -100,7 +84,7 @@ function generateDataPanel() {
     data += "<p>Last or current element: " + selectedObject.json["current_element"] + "</p>";
     data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
   } else {
-    data += "Nothing selected.";
+    data += "<p>Nothing selected.</p>";
   }
   div.innerHTML = data;
   document.getElementById("panel-div").replaceChild(div, document.getElementById("tab-content"));

@@ -56,7 +56,7 @@ class Station:
         details += "\nStation objectId : " + str(self.id)
         details += "\nLoop : " + self.loop.name
         details += "\nStation Type : "
-        details += ("neutral", "activity zone", "residential zone", "down town")[self.station_type]
+        details += self.get_string_type()
         details += "\nCapacity : " + str(self.capacity)
         details += "\nNext element : "
         if type(self.next_element) is Station:
@@ -72,7 +72,9 @@ class Station:
 
     def get_type(self):
         return (Type.NEUTRAL, Type.ACTIVITY, Type.RESIDENTIAL, Type.CITY)[self.station_type]
-        # return t
+
+    def get_string_type(self):
+        return ("neutral", "activity zone", "residential zone", "down town")[self.station_type]
 
     def drain(self, destination=None):
         """

@@ -1,12 +1,13 @@
 import math
 
-from model import switch
 from settings import simlog
+from model import switch, warehouse
 from simulator import converter
 from simulator import sim_loop
 
 
 # CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
+
 
 def serialize_time():
     return {
@@ -30,10 +31,19 @@ def serialize_loop(a_loop):
 def serialize_objects_list(objects):
     data = {}
     for i in range(0, len(objects)):
-        true_obj = objects[i][1]
-        data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj,
-                                                                    switch.Switch) else serialize_station_set_data(
-            true_obj)
+        obj = objects[i][1]
+        obj_type = objects[i][0]
+        if "station" in obj_type:
+            data[i] = "Station " + obj.name
+            # data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch)
+            # else serialize_station_set_data(true_obj)            #
+        elif "warehouse" in obj_type:
+            data[i] = "Warehouse " + obj.id + " in " + obj.loop
+            # data[i] = serialize_warehouse_set_data(obj)
+        elif "out" in obj_type:
+            data[i] = "Switch out" + obj.next_element.name + " to " + obj.next_element_other.name
+        elif "in" in obj_type:
+            data[i] = "Switch in " + obj.next_element_other.name + " from " + obj.next_element.name
     return data
 
 
@@ -48,9 +58,28 @@ def serialize_station_set_data(a_station):
         'name': a_station.name,
         'capacity': a_station.capacity,
         'outerCircle': a_station.loop.name,
-        'type': a_station.station_type,
+        'type': a_station.get_string_type(),
         'next_element': a_station.next_element.name,
-        'objects': serialize_capsule_queue(a_station.capsule_queue)
+        'nb_travelers': a_station.traveler_queue.qsize(),
+        'nb_capsules': a_station.capsule_queue.qsize(),
+        'capsules': serialize_capsule_queue(a_station.capsule_queue)
+    }
+
+
+def serialize_warehouse_set_data(a_warehouse):
+    radius_angle = math.radians(a_warehouse.angle)
+    loop_radius = math.floor(a_warehouse.loop.size / (2 * math.pi))
+    return {
+        'uuid': str(a_warehouse.uuid),
+        'id': a_warehouse.id,
+        'x': a_warehouse.loop.x + loop_radius * math.cos(radius_angle),
+        'y': a_warehouse.loop.y + loop_radius * math.sin(radius_angle),
+        'name': a_warehouse.name,
+        'capacity': a_warehouse.capacity,
+        'outerCircle': a_warehouse.loop.name,
+        'next_element': a_warehouse.next_element.name,
+        'nb_capsules': a_warehouse.capsule_queue.qsize(),
+        'capsules': serialize_capsule_queue(a_warehouse.capsule_queue)
     }
 
 
@@ -67,13 +96,20 @@ def serialize_station_var_data(station):
     }
 
 
+def serialize_warehouse_var_data(warehouse):
+    return {
+    }
+
+
 def serialize_switch_set_data(a_switch):
     switch_positions = get_switch_positions(a_switch)
     return {
         'uuid': str(a_switch.uuid),
         'id': a_switch.id,
-        'nameIn': a_switch.my_loop.name + ' => ' + a_switch.other_loop.name,
-        'nameOut': a_switch.other_loop.name + ' <= ' + a_switch.my_loop.name,
+        'nameIn': a_switch.my_loop.name + ' -> ' + a_switch.other_loop.name,
+        'nameOut': a_switch.other_loop.name + ' <- ' + a_switch.my_loop.name,
+        # 'nameIn':  a_switch.id + ': ' + a_switch.my_loop.name + ' -> ' + a_switch.other_loop.name,
+        # 'nameOut': a_switch.id + ': ' + a_switch.other_loop.name + ' <- ' + a_switch.my_loop.name,
         'xIn': switch_positions[0],
         'yIn': switch_positions[1],
         'xOut': switch_positions[2],

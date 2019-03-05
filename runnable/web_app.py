@@ -11,6 +11,7 @@ from model import loop
 from model import sim_record
 from model import station
 from model import switch
+from model import warehouse
 from settings import json_serializer
 from settings import network
 from simulator import sim_loop
@@ -55,10 +56,13 @@ def start_simulation():
 def stop_simulation():
     global sim_thread
     global is_simulation_started
-    if is_simulation_started:
-        is_simulation_started = False
-        # sim_loop.change_state(sim_loop.SimState.KILLED)
-        # sim_record.records.is_empty()
+    is_simulation_started = False
+    sim_loop.change_state(sim_loop.SimState.KILLED)
+    # sim_record.records.empty()
+    return redirect(url_for('root'))
+
+@app.route('/pause')
+def pause_simulation():
     return redirect(url_for('root'))
 
 
@@ -85,6 +89,13 @@ def generate_stations_set_data_json():
     return Response(dumps(list_stations_set_data_json), mimetype="application/json")
 
 
+@app.route('/warehousesSetData.json')
+def generate_warehouses_set_data_json():
+    list_warehouses_set_data_json = [json_serializer.serialize_warehouse_set_data(a_warehouse) for a_warehouse in
+                                     warehouse.get_warehouses()]
+    return Response(dumps(list_warehouses_set_data_json), mimetype="application/json")
+
+
 @app.route('/switchesSetData.json')
 def generate_switches_set_data_json():
     list_switches_set_data_json = [json_serializer.serialize_switch_set_data(a_switch) for a_switch in
@@ -100,6 +111,16 @@ def generate_stations_var_data_json():
     list_stations_var_data_json = [json_serializer.serialize_station_var_data(a_station) for a_station in
                                    last_record.stations_record]
     return Response(dumps(list_stations_var_data_json), mimetype="application/json")
+
+
+@app.route('/warehousesVarData.json')
+def generate_warehouses_var_data_json():
+    if sim_record.is_empty():
+        return Response(mimetype="application/json")
+
+    list_warehouses_var_data_json = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in
+                                     last_record.warehouse_record]
+    return Response(dumps(list_warehouses_var_data_json), mimetype="application/json")
 
 
 @app.route('/switchesVarData.json')

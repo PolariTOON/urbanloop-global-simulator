@@ -4,12 +4,14 @@ let networkLayer;
 let infoLayer;
 
 let selectedObject = undefined;
-let objects;
+let capsules;
 
 const loopColor = 'rgb(156, 156, 156)';
 const loopSelectedColor = 'rgb(255, 200, 20)';
 const stationColor = 'rgb(40, 40, 200)';
 const stationSelectedColor = 'rgb(255, 200, 20)';
+const warehouseColor = 'rgb(40, 40, 40)';
+const warehouseSelectedColor = 'rgb(255, 200, 20)';
 const switchColor = 'rgb(200, 40, 40)';
 const switchSelectedColor = 'rgb(255, 200, 20)';
 const capsuleInnerEmptyColor = 'rgb(173, 72, 45)';
@@ -67,7 +69,7 @@ class Loop {
         networkLayer.add(this.innerCircle);
         networkLayer.add(this.text);
 
-        objects.push(this);
+        capsules.push(this);
     }
 
     select() {
@@ -164,7 +166,7 @@ class Station {
         networkLayer.add(this.innerCircle);
         infoLayer.add(this.info);
 
-        objects.push(this);
+        capsules.push(this);
     }
 
     select() {
@@ -192,7 +194,107 @@ class Station {
         this.outerCircle.y(y);
         this.info.y(y);
     }
+
+    update(stationJSON) {
+        this.json = stationJSON;
+        this.updateColor();
+    }
 }
+
+
+class Warehouse {
+    constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
+        this.json = warehouseJSON;
+        this.uuid = warehouseJSON['uuid'];
+        this.id = warehouseJSON['id'];
+
+        let x = warehouseJSON['x'];
+        let y = networkDiv.offsetHeight - warehouseJSON['y'];
+        let semiWidth = Math.floor(warehouseWidth / 2);
+
+        this.innerCircle = new Konva.Circle({
+            name: this.uuid,
+            x: x,
+            y: y,
+            radius: warehouseRadius - semiWidth,
+            fill: 'white',
+            stroke: 'black',
+            strokeWidth: 0.3,
+        });
+
+        this.outerCircle = new Konva.Circle({
+            name: this.uuid,
+            x: x,
+            y: y,
+            radius: warehouseRadius + semiWidth,
+            fill: warehouseColor,
+            stroke: 'black',
+            strokeWidth: 0.3,
+        });
+
+        this.info = new Konva.Label({
+            x: x,
+            y: y,
+            opacity: 0.75,
+            visible: false,
+            listening: false
+        });
+
+        this.info.add(
+            new Konva.Tag({
+                fill: 'black',
+                pointerDirection: 'down',
+                pointerWidth: 10,
+                pointerHeight: 10,
+                lineJoin: 'round',
+                shadowColor: 'black',
+                shadowBlur: 10,
+                shadowOffset: 10,
+                shadowOpacity: 0.2
+            })
+        );
+
+        this.info.add(
+            new Konva.Text({
+                text: 'Warehouse : ' + warehouseJSON['name'] + ' | Capacity : ' + warehouseJSON['capacity'],
+                fontFamily: 'Calibri',
+                fontSize: 18,
+                padding: 5,
+                fill: 'white'
+            })
+        );
+
+        initBehaviors(this, this.innerCircle, this.outerCircle, this.info);
+
+        networkLayer.add(this.outerCircle);
+        networkLayer.add(this.innerCircle);
+        infoLayer.add(this.info);
+    }
+
+    select() {
+        if (selectedObject !== undefined && selectedObject !== this) {
+            selectedObject.unselect();
+        }
+
+        selectedObject = this;
+        this.outerCircle.fill(warehouseSelectedColor);
+        networkLayer.batchDraw();
+    }
+
+    unselect() {
+        if (selectedObject === this) {
+            selectedObject = undefined;
+        }
+        this.outerCircle.fill(warehouseColor);
+        networkLayer.batchDraw();
+    }
+
+    update(warehouseJSON) {
+        this.json = warehouseJSON;
+        this.updateColor();
+    }
+}
+
 
 class Switch {
     constructor(switchJSON, switchRadius = 12, switchWidth = 4) {
@@ -331,7 +433,7 @@ class Switch {
         infoLayer.add(this.infoIn);
         infoLayer.add(this.infoOut);
 
-        objects.push(this);
+        capsules.push(this);
     }
 
     select() {
@@ -399,7 +501,7 @@ class Capsule {
         networkLayer.add(this.innerCircle);
         this.update(capsuleJSON);
 
-        objects.push(this);
+        capsules.push(this);
     }
 
     select() {
@@ -430,6 +532,7 @@ class Capsule {
         this.outerCircle.x(x);
         this.outerCircle.y(y);
         this.travelerNumber = capsuleJSON['travelerNumber'];
+        this.json = capsuleJSON;
 
         this.updateColor();
     }
@@ -508,7 +611,7 @@ function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
 function initNetworkScene() {
     $.ajaxSetup({async: false});
 
-    objects = [];
+    capsules = [];
 
     $.get('/load');
 
@@ -521,6 +624,13 @@ function initNetworkScene() {
     $.get('/stationsSetData.json', function (listStationSetDataJSON) {
         listStationSetDataJSON.forEach(function (stationSetDataJSON) {
             new Station(stationSetDataJSON);
+        });
+    });
+
+    $.get('/warehousesSetData.json', function(listWarehouseSetDataJSON) {
+        // console.log(listWarehouseSetDataJSON.length);
+        listWarehouseSetDataJSON.forEach(function (warehouseSetDataJSON){
+            new Warehouse(warehouseSetDataJSON);
         });
     });
 
@@ -541,9 +651,9 @@ function updateNetworkScene() {
         document.getElementById('time-span').innerHTML = timeJSON['time']
     });*/
 
-    $.get('/objects.json', function (listCapsuleJSON) {
+    $.get('/capsules.json', function (listCapsuleJSON) {
         listCapsuleJSON.forEach(function (capsuleJSON) {
-            let targetCapsules = objects.filter(object => object.uuid.includes(capsuleJSON['uuid']));
+            let targetCapsules = capsules.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
 
             if (targetCapsules.length <= 0) {
                 new Capsule(capsuleJSON);
@@ -553,8 +663,19 @@ function updateNetworkScene() {
 
         });
     });
-
+    $.get('/stations.json', function (listStationJSON) {
+        listStationJSON.forEach(function (stationJSON) {
+            let targetStations = stations.filter(station => station.uuid.includes(stationJSON['uuid']));
+            targetStations.forEach(station => station.update(stationJSON));
+        });
+    });
+    $.get('/warehouses.json', function (listWarehouseJSON) {
+        listWarehouseJSON.forEach(function (warehouseJSON) {
+            let targetWarehouses = warehouses.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
+            targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
+        });
+    });
     networkLayer.batchDraw();
     infoLayer.batchDraw();
+    // generateDataPanel();
 }
-

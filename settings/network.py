@@ -73,7 +73,7 @@ def load(file_path=None, web=False):
                     elms[e].angle_other_loop = element["angle"]
                 the_loop.switches += [elms[e]]
             elif el_type == "warehouse" :
-                elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"])]
+                elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"])]
             else:
                 simlog.error("The json file is not properly formatted. "
                              "\n FORMAT : "

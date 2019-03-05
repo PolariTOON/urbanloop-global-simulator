@@ -215,6 +215,113 @@ class Station {
     }
 }
 
+
+
+class Station {
+    constructor(warehouseJSON, networkLayer, infoLayer, warehouseRadius = 20, warehouseWidth = 20) {
+        let x = warehouseJSON['x'];
+        let y = networkDiv.offsetHeight - warehouseJSON['y'];
+        let semiWidth = Math.floor(warehouseWidth / 2);
+
+        this.json = warehouseJSON;
+        this.networkLayer = networkLayer;
+        this.infoLayer = infoLayer;
+        this.id = 'warehouse:' + warehouseJSON['id'];
+        this.color = 'rgb(40, 40, 40)';
+        this.selectedColor = 'rgb(255, 200, 20)';
+
+        this.innerCircle = new Konva.Circle({
+            x: x,
+            y: y,
+            radius: warehouseRadius - semiWidth,
+            fill: 'white',
+            stroke: 'black',
+            strokeWidth: 0.3,
+        });
+
+        this.outerCircle = new Konva.Circle({
+            name: this.id,
+            x: x,
+            y: y,
+            radius: warehouseRadius + semiWidth,
+            fill: this.color,
+            stroke: 'black',
+            strokeWidth: 0.3,
+        });
+
+        this.info = new Konva.Label({
+            x: x,
+            y: y,
+            opacity: 0.75,
+            visible: false,
+            listening: false
+        });
+
+        this.info.add(
+            new Konva.Tag({
+                fill: 'black',
+                pointerDirection: 'down',
+                pointerWidth: 10,
+                pointerHeight: 10,
+                lineJoin: 'round',
+                shadowColor: 'black',
+                shadowBlur: 10,
+                shadowOffset: 10,
+                shadowOpacity: 0.2
+            })
+        );
+
+        this.info.add(
+            new Konva.Text({
+                text: 'Warehouse : ' + warehouseJSON['name'] + ' | Capacity : ' + warehouseJSON['capacity'],
+                fontFamily: 'Calibri',
+                fontSize: 18,
+                padding: 5,
+                fill: 'white'
+            })
+        );
+
+        this.outerCircle.on('mousedown', () => {
+            this.select();
+        });
+
+        this.outerCircle.on('mouseover', () => {
+            handCursor();
+            this.info.show();
+            this.infoLayer.batchDraw();
+        });
+
+        this.outerCircle.on('mouseout', () => {
+            resetCursor();
+            this.info.hide();
+            this.infoLayer.batchDraw();
+        });
+
+        this.networkLayer.add(this.outerCircle);
+        this.networkLayer.add(this.innerCircle);
+        this.infoLayer.add(this.info);
+    }
+
+    select() {
+        if (selectedObject !== undefined && selectedObject !== this) {
+            selectedObject.unselect();
+        }
+
+        selectedObject = this;
+        this.outerCircle.fill(this.selectedColor);
+        this.networkLayer.batchDraw();
+    }
+
+    unselect() {
+        if (selectedObject === this) {
+            selectedObject = undefined;
+        }
+        this.outerCircle.fill(this.color);
+        this.networkLayer.batchDraw();
+    }
+}
+
+
 class Switch {
     constructor(switchJSON, networkLayer, infoLayer, switchRadius = 12, switchWidth = 4) {
         let xIn = switchJSON['xIn'];
@@ -519,6 +626,11 @@ function initNetworkScene(networkLayer, infoLayer) {
         });
     });
 
+    $.get('/warehousesSetData.json', function(listWarehouseSetDataJSON) {
+        listWarehouseSetDataJSON.forEach(function (warehouseSetDataJSON){
+            new Warehouse(warehouseSetDataJSON, networkLayer, infoLayer);
+        });
+    });
     $.get('/switchesSetData.json', function (listSwitchSetDataJSON) {
         listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
             new Switch(switchSetDataJSON, networkLayer, infoLayer);

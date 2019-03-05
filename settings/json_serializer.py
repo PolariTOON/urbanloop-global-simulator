@@ -1,10 +1,10 @@
 import math
 
-from model import switch
+from model import switch, warehouse
 from simulator import converter
 
-
 # CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
+
 
 def serialize_time():
     return {
@@ -23,12 +23,17 @@ def serialize_loop(loop):
         'objects': serialize_objects_list(loop.objects)
     }
 
+
 def serialize_objects_list(objects):
     data = {}
     for i in range(0, len(objects)):
         true_obj = objects[i][1]
-        data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch) else serialize_station_set_data(true_obj)
+        if isinstance(true_obj, warehouse.Warehouse):
+            data[i] = serialize_warehouse_set_data(true_obj)
+        else:
+            data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch) else serialize_station_set_data(true_obj)
     return data
+
 
 def serialize_station_set_data(station):
     radius_angle = math.radians(station.angle)
@@ -45,6 +50,22 @@ def serialize_station_set_data(station):
         'capsules': serialize_capsule_queue(station.capsule_queue)
     }
 
+
+def serialize_warehouse_set_data(warehouse):
+    radius_angle = math.radians(warehouse.angle)
+    loop_radius = math.floor(warehouse.loop.size / (2 * math.pi))
+    return {
+        'id': warehouse.id,
+        'x': warehouse.loop.x + loop_radius * math.cos(radius_angle),
+        'y': warehouse.loop.y + loop_radius * math.sin(radius_angle),
+        'name': warehouse.name,
+        'capacity': warehouse.capacity,
+        'loop': warehouse.loop.name,
+        'next_element': warehouse.next_element.name,
+        'capsules': serialize_capsule_queue(warehouse.capsule_queue)
+    }
+
+
 def serialize_capsule_queue(queue):
     capsules = {}
     capsules_list = queue.list()
@@ -52,9 +73,16 @@ def serialize_capsule_queue(queue):
         capsules[i] = capsules_list[i].id
     return capsules
 
+
 def serialize_station_var_data(station):
     return {
     }
+
+
+def serialize_warehouse_var_data(warehouse):
+    return {
+    }
+
 
 def serialize_switch_set_data(a_switch):
     switch_positions = get_switch_positions(a_switch)
@@ -74,9 +102,11 @@ def serialize_switch_set_data(a_switch):
         'table': str(a_switch.table)
     }
 
+
 def serialize_switch_var_data(a_switch):
     return {
     }
+
 
 # def serialize_capsule(capsule_record):
 #     return {
@@ -99,6 +129,7 @@ def serialize_capsule(a_capsule):
         'next_element': a_capsule.next_element.name
     }
 
+
 def get_segment_trip_angle(loop, current_element, next_element):
     if type(current_element) is switch.Switch:
         current_element_angle = get_switch_angle(loop, current_element)
@@ -116,6 +147,7 @@ def get_segment_trip_angle(loop, current_element, next_element):
     abs_difference = math.fabs(current_element_angle - next_element_angle)
     return min(abs_difference % 360, math.fabs(360 - abs_difference) % 360)
 
+
 def get_element_angle(loop, element):
     if type(element) is switch.Switch:
         angle = get_switch_angle(loop, element)
@@ -123,12 +155,14 @@ def get_element_angle(loop, element):
 
     return element.angle
 
+
 def get_switch_angle(loop, a_switch):
     if a_switch.my_loop == loop:
         return a_switch.angle_my_loop
 
     if a_switch.other_loop == loop:
         return a_switch.angle_other_loop
+
 
 def get_capsule_position(capsule):
     """
@@ -151,6 +185,7 @@ def get_capsule_position(capsule):
         loop_radius = math.floor(capsule.loop.size / (2 * math.pi))
         return capsule.loop.x + math.cos(radius_angle) * loop_radius, capsule.loop.y + math.sin(
             radius_angle) * loop_radius
+
 
 def get_switch_positions(a_switch):
     """

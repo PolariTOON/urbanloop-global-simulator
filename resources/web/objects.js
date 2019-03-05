@@ -674,13 +674,13 @@ function updateNetworkScene() {
 
         });
     });
-    $.get('/stations.json', function (listStationJSON) {
+    $.get('/stationsVarData.json', function (listStationJSON) {
         listStationJSON.forEach(function (stationJSON) {
             let targetStations = objects.filter(station => station.uuid.includes(stationJSON['uuid']));
             targetStations.forEach(station => station.update(stationJSON));
         });
     });
-    $.get('/warehouses.json', function (listWarehouseJSON) {
+    $.get('/warehousesVarData.json', function (listWarehouseJSON) {
         listWarehouseJSON.forEach(function (warehouseJSON) {
             let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
             targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));

@@ -95,8 +95,7 @@ def generate_warehouses_set_data_json():
 
 @app.route('/switchesSetData.json')
 def generate_switches_set_data_json():
-    list_switches_set_data_json = [json_serializer.serialize_switch_set_data(a_switch) for a_switch in
-                                   switch.get_switches()]
+    list_switches_set_data_json = [json_serializer.serialize_switch_set_data(a_switch) for a_switch in switch.get_switches()]
     return Response(dumps(list_switches_set_data_json), mimetype="application/json")
 
 
@@ -105,8 +104,7 @@ def generate_stations_var_data_json():
     if sim_record.is_empty():
         return Response(mimetype="application/json")
 
-    list_stations_var_data_json = [json_serializer.serialize_station_var_data(a_station) for a_station in
-                                   last_record.stations_record]
+    list_stations_var_data_json = last_record.stations_record
     return Response(dumps(list_stations_var_data_json), mimetype="application/json")
 
 
@@ -115,8 +113,7 @@ def generate_warehouses_var_data_json():
     if sim_record.is_empty():
         return Response(mimetype="application/json")
 
-    list_warehouses_var_data_json = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in
-                                     last_record.warehouse_record]
+    list_warehouses_var_data_json = last_record.warehouses_record
     return Response(dumps(list_warehouses_var_data_json), mimetype="application/json")
 
 
@@ -125,8 +122,7 @@ def generate_switches_var_data_json():
     if sim_record.is_empty():
         return Response(mimetype="application/json")
 
-    list_switches_var_data_json = [json_serializer.serialize_switch_var_data(a_switch) for a_switch in
-                                   last_record.switches_record]
+    list_switches_var_data_json = last_record.switches_record
     return Response(dumps(list_switches_var_data_json), mimetype="application/json")
 
 

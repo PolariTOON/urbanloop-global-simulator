@@ -83,19 +83,28 @@ def serialize_warehouse_set_data(a_warehouse):
 
 def serialize_capsule_queue(queue):
     capsules = {}
-    capsules_list = queue.list()
-    for i in range(0, len(capsules_list)):
-        capsules[i] = capsules_list[i].id
+    # TODO fixer
+    # capsules_list = queue.list()
+    # for i in range(0, len(capsules_list)):
+    #    capsules[i] = capsules_list[i].id
     return capsules
 
 
-def serialize_station_var_data(station):
+def serialize_station_var_data(a_station):
     return {
+        'uuid': str(a_station.uuid),
+        'nb_travelers': a_station.traveler_queue.qsize(),
+        'nb_capsules': a_station.capsule_queue.qsize(),
+        'capsules': serialize_capsule_queue(a_station.capsule_queue)
+
     }
 
 
-def serialize_warehouse_var_data(warehouse):
+def serialize_warehouse_var_data(a_warehouse):
     return {
+        'uuid': str(a_warehouse.uuid),
+        'nb_capsules': a_warehouse.capsule_queue.qsize(),
+        'capsules': serialize_capsule_queue(a_warehouse.capsule_queue)
     }
 
 

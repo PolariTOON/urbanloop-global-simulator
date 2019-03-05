@@ -28,6 +28,7 @@ applyNetworkScene();
 
 setInterval(() => {
     updateNetworkScene();
+    generateDataPanel();
 }, 50);
 
 

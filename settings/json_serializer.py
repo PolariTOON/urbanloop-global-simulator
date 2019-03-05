@@ -97,8 +97,10 @@ def serialize_switch_set_data(a_switch):
     return {
         'uuid': str(a_switch.uuid),
         'id': a_switch.id,
-        'nameIn': a_switch.my_loop.name + ' <= ' + a_switch.other_loop.name,
-        'nameOut': a_switch.other_loop.name + ' => ' + a_switch.my_loop.name,
+        'nameIn': a_switch.my_loop.name + ' -> ' + a_switch.other_loop.name,
+        'nameOut': a_switch.other_loop.name + ' <- ' + a_switch.my_loop.name,
+        # 'nameIn':  a_switch.id + ': ' + a_switch.my_loop.name + ' -> ' + a_switch.other_loop.name,
+        # 'nameOut': a_switch.id + ': ' + a_switch.other_loop.name + ' <- ' + a_switch.my_loop.name,
         'xIn': switch_positions[0],
         'yIn': switch_positions[1],
         'xOut': switch_positions[2],

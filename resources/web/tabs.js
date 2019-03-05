@@ -46,11 +46,11 @@ function generateDataPanel() {
       if (element["name"] !== undefined) {
         data += "<br>&nbsp;Station " + element["name"];
       } else {
-        if (element["nameIn"].includes("=>")) {
-          data += "<br>&nbsp;Switch out " + element["id"] + " to " + element["other_loop_name"];
-        } else {
-          data += "<br>&nbsp;Switch in " + element["id"] + " from " + element["my_loop_name"]
-        }
+          if (selectedObject.json["name"].includes(element["my_loop_name"])){// (element["nameIn"].includes('<-')) {
+            data += "<br>&nbsp;Switch out " + element["id"] + " to " + element["other_loop_name"];
+          } else {
+            data += "<br>&nbsp;Switch in " + element["id"] + " from " + element["my_loop_name"]
+          }
       }
     }
     data += "</p>";
@@ -86,7 +86,7 @@ function generateDataPanel() {
       data += "</p>";
   } else if (selectedObject instanceof Capsule) {
     data += "Capsule #" + selectedObject.json["id"];
-    data += "<p>Contains a traveler: " + selectedObject.json["travelerNumber"] !== 0 + "</p>";
+    data += "<p>Contains a traveler: " + (selectedObject.json["travelerNumber"] !== 0) + "</p>";
     if (selectedObject.json["destination"] !== undefined) {
         data += "<p>Destination: " + selectedObject.json["destination"] + "</p>";
     }

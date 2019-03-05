@@ -175,6 +175,11 @@ class Station {
         this.outerCircle.fill(stationColor);
         networkLayer.batchDraw();
     }
+
+    update(stationJSON) {
+        this.json = stationJSON;
+        this.updateColor();
+    }
 }
 
 
@@ -263,6 +268,11 @@ class Warehouse {
         }
         this.outerCircle.fill(warehouseColor);
         networkLayer.batchDraw();
+    }
+
+    update(warehouseJSON) {
+        this.json = warehouseJSON;
+        this.updateColor();
     }
 }
 
@@ -484,6 +494,7 @@ class Capsule {
         this.outerCircle.x(x);
         this.outerCircle.y(y);
         this.travelerNumber = capsuleJSON['travelerNumber'];
+        this.json = capsuleJSON;
 
         this.updateColor();
     }
@@ -614,8 +625,19 @@ function updateNetworkScene() {
 
         });
     });
-
+    $.get('/stations.json', function (listStationJSON) {
+        listStationJSON.forEach(function (stationJSON) {
+            let targetStations = stations.filter(station => station.uuid.includes(stationJSON['uuid']));
+            targetStations.forEach(station => station.update(stationJSON));
+        });
+    });
+    $.get('/warehouses.json', function (listWarehouseJSON) {
+        listWarehouseJSON.forEach(function (warehouseJSON) {
+            let targetWarehouses = warehouses.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
+            targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
+        });
+    });
     networkLayer.batchDraw();
     infoLayer.batchDraw();
+    // generateDataPanel();
 }
-

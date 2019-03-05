@@ -40,18 +40,9 @@ function generateDataPanel() {
     data += "<p>Center coordinates : [" + selectedObject.json["x"] + ";" + selectedObject.json["y"] + "]</p>";
     data += "<p>Elements :"
     let elements = selectedObject.json["objects"];
+    console.log(elements); // TO REMOVE
     for (key in elements) {
-      element = elements[key];
-      console.log(element);
-      if (element["name"] !== undefined) {
-        data += "<br>&nbsp;Station " + element["name"];
-      } else {
-        if (element["nameIn"].includes("=>")) {
-          data += "<br>&nbsp;Switch out " + element["id"] + " to " + element["other_loop_name"];
-        } else {
-          data += "<br>&nbsp;Switch in " + element["id"] + " from " + element["my_loop_name"]
-        }
-      }
+      data += "<br>&nbsp;" + elements[key];
     }
     data += "</p>";
   } else if (selectedObject instanceof Switch) {
@@ -100,7 +91,7 @@ function generateDataPanel() {
     data += "<p>Last or current element: " + selectedObject.json["current_element"] + "</p>";
     data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
   } else {
-    data += "Nothing selected.";
+    data += "<p>Nothing selected.</p>";
   }
   div.innerHTML = data;
   document.getElementById("panel-div").replaceChild(div, document.getElementById("tab-content"));

@@ -35,3 +35,7 @@ class Queue:
 
     def empty(self):
         return len(self.items) == 0
+    
+    def is_empty(self):
+        self.items = []
+        return

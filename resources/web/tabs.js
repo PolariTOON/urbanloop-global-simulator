@@ -40,20 +40,8 @@ function generateDataPanel() {
     data += "<p>Center coordinates : [" + selectedObject.json["x"] + ";" + selectedObject.json["y"] + "]</p>";
     data += "<p>Elements :"
     let elements = selectedObject.json["objects"];
-    console.log(elements); // TO REMOVE
     for (key in elements) {
       data += "<br>&nbsp;" + elements[key];
-      /*element = elements[key];
-      console.log(element);
-      if (element["name"] !== undefined) {
-        data += "<br>&nbsp;Station " + element["name"];
-      } else {
-          if (selectedObject.json["name"].includes(element["my_loop_name"])){// (element["nameIn"].includes('<-')) {
-            data += "<br>&nbsp;Switch out " + element["id"] + " to " + element["other_loop_name"];
-          } else {
-            data += "<br>&nbsp;Switch in " + element["id"] + " from " + element["my_loop_name"]
-          }
-      }*/
     }
     data += "</p>";
   } else if (selectedObject instanceof Switch) {
@@ -88,7 +76,7 @@ function generateDataPanel() {
       data += "</p>";
   } else if (selectedObject instanceof Capsule) {
     data += "<p> Capsule #" + selectedObject.json["id"]  + "</p>";
-    data += "<p>Contains a traveler: " + selectedObject.json["travelerNumber"] !== 0 + "</p>";
+    data += "<p>Contains a traveler: " + (selectedObject.json["travelerNumber"] !== 0) + "</p>";
     if (selectedObject.json["destination"] !== undefined) {
         data += "<p>Destination: " + selectedObject.json["destination"] + "</p>";
     }

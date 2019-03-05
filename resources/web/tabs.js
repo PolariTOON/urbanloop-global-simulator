@@ -91,8 +91,8 @@ function generateDataPanel() {
     }
     data += "</p>";
   } else if (selectedObject instanceof Capsule) {
-    data += "Capsule #" + selectedObject.json["id"];
-    data += "<p>Contains a traveler: " + selectedObject.json["travelerNumber"] !== 0 + "</p>";
+    data += "<p>Capsule #" + selectedObject.json["id"] + "</p>";
+    data += "<p>Contains a traveler: " + (selectedObject.json["travelerNumber"] !== 0) + "</p>";
     if (selectedObject.json["destination"] !== undefined) {
         data += "<p>Destination: " + selectedObject.json["destination"] + "</p>";
     }

@@ -70,10 +70,53 @@ function fitStageIntoParentContainer() {
 
 window.addEventListener('resize', fitStageIntoParentContainer);
 
-document.getElementById('start-button').onclick = () => {
+// buttons
+let startButton = document.getElementById('start-button');
+let stopButton = document.getElementById('stop-button');
+let pauseButton = document.getElementById('pause-button');
+let backwardButton = document.getElementById('backward-button');
+let forwardButton = document.getElementById('forward-button');
+
+/*
+ *  0 : not running
+ *  1 : running
+ *  2 : paused
+*/
+let state = 0;
+
+startButton.onclick = () => {
+    startButton.classList.add('not-shown');
+    stopButton.classList.remove('not-shown');
     $.get('/start');
+    state = 1;
 };
 
+stopButton.onclick = () => {
+    stopButton.classList.add('not-shown');
+    startButton.classList.remove('not-shown');
+    // $.get('/stop');
+    state = 0;
+};
+
+pauseButton.onclick = () => {
+    if (state === 0)
+        return;
+    if (state === 1) {
+        // $.get('/pause');
+        state = 2;
+    } else {
+        // $.get('/resume');
+        state = 1;
+    }
+}
+
+backwardButton.onclick = () => {
+    // TODO
+}
+
+forwardButton.onclick = () => {
+    // TODO
+}
 
 stage.on('mousedown', event => {
     event.evt.preventDefault();

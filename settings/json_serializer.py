@@ -3,6 +3,7 @@ import math
 from model import switch, warehouse
 from simulator import converter
 
+
 # CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
 
 
@@ -52,7 +53,6 @@ def serialize_station_set_data(a_station):
         'next_element': a_station.next_element.name,
         'capsules': serialize_capsule_queue(a_station.capsule_queue)
     }
-
 
 
 def serialize_warehouse_set_data(a_warehouse):

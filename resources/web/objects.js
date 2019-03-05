@@ -577,11 +577,12 @@ function initNetworkScene() {
     });
 
     $.get('/warehousesSetData.json', function(listWarehouseSetDataJSON) {
+        // console.log(listWarehouseSetDataJSON.length);
         listWarehouseSetDataJSON.forEach(function (warehouseSetDataJSON){
-            console.log('warehouse');
-            new Warehouse(warehouseSetDataJSON, networkLayer, infoLayer);
+            new Warehouse(warehouseSetDataJSON);
         });
     });
+
     $.get('/switchesSetData.json', function (listSwitchSetDataJSON) {
         listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
             new Switch(switchSetDataJSON);

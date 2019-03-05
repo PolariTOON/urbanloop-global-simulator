@@ -4,7 +4,7 @@ let networkLayer;
 let infoLayer;
 
 let selectedObject = undefined;
-let capsules;
+let objects;
 
 const loopColor = 'rgb(156, 156, 156)';
 const loopSelectedColor = 'rgb(255, 200, 20)';
@@ -68,6 +68,8 @@ class Loop {
         networkLayer.add(this.outerCircle);
         networkLayer.add(this.innerCircle);
         networkLayer.add(this.text);
+
+        objects.push(this);
     }
 
     select() {
@@ -86,6 +88,13 @@ class Loop {
         }
         this.outerCircle.fill(loopColor);
         networkLayer.batchDraw();
+    }
+
+    updatePosition() {
+        const y = networkDiv.offsetHeight - this.json['y'];
+        this.innerCircle.y(y);
+        this.outerCircle.y(y);
+        this.text.y(y);
     }
 }
 
@@ -156,6 +165,8 @@ class Station {
         networkLayer.add(this.outerCircle);
         networkLayer.add(this.innerCircle);
         infoLayer.add(this.info);
+
+        objects.push(this);
     }
 
     select() {
@@ -174,6 +185,14 @@ class Station {
         }
         this.outerCircle.fill(stationColor);
         networkLayer.batchDraw();
+    }
+
+    updatePosition() {
+        const height = networkDiv.offsetHeight;
+        const y = height - this.json['y'];
+        this.innerCircle.y(y);
+        this.outerCircle.y(y);
+        this.info.y(y);
     }
 
     update(stationJSON) {
@@ -413,6 +432,8 @@ class Switch {
         networkLayer.add(this.innerOutCircle);
         infoLayer.add(this.infoIn);
         infoLayer.add(this.infoOut);
+
+        objects.push(this);
     }
 
     select() {
@@ -437,6 +458,23 @@ class Switch {
         this.outerInCircle.fill(switchColor);
         this.outerOutCircle.fill(switchColor);
         networkLayer.batchDraw();
+    }
+
+    updatePosition() {
+        const height = networkDiv.offsetHeight;
+        const xIn = this.json['xIn'];
+        const yIn = height - this.json['yIn'];
+        const xOut = this.json['xOut'];
+        const yOut = height - this.json['yOut'];
+
+        this.innerInCircle.y(yIn);
+        this.outerInCircle.y(yIn);
+        this.innerOutCircle.y(yOut);
+        this.outerOutCircle.y(yOut);
+        this.infoIn.y(yIn);
+        this.infoOut.y(yOut);
+        this.link.points([xIn, yIn, xOut, yOut]);
+        this.arrow.points([xIn, yIn, (xIn + xOut) / 2, (yIn + yOut) / 2])
     }
 }
 
@@ -463,7 +501,7 @@ class Capsule {
         networkLayer.add(this.innerCircle);
         this.update(capsuleJSON);
 
-        capsules.push(this);
+        objects.push(this);
     }
 
     select() {
@@ -573,6 +611,8 @@ function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
 function initNetworkScene() {
     $.ajaxSetup({async: false});
 
+    objects = [];
+
     $.get('/load');
 
     $.get('/loops.json', function (listLoopJSON) {
@@ -600,8 +640,6 @@ function initNetworkScene() {
         });
     });
 
-    capsules = [];
-
     $.ajaxSetup({async: true});
 
     networkLayer.batchDraw();
@@ -613,9 +651,9 @@ function updateNetworkScene() {
         document.getElementById('time-span').innerHTML = timeJSON['time']
     });*/
 
-    $.get('/capsules.json', function (listCapsuleJSON) {
+    $.get('/objects.json', function (listCapsuleJSON) {
         listCapsuleJSON.forEach(function (capsuleJSON) {
-            let targetCapsules = capsules.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
+            let targetCapsules = objects.filter(object => object.uuid.includes(capsuleJSON['uuid']));
 
             if (targetCapsules.length <= 0) {
                 new Capsule(capsuleJSON);

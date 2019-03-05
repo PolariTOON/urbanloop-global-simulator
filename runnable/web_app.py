@@ -13,8 +13,9 @@ from model import warehouse
 from settings import json_serializer
 from settings import network
 from simulator import sim_loop
+from sys import path
 
-web_directory = os.path.abspath('../resources/web')
+web_directory = os.path.abspath('%s/../resources/web' % (path[0]))
 app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
@@ -49,6 +50,15 @@ def start_simulation():
         sim_thread.start()
     return redirect(url_for('root'))
 
+@app.route('/stop')
+def stop_simulation():
+    global sim_thread
+    global is_simulation_started
+    if is_simulation_started:
+        is_simulation_started = False
+        # sim_loop.change_state(sim_loop.SimState.KILLED)
+        # sim_record.records.is_empty()
+    return redirect(url_for('root'))
 
 @app.route('/time.json')
 def generate_time_json():

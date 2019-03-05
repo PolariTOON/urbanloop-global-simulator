@@ -1,6 +1,7 @@
 import uuid
 
 _loop_id = -1
+_warehouse_id = -1
 _station_id = -1
 _switch_id = -1
 _capsule_id = -1
@@ -15,6 +16,12 @@ def generate_loop_id():
     global _loop_id
     _loop_id += 1
     return _loop_id
+
+
+def generate_warehouse_id():
+    global _warehouse_id
+    _warehouse_id += 1
+    return _warehouse_id
 
 
 def generate_station_id():

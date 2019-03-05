@@ -1,19 +1,19 @@
-from settings import simlog
 from model import queue
-from model import switch
 from model import station
+from model import switch
+from settings import simlog
+from model import identifier
 
 _warehouses = list()
-_warehouse_id = -1
 
 
 class Warehouse:
     def __init__(self, loop, angle, capacity=float('inf'), next_element=None):
         global _warehouses
-        global _warehouse_id
-        self.id = _warehouse_id
-        _warehouse_id += 1
         _warehouses.append(self)
+
+        self.uuid = identifier.generate_unique()
+        self.id = identifier.generate_warehouse_id()
         self.angle = angle
         self.capacity = capacity
         self.loop = loop
@@ -35,10 +35,10 @@ class Warehouse:
         else:
             details += "Switch " + str(self.next_element.id)
         details += "\nCapsules (%d): " % self.capsule_queue.qsize()
-        #if self.capsule_queue.qsize() != 0:
-            # l = self.capsule_queue.list()
-            # for c in l:
-            #    details += "\n    Capsule #{0}".format(c.id)
+        # if self.capsule_queue.qsize() != 0:
+        # l = self.capsule_queue.list()
+        # for c in l:
+        #    details += "\n    Capsule #{0}".format(c.id)
         return details
 
     def send_capsule(self, station):

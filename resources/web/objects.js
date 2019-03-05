@@ -4,7 +4,7 @@ let networkLayer;
 let infoLayer;
 
 let selectedObject = undefined;
-let capsules;
+let objects;
 
 const loopColor = 'rgb(156, 156, 156)';
 const loopSelectedColor = 'rgb(255, 200, 20)';
@@ -69,7 +69,7 @@ class Loop {
         networkLayer.add(this.innerCircle);
         networkLayer.add(this.text);
 
-        capsules.push(this);
+        objects.push(this);
     }
 
     select() {
@@ -166,7 +166,7 @@ class Station {
         networkLayer.add(this.innerCircle);
         infoLayer.add(this.info);
 
-        capsules.push(this);
+        objects.push(this);
     }
 
     select() {
@@ -269,6 +269,9 @@ class Warehouse {
         networkLayer.add(this.outerCircle);
         networkLayer.add(this.innerCircle);
         infoLayer.add(this.info);
+
+        objects.push(this);
+
     }
 
     select() {
@@ -287,6 +290,14 @@ class Warehouse {
         }
         this.outerCircle.fill(warehouseColor);
         networkLayer.batchDraw();
+    }
+
+    updatePosition() {
+        const height = networkDiv.offsetHeight;
+        const y = height - this.json['y'];
+        this.innerCircle.y(y);
+        this.outerCircle.y(y);
+        this.info.y(y);
     }
 
     update(warehouseJSON) {
@@ -433,7 +444,7 @@ class Switch {
         infoLayer.add(this.infoIn);
         infoLayer.add(this.infoOut);
 
-        capsules.push(this);
+        objects.push(this);
     }
 
     select() {
@@ -501,7 +512,7 @@ class Capsule {
         networkLayer.add(this.innerCircle);
         this.update(capsuleJSON);
 
-        capsules.push(this);
+        objects.push(this);
     }
 
     select() {
@@ -611,7 +622,7 @@ function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
 function initNetworkScene() {
     $.ajaxSetup({async: false});
 
-    capsules = [];
+    objects = [];
 
     $.get('/load');
 
@@ -653,7 +664,7 @@ function updateNetworkScene() {
 
     $.get('/capsules.json', function (listCapsuleJSON) {
         listCapsuleJSON.forEach(function (capsuleJSON) {
-            let targetCapsules = capsules.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
+            let targetCapsules = objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
 
             if (targetCapsules.length <= 0) {
                 new Capsule(capsuleJSON);
@@ -673,9 +684,10 @@ function updateNetworkScene() {
         listWarehouseJSON.forEach(function (warehouseJSON) {
             let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
             targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
+            console.log("bouh");
         });
     });
     networkLayer.batchDraw();
     infoLayer.batchDraw();
-    generateDataPanel();
+    // generateDataPanel();
 }

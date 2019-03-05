@@ -2,7 +2,6 @@ import math
 
 from model import switch, warehouse
 from simulator import converter
-from settings import simlog
 
 
 # CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
@@ -29,7 +28,6 @@ def serialize_loop(a_loop):
 
 def serialize_objects_list(objects):
     data = {}
-    simlog.error(str(len(objects)))
     for i in range(0, len(objects)):
         obj = objects[i][1]
         obj_type = objects[i][0]

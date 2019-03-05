@@ -49,8 +49,10 @@ def serialize_station_set_data(a_station):
         'name': a_station.name,
         'capacity': a_station.capacity,
         'outerCircle': a_station.loop.name,
-        'type': a_station.station_type,
+        'type': a_station.get_string_type(),
         'next_element': a_station.next_element.name,
+        'nb_travelers': a_station.traveler_queue.qsize(),
+        'nb_capsules': a_station.capsule_queue.qsize(),
         'capsules': serialize_capsule_queue(a_station.capsule_queue)
     }
 
@@ -67,6 +69,7 @@ def serialize_warehouse_set_data(a_warehouse):
         'capacity': a_warehouse.capacity,
         'outerCircle': a_warehouse.loop.name,
         'next_element': a_warehouse.next_element.name,
+        'nb_capsules': a_warehouse.capsule_queue.qsize(),
         'capsules': serialize_capsule_queue(a_warehouse.capsule_queue)
     }
 

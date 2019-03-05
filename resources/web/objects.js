@@ -651,7 +651,7 @@ function updateNetworkScene() {
         document.getElementById('time-span').innerHTML = timeJSON['time']
     });*/
 
-    $.get('/objects.json', function (listCapsuleJSON) {
+    $.get('/capsules.json', function (listCapsuleJSON) {
         listCapsuleJSON.forEach(function (capsuleJSON) {
             let targetCapsules = objects.filter(object => object.uuid.includes(capsuleJSON['uuid']));
 
@@ -665,17 +665,17 @@ function updateNetworkScene() {
     });
     $.get('/stations.json', function (listStationJSON) {
         listStationJSON.forEach(function (stationJSON) {
-            let targetStations = stations.filter(station => station.uuid.includes(stationJSON['uuid']));
+            let targetStations = objects.filter(station => station.uuid.includes(stationJSON['uuid']));
             targetStations.forEach(station => station.update(stationJSON));
         });
     });
     $.get('/warehouses.json', function (listWarehouseJSON) {
         listWarehouseJSON.forEach(function (warehouseJSON) {
-            let targetWarehouses = warehouses.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
+            let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
             targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
         });
     });
     networkLayer.batchDraw();
     infoLayer.batchDraw();
-    // generateDataPanel();
+    generateDataPanel();
 }

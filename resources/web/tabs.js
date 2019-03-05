@@ -19,7 +19,7 @@ function generateSelectedTab() {
       generateDataPanel();
       break;
     case viewTab:
-      generateViewPanel()
+      generateViewPanel();
       break;
   }
 }

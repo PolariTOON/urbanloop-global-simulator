@@ -36,14 +36,14 @@ def serialize_objects_list(objects):
         if "station" in obj_type:
             data[i] = "Station " + obj.name
             # data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch)
-            # else serialize_station_set_data(true_obj)            #
+            # else serialize_station_set_data(true_obj)
         elif "warehouse" in obj_type:
-            data[i] = "Warehouse " + obj.id + " in " + obj.loop
+            data[i] = "Warehouse %d in %s " % (obj.id, obj.loop)
             # data[i] = serialize_warehouse_set_data(obj)
         elif "out" in obj_type:
-            data[i] = "Switch out" + obj.next_element.name + " to " + obj.next_element_other.name
+            data[i] = "Switch out #%d to %s" % (obj.id, obj.loop.name)
         elif "in" in obj_type:
-            data[i] = "Switch in " + obj.next_element_other.name + " from " + obj.next_element.name
+            data[i] = "Switch in #%d from %s" %(obj.id, obj.loop.name)
     return data
 
 

@@ -84,37 +84,24 @@ let pauseButton = document.getElementById('pause-button');
 let backwardButton = document.getElementById('backward-button');
 let forwardButton = document.getElementById('forward-button');
 
-/*
- *  0 : not running
- *  1 : running
- *  2 : paused
-*/
-let state = 0;
 
 startButton.onclick = () => {
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
     $.get('/start');
-    state = 1;
+    running = true;
 };
 
 stopButton.onclick = () => {
     stopButton.classList.add('not-shown');
     startButton.classList.remove('not-shown');
+    running = false;
     // $.get('/stop');
-    state = 0;
 };
 
 pauseButton.onclick = () => {
-    if (state === 0)
-        return;
-    if (state === 1) {
-        // $.get('/pause');
-        state = 2;
-    } else {
-        // $.get('/resume');
-        state = 1;
-    }
+    pauseButton.setAttribute("text", running ? "Resume" : "Pause");
+    running = !running;
 }
 
 backwardButton.onclick = () => {

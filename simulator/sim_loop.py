@@ -191,9 +191,10 @@ def stop_simulation():
     Stop the simulation definitely. All objects or stations are reset
     """
     simlog.debug("Stopping simulation")
+    change_state(SimState.KILLED)
     capsule.reset_simulation()
     station.reset_simulation()
-    change_state(SimState.KILLED)
+    sim_record.records.empty()
     if _endless_quit_event is not None:
         quit_endless_simulation()
         return

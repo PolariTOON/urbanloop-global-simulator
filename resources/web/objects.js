@@ -677,5 +677,4 @@ function updateNetworkScene() {
     });
     networkLayer.batchDraw();
     infoLayer.batchDraw();
-    // generateDataPanel();
 }

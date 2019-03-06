@@ -54,15 +54,14 @@ def start_simulation():
 
 @app.route('/stop')
 def stop_simulation():
-    global sim_thread
     global is_simulation_started
     is_simulation_started = False
-    sim_loop.change_state(sim_loop.SimState.KILLED)
-    # sim_record.records.empty()
-    return redirect(url_for('root'))
 
-@app.route('/pause')
-def pause_simulation():
+    global sim_thread
+    sim_thread = None
+
+    sim_loop.stop_simulation()
+    sim_record.records.empty()
     return redirect(url_for('root'))
 
 

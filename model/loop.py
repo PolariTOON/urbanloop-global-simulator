@@ -49,7 +49,7 @@ class Loop:
                 angle_next = element[2] - order[(i + 1) % len(order)][2]
             if angle_next < 0:
                 angle_next += 360
-            self.lengths += [float(angle_next / 360) * self.size]  # arc = 2*D*pi*angle/360  et D = circonference/pi
+            self.lengths += [float(angle_next / 360) * self.size]  # arc = D*pi*angle/360  et D = circonference/pi
             if self.size is None:
                 self.size = sum(self.lengths)
 

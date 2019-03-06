@@ -9,6 +9,7 @@ from settings import config
 from settings import simlog
 from simulator import ascent_generator
 from simulator import traveler_generator
+import threading
 
 
 class SimState(Enum):
@@ -64,8 +65,18 @@ class SimLoop:
         You can create several independents process while the
         SimState is RUNNING.
         """
+
         global _current_tick
         while True:
+            # check for thread to be be stopped
+            current_thread = threading.current_thread()
+            if current_thread != threading.main_thread():
+                # mode graphique
+                if current_thread.stopped():
+                    simlog.debug("Thread is stopping! Shutting down simulator...")
+                    stop_simulation()
+                    return
+            # running simulator
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
@@ -165,7 +176,6 @@ def run_simulation(sim_loop=None, is_recorded=False):
 
     _env.run(until=int(config.sim['duration']))
 
-
 def quit_endless_simulation():
     """
     Stop an endless simulation by triggering the _endless_quit_event
@@ -176,6 +186,7 @@ def quit_endless_simulation():
         yield _endless_quit_event.succeed()
 
     _env.process(_trigger())
+    # _endless_quit_event = _env.event()
 
 
 def pause_simulation():

@@ -2,17 +2,11 @@ import logging
 import os
 from json import dumps
 from sys import path
-from threading import Thread
 
 from flask import Flask, Response, redirect, url_for
 
-from model import loop
-from model import sim_record
-from model import station
-from model import switch
-from model import warehouse
-from settings import json_serializer
-from settings import network
+from model import loop, station, switch, warehouse, sim_record
+from settings import json_serializer, network, simlog, stoppable_thread as sth
 from simulator import sim_loop
 
 web_directory = os.path.abspath('%s/../resources/web' % (path[0]))
@@ -46,19 +40,20 @@ def start_simulation():
     global is_simulation_started
     if not is_simulation_started:
         is_simulation_started = True
-        sim_thread = Thread(target=sim_loop.run_simulation, args=(None, True))
+        sim_thread = sth.StoppableThread(target=sim_loop.run_simulation, args=(None, True))
         sim_thread.start()
+
     return redirect(url_for('root'))
 
 
 @app.route('/stop')
 def stop_simulation():
-    global is_simulation_started
+    global is_simulation_started, sim_thread
     is_simulation_started = False
+    # stops simulation
+    sim_thread.stop()
+    del sim_thread
 
-
-@app.route('/pause')
-def pause_simulation():
     return redirect(url_for('root'))
 
 

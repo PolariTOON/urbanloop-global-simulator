@@ -6,14 +6,8 @@ from threading import Thread
 
 from flask import Flask, Response, redirect, url_for
 
-from model import capsule
-from model import loop
-from model import sim_record
-from model import station
-from model import switch
-from model import warehouse
-from settings import json_serializer
-from settings import network
+from model import capsule, loop, station, switch, warehouse, sim_record
+from settings import json_serializer, network, simlog
 from simulator import sim_loop
 
 web_directory = os.path.abspath('%s/../resources/web' % (path[0]))

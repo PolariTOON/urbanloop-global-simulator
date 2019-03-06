@@ -96,7 +96,7 @@ stopButton.onclick = () => {
     stopButton.classList.add('not-shown');
     startButton.classList.remove('not-shown');
     running = false;
-    // $.get('/stop');
+    $.get('/stop');
 };
 
 pauseButton.onclick = () => {

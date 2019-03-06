@@ -197,7 +197,7 @@ class Station {
 
     update(stationJSON) {
         this.json = stationJSON;
-        this.updateColor();
+        //this.updateColor();
     }
 }
 
@@ -302,7 +302,7 @@ class Warehouse {
 
     update(warehouseJSON) {
         this.json = warehouseJSON;
-        this.updateColor();
+        //this.updateColor();
     }
 }
 
@@ -684,7 +684,7 @@ function updateNetworkScene() {
         listWarehouseJSON.forEach(function (warehouseJSON) {
             let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
             targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
-            console.log("bouh");
+            //console.log("bouh");
         });
     });
     networkLayer.batchDraw();

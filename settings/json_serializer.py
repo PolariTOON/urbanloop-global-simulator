@@ -36,7 +36,7 @@ def serialize_objects_list(objects):
             # data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch)
             # else serialize_station_set_data(true_obj)
         elif "warehouse" in obj_type:
-            data[i] = "Warehouse %d in %s " % (obj.id, obj.loop)
+            data[i] = "Warehouse %d in %s " % (obj.id, obj.loop.name)
             # data[i] = serialize_warehouse_set_data(obj)
         elif "out" in obj_type:
             data[i] = "Switch out #%d to %s" % (obj.id, obj.loop.name)

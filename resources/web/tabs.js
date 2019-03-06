@@ -19,7 +19,7 @@ function generateSelectedTab() {
       generateDataPanel();
       break;
     case viewTab:
-      generateViewPanel()
+      generateViewPanel();
       break;
   }
 }
@@ -70,9 +70,9 @@ function generateDataPanel() {
       data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
       data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
       data += "<p>Capsules:" + selectedObject.json["nb_capsules"];
-      for (k in selectedObject.json["capsules"]) {
+      /*for (k in selectedObject.json["capsules"]) {
           data += "<br>&nbsp;<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
-      }
+      }*/
       data += "</p>";
   } else if (selectedObject instanceof Capsule) {
     data += "<p> Capsule #" + selectedObject.json["id"]  + "</p>";

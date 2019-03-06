@@ -29,7 +29,7 @@ class Loop:
         self.objects = []
         self.lengths = []
 
-    def add_order(self, order):
+    def add_order(self, order, clockwise):
         """
          permet d'ajouter les elements dans la boucle en déterminant leur position
          (objects de la forme [nature, pointeur, angle])
@@ -43,14 +43,20 @@ class Loop:
             element = order[i]
             # order[i] = [nature, obj, angle]
             self.objects += [order[i]]
-            # print(order[i])
-            angle_next = order[(i + 1) % len(order)][2] - element[2]
+            if clockwise:  # sens horaire des angles
+                angle_next = order[(i + 1) % len(order)][2] - element[2]
+            else:  # sens trigonométrique des angles
+                angle_next = element[2] - order[(i + 1) % len(order)][2]
             if angle_next < 0:
                 angle_next += 360
             self.lengths += [float(angle_next / 360) * self.size]  # arc = 2*D*pi*angle/360  et D = circonference/pi
             if self.size is None:
                 self.size = sum(self.lengths)
         print(self.lengths)
+
+        # [58.33333333333333, 97.222222222, 165.27777777777777, 48.611111111, 116.66666666666666, 213.8888888888889]
+        # [250.0, 150.0, 150.0, 175.0, 55.0, 120.0]
+        # [125.0, 97.22222222222223, 41.666666666666664, 69.44444444444444, 90.27777777777777, 76.3888888888889]
 
     def distance_between(self, element1, element2):
         for i in range(len(self.objects)):

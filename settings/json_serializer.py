@@ -36,14 +36,14 @@ def serialize_objects_list(objects):
         if "station" in obj_type:
             data[i] = "Station " + obj.name
             # data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch)
-            # else serialize_station_set_data(true_obj)            #
+            # else serialize_station_set_data(true_obj)
         elif "warehouse" in obj_type:
-            data[i] = "Warehouse " + obj.id + " in " + obj.loop
+            data[i] = "Warehouse %d in %s " % (obj.id, obj.loop.name)
             # data[i] = serialize_warehouse_set_data(obj)
         elif "out" in obj_type:
-            data[i] = "Switch out" + obj.next_element.name + " to " + obj.next_element_other.name
+            data[i] = "Switch out #%d to %s" % (obj.id, obj.loop.name)
         elif "in" in obj_type:
-            data[i] = "Switch in " + obj.next_element_other.name + " from " + obj.next_element.name
+            data[i] = "Switch in #%d from %s" %(obj.id, obj.loop.name)
     return data
 
 
@@ -85,19 +85,28 @@ def serialize_warehouse_set_data(a_warehouse):
 
 def serialize_capsule_queue(queue):
     capsules = {}
-    capsules_list = queue.list()
-    for i in range(0, len(capsules_list)):
-        capsules[i] = capsules_list[i].id
+    # TODO fixer
+    # capsules_list = queue.list()
+    # for i in range(0, len(capsules_list)):
+    #    capsules[i] = capsules_list[i].id
     return capsules
 
 
-def serialize_station_var_data(station):
+def serialize_station_var_data(a_station):
     return {
+        'uuid': str(a_station.uuid),
+        'nb_travelers': a_station.traveler_queue.qsize(),
+        'nb_capsules': a_station.capsule_queue.qsize(),
+        'capsules': serialize_capsule_queue(a_station.capsule_queue)
+
     }
 
 
-def serialize_warehouse_var_data(warehouse):
+def serialize_warehouse_var_data(a_warehouse):
     return {
+        'uuid': str(a_warehouse.uuid),
+        'nb_capsules': a_warehouse.capsule_queue.qsize(),
+        'capsules': serialize_capsule_queue(a_warehouse.capsule_queue)
     }
 
 

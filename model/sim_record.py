@@ -1,4 +1,4 @@
-from model import capsule
+from model import capsule, station, warehouse
 from model import queue
 from settings import config
 from settings import json_serializer
@@ -13,10 +13,10 @@ _offset = 500
 class SimRecord:
     def __init__(self):
         self.time_record = json_serializer.serialize_time()
-        self.stations_record = []
+        self.stations_record = [json_serializer.serialize_station_var_data(a_station) for a_station in station.get_stations()]
         self.switches_record = []
-        self.capsules_record = [json_serializer.serialize_capsule(a_capsule) for a_capsule in
-                                capsule.get_capsules()]
+        self.capsules_record = [json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]
+        self.warehouses_record = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in warehouse.get_warehouses()]
 
 
 def change_queue_size(limit=_limit):

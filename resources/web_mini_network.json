@@ -1,6 +1,7 @@
 {
   "Nancy": {
     "center": [500,630],
+    "clockwise" : false,
     "circonference": 500,
     "content": [{"type":"station","name":"Gare", "angle":90, "station_type": 3, "capacity": 5},
                 {"type":"station","name":"Stanislas", "angle":0, "station_type": 3, "capacity": 4},
@@ -13,6 +14,7 @@
   "Villers-les-Nancy": {
     "center": [300,400],
     "circonference": 700,
+    "clockwise" : false,
     "content": [{"type":"switch_in","other_loop":"Nancy", "angle":30 },
                 {"type":"station","name":"Velodrome", "angle":0, "station_type": 3, "capacity": 5},
                 {"type":"station","name":"TELECOM Nancy", "angle":310, "station_type": 1, "capacity": 4},
@@ -24,6 +26,7 @@
   "Laxou": {
     "center": [150,650],
     "circonference": 900,
+    "clockwise" : false,
     "content": [{"type":"switch_out","other_loop":"Nancy", "length": 187.941, "angle":40 },
                 {"type":"switch_in","other_loop":"Nancy", "angle":300 },
                 {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":240 },

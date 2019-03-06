@@ -93,17 +93,19 @@ def load(file_path=None, web=False):
         for i in range(len(elms)):
             # gestion des elements precedents et suivants
             elm = elms[i]
-            if type(elm) == Switch and elm.other_loop == the_loop:  # c'est un switch_in
+            if type(elm) is Switch and elm.other_loop == the_loop:  # c'est un switch_in
                 elm.next_element_other = elms[(i + 1) % len(elms)]
                 order += [["switch_in", elm, elm.angle_other_loop]]
             else:  # type(elm) == Station or (type(elm) == Switch and elm.my_loop == l):
                 elm.next_element = elms[(i + 1) % len(elms)]
-                if type(elm) == Switch:
+                if type(elm) is Switch:
                     elm.previous_element = elms[(i - 1) % len(elms)]
                     order += [["switch_out", elm, elm.angle_my_loop]]
+                elif type(elm) is model_warehouse.Warehouse:
+                    order += [["warehouse", elm, elm.angle]]
                 else:
                     order += [["station", elm, elm.angle]]
-        the_loop.add_order(order)
+        the_loop.add_order(order, info["clockwise"])
     model_switch.init()
     '''nb_st = len(st.get_stations())
         print(nb_st)

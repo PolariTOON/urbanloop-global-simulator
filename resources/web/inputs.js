@@ -1,5 +1,5 @@
 const zoomIntensity = 1.1;
-const minScale = 0.5;
+const minScale = 0.01;
 let moveIntensity = 1;
 let pressTimeout;
 let doPan = false;

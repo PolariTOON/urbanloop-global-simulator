@@ -7,7 +7,7 @@ from simulator import sim_loop
 
 records = queue.Queue()
 _limit = int(config.sim['default_record_size'])
-_offset = 0
+_offset = 2
 
 
 class SimRecord:

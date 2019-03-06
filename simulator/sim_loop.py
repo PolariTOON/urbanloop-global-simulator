@@ -73,8 +73,8 @@ class SimLoop:
                 if is_frequency(1):
                     _env.process(self.traveler_generator.generate())
 
-                # if not _current_tick == 0 and is_frequency(120):
-                # station.fill_and_full_stations()
+                if not _current_tick == 0 and is_frequency(120):
+                    station.fill_and_full_stations()
 
                 if self.is_recorded:
                     sim_record.put_record()

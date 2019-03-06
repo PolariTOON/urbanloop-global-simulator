@@ -1,3 +1,5 @@
+import math
+
 from model import identifier
 from model import station
 from model import switch
@@ -7,8 +9,6 @@ from simulator import converter
 from simulator import sim_loop
 
 _capsules = list()
-start = 0
-end = 0
 
 
 class Capsule:
@@ -86,25 +86,16 @@ class Capsule:
         """
         :return: Trip event generator
         """
-        if self.id == 0:
-            simlog.error("dist : " + self.current_element.name + " " + self.next_element.name)
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
         self.segment_length = dist_to_next_element
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
         self.segment_ticks_duration = time_to_next_element * sim_loop.get_tick_per_second()
-        if self.id == 0:
-            global start
-            simlog.error("dist : " + str(dist_to_next_element))
-            simlog.error("duration : " + str(self.segment_ticks_duration))
-            start = sim_loop.get_current_tick()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
 
     def callback_trip_event(self):
-        if self.id == 0:
-            simlog.error("DURATION : " + str(sim_loop.get_current_tick() - start))
         """
         Recursive callback that steps the trip event.
         This function is called when the capsule arrives to the next_element which isn't
@@ -193,13 +184,13 @@ class Capsule:
         """
         :return: The distance traveled each tick by a capsule at the defined speed
         """
-        return self.speed / sim_loop.get_tick_per_second()
+        return float(self.speed / sim_loop.get_tick_per_second())
 
     def get_angle_per_tick(self):
         """
         :return: The distance traveled each tick by a capsule at the defined speed
         """
-        return self.get_meter_per_tick() / self.loop.size
+        return self.get_meter_per_tick() / (self.loop.size / (2 * math.pi))
 
     def _get_travelers_id(self):
         """

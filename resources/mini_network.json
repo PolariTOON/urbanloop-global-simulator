@@ -1,38 +1,38 @@
 {
   "Nancy": {
-    "center": [500,70],
+    "center": [500,630],
+    "clockwise" : false,
     "circonference": 500,
-    "clockwise" : true,
-    "content": [{"type":"station","name":"Gare", "angle":0, "station_type": 3, "capacity": 5},
-                {"type":"station","name":"Stanislas", "angle":90, "station_type": 3, "capacity": 4},
-                {"type":"station","name":"Campus_ARTEM", "angle": 160, "station_type": 1, "capacity": 4},
-                {"type":"switch_out","other_loop":"Villers-les-Nancy", "length": 15, "angle":190},
-                {"type":"switch_out","other_loop":"Laxou", "length": 50, "angle":240},
-                {"type":"switch_in","other_loop":"Laxou", "angle":305}
+    "content": [{"type":"station","name":"Gare", "angle":90, "station_type": 3, "capacity": 5},
+                {"type":"station","name":"Stanislas", "angle":0, "station_type": 3, "capacity": 4},
+                {"type":"station","name":"Campus_ARTEM", "angle": 290, "station_type": 1, "capacity": 4},
+                {"type":"switch_out","other_loop":"Villers-les-Nancy", "length": 132.206, "angle":260},
+                {"type":"switch_out","other_loop":"Laxou", "length": 219.716, "angle":210},
+                {"type":"switch_in","other_loop":"Laxou", "angle":145}
     ]
   },
   "Villers-les-Nancy": {
-    "center": [300,300],
+    "center": [300,400],
     "circonference": 700,
-    "clockwise" : true,
-    "content": [{"type":"switch_in","other_loop":"Nancy", "angle":60 },
-                {"type":"station","name":"Velodrome", "angle":90, "station_type": 3, "capacity": 5},
-                {"type":"station","name":"TELECOM Nancy", "angle":140, "station_type": 1, "capacity": 4},
+    "clockwise" : false,
+    "content": [{"type":"switch_in","other_loop":"Nancy", "angle":30 },
+                {"type":"station","name":"Velodrome", "angle":0, "station_type": 3, "capacity": 5},
+                {"type":"station","name":"TELECOM Nancy", "angle":310, "station_type": 1, "capacity": 4},
                 {"type":"station","name":"Eglise", "angle":225, "station_type": 2, "capacity": 3},
-                {"type":"warehouse", "angle":250, "capacity": 50},
-                {"type":"switch_out","other_loop":"Laxou", "length": 60, "angle":310}
+                {"type":"warehouse", "capacity": 50, "angle":180},
+                {"type":"switch_out","other_loop":"Laxou", "length": 147.064, "angle":140}
     ]
   },
   "Laxou": {
-    "center": [150,50],
+    "center": [150,650],
     "circonference": 900,
-    "clockwise" : true,
-    "content": [{"type":"switch_out","other_loop":"Nancy", "length": 60, "angle":50 },
-                {"type":"switch_in","other_loop":"Nancy", "angle":150 },
-                {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":210 },
-                {"type":"station","name":"Auchan", "angle":270, "station_type": 1, "capacity": 3},
-                {"type":"station","name":"Sapiniere", "angle":340, "station_type": 2, "capacity": 3},
-                {"type":"warehouse", "angle":2, "capacity": 1000}
+    "clockwise" : false,
+    "content": [{"type":"switch_out","other_loop":"Nancy", "length": 187.941, "angle":40 },
+                {"type":"switch_in","other_loop":"Nancy", "angle":300 },
+                {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":240 },
+                {"type":"station","name":"Auchan", "angle":180, "station_type": 1, "capacity": 3},
+                {"type":"station","name":"Sapiniere", "angle":110, "station_type": 2, "capacity": 3},
+                {"type":"warehouse", "capacity": 100, "angle":80}
     ]
   }
 }

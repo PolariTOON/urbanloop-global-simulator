@@ -638,9 +638,8 @@ function initNetworkScene() {
         });
     });
 
-    $.get('/warehousesSetData.json', function(listWarehouseSetDataJSON) {
-        // console.log(listWarehouseSetDataJSON.length);
-        listWarehouseSetDataJSON.forEach(function (warehouseSetDataJSON){
+    $.get('/warehousesSetData.json', function (listWarehouseSetDataJSON) {
+        listWarehouseSetDataJSON.forEach(function (warehouseSetDataJSON) {
             new Warehouse(warehouseSetDataJSON);
         });
     });
@@ -674,20 +673,21 @@ function updateNetworkScene() {
 
         });
     });
+
     $.get('/stationsVarData.json', function (listStationJSON) {
         listStationJSON.forEach(function (stationJSON) {
             let targetStations = objects.filter(station => station.uuid.includes(stationJSON['uuid']));
             targetStations.forEach(station => station.update(stationJSON));
         });
     });
+
     $.get('/warehousesVarData.json', function (listWarehouseJSON) {
         listWarehouseJSON.forEach(function (warehouseJSON) {
             let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
             targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
-            //console.log("bouh");
         });
     });
+
     networkLayer.batchDraw();
     infoLayer.batchDraw();
-    // generateDataPanel();
 }

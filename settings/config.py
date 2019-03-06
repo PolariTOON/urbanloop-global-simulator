@@ -33,7 +33,6 @@ def load(file_name):
     capsule = config['CAPSULE']
     routing = config['ROUTING']
     sim = config['SIM']
-    # print(default['travelers_per_day'])
 
 
 if loaded is False:

@@ -9,7 +9,7 @@ from settings import network
 
 """Initialisation"""
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-network.load("{0}/../resources/{1}".format(path[0], "mini_network.json"))
+network.load("{0}/../resources/{1}".format(path[0], "old_mini_network.json"))
 
 """création d'une capsule à TELECOM Nancy voulant aller à la Gare """
 telecom = station.get_station_by_name("TELECOM Nancy")

@@ -15,6 +15,7 @@ canvas {
 }
 
 #panel-div {
+    position: relative;
     background-color: #eee;
     padding: 1.5rem;
 }
@@ -61,4 +62,38 @@ hr {
 #tab-content input {
     font-size: 0.8rem;
     height: inherit;
+}
+
+.slider {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 1.5rem;
+    width: 80%;
+    -webkit-appearance: none;
+    left: 50%;
+    transform: translate(-50%, 0);
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #328e2c;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #328e2c;
+    cursor: pointer;
 }

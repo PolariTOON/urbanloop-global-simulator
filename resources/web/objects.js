@@ -97,6 +97,11 @@ class Loop {
         this.outerCircle.y(y);
         this.text.y(y);
     }
+
+    updateScale(value) {
+        this.text.scaleX(value);
+        this.text.scaleY(value);
+    }
 }
 
 class Station {
@@ -196,12 +201,20 @@ class Station {
         this.info.y(y);
     }
 
+    updateScale(value) {
+        this.innerCircle.scaleX(value);
+        this.innerCircle.scaleY(value);
+        this.outerCircle.scaleX(value);
+        this.outerCircle.scaleY(value);
+        this.info.scaleX(value);
+        this.info.scaleY(value);
+    }
+
     update(stationJSON) {
         this.json = stationJSON;
         //this.updateColor();
     }
 }
-
 
 class Warehouse {
     constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
@@ -310,8 +323,16 @@ class Warehouse {
         this.json = warehouseJSON;
         //this.updateColor();
     }
-}
 
+    updateScale(value) {
+        this.innerRectangle.scaleX(value);
+        this.innerRectangle.scaleY(value);
+        this.outerRectangle.scaleX(value);
+        this.outerRectangle.scaleY(value);
+        this.info.scaleX(value);
+        this.info.scaleY(value);
+    }
+}
 
 class Switch {
     constructor(switchJSON, switchRadius = 12, switchWidth = 4) {
@@ -493,6 +514,25 @@ class Switch {
         this.link.points([xIn, yIn, xOut, yOut]);
         this.arrow.points([xIn, yIn, (xIn + xOut) / 2, (yIn + yOut) / 2])
     }
+
+    updateScale(value) {
+        this.innerInCircle.scaleX(value);
+        this.innerInCircle.scaleY(value);
+        this.outerInCircle.scaleX(value);
+        this.outerInCircle.scaleY(value);
+        this.innerOutCircle.scaleX(value);
+        this.innerOutCircle.scaleY(value);
+        this.outerOutCircle.scaleX(value);
+        this.outerOutCircle.scaleY(value);
+        this.infoIn.scaleX(value);
+        this.infoIn.scaleY(value);
+        this.infoOut.scaleX(value);
+        this.infoOut.scaleY(value);
+        this.link.strokeWidth(2 * value);
+        this.arrow.strokeWidth(2 * value);
+        this.arrow.pointerWidth(10 * value);
+        this.arrow.pointerLength(10 * value);
+    }
 }
 
 class Capsule {
@@ -566,6 +606,13 @@ class Capsule {
             this.innerCircle.fill(capsuleInnerEmptyColor);
             this.outerCircle.fill(capsuleOuterEmptyColor);
         }
+    }
+
+    updateScale(value) {
+        this.innerCircle.scaleX(value);
+        this.innerCircle.scaleY(value);
+        this.outerCircle.scaleX(value);
+        this.outerCircle.scaleY(value);
     }
 
     isAboard() {

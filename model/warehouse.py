@@ -1,8 +1,8 @@
+from model import identifier
 from model import queue
 from model import station
 from model import switch
 from settings import simlog
-from model import identifier
 
 _warehouses = list()
 
@@ -41,46 +41,46 @@ class Warehouse:
         #    details += "\n    Capsule #{0}".format(c.id)
         return details
 
-    def send_capsule(self, station):
-        simlog.info("an empty capsule left warehouse %d to %s" % (self.id, station.name))
+    def send_capsule(self, a_station):
+        simlog.info("an empty capsule left warehouse %d to %s" % (self.id, a_station.name))
         capsule = self.capsule_queue.get()
-        capsule.destination = station
+        capsule.destination = a_station
         if True:  # TODO eviter de sortir alors que y'a déjà une cpasule sur la sortie
             capsule.start_trip()
 
 
-def which_warehouse_before(station):
+def which_warehouse_before(a_station):
     """
     trouver le warehouse dont la capsule doit partir pour arriver à la station au plus vite
-    :param station:
+    :param a_station:
     :return: l'entrepôt le plus proche "en amont"
     """
     go_from = None
     cost_go_from = float('inf')
     for candidat in _warehouses:
         if candidat.capsule_queue.qsize() > 0:
-            if candidat.loop is station.loop:
+            if candidat.loop is a_station.loop:
                 return candidat
-            cost = switch.cost_between(candidat, station)
+            cost = switch.cost_between(candidat, a_station)
             if cost < cost_go_from:
                 go_from = candidat
                 cost_go_from = cost
     return go_from
 
 
-def which_warehouse_after(station):
+def which_warehouse_after(a_station):
     """
     trouver le warehouse vers lequel la capsule doit partir depuis la station
-    :param station:
+    :param a_station:
     :return: l'entrepôt le plus proche "en aval"
     """
     go_to = None
     cost_go_to = float('inf')
     for candidat in _warehouses:
         if candidat.capsule_queue.qsize() < candidat.capacity:
-            if candidat.loop is station.loop:
+            if candidat.loop is a_station.loop:
                 return candidat
-            cost = switch.cost_between(station, candidat)
+            cost = switch.cost_between(a_station, candidat)
             if cost < cost_go_to:
                 go_to = candidat
                 cost_go_to = cost

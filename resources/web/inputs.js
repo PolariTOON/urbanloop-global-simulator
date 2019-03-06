@@ -67,22 +67,22 @@ function fitStageIntoParentContainer() {
     stage.height(networkDiv.offsetWidth);
 
     objects.forEach(object => {
-       if (!(object instanceof Capsule)) {
-           object.updatePosition();
-       }
+        if (!(object instanceof Capsule)) {
+            object.updatePosition();
+        }
     });
 
-    stage.draw();
+    stage.batchDraw();
 }
 
 window.addEventListener('resize', fitStageIntoParentContainer);
 
-// buttons
 let startButton = document.getElementById('start-button');
 let stopButton = document.getElementById('stop-button');
 let pauseButton = document.getElementById('pause-button');
 let backwardButton = document.getElementById('backward-button');
 let forwardButton = document.getElementById('forward-button');
+let scaleSlider = document.getElementById('scale-slider');
 
 startButton.onclick = () => {
     startButton.classList.add('not-shown');
@@ -101,15 +101,20 @@ stopButton.onclick = () => {
 pauseButton.onclick = () => {
     pauseButton.innerHTML("value", running ? "Resume" : "Pause");
     running = !running;
-}
+};
 
 backwardButton.onclick = () => {
     // TODO
-}
+};
 
 forwardButton.onclick = () => {
     // TODO
-}
+};
+
+scaleSlider.oninput = () => {
+    objects.forEach(object => object.updateScale(Math.sqrt(scaleSlider.value)));
+    stage.batchDraw();
+};
 
 stage.on('mousedown', event => {
     event.evt.preventDefault();

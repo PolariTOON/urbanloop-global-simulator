@@ -100,7 +100,7 @@ stopButton.onclick = () => {
 };
 
 pauseButton.onclick = () => {
-    pauseButton.setAttribute("text", running ? "Resume" : "Pause");
+    pauseButton.innerHTML("value", running ? "Resume" : "Pause");
     running = !running;
 }
 

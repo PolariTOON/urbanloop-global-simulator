@@ -57,11 +57,6 @@ def stop_simulation():
     return redirect(url_for('root'))
 
 
-@app.route('/pause')
-def pause_simulation():
-    return redirect(url_for('root'))
-
-
 @app.route('/time.json')
 def generate_time_json():
     if sim_record.is_empty():

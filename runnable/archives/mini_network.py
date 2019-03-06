@@ -9,12 +9,12 @@ from settings import network
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 # logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-network_path = '../resources/mini_network.json'
+network_path = '../resources/old_mini_network.json'
 try:
     with open(network_path, "r") as file:
         None  # TODO WTF ?
 except FileNotFoundError:
-    network_path = 'resources/mini_network.json'
+    network_path = 'resources/old_mini_network.json'
 
 network.load(network_path)
 

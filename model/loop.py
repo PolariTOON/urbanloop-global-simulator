@@ -52,11 +52,6 @@ class Loop:
             self.lengths += [float(angle_next / 360) * self.size]  # arc = 2*D*pi*angle/360  et D = circonference/pi
             if self.size is None:
                 self.size = sum(self.lengths)
-        print(self.lengths)
-
-        # [58.33333333333333, 97.222222222, 165.27777777777777, 48.611111111, 116.66666666666666, 213.8888888888889]
-        # [250.0, 150.0, 150.0, 175.0, 55.0, 120.0]
-        # [125.0, 97.22222222222223, 41.666666666666664, 69.44444444444444, 90.27777777777777, 76.3888888888889]
 
     def distance_between(self, element1, element2):
         for i in range(len(self.objects)):
@@ -70,7 +65,6 @@ class Loop:
                     element = self.objects[index][1]
                     distance += self.lengths[index - 1]
                     if element is element2:
-                        print(element1.name + " " + element2.name + " : " + str(distance))
                         return distance
         return 0
 

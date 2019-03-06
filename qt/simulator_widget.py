@@ -65,7 +65,7 @@ class SimulatorWidget(QWidget):
         """
         simlog.debug("click at [{0};{1}]".format(event.x(), event.y()))
         # WARNING
-        # relative offsets to mini_network.json
+        # relative offsets to old_mini_network.json
         x = event.x() - 18  # - x_offset
         y = event.y() - 102 # - y_offset
         # computing if click happened on a capsule

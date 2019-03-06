@@ -6,8 +6,18 @@ from threading import Thread
 
 from flask import Flask, Response, redirect, url_for
 
+<<<<<<< HEAD
 from model import capsule, loop, station, switch, warehouse, sim_record
 from settings import json_serializer, network, simlog
+=======
+from model import loop
+from model import sim_record
+from model import station
+from model import switch
+from model import warehouse
+from settings import json_serializer
+from settings import network
+>>>>>>> 2edb22a91a6c444dc33953913fad32aa458860a4
 from simulator import sim_loop
 
 web_directory = os.path.abspath('%s/../resources/web' % (path[0]))
@@ -31,7 +41,7 @@ def load_network():
     global is_network_loaded
     if not is_network_loaded:
         is_network_loaded = True
-        network.load(web=True)
+        network.load()
     return redirect(url_for('root'))
 
 
@@ -51,11 +61,9 @@ def stop_simulation():
     global is_simulation_started
     is_simulation_started = False
 
-    global sim_thread
-    sim_thread = None
 
-    sim_loop.stop_simulation()
-    sim_record.records.empty()
+@app.route('/pause')
+def pause_simulation():
     return redirect(url_for('root'))
 
 
@@ -63,9 +71,9 @@ def stop_simulation():
 def generate_time_json():
     if sim_record.is_empty():
         return Response(mimetype="application/json")
-    global update_get_count
-    update_get_count += 1
+
     update_record()
+
     return Response(dumps(last_record.time_record), mimetype="application/json")
 
 
@@ -91,7 +99,8 @@ def generate_warehouses_set_data_json():
 
 @app.route('/switchesSetData.json')
 def generate_switches_set_data_json():
-    list_switches_set_data_json = [json_serializer.serialize_switch_set_data(a_switch) for a_switch in switch.get_switches()]
+    list_switches_set_data_json = [json_serializer.serialize_switch_set_data(a_switch) for a_switch in
+                                   switch.get_switches()]
     return Response(dumps(list_switches_set_data_json), mimetype="application/json")
 
 
@@ -99,46 +108,44 @@ def generate_switches_set_data_json():
 def generate_stations_var_data_json():
     if sim_record.is_empty():
         return Response(mimetype="application/json")
+    update_record()
 
-    list_stations_var_data_json = last_record.stations_record
-    return Response(dumps(list_stations_var_data_json), mimetype="application/json")
+    return Response(dumps(last_record.stations_record), mimetype="application/json")
 
 
 @app.route('/warehousesVarData.json')
 def generate_warehouses_var_data_json():
     if sim_record.is_empty():
         return Response(mimetype="application/json")
+    update_record()
 
-    list_warehouses_var_data_json = last_record.warehouses_record
-    return Response(dumps(list_warehouses_var_data_json), mimetype="application/json")
+    return Response(dumps(last_record.warehouses_record), mimetype="application/json")
 
 
 @app.route('/switchesVarData.json')
 def generate_switches_var_data_json():
     if sim_record.is_empty():
         return Response(mimetype="application/json")
+    update_record()
 
-    list_switches_var_data_json = last_record.switches_record
-    return Response(dumps(list_switches_var_data_json), mimetype="application/json")
+    return Response(dumps(last_record.switches_record), mimetype="application/json")
 
 
 @app.route('/capsules.json')
 def generate_capsules_json():
     if sim_record.is_empty():
         return Response(mimetype="application/json")
-    global update_get_count
-    update_get_count += 1
     update_record()
 
-    list_capsules_json = last_record.capsules_record
-    return Response(dumps(list_capsules_json), mimetype="application/json")
+    return Response(dumps(last_record.capsules_record), mimetype="application/json")
 
 
 def update_record():
     global last_record
     global update_get_count
+    update_get_count += 1
 
-    if last_record is None or update_get_count == 2:
+    if last_record is None or update_get_count == 3:
         update_get_count = 0
         last_record = sim_record.get_record()
 

@@ -1,7 +1,7 @@
 from enum import Enum
 
 import simpy
-
+import time
 from model import capsule
 from model import sim_record
 from model import station
@@ -67,6 +67,7 @@ class SimLoop:
         global _current_tick
         while True:
             if _sim_state == SimState.RUNNING:
+                start = time.time()
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
                 if is_frequency(1):

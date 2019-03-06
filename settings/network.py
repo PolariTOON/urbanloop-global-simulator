@@ -15,7 +15,7 @@ fichier pour l'import des réseaux sur les formats json correspondant
 """
 
 
-def load(file_path=None, web=False):
+def load(file_path=None):
     """
     fonction qui a partir d'un fichier json récupère le réseau correspondant et le traduit en objets
         :param file_path: fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
@@ -23,8 +23,6 @@ def load(file_path=None, web=False):
     """
     if file_path is None:  # aller chercher celui par défaut
         file_path = '{0}/../resources/mini_network.json'.format(sys.path[0])
-        if web:
-            file_path = '{0}/../resources/web_mini_network.json'.format(sys.path[0])
 
     model_loop.all_loops = {}  # autrement ca foire quand on charge un autre network
     with open(file_path, 'r') as file:
@@ -72,7 +70,7 @@ def load(file_path=None, web=False):
                         elms += [Switch(loop=other_l, other_loop=the_loop)]
                     elms[e].angle_other_loop = element["angle"]
                 the_loop.switches += [elms[e]]
-            elif el_type == "warehouse" :
+            elif el_type == "warehouse":
                 elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"])]
             else:
                 simlog.error("The json file is not properly formatted. "

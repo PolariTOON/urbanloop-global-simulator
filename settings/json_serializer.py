@@ -1,9 +1,7 @@
 import math
 
-from settings import simlog
-from model import switch, warehouse
+from model import switch
 from simulator import converter
-from simulator import sim_loop
 
 
 # CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
@@ -39,11 +37,11 @@ def serialize_objects_list(objects):
             # else serialize_station_set_data(true_obj)
         elif "warehouse" in obj_type:
             data[i] = "Warehouse %d in %s " % (obj.id, obj.loop.name)
-            # data[i] = serialize_warehouse_set_data(obj)
+            #  data[i] = serialize_warehouse_set_data(obj)
         elif "out" in obj_type:
             data[i] = "Switch out #%d to %s" % (obj.id, obj.loop.name)
         elif "in" in obj_type:
-            data[i] = "Switch in #%d from %s" %(obj.id, obj.loop.name)
+            data[i] = "Switch in #%d from %s" % (obj.id, obj.loop.name)
     return data
 
 
@@ -209,11 +207,6 @@ def get_capsule_position(capsule):
         angle = get_element_angle(capsule.loop, capsule.current_element)
         trip_angle = capsule.get_segment_traveled_angle()
         radius_angle = math.radians(angle) - trip_angle
-        if capsule.id == 0:
-            # simlog.error(str(capsule.id) + "current : " + capsule.current_element.name + " next : " + capsule.next_element.name + "angle: " + str(angle) + " trip_angle : " + str(math.degrees(trip_angle)))
-            simlog.error("tick " + str(
-                sim_loop.get_current_tick() - capsule.segment_start_tick) + "  - current : " + capsule.current_element.name + " next : " + capsule.next_element.name + " distance: " + str(
-                capsule.get_segment_traveled_distance()))
         loop_radius = get_loop_radius(capsule.loop)
         return capsule.loop.x + math.cos(radius_angle) * loop_radius, capsule.loop.y + math.sin(
             radius_angle) * loop_radius

@@ -11,7 +11,7 @@ from simulator.traveler_generator import total_generated
 START_TIME = time.time()
 starting_sim_loop = sim_loop.SimLoop()
 
-network.load() # chargement du réseau
+network.load()
 
 """Start"""
 if __name__ == "__main__":

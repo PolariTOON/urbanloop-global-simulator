@@ -7,16 +7,19 @@ from simulator import sim_loop
 
 records = queue.Queue()
 _limit = int(config.sim['default_record_size'])
-_offset = 500
+_offset = 0
 
 
 class SimRecord:
     def __init__(self):
+        self.current_tick = sim_loop.get_current_tick()
         self.time_record = json_serializer.serialize_time()
-        self.stations_record = [json_serializer.serialize_station_var_data(a_station) for a_station in station.get_stations()]
+        self.stations_record = [json_serializer.serialize_station_var_data(a_station) for a_station in
+                                station.get_stations()]
         self.switches_record = []
         self.capsules_record = [json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]
-        self.warehouses_record = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in warehouse.get_warehouses()]
+        self.warehouses_record = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in
+                                  warehouse.get_warehouses()]
 
 
 def change_queue_size(limit=_limit):
@@ -53,6 +56,7 @@ def get_record():
     Get a record of the simulation from the record queue. If the simulation was paused and the record queue is
     mid-empty, the simulation will restart in order to refill the record queue.
     """
+    global records
     if is_empty():
         simlog.error("The record queue is empty, impossible to get any")
         return None
@@ -63,7 +67,7 @@ def get_record():
     record = None
     for i in range(_offset + 1):
         record = records.get()
-        if is_empty:
+        if is_empty():
             return record
     return record
 

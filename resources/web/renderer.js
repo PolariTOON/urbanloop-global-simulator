@@ -1,3 +1,5 @@
+let running = true;
+
 let stage = new Konva.Stage({
     container: 'network-div',
     width: networkDiv.offsetWidth,
@@ -27,8 +29,10 @@ initNetworkScene();
 applyNetworkScene();
 
 setInterval(() => {
-    updateNetworkScene();
-    generateDataPanel();
+    if (running) {
+        updateNetworkScene();
+        generateDataPanel();
+    }
 }, 50);
 
 

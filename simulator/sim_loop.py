@@ -1,7 +1,7 @@
 from enum import Enum
 
 import simpy
-import time
+
 from model import capsule
 from model import sim_record
 from model import station
@@ -67,14 +67,13 @@ class SimLoop:
         global _current_tick
         while True:
             if _sim_state == SimState.RUNNING:
-                start = time.time()
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
-                if is_frequency(1):
+                if modulo_on_seconds(1):
                     _env.process(self.traveler_generator.generate())
 
-                # if not _current_tick == 0 and is_frequency(120):
-                # station.fill_and_full_stations()
+                if not _current_tick == 0 and modulo_on_seconds(120):
+                    station.fill_and_full_stations()
 
                 if self.is_recorded:
                     sim_record.put_record()
@@ -132,7 +131,7 @@ def _change_sim_tick(value=_sim_tick):
     simlog.debug("Changing sim ticks per seconds from %f to %f" % (old_value, get_tick_per_second()))
 
 
-def is_frequency(seconds):
+def modulo_on_seconds(seconds):
     """
     :param seconds: The desired frequency
     :return: Boolean, if the current_tick is in phase with the given frequency
@@ -266,6 +265,11 @@ def get_start_hour():
     :return: The simulation start hour
     """
     return _start_hour
+
+
+def get_current_day():
+    global _start_hour
+    return 1 + int((_start_hour * 3600 + get_simulation_time()) / 86400)
 
 
 def get_simulation_time():

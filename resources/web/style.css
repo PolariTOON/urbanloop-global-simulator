@@ -23,6 +23,12 @@ hr {
     margin: .8rem 10%;
 }
 
+#timer-div {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.5rem;
+}
+
 #buttons-div {
     display: flex;
     justify-content: space-around;

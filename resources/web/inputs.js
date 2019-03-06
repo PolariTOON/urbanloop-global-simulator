@@ -84,7 +84,6 @@ let pauseButton = document.getElementById('pause-button');
 let backwardButton = document.getElementById('backward-button');
 let forwardButton = document.getElementById('forward-button');
 
-
 startButton.onclick = () => {
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');

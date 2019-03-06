@@ -7,6 +7,8 @@ from simulator import converter
 from simulator import sim_loop
 
 _capsules = list()
+start = 0
+end = 0
 
 
 class Capsule:
@@ -28,6 +30,7 @@ class Capsule:
         self.trip_event = None
         self.descent_event = None
         self.speed = float(config.capsule['max_speed'])
+        self.segment_length = 0
         self.segment_start_tick = 0
         self.segment_ticks_duration = 0
 
@@ -52,7 +55,7 @@ class Capsule:
         """
         The capsule continues its road to the destination, on the same station
         """
-        simlog.debug("Capsule %d continues its trip" % self.id, self.next_element.name, self.current_element.name)
+        simlog.debug("Capsule %d continues its trip" % self.id, self.current_element.name, self.next_element.name)
         self.current_element = self.next_element
 
         if type(self.current_element) is switch.Switch and not self.current_element.is_switch_out(self.loop):
@@ -83,15 +86,25 @@ class Capsule:
         """
         :return: Trip event generator
         """
+        if self.id == 0:
+            simlog.error("dist : " + self.current_element.name + " " + self.next_element.name)
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
+        self.segment_length = dist_to_next_element
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
         self.segment_ticks_duration = time_to_next_element * sim_loop.get_tick_per_second()
+        if self.id == 0:
+            global start
+            simlog.error("dist : " + str(dist_to_next_element))
+            simlog.error("duration : " + str(self.segment_ticks_duration))
+            start = sim_loop.get_current_tick()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
 
     def callback_trip_event(self):
+        if self.id == 0:
+            simlog.error("DURATION : " + str(sim_loop.get_current_tick() - start))
         """
         Recursive callback that steps the trip event.
         This function is called when the capsule arrives to the next_element which isn't
@@ -149,6 +162,24 @@ class Capsule:
         """
         return len(self.travelers) > 0
 
+    def get_segment_traveled_angle(self):
+        """
+        :return: The segmentPercentage travelled by the capsule on the segment road from the previous to the next element
+        """
+        if self.destination is None or self.segment_ticks_duration == 0:
+            return 0
+
+        return (sim_loop.get_current_tick() - self.segment_start_tick) * self.get_angle_per_tick()
+
+    def get_segment_traveled_distance(self):
+        """
+        :return: The segmentPercentage travelled by the capsule on the segment road from the previous to the next element
+        """
+        if self.destination is None or self.segment_ticks_duration == 0:
+            return 0
+
+        return (sim_loop.get_current_tick() - self.segment_start_tick) * self.get_meter_per_tick()
+
     def get_segment_trip_percentage(self):
         """
         :return: The segmentPercentage travelled by the capsule on the segment road from the previous to the next element
@@ -157,6 +188,18 @@ class Capsule:
             return 0
 
         return (sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration
+
+    def get_meter_per_tick(self):
+        """
+        :return: The distance traveled each tick by a capsule at the defined speed
+        """
+        return self.speed / sim_loop.get_tick_per_second()
+
+    def get_angle_per_tick(self):
+        """
+        :return: The distance traveled each tick by a capsule at the defined speed
+        """
+        return self.get_meter_per_tick() / self.loop.size
 
     def _get_travelers_id(self):
         """

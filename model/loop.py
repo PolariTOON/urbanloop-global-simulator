@@ -39,14 +39,13 @@ class Loop:
         """
         self.objects = []
         self.lengths = []
-        nb_elm = len(order)
         for i in range(len(order)):
             element = order[i]
             # order[i] = [nature, obj, angle]
             self.objects += [order[i]]
             if clockwise:  # sens horaire des angles
                 angle_next = order[(i + 1) % len(order)][2] - element[2]
-            else:  # sens trigonométrique des angles 
+            else:  # sens trigonométrique des angles
                 angle_next = element[2] - order[(i + 1) % len(order)][2]
             if angle_next < 0:
                 angle_next += 360
@@ -71,6 +70,7 @@ class Loop:
                     element = self.objects[index][1]
                     distance += self.lengths[index - 1]
                     if element is element2:
+                        print(element1.name + " " + element2.name + " : " + str(distance))
                         return distance
         return 0
 

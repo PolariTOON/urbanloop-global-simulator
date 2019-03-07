@@ -2,11 +2,12 @@ import logging
 import os
 from json import dumps
 from sys import path
+from threading import Thread
 
 from flask import Flask, Response, redirect, url_for
 
 from model import loop, station, switch, warehouse, capsule
-from settings import json_serializer, network, stoppable_thread as sth
+from settings import json_serializer, network
 from simulator import sim_loop
 
 web_directory = os.path.abspath('%s/../resources/web' % (path[0]))
@@ -16,6 +17,7 @@ log.setLevel(logging.ERROR)
 sim_thread = None
 is_network_loaded = False
 is_simulation_started = False
+is_simulation_paused = False
 
 
 @app.route('/')
@@ -38,20 +40,35 @@ def start_simulation():
     global is_simulation_started
     if not is_simulation_started:
         is_simulation_started = True
-        sim_thread = sth.StoppableThread(target=sim_loop.run_simulation, args=(None, True))
+        sim_thread = Thread(target=sim_loop.start_simulation, args=[True])
         sim_thread.start()
+    return redirect(url_for('root'))
 
+
+@app.route('/pause')
+def pause_simulation():
+    global is_simulation_started, is_simulation_paused
+    if is_simulation_started and not is_simulation_paused:
+        is_simulation_paused = True
+        sim_loop.pause_simulation()
+    return redirect(url_for('root'))
+
+
+@app.route('/resume')
+def resume_simulation():
+    global is_simulation_started, is_simulation_paused
+    if is_simulation_started and is_simulation_paused:
+        is_simulation_paused = False
+        sim_loop.run_simulation_after_pause()
     return redirect(url_for('root'))
 
 
 @app.route('/stop')
 def stop_simulation():
-    global is_simulation_started, sim_thread
-    is_simulation_started = False
-    # stops simulation
-    sim_thread.stop()
-    del sim_thread
-
+    global is_simulation_started
+    if is_simulation_started:
+        is_simulation_started = False
+        sim_loop.stop_simulation()
     return redirect(url_for('root'))
 
 

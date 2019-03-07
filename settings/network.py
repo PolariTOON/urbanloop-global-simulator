@@ -10,9 +10,13 @@ from model.loop import Loop
 from model.switch import Switch
 from settings import simlog, config
 
+import numpy as np
+
 """
 fichier pour l'import des réseaux sur les formats json correspondant
 """
+
+_size = None # {'min_x': 0, 'max_x': 0, 'min_y': 0, 'max_y': 0}
 
 
 def load(file_path=None):
@@ -88,6 +92,7 @@ def load(file_path=None):
                              "0,359)>} "
                              "\n \t ]}}")
             order = []
+        tri_bulle_angle(elms)
         for i in range(len(elms)):
             # gestion des elements precedents et suivants
             elm = elms[i]
@@ -104,6 +109,23 @@ def load(file_path=None):
                 else:
                     order += [["station", elm, elm.angle]]
         the_loop.add_order(order, info["clockwise"])
+
+        global _size
+        radius = (the_loop.size / (2*np.pi)) + 10
+        print(radius)
+        if _size is None:
+            _size['min_x'] = the_loop.x - radius
+            _size['max_x'] = the_loop.x + radius
+            _size['min_y'] = the_loop.y - radius
+            _size['max_y'] = the_loop.y + radius
+        if the_loop.x-radius < _size['min_x']:
+            _size['min_x']= the_loop.x-radius
+        elif the_loop.x+radius > _size['max_x']:
+            _size['max_x'] = the_loop.x + radius
+        if the_loop.y-radius < _size['min_y']:
+            _size['min_y'] = the_loop.y-radius
+        elif the_loop.y+radius > _size['max_y']:
+            _size['max_y'] = the_loop.y + radius
     model_switch.init()
     '''nb_st = len(st.get_stations())
         print(nb_st)
@@ -136,3 +158,27 @@ def reload(file_path=None):
     model_loop.all_loops = {}
     model_capsule._capsules = list()
     load(file_path)
+
+
+def get_size():
+    """
+    :return: largeur ou longueur nécessaire pour afficher tout le réseau (contenu dans un carré)
+    """
+    global _size
+    length = _size['max_x'] - _size['min_x']
+    width = _size['max_y'] - _size['min_y']
+    return max(length, width)
+
+
+def tri_bulle_angle(tab_objects):
+    # tri de l'ordre croissant des angle (bulle)
+    curseur = 0
+    permut = True
+    while permut:
+        permut = False
+        curseur += 1
+        for i in range(0, len(tab_objects) - curseur):
+            if tab_objects[i].angle > tab_objects[i + 1].angle:
+                permut = True
+                tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
+    return

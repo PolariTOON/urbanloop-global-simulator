@@ -3,6 +3,7 @@ import math
 from model import identifier
 from model import station
 from model import switch
+from model import warehouse
 from settings import config
 from settings import simlog
 from simulator import converter
@@ -105,7 +106,11 @@ class Capsule:
             self.ask_route(self.next_element)
         else:
             self._continue()
-
+        # optimisation : si une capsule vide en direction d'un entrepot passe devant une station vide elle se déroute
+        if not self.is_aboard() and type(self.next_element) == station.Station and type(self.destination) == warehouse.Warehouse:
+            if self.next_element.capsule_queue.qsize() <= 1 and self.next_element.estimated_capsules_number() < self.next_element.capacity - 1:
+                simlog.debug("The capsule %d direction %s is rerouted to %s (%d/%d)" % (self.id, self.destination.name, self.next_element.name, self.next_element.estimated_capsules_number(), self.next_element.capacity))
+                self.destination = self.next_element
         if self.current_element == self.destination:
             if self.current_element.capsule_queue.full():
                 simlog.info("Capsule %d (%s) arrives to its destination but the station is full !" %

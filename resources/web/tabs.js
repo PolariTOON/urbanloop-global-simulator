@@ -30,6 +30,10 @@ function generateDataPanel() {
   dataTab.classList.add("active");
   selectedTab = dataTab;
   
+  updateDataPanel();
+}
+
+function updateDataPanel() {
   let div = document.createElement("div");
   div.id = "tab-content";
   let data = "";

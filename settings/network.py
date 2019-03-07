@@ -16,7 +16,7 @@ import numpy as np
 fichier pour l'import des réseaux sur les formats json correspondant
 """
 
-_size = None # {'min_x': 0, 'max_x': 0, 'min_y': 0, 'max_y': 0}
+_size = {}  # {'min_x': 0, 'max_x': 0, 'min_y': 0, 'max_y': 0}
 
 
 def load(file_path=None):
@@ -92,7 +92,7 @@ def load(file_path=None):
                              "0,359)>} "
                              "\n \t ]}}")
             order = []
-        tri_bulle_angle(elms)
+        tri_insertion(elms, the_loop)
         for i in range(len(elms)):
             # gestion des elements precedents et suivants
             elm = elms[i]
@@ -112,20 +112,22 @@ def load(file_path=None):
 
         global _size
         radius = (the_loop.size / (2*np.pi)) + 10
-        print(radius)
-        if _size is None:
+        # print(radius)
+        if _size == {}:
             _size['min_x'] = the_loop.x - radius
             _size['max_x'] = the_loop.x + radius
             _size['min_y'] = the_loop.y - radius
             _size['max_y'] = the_loop.y + radius
-        if the_loop.x-radius < _size['min_x']:
-            _size['min_x']= the_loop.x-radius
-        elif the_loop.x+radius > _size['max_x']:
-            _size['max_x'] = the_loop.x + radius
-        if the_loop.y-radius < _size['min_y']:
-            _size['min_y'] = the_loop.y-radius
-        elif the_loop.y+radius > _size['max_y']:
-            _size['max_y'] = the_loop.y + radius
+        else:
+            if the_loop.x-radius < _size['min_x']:
+                _size['min_x']= the_loop.x-radius
+            elif the_loop.x+radius > _size['max_x']:
+                _size['max_x'] = the_loop.x + radius
+            if the_loop.y-radius < _size['min_y']:
+                _size['min_y'] = the_loop.y-radius
+            elif the_loop.y+radius > _size['max_y']:
+                _size['max_y'] = the_loop.y + radius
+
     model_switch.init()
     '''nb_st = len(st.get_stations())
         print(nb_st)
@@ -151,6 +153,8 @@ def load(file_path=None):
                 caps = model_capsule.Capsule(departure_station=warehouse)
                 warehouse.capsule_queue.put(caps)
                 capsules -= 1
+
+    print(get_size())
     return
 
 
@@ -170,15 +174,23 @@ def get_size():
     return max(length, width)
 
 
-def tri_bulle_angle(tab_objects):
-    # tri de l'ordre croissant des angle (bulle)
-    curseur = 0
-    permut = True
-    while permut:
-        permut = False
-        curseur += 1
-        for i in range(0, len(tab_objects) - curseur):
-            if tab_objects[i].angle > tab_objects[i + 1].angle:
-                permut = True
-                tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
-    return
+def tri_insertion(tab_objects, the_loop):
+    # tri de l'ordre croissant des angles
+    angles = []
+    for elm in tab_objects:
+        # choix de l'angle
+        if type(elm) is Switch:
+            if elm.my_loop is the_loop:
+                angles.append(elm.angle_my_loop)
+            else :
+                angles.append(elm.angle_other_loop)
+        else:
+            angles.append(elm.angle)
+    for i in range(len(tab_objects)):
+        elm_angle, elm = angles[i], tab_objects[i]
+        j = i - 1
+        while j > 0 and angles[j] > elm_angle:
+            angles[j+1], tab_objects[j+1] = angles[j], tab_objects[j]
+            j = j - 1
+        angles[j + 1], tab_objects[j + 1] = elm_angle, elm
+    return tab_objects

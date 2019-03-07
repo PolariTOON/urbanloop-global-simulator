@@ -3,6 +3,8 @@ const minScale = 0.01;
 let moveIntensity = 1;
 let pressTimeout;
 let doPan = false;
+let running = false;
+let paused = false;
 
 
 stage.on('mousedown', event => {
@@ -85,6 +87,7 @@ let forwardButton = document.getElementById('forward-button');
 let scaleSlider = document.getElementById('scale-slider');
 
 startButton.onclick = () => {
+    if (running) return;
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
     $.get('/start');
@@ -92,15 +95,24 @@ startButton.onclick = () => {
 };
 
 stopButton.onclick = () => {
+    if (!running) return;
     stopButton.classList.add('not-shown');
     startButton.classList.remove('not-shown');
-    running = false;
     $.get('/stop');
+    running = false;
+    applyNetworkScene();
 };
 
 pauseButton.onclick = () => {
-    pauseButton.innerHTML("value", running ? "Resume" : "Pause");
-    running = !running;
+    if (paused) {
+        $.get('/resume');
+        pauseButton.innerHTML = "Pause";
+        paused = false;
+    } else {
+        $.get('/pause');
+        pauseButton.innerHTML = "Resume";
+        paused = true;
+    }
 };
 
 backwardButton.onclick = () => {

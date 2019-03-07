@@ -1,5 +1,6 @@
 let networkDiv = document.getElementById('network-div');
 
+let clearing = false;
 let networkLayer;
 let infoLayer;
 
@@ -711,10 +712,12 @@ function initNetworkScene() {
 
 function updateNetworkScene() {
     $.get('/time.json', function (timeJSON) {
+        if (clearing) return;
         document.getElementById('timer-span').innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time']
     });
 
     $.get('/capsules.json', function (listCapsuleJSON) {
+        if (clearing) return;
         listCapsuleJSON.forEach(function (capsuleJSON) {
             let targetCapsules = objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
 
@@ -728,6 +731,7 @@ function updateNetworkScene() {
     });
 
     $.get('/stationsVarData.json', function (listStationJSON) {
+        if (clearing) return;
         listStationJSON.forEach(function (stationJSON) {
             let targetStations = objects.filter(station => station.uuid.includes(stationJSON['uuid']));
             targetStations.forEach(station => station.update(stationJSON));
@@ -735,6 +739,7 @@ function updateNetworkScene() {
     });
 
     $.get('/warehousesVarData.json', function (listWarehouseJSON) {
+        if (clearing) return;
         listWarehouseJSON.forEach(function (warehouseJSON) {
             let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
             targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));

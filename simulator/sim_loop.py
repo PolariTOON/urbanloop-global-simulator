@@ -1,15 +1,15 @@
+import time
 from enum import Enum
 
 import simpy
 
 from model import capsule
-from model import sim_record
 from model import station
+from runnable import web_app
 from settings import config
 from settings import simlog
 from simulator import ascent_generator
 from simulator import traveler_generator
-import threading
 
 
 class SimState(Enum):
@@ -20,16 +20,15 @@ class SimState(Enum):
 
 _env = None
 _current_tick = 0
-_sim_state = SimState.RUNNING
+_sim_state = None
 _sim_tick = 0.05
 _start_hour = None
 _sim_tick_variation = list()
-_loop_process = None
 _endless_quit_event = None
 
-import time
+
 class SimLoop:
-    def __init__(self, is_recorded=False):
+    def __init__(self, is_visualized=False):
         global _env
         global _sim_state
         global _sim_tick
@@ -38,15 +37,19 @@ class SimLoop:
         _sim_tick = float(config.sim['tick'])
         _load_env()
         _start_hour = int(config.sim['start_hour'])
+        _sim_state = SimState.RUNNING
         self.traveler_generator = traveler_generator.TravelerGenerator()
         self.ascent_generator = ascent_generator.AscentGenerator()
         self.tick_event = _env.event()
         self.is_endless = False
-        self.is_recorded = is_recorded
+        self.is_visualized = is_visualized
 
         if config.sim['endless'] in ['true', 'True']:
             self.is_endless = True
             _endless_quit_event = _env.event()
+
+        # Register the loop process in the simulation environment
+        _env.process(self.loop())
 
     def tick(self):
         """
@@ -65,19 +68,9 @@ class SimLoop:
         You can create several independents process while the
         SimState is RUNNING.
         """
-
         global _current_tick
         start = time.time()
         while True:
-            # check for thread to be be stopped
-            current_thread = threading.current_thread()
-            if current_thread != threading.main_thread():
-                # mode graphique
-                if current_thread.stopped():
-                    simlog.debug("Thread is stopping! Shutting down simulator...")
-                    stop_simulation()
-                    return
-            # running simulator
             if _sim_state == SimState.RUNNING:
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
@@ -87,28 +80,22 @@ class SimLoop:
                 if not _current_tick == 0 and modulo_on_seconds(120):
                     station.fill_and_full_stations()
 
-                if self.is_recorded:
+                if self.is_visualized:
                     time.sleep(0.0)
 
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
-                yield _env.process(_env.exit())
-
-
-def _process_loop(sim_loop):
-    """
-    This function processes the station function of the sim_loop instance on the simulation environment _env
-    :param sim_loop: The sim_loop instance
-    """
-    global _env
-    global _loop_process
-
-    _loop_process = _env.process(sim_loop.loop())
+                reset_simulation_parameters()
+                if self.is_endless:
+                    _quit_endless_simulation()
+                else:
+                    yield _env.process(_env.exit())
+                return
 
 
 def _load_env():
     """
-    Load the simulation environment with configuration
+    Load the simulation environment with configuration, real_time or not
     """
     global _env
     real_time_boolean = config.sim['real_time']
@@ -120,11 +107,12 @@ def _load_env():
 
 def _change_sim_tick(value=_sim_tick):
     """
-    Change the current sim_tick value
+    Change the current sim_tick value. Bigger is the sim_tick value,
+    more jerky the simulation will be. Use this to speed up (really)
+    the simulation.
     /!\ This function is disabled in case of real time simulation
     :param value: The desired new sim_tick value
     """
-
     if type(_env) is simpy.rt.RealtimeEnvironment:
         simlog.warn("You can't change the sim_tick in a real-time environment")
         return
@@ -145,9 +133,12 @@ def _change_sim_tick(value=_sim_tick):
 
 def modulo_on_seconds(seconds):
     """
-    :param seconds: The desired frequency
+    This function will return True every simulated seconds.
+    :param seconds: The desired modulo
     :return: Boolean, if the current_tick is in phase with the given frequency
     """
+    if seconds / _sim_tick < 1:
+        return True
     return get_current_tick() % (seconds / _sim_tick) == 0
 
 
@@ -160,26 +151,34 @@ def change_state(sim_state=SimState.RUNNING):
     _sim_state = sim_state
 
 
-def run_simulation(sim_loop=None, is_recorded=False):
+def start_simulation(is_visualized=False):
     """
-    Run the simulation with the loop_process
+    Start the simulation for the first time. Use run_simulation_after_pause()
+    to re-run the simulation after a PAUSED state.
+    :param is_visualized: Set to True if the web_app.py is launched
     """
     global _env
-
-    if sim_loop is None:
-        sim_loop = SimLoop(is_recorded=is_recorded)
-
-    _process_loop(sim_loop)
+    sim_loop = SimLoop(is_visualized=is_visualized)
 
     if sim_loop.is_endless:
         _env.run(_endless_quit_event)
         return
-
     _env.run(until=int(config.sim['duration']))
 
-def quit_endless_simulation():
+
+def run_simulation_after_pause():
     """
-    Stop an endless simulation by triggering the _endless_quit_event
+    Re-run the simulation after a PAUSED state.
+    """
+    simlog.warn("Simulation re-RUNNING")
+    change_state(SimState.RUNNING)
+
+
+def _quit_endless_simulation():
+    """
+    Stop an endless simulation by triggering the _endless_quit_event.
+    This function should only be used in SimLoop.loop(), and asserts
+    that the simulation is endless
     """
     global _env
 
@@ -187,47 +186,39 @@ def quit_endless_simulation():
         yield _endless_quit_event.succeed()
 
     _env.process(_trigger())
-    # _endless_quit_event = _env.event()
-
-
-def pause_simulation():
-    """
-    Pause the simulation. Call run_simulation to restart the simulation
-    """
-    global _loop_process
-    change_state(SimState.PAUSED)
 
 
 def stop_simulation():
     """
-    Stop the simulation definitely. All objects or stations are reset
+    Stop the simulation definitely. After call this method, The SimLoop.loop()
+    function will manage the case endless or not, and reset all simulation parameters
     """
-    simlog.debug("Stopping simulation")
+    simlog.warn("Simulation KILLED")
     change_state(SimState.KILLED)
-    capsule.reset_simulation()
-    station.reset_simulation()
-    sim_record.records.empty()
-    if _endless_quit_event is not None:
-        quit_endless_simulation()
+
+
+def pause_simulation():
+    """
+    Pause the simulation. Call run_simulation_after_pause to restart the simulation
+    """
+    simlog.warn("Simulation PAUSED")
+    change_state(SimState.PAUSED)
+
+
+def reset_simulation_parameters():
+    """
+    Reset the current simulation parameters. The SimState needs to be KILLED
+    """
+    global _current_tick, _sim_state, _sim_tick_variation
+
+    if _sim_state != SimState.KILLED:
         return
 
-
-def reset_simulation():
-    """
-    Reset the current simulation at
-    """
-    global _current_tick
-    global _sim_tick_variation
-    global _loop_process
-    simlog.warn("Resetting the simulation")
-    change_state(SimState.PAUSED)
-    _loop_process.interrupt()
+    simlog.warn("Resetting the simulation parameters")
     capsule.reset_simulation()
     station.reset_simulation()
     _current_tick = 0
     _sim_tick_variation = list()
-    change_state(SimState.RUNNING)
-    run_simulation()
 
 
 def get_env():
@@ -282,6 +273,7 @@ def get_start_hour():
 def get_current_day():
     global _start_hour
     if _start_hour is None:
+        # This case means that the simulation hasn't been started yet.
         return 0
     return 1 + int((_start_hour * 3600 + get_simulation_time()) / 86400)
 

@@ -45,13 +45,27 @@ def seconds_to_decimal_hour(seconds):
     return round(seconds / 3600, 2)
 
 
+def now_to_day():
+    """
+    :return: The current day. This function takes into account the
+    sim_tick variations.
+    """
+    # Start at Day 1
+    start_hour = sim_loop.get_start_hour()
+    if start_hour is None:
+        # This case means that the simulation hasn't been started yet.
+        return 1
+    return 1 + int((start_hour * 3600 + sim_loop.get_simulated_time()) / 86400)
+
+
 def now_to_seconds():
     """
-    :return: The current time in second
+    :return: The current time in second. This function takes into account the
+    sim_tick variations.
     """
-    if None in (sim_loop.get_current_tick(), sim_loop.get_sim_tick(), sim_loop.get_start_hour()):
+    if sim_loop.get_start_hour() is None:
         return -1
-    return sim_loop.get_current_tick() * sim_loop.get_sim_tick() + sim_loop.get_start_hour() * 3600
+    return sim_loop.get_start_hour() * 3600 + sim_loop.get_simulated_time()
 
 
 def seconds_to_floor_hour(seconds):
@@ -63,7 +77,6 @@ def seconds_to_floor_hour(seconds):
     return floor((seconds % 86400) / 3600)
 
 
-# noinspection PyTypeChecker
 def station_probability(station_type, second, is_arrival=True):
     """
     This function gives you the probability to lead a traveler to a station_type
@@ -119,5 +132,9 @@ def station_probability(station_type, second, is_arrival=True):
 
 
 def random_ascent_descent_duration():
+    """
+    :return: A value between [|time-2, time+2|]. time is the defined duration (in the config file)
+    for ascent and descent events.
+    """
     random_seconds = random.randrange(_ascent_descent_duration - 2, _ascent_descent_duration + 2, 1)
     return random_seconds * sim_loop.get_tick_per_second()

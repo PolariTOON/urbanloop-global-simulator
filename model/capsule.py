@@ -80,6 +80,8 @@ class Capsule:
         simlog.info("Capsule %d (%s) starts its trip" % (self.id, self._get_capacity_state()),
                     self.current_element, self.destination)
         simlog.debug("Amount of capsules : %d" % self.current_element.capsule_queue.qsize(), self.current_element)
+        for a_traveler in self.travelers:
+            a_traveler.trip_start_tick = sim_loop.get_current_tick()
         sim_loop.get_env().process(self.update_trip())
 
     def update_trip(self):

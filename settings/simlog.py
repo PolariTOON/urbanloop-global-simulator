@@ -56,4 +56,4 @@ def error(message, *stations_switches_loops_or_strings):
 
 if _loaded is False:
     _load()
-    logging.basicConfig(format='[%(levelname)s]%(message)s', level=logging.DEBUG)
+    logging.basicConfig(format='[%(levelname)s]%(message)s', level=logging.ERROR)

@@ -1,5 +1,7 @@
 import threading
+
 from settings import simlog
+
 
 class StoppableThread(threading.Thread):
     """Thread class with a stop() method. The thread itself has to check

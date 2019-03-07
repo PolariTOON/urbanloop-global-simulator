@@ -1,4 +1,4 @@
-from model import capsule, station, warehouse
+from model import capsule
 from model import queue
 from settings import config
 from settings import json_serializer
@@ -8,18 +8,30 @@ from simulator import sim_loop
 records = queue.Queue()
 _limit = int(config.sim['default_record_size'])
 _offset = 0
+from json import dumps
+
+
+def gentest():
+    yield dumps([json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()])
 
 
 class SimRecord:
     def __init__(self):
-        self.current_tick = sim_loop.get_current_tick()
-        self.time_record = json_serializer.serialize_time()
-        self.stations_record = [json_serializer.serialize_station_var_data(a_station) for a_station in
-                                station.get_stations()]
+        self.test = gentest()
+        # self.current_tick = sim_loop.get_current_tick()
+        # self.time_record = json_serializer.serialize_time()
+        # self.stations_record = [json_serializer.serialize_station_var_data(a_station) for a_station in
+        #                         station.get_stations()]
+        # self.switches_record = []
+        # self.capsules_record = [json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]
+        # self.warehouses_record = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in
+        #                           warehouse.get_warehouses()]
+        self.current_tick = []
+        self.time_record = []
+        self.stations_record = []
         self.switches_record = []
-        self.capsules_record = [json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]
-        self.warehouses_record = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in
-                                  warehouse.get_warehouses()]
+        self.capsules_record = [CapsuleRecord(a_capsule) for a_capsule in capsule.get_capsules()]
+        self.warehouses_record = []
 
 
 def change_queue_size(limit=_limit):

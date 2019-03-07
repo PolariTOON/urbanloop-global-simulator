@@ -5,9 +5,6 @@ from simulator import converter
 from simulator import sim_loop
 
 
-# CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
-
-
 def serialize_time():
     return {
         'day': sim_loop.get_current_day(),

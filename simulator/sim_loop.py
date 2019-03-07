@@ -27,7 +27,7 @@ _sim_tick_variation = list()
 _loop_process = None
 _endless_quit_event = None
 
-
+import time
 class SimLoop:
     def __init__(self, is_recorded=False):
         global _env
@@ -67,6 +67,7 @@ class SimLoop:
         """
 
         global _current_tick
+        start = time.time()
         while True:
             # check for thread to be be stopped
             current_thread = threading.current_thread()
@@ -87,7 +88,7 @@ class SimLoop:
                     station.fill_and_full_stations()
 
                 if self.is_recorded:
-                    sim_record.put_record()
+                    time.sleep(0.0)
 
                 yield _env.timeout(1)
             elif _sim_state == SimState.KILLED:
@@ -280,6 +281,8 @@ def get_start_hour():
 
 def get_current_day():
     global _start_hour
+    if _start_hour is None:
+        return 0
     return 1 + int((_start_hour * 3600 + get_simulation_time()) / 86400)
 
 

@@ -7,7 +7,7 @@ from simulator import sim_loop
 
 records = queue.Queue()
 _limit = int(config.sim['default_record_size'])
-_offset = 0
+_offset = 2
 from json import dumps
 
 
@@ -30,7 +30,7 @@ class SimRecord:
         self.time_record = []
         self.stations_record = []
         self.switches_record = []
-        self.capsules_record = [CapsuleRecord(a_capsule) for a_capsule in capsule.get_capsules()]
+        self.capsules_record = [CapsuleRecord(a_capsule) for a_capsule in capsule.get_capsules()] # TODO : vérifier ça !
         self.warehouses_record = []
 
 

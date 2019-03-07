@@ -1,8 +1,8 @@
+from model import identifier
 from model import queue
 from model import station
 from model import switch
 from settings import simlog
-from model import identifier
 
 _warehouses = list()
 
@@ -46,7 +46,8 @@ class Warehouse:
         if self.capsule_queue.qsize() > 0:
             capsule_to_send = self.capsule_queue.get()
             capsule_to_send.destination = station_destination
-            capsule_to_send.start_trip()
+            if True:  # TODO eviter de sortir alors que y'a déjà une cpasule sur la sortie
+                capsule_to_send.start_trip()
 
 
 def which_warehouse_before(station_destination):

@@ -2,13 +2,12 @@ import math
 
 from model import switch
 from simulator import converter
-
-
-# CREATE OBJECT ID FOR ALL OBJECTS OF MODEL
+from simulator import sim_loop
 
 
 def serialize_time():
     return {
+        'day': sim_loop.get_current_day(),
         'time': converter.seconds_to_string(converter.now_to_seconds())
     }
 
@@ -150,24 +149,6 @@ def serialize_capsule(a_capsule):
     }
 
 
-def get_segment_trip_angle(loop, current_element, next_element):
-    if type(current_element) is switch.Switch:
-        current_element_angle = get_switch_angle(loop, current_element)
-    else:
-        current_element_angle = current_element.angle
-
-    if type(next_element) is switch.Switch:
-        next_element_angle = get_switch_angle(loop, next_element)
-    else:
-        next_element_angle = next_element.angle
-
-    if None in (current_element_angle, next_element_angle):
-        return 0
-
-    abs_difference = math.fabs(current_element_angle - next_element_angle)
-    return min(abs_difference % 360, math.fabs(360 - abs_difference) % 360)
-
-
 def get_element_angle(loop, element):
     if type(element) is switch.Switch:
         angle = get_switch_angle(loop, element)
@@ -186,10 +167,6 @@ def get_switch_angle(loop, a_switch):
 
 def get_loop_radius(loop):
     return loop.size / (2 * math.pi)
-
-
-def get_loop_segment_angle(loop, distance):
-    return distance / get_loop_radius(loop)
 
 
 def get_capsule_position(capsule):

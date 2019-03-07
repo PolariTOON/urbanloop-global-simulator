@@ -52,6 +52,7 @@ class Loop {
         });
 
         this.text = new Konva.Text({
+            name: this.uuid,
             x: x,
             y: y,
             text: loopJSON['name'],
@@ -95,6 +96,11 @@ class Loop {
         this.innerCircle.y(y);
         this.outerCircle.y(y);
         this.text.y(y);
+    }
+
+    updateScale(value) {
+        this.text.scaleX(value);
+        this.text.scaleY(value);
     }
 }
 
@@ -195,12 +201,20 @@ class Station {
         this.info.y(y);
     }
 
+    updateScale(value) {
+        this.innerCircle.scaleX(value);
+        this.innerCircle.scaleY(value);
+        this.outerCircle.scaleX(value);
+        this.outerCircle.scaleY(value);
+        this.info.scaleX(value);
+        this.info.scaleY(value);
+    }
+
     update(stationJSON) {
         this.json = stationJSON;
         //this.updateColor();
     }
 }
-
 
 class Warehouse {
     constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
@@ -212,25 +226,31 @@ class Warehouse {
         let y = networkDiv.offsetHeight - warehouseJSON['y'];
         let semiWidth = Math.floor(warehouseWidth / 2);
 
-        this.innerCircle = new Konva.Circle({
+        this.innerRectangle = new Konva.Rect({
             name: this.uuid,
             x: x,
             y: y,
-            radius: warehouseRadius - semiWidth,
+            width: 2 * (warehouseRadius - semiWidth),
+            height: 2 * (warehouseRadius - semiWidth),
             fill: 'white',
             stroke: 'black',
             strokeWidth: 0.3,
         });
+        this.innerRectangle.offsetX(this.innerRectangle.width() / 2);
+        this.innerRectangle.offsetY(this.innerRectangle.height() / 2);
 
-        this.outerCircle = new Konva.Circle({
+        this.outerRectangle = new Konva.Rect({
             name: this.uuid,
             x: x,
             y: y,
-            radius: warehouseRadius + semiWidth,
+            width: 2 * (warehouseRadius + semiWidth),
+            height: 2 * (warehouseRadius + semiWidth),
             fill: warehouseColor,
             stroke: 'black',
             strokeWidth: 0.3,
         });
+        this.outerRectangle.offsetX(this.outerRectangle.width() / 2);
+        this.outerRectangle.offsetY(this.outerRectangle.height() / 2);
 
         this.info = new Konva.Label({
             x: x,
@@ -264,14 +284,13 @@ class Warehouse {
             })
         );
 
-        initBehaviors(this, this.innerCircle, this.outerCircle, this.info);
+        initBehaviors(this, this.innerRectangle, this.outerRectangle, this.info);
 
-        networkLayer.add(this.outerCircle);
-        networkLayer.add(this.innerCircle);
+        networkLayer.add(this.outerRectangle);
+        networkLayer.add(this.innerRectangle);
         infoLayer.add(this.info);
 
         objects.push(this);
-
     }
 
     select() {
@@ -280,7 +299,7 @@ class Warehouse {
         }
 
         selectedObject = this;
-        this.outerCircle.fill(warehouseSelectedColor);
+        this.outerRectangle.fill(warehouseSelectedColor);
         networkLayer.batchDraw();
     }
 
@@ -288,15 +307,15 @@ class Warehouse {
         if (selectedObject === this) {
             selectedObject = undefined;
         }
-        this.outerCircle.fill(warehouseColor);
+        this.outerRectangle.fill(warehouseColor);
         networkLayer.batchDraw();
     }
 
     updatePosition() {
         const height = networkDiv.offsetHeight;
         const y = height - this.json['y'];
-        this.innerCircle.y(y);
-        this.outerCircle.y(y);
+        this.innerRectangle.y(y);
+        this.outerRectangle.y(y);
         this.info.y(y);
     }
 
@@ -304,8 +323,16 @@ class Warehouse {
         this.json = warehouseJSON;
         //this.updateColor();
     }
-}
 
+    updateScale(value) {
+        this.innerRectangle.scaleX(value);
+        this.innerRectangle.scaleY(value);
+        this.outerRectangle.scaleX(value);
+        this.outerRectangle.scaleY(value);
+        this.info.scaleX(value);
+        this.info.scaleY(value);
+    }
+}
 
 class Switch {
     constructor(switchJSON, switchRadius = 12, switchWidth = 4) {
@@ -487,6 +514,25 @@ class Switch {
         this.link.points([xIn, yIn, xOut, yOut]);
         this.arrow.points([xIn, yIn, (xIn + xOut) / 2, (yIn + yOut) / 2])
     }
+
+    updateScale(value) {
+        this.innerInCircle.scaleX(value);
+        this.innerInCircle.scaleY(value);
+        this.outerInCircle.scaleX(value);
+        this.outerInCircle.scaleY(value);
+        this.innerOutCircle.scaleX(value);
+        this.innerOutCircle.scaleY(value);
+        this.outerOutCircle.scaleX(value);
+        this.outerOutCircle.scaleY(value);
+        this.infoIn.scaleX(value);
+        this.infoIn.scaleY(value);
+        this.infoOut.scaleX(value);
+        this.infoOut.scaleY(value);
+        this.link.strokeWidth(2 * value);
+        this.arrow.strokeWidth(2 * value);
+        this.arrow.pointerWidth(10 * value);
+        this.arrow.pointerLength(10 * value);
+    }
 }
 
 class Capsule {
@@ -562,6 +608,13 @@ class Capsule {
         }
     }
 
+    updateScale(value) {
+        this.innerCircle.scaleX(value);
+        this.innerCircle.scaleY(value);
+        this.outerCircle.scaleX(value);
+        this.outerCircle.scaleY(value);
+    }
+
     isAboard() {
         return this.travelerNumber > 0;
     }
@@ -575,18 +628,18 @@ function resetCursor() {
     document.body.style.cursor = 'auto';
 }
 
-function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
+function initBehaviors(object, innerShape, outerShape, info = undefined) {
     let hasInfo = info !== undefined;
 
-    innerCircle.on('mousedown', () => {
+    innerShape.on('mousedown', () => {
         object.select();
     });
 
-    outerCircle.on('mousedown', () => {
+    outerShape.on('mousedown', () => {
         object.select();
     });
 
-    innerCircle.on('mouseover', () => {
+    innerShape.on('mouseover', () => {
         handCursor();
         if (hasInfo) {
             info.show();
@@ -594,7 +647,7 @@ function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
         }
     });
 
-    outerCircle.on('mouseover', () => {
+    outerShape.on('mouseover', () => {
         handCursor();
         if (hasInfo) {
             info.show();
@@ -602,7 +655,7 @@ function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
         }
     });
 
-    innerCircle.on('mouseout', () => {
+    innerShape.on('mouseout', () => {
         resetCursor();
         if (hasInfo) {
             info.hide();
@@ -610,7 +663,7 @@ function initBehaviors(object, innerCircle, outerCircle, info = undefined) {
         }
     });
 
-    outerCircle.on('mouseout', () => {
+    outerShape.on('mouseout', () => {
         resetCursor();
         if (hasInfo) {
             info.hide();
@@ -657,9 +710,9 @@ function initNetworkScene() {
 }
 
 function updateNetworkScene() {
-    /*$.get('/time.json', function (timeJSON) {
-        document.getElementById('time-span').innerHTML = timeJSON['time']
-    });*/
+    $.get('/time.json', function (timeJSON) {
+        document.getElementById('timer-span').innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time']
+    });
 
     $.get('/capsules.json', function (listCapsuleJSON) {
         listCapsuleJSON.forEach(function (capsuleJSON) {

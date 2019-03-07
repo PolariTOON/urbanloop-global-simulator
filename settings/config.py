@@ -28,7 +28,6 @@ def load(file_name):
     config = configparser.ConfigParser()
     config.read(file_name)
     default = config['DEFAULT']
-    interface = config['INTERFACE']
     model = config['MODEL']
     capsule = config['CAPSULE']
     routing = config['ROUTING']

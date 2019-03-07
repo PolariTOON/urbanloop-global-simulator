@@ -3,6 +3,8 @@ from model import routing
 from settings import config
 from settings import simlog
 
+import numpy as np
+
 timer_other = int(config.routing['timer_other'])
 my_timer = int(config.routing['my_timer'])
 switched_cost = int(config.routing['switched_cost'])
@@ -97,10 +99,22 @@ class Switch:
 
 def init():
     """
-    fonction d'initialisation de tous les switchs pour que la taille des tableaux correspondant à tous les objets prévus
+    fonction d'initialisation de tous les switchs pour que les longueur dépendent des coordonnées
+    et que la taille des tableaux correspondant à tous les objets prévus
+    puis création de la table de routage permanente
         :return: 0UT : (void) modification des attributs intrinsèques aux switchs
     """
-    for a_switch in _switches:
+    for a_switch in _switches:  #  lenght depend des coordonnées
+        loop_out, loop_in = a_switch.my_loop, a_switch.other_loop
+        r_out = loop_out.size / (2 * np.pi)
+        r_in = loop_in.size / (2 * np.pi)
+        x_out = loop_out.x + np.cos(np.deg2rad(a_switch.angle_my_loop)) * r_out
+        y_out = loop_out.y + np.sin(np.deg2rad(a_switch.angle_my_loop)) * r_out
+        x_in = loop_in.x + np.cos(np.deg2rad(a_switch.angle_other_loop)) * r_in
+        y_in = loop_in.y + np.sin(np.deg2rad(a_switch.angle_other_loop)) * r_in
+        a_switch.size = np.round(np.sqrt((x_out - x_in)**2 + (y_out - y_in)**2), 2)
+
+    for a_switch in _switches:  # table de "nouvelles"
         a_switch.permanent_table = {a_switch.my_loop.name: [False, 0, [a_switch.id, a_switch.my_loop.name]],
                                     a_switch.other_loop.name: [True, a_switch.size,
                                                                [a_switch.id, a_switch.other_loop.name]]}
@@ -162,9 +176,9 @@ def cost_between(element1, element2):
     # ajout du cout de routage jusqu'à la boucle2
     cost += switch.table[boucle2.name][1]
     # trajet entre le switch in de fin et l'élément2
-    last_switch = switch.table[boucle2.name][2][len(switch.table[boucle2.name][2])-1]
+    last_switch = switch.table[boucle2.name][2][len(switch.table[boucle2.name][2]) - 1]
     for s in _switches:
-        if s.id == last_switch :
+        if s.id == last_switch:
             last_switch = s
     cost += boucle2.distance_between(s, element2)
     return cost

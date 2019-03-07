@@ -56,7 +56,7 @@ class Capsule:
         """
         The capsule continues its road to the destination, on the same station
         """
-        simlog.debug("Capsule %d continues its trip to %s" % self.id, self.current_element.name, self.next_element.name, self.destination)
+        simlog.debug("Capsule %d continues its trip to %s" % (self.id, self.destination.name), self.current_element.name, self.next_element.name)
         self.current_element = self.next_element
 
         if type(self.current_element) is switch.Switch and not self.current_element.is_switch_out(self.loop):
@@ -72,14 +72,14 @@ class Capsule:
         self.current_element = current_switch
         self.next_element = current_switch
         self.loop = current_switch.other_loop
-        simlog.info("Capsule %d is switched from %s to %s" % self.id, current_switch.my_loop, self.loop)
+        simlog.info("Capsule %d is switched (destination %s)" % (self.id, self.destination), current_switch.my_loop, self.loop)
 
     def start_trip(self):
         """
         The capsule starts a trip to its destination
         """
         simlog.info("Capsule %d (%s) starts its trip to %s" % (self.id, self._get_capacity_state(), self.destination.name),
-                    self.current_element, self.destination)
+                    self.current_element)
         simlog.debug("Amount of capsules : %d" % self.current_element.capsule_queue.qsize(), self.current_element)
         sim_loop.get_env().process(self.update_trip())
 
@@ -109,7 +109,7 @@ class Capsule:
         # optimisation : si une capsule vide en direction d'un entrepot passe devant une station vide elle se déroute
         if not self.is_aboard() and type(self.next_element) == station.Station and type(self.destination) == warehouse.Warehouse:
             if self.next_element.capsule_queue.qsize() <= 1 and self.next_element.estimated_capsules_number() < self.next_element.capacity - 1:
-                simlog.debug("The capsule %d direction %s is rerouted to %s (%d/%d)" % (self.id, self.destination.name, self.next_element.name, self.next_element.estimated_capsules_number(), self.next_element.capacity))
+                simlog.debug("The capsule %d direction %s is rerouted to %s (%d/%d)" % (self.id, self.destination.name, self.next_element.name, self.next_element.estimated_capsules_number(), self.next_element.capacity), self.current_element, self.next_element)
                 self.destination = self.next_element
         if self.current_element == self.destination:
             if self.current_element.capsule_queue.full():
@@ -130,7 +130,7 @@ class Capsule:
         self.current_element.capsule_queue.put(self)
         self.destination = None
         simlog.debug(
-            "%s contains %d capsules now" % (self.current_element.name, self.current_element.capsule_queue.qsize()))
+            "Contains %d capsules now" % (self.current_element.capsule_queue.qsize()), self.current_element.name)
         if self.travelers:
             simlog.debug("Start descent in capsule %d" % self.id, self.destination)
             self.descent_event = sim_loop.get_env().timeout(converter.random_ascent_descent_duration())
@@ -143,7 +143,7 @@ class Capsule:
         """
         self.destination = traveler.destination_station
         self.travelers.append(traveler)
-        simlog.info("Traveler %s gets in capsule %d" % (self._get_travelers_id(), self.id), traveler.departure_station)
+        simlog.info("Traveler %s gets in capsule %d" % (self._get_travelers_id(), self.id), traveler.departure_station, self.destination)
 
     def get_out_traveler(self):
         """

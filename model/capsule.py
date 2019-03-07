@@ -50,13 +50,13 @@ class Capsule:
             self._change_loop(current_switch)
         else:
             self._continue()
-            simlog.info("Capsule %d stays on its station" % self.id, self.loop)
+            simlog.info("Capsule %d stays on its loop" % self.id, self.loop)
 
     def _continue(self):
         """
         The capsule continues its road to the destination, on the same station
         """
-        simlog.debug("Capsule %d continues its trip" % self.id, self.current_element.name, self.next_element.name)
+        simlog.debug("Capsule %d continues its trip to %s" % self.id, self.current_element.name, self.next_element.name, self.destination)
         self.current_element = self.next_element
 
         if type(self.current_element) is switch.Switch and not self.current_element.is_switch_out(self.loop):
@@ -72,13 +72,13 @@ class Capsule:
         self.current_element = current_switch
         self.next_element = current_switch
         self.loop = current_switch.other_loop
-        simlog.info("Capsule %d is switched" % self.id, current_switch.my_loop, self.loop)
+        simlog.info("Capsule %d is switched from %s to %s" % self.id, current_switch.my_loop, self.loop)
 
     def start_trip(self):
         """
         The capsule starts a trip to its destination
         """
-        simlog.info("Capsule %d (%s) starts its trip" % (self.id, self._get_capacity_state()),
+        simlog.info("Capsule %d (%s) starts its trip to %s" % (self.id, self._get_capacity_state(), self.destination.name),
                     self.current_element, self.destination)
         simlog.debug("Amount of capsules : %d" % self.current_element.capsule_queue.qsize(), self.current_element)
         sim_loop.get_env().process(self.update_trip())

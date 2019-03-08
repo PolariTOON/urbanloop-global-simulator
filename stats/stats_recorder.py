@@ -77,9 +77,86 @@ class StatsRecorder:
     self._capsule_average_loop.add(tick, quantity, loop)
 
   # à propos du drainage
+  def add_sent_capsules_drain(self, quantity, loop, tick):
+    """
+    ajoute le nombre de capsules ayant quitté la loop
+    """
+    if not self._is_recording:
+      return
+    self._sent_capsules_drain.add(tick, quantity, loop)
+
+  def add_called_capsules_drain(self, quantity, loop, tick):
+    """
+    ajoute le nombre de capsules étant entrées dans la loop
+    """
+    if not self._is_recording:
+      return
+    self._called_capsules_drain.add(tick, quantity, loop)
 
   # à propos des travelers
+  def add_waiting_time_traveler(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._waiting_time_traveler.add(tick, quantity, loop)
+  
+  def add_traveling_time_traveler(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._traveling_time_traveler.add(tick, quantity, loop)
 
   # à propos des stations
+  def add_stopped_capsules_station(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._stopped_capsules_station.add(tick, quantity, loop)
+
+  def add__departure_from_station(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._departure_from_station.add(tick, quantity, loop)
+
+  def add_arrival_to_station(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._arrival_to_station.add(tick, quantity, loop)
+
+  def add__arrival_to_station(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._waiting_travelers.add(tick, quantity, loop)
 
   # à propos des capsules
+  def add_busy_moving_time(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._busy_moving_time.add(tick, quantity, loop)
+
+  def add_busy_not_moving_time(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._busy_not_moving_time.add(tick, quantity, loop)
+
+  def add_free_not_moving_time(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._free_not_moving_time.add(tick, quantity, loop)
+
+  def add_free_moving_time(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._free_moving_time.add(tick, quantity, loop)
+
+  def add_time_in_network(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._time_in_network.add(tick, quantity, loop)
+
+  def add_time_in_warehouse(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._time_in_warehouse.add(tick, quantity, loop)
+
+  def add_traveling_distance(self, quantity, loop, tick):
+    if not self._is_recording:
+      return
+    self._traveling_distance.add(tick, quantity, loop)

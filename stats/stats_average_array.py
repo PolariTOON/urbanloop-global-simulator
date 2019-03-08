@@ -131,6 +131,26 @@ class StatsAverageArray(abstract_array.AbstractArray):
     return sd**.5
 
   # global stats
+  def get_global_count(self):
+    """
+    renvoie le nombre de données récoltées
+    """
+    keys = self.get_keys()
+    cpt = 0
+    for key in keys:
+      cpt += self.get_values_count(key)
+    return cpt
+
+  def get_global_count_between(self, start, end):
+    """
+    renvoie le nombre de données récoltées entre deux dates
+    """
+    keys = self.get_keys()
+    cpt = 0
+    for key in keys:
+      cpt += self.get_values_count_between(key, start, end)
+    return cpt
+
   def get_global_min(self):
     """
     renvoie la valeur minimum de l'ensemble des objets
@@ -203,12 +223,24 @@ class StatsAverageArray(abstract_array.AbstractArray):
     """
     renvoie l'écart-type des objets
     """
-    # TODO
-    return 0
+    keys = self.get_keys()
+    sd = 0
+    average = self.get_global_average()
+    for key in keys:
+      for value in self.get_values(key):
+        sd += (value - average)**2
+    sd /= self.get_global_count()
+    return sd **.5
 
   def get_global_standard_deviation_between(self, start, end):
     """
     renvoie l'écart-type des objets entre deux dates
     """
-    # TODO
-    return 0
+    keys = self.get_keys()
+    sd = 0
+    average = self.get_global_average_between(start, end)
+    for key in keys:
+      for value in self.get_values_between(key, start, end):
+        sd += (value - average)**2
+    sd /= self.get_global_count_between(start, end)
+    return sd **.5

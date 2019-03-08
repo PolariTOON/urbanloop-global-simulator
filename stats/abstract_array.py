@@ -2,12 +2,13 @@ class AbstractArray():
   """
   Classe abstraite contenant le code commun aux classes StatsArray et StatsAverageArray
   """
-  def __init__(self, description):
+  def __init__(self, description, unit=None):
     """
     constructeur
     """
     self._data = {}
     self._description = description
+    self._unit = unit
 
   
   def _get_key(self, obj):
@@ -20,7 +21,13 @@ class AbstractArray():
     """
     renvoie la description de cette liste
     """
-    return self._description
+    return self._description + ((" (en " + self._unit + ")") if self._unit != None else "")
+  
+  def get_unit(self):
+    """
+    renvoie l'unité de mesure de la grandeur enregistrée
+    """
+    return self._unit
   
   def get_keys(self):
     """
@@ -30,6 +37,15 @@ class AbstractArray():
     for key in self._data:
       keys.append(key)
     return keys
+  
+  def get_keys_count(self):
+    """
+    renvoie le nombre d'objets ayant fourni des données
+    """
+    keys = []
+    for key in self._data:
+      keys.append(key)
+    return len(keys)
   
   def get_ticks_count(self, obj):
     """

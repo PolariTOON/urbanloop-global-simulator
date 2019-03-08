@@ -190,7 +190,7 @@ def fill_and_full_stations():
                 for i in range(min(nb_to_send-1, 1)):
                     nearer_warehouse.send_capsule(station)
 
-        if station.estimated_capsules_number() >= min(station.capacity - 1, floor(3 * station.capacity /4)):
+        if station.estimated_capsules_number() >= min(station.capacity - 1, floor(3 * station.capacity /4)) and station.capsule_queue.qsize() > 1:
             # quasi pleine --> station à vider
             simlog.debug("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
             nb_to_send = 1

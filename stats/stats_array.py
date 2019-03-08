@@ -31,15 +31,6 @@ class StatsArray(abstract_array.AbstractArray):
     """
     key = self._get_key(obj)
     return len(self._data[key])
-  
-  def get_keys(self):
-    """
-    renvoie la liste des objets concernés par ce type d'événements
-    """
-    keys = []
-    for key in self._data:
-      keys.append(key)
-    return keys
 
   def get_value_between(self, obj, tick1, tick2):
     """

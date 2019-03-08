@@ -90,7 +90,8 @@ def load(file_path=None):
                              "0,359)>} "
                              "\n \t ]}}")
             order = []
-        tri_insertion(elms, the_loop)
+        the_loop.clockwise = info["clockwise"]
+        tri_bulle(elms, the_loop)
         for i in range(len(elms)):
             # gestion des elements precedents et suivants
             elm = elms[i]
@@ -106,7 +107,7 @@ def load(file_path=None):
                     order += [["warehouse", elm, elm.angle]]
                 else:
                     order += [["station", elm, elm.angle]]
-        the_loop.add_order(order, info["clockwise"])
+        the_loop.add_order(order)
 
         global _size
         radius = (the_loop.size / (2 * np.pi)) + 10
@@ -172,8 +173,9 @@ def get_size():
     return max(length, width)
 
 
-def tri_insertion(tab_objects, the_loop):
-    # tri de l'ordre croissant des angles
+def tri_bulle(tab_objects, the_loop):
+    to_permute = True
+    cursor = 0
     angles = []
     for elm in tab_objects:
         # choix de l'angle
@@ -184,11 +186,16 @@ def tri_insertion(tab_objects, the_loop):
                 angles.append(elm.angle_other_loop)
         else:
             angles.append(elm.angle)
-    for i in range(len(tab_objects)):
-        elm_angle, elm = angles[i], tab_objects[i]
-        j = i - 1
-        while j > 0 and angles[j] > elm_angle:
-            angles[j + 1], tab_objects[j + 1] = angles[j], tab_objects[j]
-            j = j - 1
-        angles[j + 1], tab_objects[j + 1] = elm_angle, elm
+    while to_permute :
+        to_permute = False
+        cursor += 1
+        for i in range(0, len(tab_objects)-cursor):
+            if angles[i] < angles[i+1] and not the_loop.clockwise:
+                to_permute = True
+                angles[i], angles[i+1] = angles[i+1], angles[i]
+                tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
+            if angles[i] > angles[i+1] and the_loop.clockwise:
+                to_permute = True
+                angles[i], angles[i+1] = angles[i+1], angles[i]
+                tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
     return tab_objects

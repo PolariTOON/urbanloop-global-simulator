@@ -3,6 +3,7 @@ from settings import config
 
 timer_other = int(config.routing['timer_other'])
 my_timer = int(config.routing['my_timer'])
+switched_cost = int(config.routing['switched_cost'])
 
 
 def dijkstra_route(switch, table, to_cover):
@@ -63,11 +64,10 @@ def dijkstra_route(switch, table, to_cover):
                             distance, a = new_loop.dist_to_next_object(switch, next_switch)
                             # print(distance)
                             table_temp[new_loop.name] = [step[2],
-                                                         step[3] + distance + next_switch.size,
+                                                         step[3] + distance + next_switch.size + switched_cost,
                                                          step[4] + [next_switch.id, next_switch.other_loop.name]]
                             if next_switch.my_loop.name not in table_to_cover:
-                                table_to_cover[next_switch.other_loop.name] = [next_switch.id] + table_temp[
-                                    next_switch.other_loop.name]
+                                table_to_cover[next_switch.other_loop.name] = [next_switch.id] + table_temp[next_switch.other_loop.name]
                             else:
                                 # on regarde si c'est plus faible
                                 if table_temp[next_switch.other_loop.name][1] > table_to_cover[3]:

@@ -62,7 +62,7 @@ def load(file_path=None):
                     if len(elms) != e + 1:  # existe pas
                         elms += [model_switch.Switch(loop=the_loop, other_loop=other_l)]
                     elms[e].angle_my_loop = element["angle"]
-                    elms[e].size = element["length"]
+                    # elms[e].size = element["length"]
                 else:  # "switch_in":
                     if other_l.switches is not None:
                         for s in other_l.switches:
@@ -153,6 +153,7 @@ def get_size():
     :return: largeur ou longueur nécessaire pour afficher tout le réseau (contenu dans un carré)
     """
     global _size
+    print(_size)
     length = _size['max_x'] - _size['min_x']
     width = _size['max_y'] - _size['min_y']
     return max(length, width)

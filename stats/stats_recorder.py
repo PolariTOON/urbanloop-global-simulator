@@ -28,7 +28,7 @@ class StatsRecorder:
     self._arrival_to_station = saa.StatsAverageArray("Nombre d’arrivées de capsule moyen d'une station.")
     self._waiting_travelers = saa.StatsAverageArray("Nombre de voyageurs moyen dans la file d’attente d'une station.")
     # capsule
-    self._busy_moving_time = saa.StatsAverageArray("Temps « occupée et mobile» moyen d'une capsule.", "secs")
+    self._busy_moving_time = saa.StatsAverageArray("Temps « occupée et mobile » moyen d'une capsule.", "secs")
     self._busy_not_moving_time = saa.StatsAverageArray("Temps « occupée et immobile » moyen d'une capsule.", "secs")
     self._free_not_moving_time = saa.StatsAverageArray("Temps « libre et immobile » moyen d'une capsule", "secs")
     self._free_moving_time = saa.StatsAverageArray("Temps « libre et mobile » moyen d'une capsule", "secs")
@@ -67,111 +67,111 @@ class StatsRecorder:
     return self._stopping_tick - self._starting_tick + 1 if self._stopping_tick != -1 else -1
 
   # à propos des loops
-  def add_exiting_loop(self, tick, loop):
+  def add_exiting_loop(self, loop):
     """
     incremente le compteur de capsules quittant une boucle
     """
     if not self._is_recording:
       return
-    self._exiting_loop.add(tick, loop)
+    self._exiting_loop.add(loop)
 
-  def add_joining_loop(self, tick, loop):
+  def add_joining_loop(self, loop):
     """
     incremente le compteur de capsules rejoingnant une boucle
     """
     if not self._is_recording:
       return
-    self._joining_loop.add(tick, loop)
+    self._joining_loop.add(loop)
   
-  def add_capsule_average_loop(self, quantity, loop, tick):
+  def add_capsule_average_loop(self, quantity, loop):
     """
     ajoute le nombre de capsules d'une loop
     """
     if not self._is_recording:
       return
-    self._capsule_average_loop.add(tick, quantity, loop)
+    self._capsule_average_loop.add(quantity, loop)
 
   # à propos du drainage
-  def add_sent_capsules_drain(self, quantity, loop, tick):
+  def add_sent_capsules_drain(self, quantity, loop):
     """
     ajoute le nombre de capsules ayant quitté la loop
     """
     if not self._is_recording:
       return
-    self._sent_capsules_drain.add(tick, quantity, loop)
+    self._sent_capsules_drain.add(quantity, loop)
 
-  def add_called_capsules_drain(self, quantity, loop, tick):
+  def add_called_capsules_drain(self, quantity, loop):
     """
     ajoute le nombre de capsules étant entrées dans la loop
     """
     if not self._is_recording:
       return
-    self._called_capsules_drain.add(tick, quantity, loop)
+    self._called_capsules_drain.add(quantity, loop)
 
   # à propos des travelers
-  def add_waiting_time_traveler(self, quantity, loop, tick):
+  def add_waiting_time_traveler(self, quantity, loop):
     if not self._is_recording:
       return
-    self._waiting_time_traveler.add(tick, quantity, loop)
+    self._waiting_time_traveler.add(quantity, loop)
   
-  def add_traveling_time_traveler(self, quantity, loop, tick):
+  def add_traveling_time_traveler(self, quantity, loop):
     if not self._is_recording:
       return
-    self._traveling_time_traveler.add(tick, quantity, loop)
+    self._traveling_time_traveler.add(quantity, loop)
 
   # à propos des stations
-  def add_stopped_capsules_station(self, quantity, loop, tick):
+  def add_stopped_capsules_station(self, quantity, loop):
     if not self._is_recording:
       return
-    self._stopped_capsules_station.add(tick, quantity, loop)
+    self._stopped_capsules_station.add(quantity, loop)
 
-  def add__departure_from_station(self, quantity, loop, tick):
+  def add__departure_from_station(self, quantity, loop):
     if not self._is_recording:
       return
-    self._departure_from_station.add(tick, quantity, loop)
+    self._departure_from_station.add(quantity, loop)
 
-  def add_arrival_to_station(self, quantity, loop, tick):
+  def add_arrival_to_station(self, quantity, loop):
     if not self._is_recording:
       return
-    self._arrival_to_station.add(tick, quantity, loop)
+    self._arrival_to_station.add(quantity, loop)
 
-  def add__arrival_to_station(self, quantity, loop, tick):
+  def add__arrival_to_station(self, quantity, loop):
     if not self._is_recording:
       return
-    self._waiting_travelers.add(tick, quantity, loop)
+    self._waiting_travelers.add(quantity, loop)
 
   # à propos des capsules
-  def add_busy_moving_time(self, quantity, loop, tick):
+  def add_busy_moving_time(self, quantity, loop):
     if not self._is_recording:
       return
-    self._busy_moving_time.add(tick, quantity, loop)
+    self._busy_moving_time.add(quantity, loop)
 
-  def add_busy_not_moving_time(self, quantity, loop, tick):
+  def add_busy_not_moving_time(self, quantity, loop):
     if not self._is_recording:
       return
-    self._busy_not_moving_time.add(tick, quantity, loop)
+    self._busy_not_moving_time.add(quantity, loop)
 
-  def add_free_not_moving_time(self, quantity, loop, tick):
+  def add_free_not_moving_time(self, quantity, loop):
     if not self._is_recording:
       return
-    self._free_not_moving_time.add(tick, quantity, loop)
+    self._free_not_moving_time.add(quantity, loop)
 
-  def add_free_moving_time(self, quantity, loop, tick):
+  def add_free_moving_time(self, quantity, loop):
     if not self._is_recording:
       return
-    self._free_moving_time.add(tick, quantity, loop)
+    self._free_moving_time.add(quantity, loop)
 
-  def add_time_in_network(self, quantity, loop, tick):
+  def add_time_in_network(self, quantity, loop):
     if not self._is_recording:
       return
-    self._time_in_network.add(tick, quantity, loop)
+    self._time_in_network.add(quantity, loop)
 
-  def add_time_in_warehouse(self, quantity, loop, tick):
+  def add_time_in_warehouse(self, quantity, loop):
     if not self._is_recording:
       return
-    self._time_in_warehouse.add(tick, quantity, loop)
+    self._time_in_warehouse.add(quantity, loop)
 
-  def add_traveling_distance(self, quantity, loop, tick):
+  def add_traveling_distance(self, quantity, loop):
     if not self._is_recording:
       return
-    self._traveling_distance.add(tick, quantity, loop)
+    self._traveling_distance.add(quantity, loop)

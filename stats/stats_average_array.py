@@ -1,4 +1,5 @@
 from stats import abstract_array
+from sim_loop import sim_loop
 
 class StatsAverageArray(abstract_array.AbstractArray):
   """
@@ -6,9 +7,10 @@ class StatsAverageArray(abstract_array.AbstractArray):
   Chaque StatsAverageArray symbolise un événement différent
   """
   
-  def add(self, tick, value, obj):
+  def add(self, value, obj):
     if self._data[obj] is None:
       self._data[obj] = []
+    tick = sim_loop.get_simulated_time()
     self._data[obj].add((tick, value))
   
   def get_values(self, obj):

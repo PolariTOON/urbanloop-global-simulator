@@ -1,4 +1,5 @@
 from stats import abstract_array
+from sim_loop import sim_loop
 
 class StatsArray(abstract_array.AbstractArray):
   """
@@ -7,10 +8,11 @@ class StatsArray(abstract_array.AbstractArray):
   Cette classe ne sert que pour les compteurs: elle n'enregistre que des ticks.
   """
   
-  def add(self, tick, obj):
+  def add(self, obj):
     """
     permet d'enregistrer l'évènement s'étant produit au tick @param:tick pour l'objet @param:obj
     """
+    tick = sim_loop.get_simulated_time()
     key = self._get_key(obj)
     try:
       self._data[key].append(tick)

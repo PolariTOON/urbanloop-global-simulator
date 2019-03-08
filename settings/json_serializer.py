@@ -7,7 +7,7 @@ from simulator import sim_loop
 
 def serialize_time():
     return {
-        'day': sim_loop.get_current_day(),
+        'day': converter.now_to_day(),
         'time': converter.seconds_to_string(converter.now_to_seconds())
     }
 

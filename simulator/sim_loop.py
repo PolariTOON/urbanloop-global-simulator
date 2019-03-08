@@ -5,7 +5,6 @@ import simpy
 
 from model import capsule
 from model import station
-from runnable import web_app
 from settings import config
 from settings import simlog
 from simulator import ascent_generator
@@ -23,7 +22,7 @@ _current_tick = 0
 _sim_state = None
 _sim_tick = 0.05
 _start_hour = None
-_sim_tick_variation = list()
+_sim_tick_variations = list()
 _endless_quit_event = None
 
 
@@ -109,7 +108,8 @@ def _change_sim_tick(value=_sim_tick):
     """
     Change the current sim_tick value. Bigger is the sim_tick value,
     more jerky the simulation will be. Use this to speed up (really)
-    the simulation.
+    the simulation. This function adds in the variations list, the tuple :
+    (start_tick, tick_duration, sim_tick) in _sim_tick_variations
     /!\ This function is disabled in case of real time simulation
     :param value: The desired new sim_tick value
     """
@@ -117,14 +117,22 @@ def _change_sim_tick(value=_sim_tick):
         simlog.warn("You can't change the sim_tick in a real-time environment")
         return
 
+    if value <= 0:
+        simlog.warn("The sim_tick needs to be greater than zero")
+        return
+
     global _sim_tick
-    global _sim_tick_variation
+    global _sim_tick_variations
 
-    last_current_tick_variation = 0
-    if len(_sim_tick_variation) > 0:
-        last_current_tick_variation = _sim_tick_variation[-1][0]
+    if _sim_tick_variations:
+        # Not empty case
+        start_tick = _sim_tick_variations[-1][0] + _sim_tick_variations[-1][1]
+        tick_duration = _current_tick - start_tick
+        _sim_tick_variations.append((start_tick, tick_duration, _sim_tick))
+    else:
+        # Empty case
+        _sim_tick_variations.append((0, _current_tick, _sim_tick))
 
-    _sim_tick_variation.append((_current_tick - last_current_tick_variation, _sim_tick))
     old_value = get_tick_per_second()
     _sim_tick = value
 
@@ -133,11 +141,12 @@ def _change_sim_tick(value=_sim_tick):
 
 def modulo_on_seconds(seconds):
     """
-    This function will return True every simulated seconds.
+    This function will return True every simulated seconds. Seconds must be
+    greater or equal to 1.
     :param seconds: The desired modulo
     :return: Boolean, if the current_tick is in phase with the given frequency
     """
-    if seconds / _sim_tick < 1:
+    if (seconds / _sim_tick) < 1 or seconds < 1:
         return True
     return get_current_tick() % (seconds / _sim_tick) == 0
 
@@ -209,7 +218,7 @@ def reset_simulation_parameters():
     """
     Reset the current simulation parameters. The SimState needs to be KILLED
     """
-    global _current_tick, _sim_state, _sim_tick_variation
+    global _current_tick, _sim_state, _sim_tick_variations
 
     if _sim_state != SimState.KILLED:
         return
@@ -218,7 +227,7 @@ def reset_simulation_parameters():
     capsule.reset_simulation()
     station.reset_simulation()
     _current_tick = 0
-    _sim_tick_variation = list()
+    _sim_tick_variations = list()
 
 
 def get_env():
@@ -270,27 +279,27 @@ def get_start_hour():
     return _start_hour
 
 
-def get_current_day():
-    global _start_hour
-    if _start_hour is None:
-        # This case means that the simulation hasn't been started yet.
-        return 0
-    return 1 + int((_start_hour * 3600 + get_simulation_time()) / 86400)
-
-
-def get_simulation_time():
+def get_simulated_time(tick=None):
     """
-    :return: The total simulated time, in seconds
+    :return: The total simulated time, in seconds. This function takes
+    into account the sim_tick variation.
     """
-    global _sim_tick_variation
+    global _sim_tick_variations
+
+    if tick is None or tick > get_current_tick():
+        tick = get_current_tick()
+
+    if not _sim_tick_variations:
+        # Empty case
+        return tick * _sim_tick
+
     result = 0
-    for ticks, a_sim_tick in _sim_tick_variation:
-        result += ticks * a_sim_tick
+    for start_tick, tick_duration, sim_tick in _sim_tick_variations:
+        if tick <= start_tick + tick_duration:
+            return result + (tick - start_tick) * sim_tick
+        result += tick_duration * sim_tick
 
-    last_current_tick_variation = 0
-    if len(_sim_tick_variation) > 0:
-        last_current_tick_variation = _sim_tick_variation[-1][0]
-
-    result += ((_current_tick - last_current_tick_variation) * _sim_tick)
+    last_end_tick = _sim_tick_variations[-1][0] + _sim_tick_variations[-1][1]
+    result += (tick - last_end_tick) * _sim_tick
 
     return result

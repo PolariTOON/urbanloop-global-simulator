@@ -9,8 +9,6 @@ from simulator import converter
 from simulator import poisson
 from simulator import sim_loop
 
-total_generated = 0
-
 
 class TravelerGenerator:
     def __init__(self):
@@ -24,21 +22,18 @@ class TravelerGenerator:
         """
         :return: The generator of one or several travelers each second
         """
-        global total_generated
         seconds = converter.now_to_seconds()
         hour = converter.seconds_to_floor_hour(seconds)
         traveler_number = self.poisson.traveler(hour)
         for a_traveler in range(traveler_number):
             if not self.can_generate():
                 return
-
             if self.traveler_limit != -1:
                 self.traveler_limit -= 1
 
-            total_generated += 1
             departure_station = _select_random_station()
             destination_station = _select_random_station(departure_station=departure_station)
-            traveler.Traveler(departure_station, destination_station, seconds)
+            traveler.Traveler(departure_station, destination_station)
             simlog.info("Traveler generated", departure_station, destination_station)
             yield sim_loop.get_env().timeout(floor(sim_loop.get_tick_per_second() / traveler_number))
 

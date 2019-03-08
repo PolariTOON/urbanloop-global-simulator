@@ -129,3 +129,86 @@ class StatsAverageArray(abstract_array.AbstractArray):
       sd += (value - average)**2
     sd /= self.get_values_count_between(key, start, end)
     return sd**.5
+
+  # global stats
+  def get_global_min(self):
+    """
+    renvoie la valeur minimum de l'ensemble des objets
+    """
+    keys = self.get_keys()
+    global_min = float('inf')
+    for key in keys:
+      tmp_min = self.get_min(key)
+      if tmp_min < global_min:
+        global_min = tmp_min
+    return global_min
+  
+  def get_global_min_between(self, start, end):
+    """
+    renvoie la valeur minimum de l'ensemble des objets entre deux dates
+    """
+    keys = self.get_keys()
+    global_min = float('inf')
+    for key in keys:
+      tmp_min = self.get_min_between(key, start, end)
+      if tmp_min < global_min:
+        global_min = tmp_min
+    return global_min
+
+  def get_global_max(self):
+    """
+    renvoie la valeur maximum de l'ensemble des objets
+    """
+    keys = self.get_keys()
+    global_max = -float('inf')
+    for key in keys:
+      tmp_max = self.get_max(key)
+      if tmp_max > global_max:
+        global_max = tmp_max
+    return global_max
+  
+  def get_global_max_between(self, start, end):
+    """
+    renvoie la valeur maximum de l'ensemble des objets entre deux dates
+    """
+    keys = self.get_keys()
+    global_max = -float('inf')
+    for key in keys:
+      tmp_max = self.get_max_between(key, start, end)
+      if tmp_max > global_max:
+        global_max = tmp_max
+    return global_max
+
+  def get_global_average(self):
+    """
+    renvoie la valeur moyenne des objets
+    """
+    keys = self.get_keys()
+    global_average = 0
+    for key in keys:
+      global_average += self.get_average(key)
+    return global_average / self.get_keys_count()
+  
+  def get_global_average_between(self, start, end):
+    """
+    renvoie la valeur moyenne des objets entre deux dates
+    """
+    keys = self.get_keys()
+    global_average = 0
+    for key in keys:
+      global_average += self.get_average_between(key, start, end)
+    return global_average / self.get_keys_count()
+  
+  def get_global_standard_deviation(self):
+    """
+    renvoie l'écart-type des objets
+    """
+    # TODO
+    return 0
+
+  def get_global_standard_deviation_between(self, start, end):
+    """
+    renvoie l'écart-type des objets entre deux dates
+    """
+    # TODO
+    return 0

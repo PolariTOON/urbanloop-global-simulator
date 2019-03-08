@@ -17,7 +17,6 @@ log.setLevel(logging.ERROR)
 sim_thread = None
 is_network_loaded = False
 is_simulation_started = False
-is_simulation_paused = False
 
 
 @app.route('/')
@@ -47,18 +46,16 @@ def start_simulation():
 
 @app.route('/pause')
 def pause_simulation():
-    global is_simulation_started, is_simulation_paused
-    if is_simulation_started and not is_simulation_paused:
-        is_simulation_paused = True
+    global is_simulation_started
+    if is_simulation_started and not sim_loop.is_paused():
         sim_loop.pause_simulation()
     return redirect(url_for('root'))
 
 
 @app.route('/resume')
 def resume_simulation():
-    global is_simulation_started, is_simulation_paused
-    if is_simulation_started and is_simulation_paused:
-        is_simulation_paused = False
+    global is_simulation_started
+    if is_simulation_started and sim_loop.is_paused():
         sim_loop.run_simulation_after_pause()
     return redirect(url_for('root'))
 
@@ -69,6 +66,20 @@ def stop_simulation():
     if is_simulation_started:
         is_simulation_started = False
         sim_loop.stop_simulation()
+    return redirect(url_for('root'))
+
+
+@app.route('/accelerate')
+def accelerate_simulation():
+    if is_simulation_started:
+        sim_loop.accelerate_simulation()
+    return redirect(url_for('root'))
+
+
+@app.route('/decelerate')
+def decelerate_simulation():
+    if is_simulation_started:
+        sim_loop.decelerate_simulation()
     return redirect(url_for('root'))
 
 

@@ -20,6 +20,23 @@ if _activity_and_residential_fluctuation < 0 \
     _activity_and_residential_fluctuation = floor(_activity_and_residential_percent / 2)
 
 
+def sim_speed_to_string():
+    """
+    :return: This function can only be used in visualized mode.
+    """
+    sim_tick = sim_loop.get_sim_tick()
+    view_tick = sim_loop.get_visualized_tick_duration()
+    initial_tick = sim_loop.get_initial_sim_tick()
+    if sim_tick == view_tick:
+        return "RealTime"
+    if view_tick == 0:
+        if sim_tick > initial_tick:
+            return "Jerky Mode<br>1 tick = %.2f seconds" % sim_tick
+        else:
+            return "Simulator speed"
+    return "Speed x%d" % (initial_tick / view_tick)
+
+
 def seconds_to_string(seconds):
     """
     This function transforms a second amount to a HH:MM:SS string format

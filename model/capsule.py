@@ -107,8 +107,9 @@ class Capsule:
         else:
             self._continue()
         # optimisation : si une capsule vide en direction d'un entrepot passe devant une station vide elle se déroute
-        if not self.is_aboard() and type(self.next_element) == station.Station and type(self.destination) == warehouse.Warehouse:
-            if self.next_element.capsule_queue.qsize() <= 1 and self.next_element.estimated_capsules_number() < self.next_element.capacity - 1:
+        if not (self.is_aboard()) and type(self.next_element) is station.Station and type(self.destination) is warehouse.Warehouse:
+            # simlog.debug("Rerouted ? capsule %d direction %s, station qsize %d, estimated_count %d, capacity %d" % (self.id, self.destination.name, self.next_element.capsule_queue.qsize(), self.next_element.estimated_capsules_number(), self.next_element.capacity), self.next_element.name)
+            if self.next_element.capsule_queue.qsize() <= 1 and (self.next_element.estimated_capsules_number() < self.next_element.capacity - 1 or self.next_element.traveler_queue.qsize()>=1):
                 simlog.debug("The capsule %d direction %s is rerouted to %s (%d/%d)" % (self.id, self.destination.name, self.next_element.name, self.next_element.estimated_capsules_number(), self.next_element.capacity), self.current_element, self.next_element)
                 self.destination = self.next_element
         if self.current_element == self.destination:

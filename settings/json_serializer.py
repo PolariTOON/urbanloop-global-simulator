@@ -1,14 +1,17 @@
 import math
 
 from model import switch
-from simulator import converter
 from simulator import sim_loop
+from simulator import converter
 
 
 def serialize_time():
     return {
         'day': converter.now_to_day(),
-        'time': converter.seconds_to_string(converter.now_to_seconds())
+        'time': converter.seconds_to_string(converter.now_to_seconds()),
+        'speed': converter.sim_speed_to_string(),
+        'accelerateJerky': (0, 1)[sim_loop.get_visualized_tick_duration() == 0],
+        'decelerateJerky': (0, 1)[sim_loop.get_initial_sim_tick() * 4 <= sim_loop.get_sim_tick()]
     }
 
 

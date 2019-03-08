@@ -82,9 +82,9 @@ window.addEventListener('resize', fitStageIntoParentContainer);
 let startButton = document.getElementById('start-button');
 let stopButton = document.getElementById('stop-button');
 let pauseButton = document.getElementById('pause-button');
-let backwardButton = document.getElementById('backward-button');
-let forwardButton = document.getElementById('forward-button');
 let scaleSlider = document.getElementById('scale-slider');
+backwardButton.disabled = true;
+forwardButton.disabled = true;
 
 startButton.onclick = () => {
     if (running) return;
@@ -92,6 +92,8 @@ startButton.onclick = () => {
     stopButton.classList.remove('not-shown');
     $.get('/start');
     running = true;
+    backwardButton.disabled = false;
+    forwardButton.disabled = false;
 };
 
 stopButton.onclick = () => {
@@ -101,6 +103,8 @@ stopButton.onclick = () => {
     $.get('/stop');
     running = false;
     applyNetworkScene();
+    backwardButton.disabled = true;
+    forwardButton.disabled = true;
 };
 
 pauseButton.onclick = () => {
@@ -108,19 +112,25 @@ pauseButton.onclick = () => {
         $.get('/resume');
         pauseButton.innerHTML = "Pause";
         paused = false;
+        backwardButton.disabled = false;
+        forwardButton.disabled = false;
     } else {
         $.get('/pause');
         pauseButton.innerHTML = "Resume";
+        backwardButton.disabled = true;
+        forwardButton.disabled = true;
         paused = true;
     }
 };
 
 backwardButton.onclick = () => {
-    // TODO
+    if (!running) return;
+    $.get('/decelerate');
 };
 
 forwardButton.onclick = () => {
-    // TODO
+    if (!running) return;
+    $.get('/accelerate');
 };
 
 scaleSlider.oninput = () => {

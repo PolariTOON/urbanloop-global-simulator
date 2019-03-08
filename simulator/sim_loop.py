@@ -21,6 +21,7 @@ _env = None
 _current_tick = 0
 _sim_state = None
 _sim_tick = 0.05
+_visualized_tick_duration = 0.05
 _start_hour = None
 _sim_tick_variations = list()
 _endless_quit_event = None
@@ -31,9 +32,11 @@ class SimLoop:
         global _env
         global _sim_state
         global _sim_tick
+        global _visualized_tick_duration
         global _start_hour
         global _endless_quit_event
         _sim_tick = float(config.sim['tick'])
+        _visualized_tick_duration = _sim_tick
         _load_env()
         _start_hour = int(config.sim['start_hour'])
         _sim_state = SimState.RUNNING
@@ -68,22 +71,25 @@ class SimLoop:
         SimState is RUNNING.
         """
         global _current_tick
-        start = time.time()
+        tick_start_time = 0
         while True:
-            if _sim_state == SimState.RUNNING:
+            if is_running():
+                if self.is_visualized and _visualized_tick_duration != 0:
+                    tick_start_time = time.perf_counter()
+
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
-                if modulo_on_seconds(1):
+                if _modulo_on_seconds(1):
                     _env.process(self.traveler_generator.generate())
-
-                if not _current_tick == 0 and modulo_on_seconds(120):
+                if not _current_tick == 0 and _modulo_on_seconds(120):
                     station.fill_and_full_stations()
 
-                if self.is_visualized:
-                    time.sleep(0.0)
-
                 yield _env.timeout(1)
-            elif _sim_state == SimState.KILLED:
+
+                if self.is_visualized and _visualized_tick_duration != 0:
+                    sleep_time = _visualized_tick_duration - (time.perf_counter() - tick_start_time)
+                    time.sleep(max(0.0, sleep_time))
+            elif is_killed():
                 reset_simulation_parameters()
                 if self.is_endless:
                     _quit_endless_simulation()
@@ -133,13 +139,11 @@ def _change_sim_tick(value=_sim_tick):
         # Empty case
         _sim_tick_variations.append((0, _current_tick, _sim_tick))
 
-    old_value = get_tick_per_second()
     _sim_tick = value
+    simlog.warn("Changing _sim_tick. One tick equals now %f seconds" % _sim_tick)
 
-    simlog.debug("Changing sim ticks per seconds from %f to %f" % (old_value, get_tick_per_second()))
 
-
-def modulo_on_seconds(seconds):
+def _modulo_on_seconds(seconds):
     """
     This function will return True every simulated seconds. Seconds must be
     greater or equal to 1.
@@ -149,6 +153,38 @@ def modulo_on_seconds(seconds):
     if (seconds / _sim_tick) < 1 or seconds < 1:
         return True
     return get_current_tick() % (seconds / _sim_tick) == 0
+
+
+def accelerate_simulation():
+    global _sim_tick
+    global _visualized_tick_duration
+
+    initial_sim_tick = get_initial_sim_tick()
+
+    if _visualized_tick_duration > 0:
+        _visualized_tick_duration /= 2
+        if _visualized_tick_duration < initial_sim_tick * pow(2, -7):
+            _visualized_tick_duration = 0
+        return
+
+    if _sim_tick < initial_sim_tick * pow(2, 8):
+        _change_sim_tick(_sim_tick * 2)
+
+
+def decelerate_simulation():
+    global _sim_tick
+    global _visualized_tick_duration
+
+    initial_sim_tick = get_initial_sim_tick()
+
+    if _sim_tick > initial_sim_tick:
+        _change_sim_tick(_sim_tick / 2)
+        return
+
+    if _visualized_tick_duration < initial_sim_tick:
+        _visualized_tick_duration *= 2
+        if _visualized_tick_duration == 0:
+            _visualized_tick_duration = initial_sim_tick * pow(2, -7)
 
 
 def change_state(sim_state=SimState.RUNNING):
@@ -218,7 +254,8 @@ def reset_simulation_parameters():
     """
     Reset the current simulation parameters. The SimState needs to be KILLED
     """
-    global _current_tick, _sim_state, _sim_tick_variations
+    global _env, _current_tick, _sim_state, _sim_tick, _visualized_tick_duration
+    global _start_hour, _sim_tick_variations, _endless_quit_event
 
     if _sim_state != SimState.KILLED:
         return
@@ -227,6 +264,9 @@ def reset_simulation_parameters():
     capsule.reset_simulation()
     station.reset_simulation()
     _current_tick = 0
+    _sim_tick = 0.05
+    _visualized_tick_duration = 0.05
+    _start_hour = None
     _sim_tick_variations = list()
 
 
@@ -258,11 +298,34 @@ def is_paused():
     return _sim_state == SimState.PAUSED
 
 
+def is_killed():
+    """
+    :return: True if the simulation is currently paused
+    """
+    return _sim_state == SimState.KILLED
+
+
 def get_sim_tick():
     """
     :return: The simulation tick
     """
     return _sim_tick
+
+
+def get_initial_sim_tick():
+    """
+    :return: The _sim_tick value at the start of simulation
+    """
+    if _sim_tick_variations:
+        return _sim_tick_variations[0][2]
+    return _sim_tick
+
+
+def get_visualized_tick_duration():
+    """
+    :return: The visualized tick duration
+    """
+    return _visualized_tick_duration
 
 
 def get_tick_per_second():

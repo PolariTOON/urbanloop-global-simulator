@@ -4,6 +4,11 @@ let clearing = false;
 let networkLayer;
 let infoLayer;
 
+let backwardButton = document.getElementById('backward-button');
+let forwardButton = document.getElementById('forward-button');
+let timerSpan = document.getElementById('timer-span');
+let speedSpan = document.getElementById('speed-span');
+
 let selectedObject = undefined;
 let objects;
 
@@ -713,7 +718,46 @@ function initNetworkScene() {
 function updateNetworkScene() {
     $.get('/time.json', function (timeJSON) {
         if (clearing) return;
-        document.getElementById('timer-span').innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time']
+        timerSpan.innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time'];
+        speedSpan.innerHTML = timeJSON['speed'];
+
+        if (timeJSON['decelerateJerky'] === 1) {
+            if (!backwardButton.classList.contains("btn-warning")) {
+                backwardButton.classList.remove("btn-light");
+                backwardButton.classList.add("btn-warning");
+                $('#backward-button').tooltip({
+                    html: true,
+                    title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
+                });
+                $('#backward-button').tooltip('show')
+            }
+        } else {
+            if (!backwardButton.classList.contains("btn-light")) {
+                backwardButton.classList.remove("btn-warning");
+                backwardButton.classList.add("btn-light");
+                $('#backward-button').tooltip('hide');
+                $('#backward-button').tooltip('dispose');
+            }
+        }
+
+        if (timeJSON['accelerateJerky'] === 1) {
+            if (!forwardButton.classList.contains("btn-warning")) {
+                forwardButton.classList.remove("btn-light");
+                forwardButton.classList.add("btn-warning");
+                $('#forward-button').tooltip({
+                    html: true,
+                    title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
+                });
+                $('#forward-button').tooltip('show')
+            }
+        } else {
+            if (!forwardButton.classList.contains("btn-light")) {
+                forwardButton.classList.remove("btn-warning");
+                forwardButton.classList.add("btn-light");
+                $('#forward-button').tooltip('hide');
+                $('#forward-button').tooltip('dispose');
+            }
+        }
     });
 
     $.get('/capsules.json', function (listCapsuleJSON) {

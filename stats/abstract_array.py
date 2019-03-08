@@ -38,6 +38,15 @@ class AbstractArray():
       keys.append(key)
     return keys
   
+  def get_keys_count(self):
+    """
+    renvoie le nombre d'objets ayant fourni des données
+    """
+    keys = []
+    for key in self._data:
+      keys.append(key)
+    return len(keys)
+  
   def get_ticks_count(self, obj):
     """
     renvoie le nombre d'événements associés à l'objet @param:obj

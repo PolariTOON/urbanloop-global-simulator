@@ -48,6 +48,8 @@ class Switch:
         self.name = "Switch n°%d" % self.id
         self.timers = []
         self.table = {}
+        self.section_my_loop = None
+        self.section_other_loop = None
 
     def route_capsule_to_station(self, station):
         """

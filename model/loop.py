@@ -84,6 +84,12 @@ class Loop:
                         return distance
         return 0
 
+    def get_index_of(self, an_object):
+        for i in range(len(self.objects)):
+            if self.objects[i][1] is an_object:
+                return i
+        return None
+
     def dist_to_next_object(self, element, element2=None):
         """
         determine la distance entre l'element et le second element ou bien le suivant (et dans ce cas on le retourne

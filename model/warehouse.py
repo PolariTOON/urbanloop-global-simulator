@@ -20,6 +20,7 @@ class Warehouse:
         self.next_element = next_element
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
         self.name = "warehouse_%s" % self.loop.name
+        self.section_loop = None
 
     def show_details(self):
         """

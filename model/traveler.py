@@ -15,3 +15,4 @@ class Traveler:
         self.destination_station = destination_station
         self.waiting_since = waiting_since
         self.departure_station.traveler_queue.put(self)
+        self.travel_time = 0

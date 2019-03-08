@@ -135,7 +135,7 @@ def serialize_switch_set_data(a_switch):
         'next_element_name': a_switch.next_element.name,
         'next_other_element_name': a_switch.next_element_other.name,
         'size': a_switch.size,
-        'table': str(a_switch.table)
+        # 'table': str(a_switch.table)
     }
 
 

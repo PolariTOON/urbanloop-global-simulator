@@ -113,19 +113,13 @@ def load(file_path=None):
                 _size['max_y'] = the_loop.y + radius
 
     model_switch.init()
-    '''nb_st = len(st.get_stations())
-        print(nb_st)
-        r = np.random.randint(nb_st)
-        departure = st.get_station_by_id(r)
-        r = np.random.randint(nb_st)
-        arrivee = st.get_station_by_id(r)
-        Traveler(departure.name, arrivee.name, 0)
-        departure.capsule_queue.put(Capsule(departure))
-        '''
     capsules = int(config.routing['number_of_capsules'])
+    if capsules == -1:
+        capsules= sum([(a_station.capacity -1) for a_station in model_station.get_stations() ]
+                      + [(a_warehouse.capacity -1) for a_warehouse in model_warehouse.get_warehouses()])
     for i in range(6):
         for station in model_station.get_stations():
-            if station.capsule_queue.qsize() < min(station.capacity - 1, 2) and capsules > 0:
+            if station.capsule_queue.qsize() < max(station.capacity - 1, 2) and capsules > 0:
                 # creating capsules
                 caps = model_capsule.Capsule(departure_station=station)
                 # adding capsules to station
@@ -133,7 +127,7 @@ def load(file_path=None):
                 capsules -= 1
     while capsules > 0:
         for warehouse in model_warehouse.get_warehouses():
-            if capsules > 0 and warehouse.capsule_queue.qsize() < warehouse.capacity and capsules > 0:
+            if warehouse.capsule_queue.qsize() < warehouse.capacity - 1 and capsules > 0:
                 caps = model_capsule.Capsule(departure_station=warehouse)
                 warehouse.capsule_queue.put(caps)
                 capsules -= 1

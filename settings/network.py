@@ -90,6 +90,7 @@ def load(file_path=None):
                              "0,359)>} "
                              "\n \t ]}}")
             order = []
+        the_loop.clockwise = info["clockwise"]
         tri_bulle(elms, the_loop)
         for i in range(len(elms)):
             # gestion des elements precedents et suivants
@@ -106,7 +107,7 @@ def load(file_path=None):
                     order += [["warehouse", elm, elm.angle]]
                 else:
                     order += [["station", elm, elm.angle]]
-        the_loop.add_order(order, info["clockwise"])
+        the_loop.add_order(order)
 
         global _size
         radius = (the_loop.size / (2 * np.pi)) + 10
@@ -171,6 +172,7 @@ def get_size():
     width = _size['max_y'] - _size['min_y']
     return max(length, width)
 
+
 def tri_bulle(tab_objects, the_loop):
     to_permute = True
     cursor = 0
@@ -188,7 +190,11 @@ def tri_bulle(tab_objects, the_loop):
         to_permute = False
         cursor += 1
         for i in range(0, len(tab_objects)-cursor):
-            if angles[i] < angles[i+1]:
+            if angles[i] < angles[i+1] and not the_loop.clockwise:
+                to_permute = True
+                angles[i], angles[i+1] = angles[i+1], angles[i]
+                tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
+            if angles[i] > angles[i+1] and the_loop.clockwise:
                 to_permute = True
                 angles[i], angles[i+1] = angles[i+1], angles[i]
                 tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]

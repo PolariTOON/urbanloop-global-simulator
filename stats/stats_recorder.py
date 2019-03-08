@@ -10,6 +10,7 @@ class StatsRecorder:
     constructeur du StatsRecorder
     """
     self._init_tick = tick
+    self._stopping_tick = -1
     self._is_recording = False
     # loop
     self._exiting_loop = sa.StatsArray("Nombre de capsules quittant une boucle.")
@@ -34,8 +35,10 @@ class StatsRecorder:
     self._time_in_network = saa.StatsAverageArray("Temps sur le circuit moyen d'une capsule.", "secs")
     self._time_in_warehouse = saa.StatsAverageArray("Temps dans un entrepôt moyen d'une capsule.", "secs")
     self._traveling_distance = saa.StatsAverageArray("Distance de trajet moyenne d'une capsule.", "secs")
+    # record
+    self._start_listen(self._init_tick)
     
-  def start_listen(self, tick):
+  def _start_listen(self, tick):
     """
     à partir de cet appel, l'objet va enregistrer les informations qu'on lui envoie
     """
@@ -50,7 +53,19 @@ class StatsRecorder:
     self._is_recording = False
     self._stopping_tick = tick
     simlog.info("StatsRecorder is now off.")
-  
+
+  def get_running_time(self, tick):
+    """
+    renvoie le nombre de secondes depuis lequel le Recorder a été lancé
+    """
+    return tick - self._init_tick + 1
+
+  def get_record_time(self):
+    """
+    renvoie le nombre de secondes pendant lequel le Recorder a enregistré
+    """
+    return self._stopping_tick - self._starting_tick + 1 if self._stopping_tick != -1 else -1
+
   # à propos des loops
   def add_exiting_loop(self, tick, loop):
     """

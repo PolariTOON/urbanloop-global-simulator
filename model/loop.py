@@ -18,6 +18,7 @@ class Loop:
         self.id = identifier.generate_loop_id()
         self.name = name
         simlog.info("Create station " + self.name)
+        self.clockwise = False
         if coordinates is not None:
             self.x = coordinates[0]
             self.y = coordinates[1]
@@ -29,7 +30,7 @@ class Loop:
         self.objects = []
         self.lengths = []
 
-    def add_order(self, order, clockwise):
+    def add_order(self, order):
         """
          permet d'ajouter les elements dans la boucle en déterminant leur position
          (objects de la forme [nature, pointeur, angle])
@@ -43,7 +44,7 @@ class Loop:
             element = order[i]
             # order[i] = [nature, obj, angle]
             self.objects += [order[i]]
-            if clockwise:  # sens horaire des angles
+            if self.clockwise:  # sens horaire des angles
                 angle_next = order[(i + 1) % len(order)][2] - element[2]
             else:  # sens trigonométrique des angles
                 angle_next = element[2] - order[(i + 1) % len(order)][2]

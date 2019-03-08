@@ -10,6 +10,7 @@ class Traveler:
         Travelers are automatically added to the queue in the departure_station
         :param departure_station_name: nom de la station de départ du voyageur (String)
         :param destination_station_name: nom de la station d'arrivée souhaitée par le voyageur (String)
+        :param waiting_since: The time since the Traveler is waiting at departure_station (in seconds)
         """
         global total_generated
         total_generated += 1
@@ -20,6 +21,7 @@ class Traveler:
         self.waiting_since = sim_loop.get_current_tick()
         self.trip_start_tick = None
         self.departure_station.traveler_queue.put(self)
+        # TODO self.travel_time = 0
 
     def get_waiting_seconds(self):
         """

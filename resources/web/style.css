@@ -68,11 +68,12 @@ hr {
     position: fixed;
     bottom: 0;
     z-index: 999;
-    width: 80%;
+    width: 20.5%;
 }
 
 #scale-slider {
-    margin-left: 5%;
+    width: 80%;
+    margin-left: 10%;
     margin-bottom: 5%;
     height: 15px;
     border-radius: 5px;

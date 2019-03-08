@@ -36,7 +36,7 @@ class Switch:
         self.my_loop = loop
         self.loop = self.my_loop
         self.angle = angle
-        self.last_element = previous_element
+        # self.last_element = previous_element
         self.next_element = next_element
         self.other_loop = other_loop
         self.next_element_other = next_element_other

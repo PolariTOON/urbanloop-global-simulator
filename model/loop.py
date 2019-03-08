@@ -1,4 +1,4 @@
-from model import identifier
+from model import identifier, station, switch
 from settings import simlog
 
 all_loops = {}
@@ -39,18 +39,33 @@ class Loop:
             :return: void (mise à jour de objects et lengths)
         """
         self.objects = []
-        self.lengths = []
+        self.lengths = [0 for i in order]
         for i in range(len(order)):
             element = order[i]
-            # order[i] = [nature, obj, angle]
-            self.objects += [order[i]]
+        # mise à jour des suivants + object[i] = [nature, obj, angle]
+            if type(element) is switch.Switch and element.other_loop == self:    # switch_in
+                element.next_element_other = order[(i + 1) % len(order)]
+                self.objects += [["switch_in", element, element.angle_other_loop]]
+                self.switches += [element]
+            else:
+                element.next_element = order[(i + 1) % len(order)]
+                if type(element) is switch.Switch : # switch_out
+                    # element.previous_element = order[(i - 1) % len(order)]
+                    self.objects += [["switch_out", element, element.angle_my_loop]]
+                    self.switches += [element]
+                elif type(element) is station.Station:
+                    self.objects += [["station", element, element.angle]]
+                    self.stations += [element]
+                else:
+                    self.objects += [["warehouse", element, element.angle]]
+        # mise à jour des longueurs
             if self.clockwise:  # sens horaire des angles
-                angle_next = order[(i + 1) % len(order)][2] - element[2]
+                angle_to_go = self.objects[i][2] - self.objects[(i-1)%len(self.objects)][2]
             else:  # sens trigonométrique des angles
-                angle_next = element[2] - order[(i + 1) % len(order)][2]
-            if angle_next < 0:
-                angle_next += 360
-            self.lengths += [float(angle_next / 360) * self.size]  # arc = D*pi*angle/360  et D = circonference/pi
+                angle_to_go = self.objects[(i-1) % len(self.objects)][2] - self.objects[i][2]
+            if angle_to_go < 0:
+                angle_to_go += 360
+            self.lengths[i-1] = float(angle_to_go / 360) * self.size  # arc = D*pi*angle/360  et D = circonference/pi
             if self.size is None:
                 self.size = sum(self.lengths)
 

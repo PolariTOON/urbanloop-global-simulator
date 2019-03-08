@@ -46,7 +46,7 @@ def load(file_path=None):
             if el_type == "station":
                 elms += [model_station.Station(name=element["name"], capacity=element["capacity"], loop=the_loop,
                                                angle=element["angle"], station_type=element["station_type"])]
-                the_loop.stations += [elms[e]]
+                # the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
                 if other in model_loop.all_loops:
@@ -71,7 +71,7 @@ def load(file_path=None):
                     if len(elms) != e + 1:  # existe pas
                         elms += [model_switch.Switch(loop=other_l, other_loop=the_loop)]
                     elms[e].angle_other_loop = element["angle"]
-                the_loop.switches += [elms[e]]
+                # the_loop.switches += [elms[e]]
             elif el_type == "warehouse":
                 elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"])]
             else:
@@ -89,26 +89,10 @@ def load(file_path=None):
                              "\n \t \t \t {'type':'switch_in','other_loop':<loop_name(String)>, 'angle':<placing(int["
                              "0,359)>} "
                              "\n \t ]}}")
-            order = []
+        order = []
         the_loop.clockwise = info["clockwise"]
         tri_bulle(elms, the_loop)
-        for i in range(len(elms)):
-            # gestion des elements precedents et suivants
-            elm = elms[i]
-            if type(elm) is model_switch.Switch and elm.other_loop == the_loop:  # c'est un switch_in
-                elm.next_element_other = elms[(i + 1) % len(elms)]
-                order += [["switch_in", elm, elm.angle_other_loop]]
-            else:  # type(elm) == Station or (type(elm) == model_switch.Switch and elm.my_loop == l):
-                elm.next_element = elms[(i + 1) % len(elms)]
-                if type(elm) is model_switch.Switch:
-                    elm.previous_element = elms[(i - 1) % len(elms)]
-                    order += [["switch_out", elm, elm.angle_my_loop]]
-                elif type(elm) is model_warehouse.Warehouse:
-                    order += [["warehouse", elm, elm.angle]]
-                else:
-                    order += [["station", elm, elm.angle]]
-        the_loop.add_order(order)
-
+        the_loop.add_order(elms)
         global _size
         radius = (the_loop.size / (2 * np.pi)) + 10
         # print(radius)

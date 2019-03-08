@@ -92,6 +92,11 @@ def serialize_capsule_queue(queue):
 def serialize_station_var_data(a_station):
     return {
         'uuid': str(a_station.uuid),
+        'name': a_station.name,
+        'capacity': a_station.capacity,
+        'outerCircle': a_station.loop.name,
+        'type': a_station.get_string_type(),
+        'next_element': a_station.next_element.name,
         'nb_travelers': a_station.traveler_queue.qsize(),
         'nb_capsules': a_station.capsule_queue.qsize(),
         'capsules': serialize_capsule_queue(a_station.capsule_queue)
@@ -102,6 +107,11 @@ def serialize_station_var_data(a_station):
 def serialize_warehouse_var_data(a_warehouse):
     return {
         'uuid': str(a_warehouse.uuid),
+        'id': a_warehouse.id,
+        'name': a_warehouse.name,
+        'capacity': a_warehouse.capacity,
+        'outerCircle': a_warehouse.loop.name,
+        'next_element': a_warehouse.next_element.name,
         'nb_capsules': a_warehouse.capsule_queue.qsize(),
         'capsules': serialize_capsule_queue(a_warehouse.capsule_queue)
     }

@@ -1,7 +1,7 @@
 {
   "Nancy": {
     "center": [3300,2600],
-    "clockwise" : false,
+    "clockwise" : true,
     "circonference": 5000,
     "content": [{"type":"station","name":"Gare", "angle":149.2, "station_type": 3, "capacity": 5},
                 {"type":"station","name":"Stanislas", "angle":106, "station_type": 3, "capacity": 4},

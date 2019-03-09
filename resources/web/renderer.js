@@ -1,11 +1,10 @@
 let stage = new Konva.Stage({
     container: 'network-div',
-    width: networkDiv.offsetWidth,
-    height: networkDiv.offsetHeight
+    width: getNetworkDivSize().width,
+    height: getNetworkDivSize().height
 });
 
 let updateLoop;
-let refreshTime = 50;
 networkLayer = new Konva.Layer();
 infoLayer = new Konva.Layer();
 
@@ -33,7 +32,7 @@ function startUpdateLoop() {
             updateNetworkScene();
             generateDataPanel();
         }
-    }, refreshTime);
+    }, 30);
 }
 
 function stopUpdateLoop() {

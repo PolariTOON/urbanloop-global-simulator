@@ -1,4 +1,11 @@
-const zoomIntensity = 1.1;
+// Some elements are defined in the above file objects.js
+let startButton = document.getElementById('start-button');
+let stopButton = document.getElementById('stop-button');
+let pauseButton = document.getElementById('pause-button');
+backwardButton.disabled = true;
+forwardButton.disabled = true;
+
+const zoomIntensity = 0.9;
 const minScale = 0.01;
 let moveIntensity = 1;
 let pressTimeout;
@@ -6,6 +13,22 @@ let doPan = false;
 let running = false;
 let paused = false;
 
+function fitStageIntoParentContainer() {
+    stage.width(getNetworkDivSize().width);
+    stage.height(getNetworkDivSize().height);
+
+    calibrateNetworkScene();
+
+    objects.forEach(object => {
+        if (!(object instanceof Capsule)) {
+            object.updatePosition();
+        }
+    });
+
+    stage.batchDraw();
+}
+
+window.addEventListener('resize', fitStageIntoParentContainer);
 
 stage.on('mousedown', event => {
     event.evt.preventDefault();
@@ -31,8 +54,9 @@ stage.on('mousemove', event => {
 
         let newPos = {
             x: stage.x() + moveIntensity * deltaX,
-            y: stage.y() + moveIntensity * deltaY,
+            y: stage.y() + moveIntensity * deltaY
         };
+
         stage.position(newPos);
         stage.batchDraw();
     }
@@ -60,31 +84,10 @@ stage.on('wheel', event => {
         x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
         y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
     };
+
     stage.position(newPos);
     stage.batchDraw();
 });
-
-function fitStageIntoParentContainer() {
-    stage.width(networkDiv.offsetWidth);
-    stage.height(networkDiv.offsetWidth);
-
-    objects.forEach(object => {
-        if (!(object instanceof Capsule)) {
-            object.updatePosition();
-        }
-    });
-
-    stage.batchDraw();
-}
-
-window.addEventListener('resize', fitStageIntoParentContainer);
-
-let startButton = document.getElementById('start-button');
-let stopButton = document.getElementById('stop-button');
-let pauseButton = document.getElementById('pause-button');
-let scaleSlider = document.getElementById('scale-slider');
-backwardButton.disabled = true;
-forwardButton.disabled = true;
 
 startButton.onclick = () => {
     if (running) return;
@@ -134,7 +137,8 @@ forwardButton.onclick = () => {
 };
 
 scaleSlider.oninput = () => {
-    objects.forEach(object => object.updateScale(Math.sqrt(scaleSlider.value)));
+    objectScale = Math.sqrt(scaleSlider.value);
+    objects.forEach(object => object.updateScale(objectScale));
     stage.batchDraw();
 };
 

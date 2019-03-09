@@ -46,7 +46,7 @@ def load(file_path=None):
             if el_type == "station":
                 elms += [model_station.Station(name=element["name"], capacity=element["capacity"], loop=the_loop,
                                                angle=element["angle"], station_type=element["station_type"])]
-                the_loop.stations += [elms[e]]
+                # the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
                 if other in model_loop.all_loops:
@@ -62,7 +62,7 @@ def load(file_path=None):
                     if len(elms) != e + 1:  # existe pas
                         elms += [model_switch.Switch(loop=the_loop, other_loop=other_l)]
                     elms[e].angle_my_loop = element["angle"]
-                    elms[e].size = element["length"]
+                    # elms[e].size = element["length"]
                 else:  # "switch_in":
                     if other_l.switches is not None:
                         for s in other_l.switches:
@@ -71,7 +71,7 @@ def load(file_path=None):
                     if len(elms) != e + 1:  # existe pas
                         elms += [model_switch.Switch(loop=other_l, other_loop=the_loop)]
                     elms[e].angle_other_loop = element["angle"]
-                the_loop.switches += [elms[e]]
+                # the_loop.switches += [elms[e]]
             elif el_type == "warehouse":
                 elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"])]
             else:
@@ -89,26 +89,11 @@ def load(file_path=None):
                              "\n \t \t \t {'type':'switch_in','other_loop':<loop_name(String)>, 'angle':<placing(int["
                              "0,359)>} "
                              "\n \t ]}}")
-            order = []
+        order = []
         the_loop.clockwise = info["clockwise"]
         tri_bulle(elms, the_loop)
-        for i in range(len(elms)):
-            # gestion des elements precedents et suivants
-            elm = elms[i]
-            if type(elm) is model_switch.Switch and elm.other_loop == the_loop:  # c'est un switch_in
-                elm.next_element_other = elms[(i + 1) % len(elms)]
-                order += [["switch_in", elm, elm.angle_other_loop]]
-            else:  # type(elm) == Station or (type(elm) == model_switch.Switch and elm.my_loop == l):
-                elm.next_element = elms[(i + 1) % len(elms)]
-                if type(elm) is model_switch.Switch:
-                    elm.previous_element = elms[(i - 1) % len(elms)]
-                    order += [["switch_out", elm, elm.angle_my_loop]]
-                elif type(elm) is model_warehouse.Warehouse:
-                    order += [["warehouse", elm, elm.angle]]
-                else:
-                    order += [["station", elm, elm.angle]]
-        the_loop.add_order(order)
-
+        the_loop.add_order(elms)
+        sections_loop(the_loop)
         global _size
         radius = (the_loop.size / (2 * np.pi)) + 10
         # print(radius)
@@ -128,19 +113,13 @@ def load(file_path=None):
                 _size['max_y'] = the_loop.y + radius
 
     model_switch.init()
-    '''nb_st = len(st.get_stations())
-        print(nb_st)
-        r = np.random.randint(nb_st)
-        departure = st.get_station_by_id(r)
-        r = np.random.randint(nb_st)
-        arrivee = st.get_station_by_id(r)
-        Traveler(departure.name, arrivee.name, 0)
-        departure.capsule_queue.put(Capsule(departure))
-        '''
     capsules = int(config.routing['number_of_capsules'])
+    if capsules == -1:
+        capsules= sum([(a_station.capacity -1) for a_station in model_station.get_stations() ]
+                      + [(a_warehouse.capacity -1) for a_warehouse in model_warehouse.get_warehouses()])
     for i in range(6):
         for station in model_station.get_stations():
-            if station.capsule_queue.qsize() < min(station.capacity - 1, 2) and capsules > 0:
+            if station.capsule_queue.qsize() < max(station.capacity - 1, 2) and capsules > 0:
                 # creating capsules
                 caps = model_capsule.Capsule(departure_station=station)
                 # adding capsules to station
@@ -148,7 +127,7 @@ def load(file_path=None):
                 capsules -= 1
     while capsules > 0:
         for warehouse in model_warehouse.get_warehouses():
-            if capsules > 0 and warehouse.capsule_queue.qsize() < warehouse.capacity and capsules > 0:
+            if warehouse.capsule_queue.qsize() < warehouse.capacity - 1 and capsules > 0:
                 caps = model_capsule.Capsule(departure_station=warehouse)
                 warehouse.capsule_queue.put(caps)
                 capsules -= 1
@@ -168,9 +147,59 @@ def get_size():
     :return: largeur ou longueur nécessaire pour afficher tout le réseau (contenu dans un carré)
     """
     global _size
+    print(_size)
     length = _size['max_x'] - _size['min_x']
     width = _size['max_y'] - _size['min_y']
     return max(length, width)
+
+
+def sections_loop(the_loop):
+    """
+    découpe la loop en sections entre 2 switchs
+    :return: entre les éléments
+    """
+    switch1 = the_loop.switches[0]
+    index_s = 1
+    section = "%s_%d-%d" % (the_loop.name, switch1.id, the_loop.switches[index_s].id)
+    # print(section, "\n \t", switch1.name)
+    if switch1.my_loop is the_loop:  # switch_out
+        switch1.section_my_loop = section
+    else:
+        switch1.section_other_loop = section
+    index = the_loop.get_index_of(switch1)
+    for j in range(1, len(the_loop.objects)):
+        the_object = the_loop.objects[(index +j)%len(the_loop.objects)][1]
+        # print('\t', the_object.name)
+        if type(the_object) is model_station.Station or type(the_object) is model_warehouse.Warehouse:
+            the_object.section_loop = section
+        elif the_object is the_loop.switches[index_s]:
+            index_s = (index_s + 1) % len(the_loop.switches)
+            section = "%s_%d-%d" % (the_loop.name, the_object.id, the_loop.switches[index_s].id)
+            # print('\n \n ', section, '\n \t', the_object.name )
+            if the_object.my_loop is the_loop :
+                # switch out
+                the_object.section_my_loop = section
+            else:
+                # switch in
+                the_object.section_other_loop = section
+
+        else:
+            simlog.error("ordre des switchs biaisés dans la boucle %s" % the_loop.name )
+
+
+# def define_section(the_loop, switch1):
+#     i = the_loop.switches.indexOf(switch1)
+#     is_a_out = switch1.my_loop is the_loop
+#     for j in range(1, len(the_loop.switches)):
+#         index = (i+j)%len(the_loop.switches)
+#         if is_a_out and the_loop.switches[index].other_loop is the_loop :
+#             switch2 = the_loop.switches[index]
+#             section =
+#             switch1.section_my_loop =
+#             return "%s_%d-%d" % (the_loop.name, switch1.id, switch2.id)
+#         elif not is_a_out and the_loop.switches[index].my_loop is the_loop :
+#             switch2 = the_loop.switches[index]
+#             return "%s_%d-%d" % (the_loop.name, switch1.id, switch2.id)
 
 
 def tri_bulle(tab_objects, the_loop):

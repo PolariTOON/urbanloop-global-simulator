@@ -42,6 +42,7 @@ class Station:
         self.traveler_queue = queue.Queue()
         self.capsule_queue = queue.Queue(maxsize=capacity)
         self.next_element = None
+        self.section_loop = None
 
     def reset_simulation(self):
         self.traveler_queue = queue.Queue()

@@ -55,7 +55,7 @@ function updateDataPanel() {
     data += "<p>Loop switched: " + selectedObject.json["other_loop_name"] + "</p>";
     data += "<p><br>&nbsp; Next element:" + selectedObject.json["next_other_element_name"] + "</p>";
     data += "<p>Size of the link: " + selectedObject.json["size"] + "</p>";
-    data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
+    //data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
   } else if (selectedObject instanceof Station) {
       data += "<p>Station " + selectedObject.json["name"] + "</p>";
       data += "<p>Type de station: " + selectedObject.json["type"] + "</p>";

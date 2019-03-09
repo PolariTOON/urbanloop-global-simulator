@@ -102,6 +102,11 @@ def serialize_capsule_queue(queue):
 def serialize_station_var_data(a_station):
     return {
         'uuid': str(a_station.uuid),
+        'name': a_station.name,
+        'capacity': a_station.capacity,
+        'outerCircle': a_station.loop.name,
+        'type': a_station.get_string_type(),
+        'next_element': a_station.next_element.name,
         'nb_travelers': a_station.traveler_queue.qsize(),
         'nb_capsules': a_station.capsule_queue.qsize(),
         'capsules': serialize_capsule_queue(a_station.capsule_queue)
@@ -112,6 +117,11 @@ def serialize_station_var_data(a_station):
 def serialize_warehouse_var_data(a_warehouse):
     return {
         'uuid': str(a_warehouse.uuid),
+        'id': a_warehouse.id,
+        'name': a_warehouse.name,
+        'capacity': a_warehouse.capacity,
+        'outerCircle': a_warehouse.loop.name,
+        'next_element': a_warehouse.next_element.name,
         'nb_capsules': a_warehouse.capsule_queue.qsize(),
         'capsules': serialize_capsule_queue(a_warehouse.capsule_queue)
     }
@@ -135,7 +145,7 @@ def serialize_switch_set_data(a_switch):
         'next_element_name': a_switch.next_element.name,
         'next_other_element_name': a_switch.next_element_other.name,
         'size': a_switch.size,
-        'table': str(a_switch.table)
+        # 'table': str(a_switch.table)
     }
 
 
@@ -193,7 +203,10 @@ def get_capsule_position(capsule):
         # In this case, current_element and next_element can be station or switch
         angle = get_element_angle(capsule.loop, capsule.current_element)
         trip_angle = capsule.get_segment_traveled_angle()
-        radius_angle = math.radians(angle) - trip_angle
+        if capsule.loop.clockwise :
+            radius_angle = math.radians(angle) + trip_angle
+        else :
+            radius_angle = math.radians(angle) - trip_angle
         loop_radius = get_loop_radius(capsule.loop)
         return capsule.loop.x + math.cos(radius_angle) * loop_radius, capsule.loop.y + math.sin(
             radius_angle) * loop_radius

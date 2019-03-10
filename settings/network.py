@@ -147,7 +147,7 @@ def get_size():
     :return: largeur ou longueur nécessaire pour afficher tout le réseau (contenu dans un carré)
     """
     global _size
-    print(_size)
+    # print(_size)
     length = _size['max_x'] - _size['min_x']
     width = _size['max_y'] - _size['min_y']
     return max(length, width)

@@ -73,7 +73,7 @@ class Loop:
         for i in range(len(self.objects)):
             element = self.objects[i][1]
             if element is element1:
-                if element is element2:
+                if element is element2: # on veut la taille du switch element1
                     return element.size
                 distance = 0
                 for j in range(i + 1, len(self.objects) + i + 1):
@@ -82,7 +82,7 @@ class Loop:
                     distance += self.lengths[index - 1]
                     if element is element2:
                         return distance
-        return 0
+        return None
 
     def get_index_of(self, an_object):
         for i in range(len(self.objects)):
@@ -90,7 +90,7 @@ class Loop:
                 return i
         return None
 
-    def dist_to_next_object(self, element, element2=None):
+    '''def dist_to_next_object(self, element, element2=None):
         """
         determine la distance entre l'element et le second element ou bien le suivant (et dans ce cas on le retourne
         :param  element : element permettant de calculer "le suivant" (Station) OBLIGATOIRE
@@ -112,7 +112,7 @@ class Loop:
                         cost += self.lengths[index]
                         if self.objects[index][1] is element2:
                             return cost, self.objects[index][1]
-        return 0, None
+        return 0, None'''
 
     def show_details(self):
         """

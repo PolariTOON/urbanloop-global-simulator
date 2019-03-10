@@ -6,9 +6,10 @@
     "content": [{"type":"station","name":"Gare", "angle":149.2, "station_type": 3, "capacity": 5},
                 {"type":"station","name":"Stanislas", "angle":106, "station_type": 3, "capacity": 4},
                 {"type":"station","name":"Campus_ARTEM", "angle": 270, "station_type": 1, "capacity": 4},
-                {"type":"switch_out","other_loop":"Villers-les-Nancy", "angle":255.6},
+                {"type":"switch_out","other_loop":"Villers-les-Nancy", "angle":245.6},
                 {"type":"switch_out","other_loop":"Laxou", "angle":189.6},
-                {"type":"switch_in","other_loop":"Laxou", "angle":175.2}
+                {"type":"switch_in","other_loop":"Laxou", "angle":175.2},
+                {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":220}
     ]
   },
   "Villers-les-Nancy": {
@@ -20,7 +21,9 @@
                 {"type":"station","name":"TELECOM Nancy", "angle":314, "station_type": 1, "capacity": 4},
                 {"type":"station","name":"Eglise", "angle":254, "station_type": 2, "capacity": 3},
                 {"type":"warehouse", "capacity": 50, "angle":200},
-                {"type":"switch_out","other_loop":"Laxou", "angle":180}
+                {"type":"switch_out","other_loop":"Laxou", "angle":180},
+                {"type":"switch_out","other_loop":"Nancy", "angle":70},
+                {"type":"station","name":"Nancy Thermal", "angle":110, "station_type": 2, "capacity": 3}
     ]
   },
   "Laxou": {
@@ -32,7 +35,8 @@
                 {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":260 },
                 {"type":"station","name":"Auchan", "angle":167.8, "station_type": 1, "capacity": 3},
                 {"type":"station","name":"Sapiniere", "angle":130.6, "station_type": 2, "capacity": 3},
-                {"type":"warehouse", "capacity": 100, "angle":100}
+                {"type":"warehouse", "capacity": 100, "angle":100},
+                {"type":"station", "name":"Fac. de Lettres", "capacity": 3, "station_type":1 ,"angle":320}
     ]
   }
 }

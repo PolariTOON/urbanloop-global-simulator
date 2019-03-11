@@ -5,10 +5,12 @@ import simpy
 
 from model import capsule
 from model import station
+from model import loop
 from settings import config
 from settings import simlog
 from simulator import ascent_generator
 from simulator import traveler_generator
+from stats import stats_record
 
 
 class SimState(Enum):
@@ -25,6 +27,7 @@ _visualized_tick_duration = 0.05
 _start_hour = None
 _sim_tick_variations = list()
 _endless_quit_event = None
+recorder = None
 
 
 class SimLoop:
@@ -35,6 +38,7 @@ class SimLoop:
         global _visualized_tick_duration
         global _start_hour
         global _endless_quit_event
+        global recorder
         _sim_tick = float(config.sim['tick'])
         _visualized_tick_duration = _sim_tick
         _load_env()
@@ -45,6 +49,8 @@ class SimLoop:
         self.tick_event = _env.event()
         self.is_endless = False
         self.is_visualized = is_visualized
+        recorder = stats_record.StatsRecorder(0)
+
 
         if config.sim['endless'] in ['true', 'True']:
             self.is_endless = True
@@ -71,11 +77,25 @@ class SimLoop:
         SimState is RUNNING.
         """
         global _current_tick
+        global recorder
         tick_start_time = 0
         while True:
             if is_running():
                 if self.is_visualized and _visualized_tick_duration != 0:
                     tick_start_time = time.perf_counter()
+                
+                if _modulo_on_seconds(30): # stats
+                    # loops
+                    loops = []
+                    capsules = []
+                    for loop_name in loop.all_loops:
+                        loops.append(loop.get_by_name(loop_name))
+                        capsules[loop_name] = 0
+                    for capsule in capsule._capsules:
+                        capsules[capsule.loop.name] += 1
+                    for loop in loops:
+                        recorder.add_capsule_average_loop(capsules[loop.name], loop)
+
 
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
@@ -226,6 +246,8 @@ def _quit_endless_simulation():
     that the simulation is endless
     """
     global _env
+    global recorder
+    recorder.stop_listen(get_simulated_time())
 
     def _trigger():
         yield _endless_quit_event.succeed()
@@ -240,7 +262,8 @@ def stop_simulation():
     """
     simlog.warn("Simulation KILLED")
     change_state(SimState.KILLED)
-
+    global recorder
+    recorder.stop_listen()
 
 def pause_simulation():
     """

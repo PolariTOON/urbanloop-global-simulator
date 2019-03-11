@@ -71,7 +71,9 @@ class Capsule:
         """
         self.current_element = current_switch
         self.next_element = current_switch
+        sim_loop.recorder.add_exiting_loop(self.loop)
         self.loop = current_switch.other_loop
+        sim_loop.recorder.add_joining_loop(self.loop)
         simlog.info("Capsule %d is switched (destination %s)" % (self.id, self.destination.name), current_switch.my_loop, self.loop)
 
     def start_trip(self):

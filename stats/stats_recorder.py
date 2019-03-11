@@ -56,11 +56,12 @@ class StatsRecorder:
 
   def extract(self):
     simlog.info("Extracting stats.")
-    buffer = "# loops stats"
+    buffer = "# loops stats\n\n"
     buffer += self._exiting_loop.extract()
     buffer += self._joining_loop.extract()
     buffer += self._capsule_average_loop.extract()
-    stats_file = open("latest-stats.txt", "w")
+    buffer += "\n"
+    stats_file = open("out/latest-stats.txt", "w")
     stats_file.write(buffer)
     stats_file.close()
 

@@ -66,7 +66,7 @@ class StatsArray(abstract_array.AbstractArray):
       buffer += "# " + key + "\n"
       for value in data[key]:
         buffer += str(value) + ";"
-      buffer.pop()
+      buffer = buffer[:-1]
       buffer += "#\n"
     # fermeture
     buffer += "# \n# end"

@@ -59,7 +59,7 @@ class StatsAverageArray(abstract_array.AbstractArray):
       buffer += ""
       for couple in data[key]:
         buffer += str(couple[0]) + "-" + str(couple[1]) + ";"
-      buffer.pop()
+      buffer = buffer[:-1]
       buffer += "#\n"
     # fermeture
     buffer += "# \n# end"

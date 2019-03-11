@@ -8,7 +8,9 @@ from model import loop as model_loop
 from model import station as model_station
 from model import switch as model_switch
 from model import warehouse as model_warehouse
+from model import traveler
 from settings import simlog, config
+from model import identifier
 
 """
 fichier pour l'import des réseaux sur les formats json correspondant
@@ -113,31 +115,56 @@ def load(file_path=None):
                 _size['max_y'] = the_loop.y + radius
 
     model_switch.init()
-    capsules = int(config.routing['number_of_capsules'])
-    if capsules == -1:
-        capsules= sum([(a_station.capacity -1) for a_station in model_station.get_stations() ]
-                      + [(a_warehouse.capacity -1) for a_warehouse in model_warehouse.get_warehouses()])
-    for i in range(6):
-        for station in model_station.get_stations():
-            if station.capsule_queue.qsize() < max(station.capacity - 1, 2) and capsules > 0:
-                # creating capsules
-                caps = model_capsule.Capsule(departure_station=station)
-                # adding capsules to station
-                station.capsule_queue.put(caps)
-                capsules -= 1
-    while capsules > 0:
-        for warehouse in model_warehouse.get_warehouses():
-            if warehouse.capsule_queue.qsize() < warehouse.capacity - 1 and capsules > 0:
-                caps = model_capsule.Capsule(departure_station=warehouse)
-                warehouse.capsule_queue.put(caps)
-                capsules -= 1
+    init_capsules()
+
+    print(get_size())
+    file.close()
     return
 
 
 def reload(file_path=None):
+    print("a")
     model_loop.all_loops = {}
+    model_switch._switches = []
+    model_switch.alive_timers = []
+    model_warehouse._warehouses = list()
+    model_station._stations = list()
     model_capsule._capsules = list()
+    traveler.total_generated = 0
+    identifier._loop_id = -1
+    identifier._warehouse_id = -1
+    identifier._station_id = -1
+    identifier._switch_id = -1
+    identifier._capsule_id = -1
+    identifier._traveler_id = -1
+    print("b")
+    # init_capsules()
+    print("c")
     load(file_path)
+    print("c")
+
+
+def init_capsules():
+    model_capsule._capsules = list()
+    identifier._capsule_id = -1
+    nb_capsules = int(config.routing['number_of_capsules'])
+    if nb_capsules == -1:  # infini = on rempli toutes les stations et entrepôts à capacity-1
+        nb_capsules = sum([(a_station.capacity - 1) for a_station in model_station.get_stations()]
+                          + [(a_warehouse.capacity - 1) for a_warehouse in model_warehouse.get_warehouses()])
+    for i in range(6):
+        for station in model_station.get_stations():
+            if station.capsule_queue.qsize() < max(station.capacity - 1, 2) and nb_capsules > 0:
+                # creating capsules
+                caps = model_capsule.Capsule(departure_station=station)
+                # adding capsules to station
+                station.capsule_queue.put(caps)
+                nb_capsules -= 1
+    while nb_capsules > 0:
+        for warehouse in model_warehouse.get_warehouses():
+            if warehouse.capsule_queue.qsize() < warehouse.capacity - 1 and nb_capsules > 0:
+                caps = model_capsule.Capsule(departure_station=warehouse)
+                warehouse.capsule_queue.put(caps)
+                nb_capsules -= 1
 
 
 def get_size():

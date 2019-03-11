@@ -68,7 +68,8 @@ def stop_simulation():
     if is_simulation_started:
         is_simulation_started = False
         sim_loop.stop_simulation()
-        network.reload()
+        print("begin start")
+        network.reload(None)
         print("stop")
     return redirect(url_for('root'))
 

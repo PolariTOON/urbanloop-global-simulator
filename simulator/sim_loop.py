@@ -99,7 +99,6 @@ class SimLoop:
                     for loop in loops:
                         recorder.add_capsule_average_loop(capsules[loop.name], loop)
 
-
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
                 if _modulo_on_seconds(1):
@@ -267,6 +266,7 @@ def stop_simulation():
     change_state(SimState.KILLED)
     global recorder
     recorder.stop_listen(get_simulated_time)
+    recorder.extract()
 
 def pause_simulation():
     """

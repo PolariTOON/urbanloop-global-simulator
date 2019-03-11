@@ -54,6 +54,16 @@ class StatsRecorder:
     self._stopping_tick = tick
     simlog.info("StatsRecorder is now off.")
 
+  def extract(self):
+    simlog.info("Extracting stats.")
+    buffer = "# loops stats"
+    buffer += self._exiting_loop.extract()
+    buffer += self._joining_loop.extract()
+    buffer += self._capsule_average_loop.extract()
+    stats_file = open("latest-stats.txt", "w")
+    stats_file.write(buffer)
+    stats_file.close()
+
   def get_running_time(self, tick):
     """
     renvoie le nombre de secondes depuis lequel le Recorder a été lancé

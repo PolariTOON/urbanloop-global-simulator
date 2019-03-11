@@ -1,5 +1,5 @@
 from stats import abstract_array
-from sim_loop import sim_loop
+from simulator import sim_loop
 
 class StatsArray(abstract_array.AbstractArray):
   """
@@ -10,7 +10,7 @@ class StatsArray(abstract_array.AbstractArray):
   
   def add(self, obj):
     """
-    permet d'enregistrer l'évènement s'étant produit au tick @param:tick pour l'objet @param:obj
+    permet d'enregistrer l'évènement s'étant produit au tick actuel pour l'objet @param:obj
     """
     tick = sim_loop.get_simulated_time()
     key = self._get_key(obj)
@@ -53,3 +53,21 @@ class StatsArray(abstract_array.AbstractArray):
         break
     
     return len(ticks[start:end+1])
+  
+  def extract(self):
+    """
+    renvoie un string pour l'extraction des stats
+    """
+    # init
+    buffer = "# " + self.get_info() + "\n # \n"
+    # contenu
+    data = self._data
+    for key in data:
+      buffer += "# " + key + "\n"
+      for value in data[key]:
+        buffer += str(value) + ";"
+      buffer.pop()
+      buffer += "#\n"
+    # fermeture
+    buffer += "# \n# end"
+    return buffer

@@ -1,5 +1,5 @@
 from stats import abstract_array
-from sim_loop import sim_loop
+from simulator import sim_loop
 
 class StatsAverageArray(abstract_array.AbstractArray):
   """
@@ -8,10 +8,13 @@ class StatsAverageArray(abstract_array.AbstractArray):
   """
   
   def add(self, value, obj):
-    if self._data[obj] is None:
-      self._data[obj] = []
+    key = self._get_key(obj)
+    try:
+      self._data[key]
+    except KeyError:
+      self._data[key] = []
     tick = sim_loop.get_simulated_time()
-    self._data[obj].add((tick, value))
+    self._data[key].append((tick, value))
   
   def get_values(self, obj):
     """
@@ -31,6 +34,7 @@ class StatsAverageArray(abstract_array.AbstractArray):
     """
     renvoie les couples [tick; value] des évènements associés à l'objet @param:obj
     entre les dates @param:tick1 et @param:tick2
+    REPRENDRE
     """
     key = self._get_key(obj)
     return self._data[key][start:end+1]
@@ -38,9 +42,28 @@ class StatsAverageArray(abstract_array.AbstractArray):
   def get_values_count_between(self, obj, start, end):
     """
     renvoie le nombre d'évènements associés à l'objet @param:obj
+    REPRENDRE
     """
     key = self._get_key(obj)
     return len(self.get_values_between(obj, start, end))
+
+  def extract(self):
+    """
+    renvoie un string pour l'extraction des stats
+    """
+    # init
+    buffer = "# " + self.get_info() + "\n # \n"
+    # contenu
+    data = self._data
+    for key in data:
+      buffer += ""
+      for couple in data[key]:
+        buffer += str(couple[0]) + "-" + str(couple[1]) + ";"
+      buffer.pop()
+      buffer += "#\n"
+    # fermeture
+    buffer += "# \n# end"
+    return buffer
 
   def get_min(self, obj):
     """

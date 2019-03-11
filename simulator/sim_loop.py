@@ -3,14 +3,14 @@ from enum import Enum
 
 import simpy
 
-from model import capsule
-from model import station
-from model import loop
+from model import capsule as Capsule
+from model import station as Station
+from model import loop as Loop
 from settings import config
 from settings import simlog
 from simulator import ascent_generator
 from simulator import traveler_generator
-from stats import stats_record
+from stats import stats_recorder
 
 
 class SimState(Enum):
@@ -46,13 +46,10 @@ class SimLoop:
         self.is_real_time = False
         self.is_endless = False
         self.is_visualized = is_visualized
-<<<<<<< HEAD
-        recorder = stats_record.StatsRecorder(0)
+        recorder = stats_recorder.StatsRecorder(0)
 
-=======
         self.traveler_generator = traveler_generator.TravelerGenerator()
         self.ascent_generator = ascent_generator.AscentGenerator()
->>>>>>> 282cf5a368e4a13a6846f9868957342a6ee3af1a
 
         if config.sim['real_time'] in ['true', 'True']:
             self.is_real_time = True
@@ -93,11 +90,11 @@ class SimLoop:
                 if _modulo_on_seconds(30): # stats
                     # loops
                     loops = []
-                    capsules = []
-                    for loop_name in loop.all_loops:
-                        loops.append(loop.get_by_name(loop_name))
+                    capsules = {}
+                    for loop_name in Loop.all_loops:
+                        loops.append(Loop.get_by_name(loop_name))
                         capsules[loop_name] = 0
-                    for capsule in capsule._capsules:
+                    for capsule in Capsule._capsules:
                         capsules[capsule.loop.name] += 1
                     for loop in loops:
                         recorder.add_capsule_average_loop(capsules[loop.name], loop)
@@ -108,7 +105,7 @@ class SimLoop:
                 if _modulo_on_seconds(1):
                     _env.process(self.traveler_generator.generate())
                 if not _current_tick == 0 and _modulo_on_seconds(120):
-                    station.fill_and_full_stations()
+                    Station.fill_and_full_stations()
 
                 yield _env.timeout(1)
 
@@ -253,6 +250,7 @@ def _quit_endless_simulation():
     global _env
     global recorder
     recorder.stop_listen(get_simulated_time())
+    recorder.extract()
 
     def _trigger():
         yield _endless_quit_event.succeed()
@@ -268,7 +266,7 @@ def stop_simulation():
     simlog.warn("Simulation KILLED")
     change_state(SimState.KILLED)
     global recorder
-    recorder.stop_listen()
+    recorder.stop_listen(get_simulated_time)
 
 def pause_simulation():
     """
@@ -289,8 +287,8 @@ def reset_simulation_parameters():
         return
 
     simlog.warn("Resetting the simulation parameters")
-    capsule.reset_simulation()
-    station.reset_simulation()
+    Capsule.reset_simulation()
+    Station.reset_simulation()
     _current_tick = 0
     _sim_tick = 0.05
     _visualized_tick_duration = 0.05

@@ -38,7 +38,7 @@ class Loop {
         this.id = loopJSON['id'];
 
         const x = loopJSON['x'];
-        const y = networkDiv.offsetHeight - loopJSON['y'];
+        const y = getNetworkDivSize().height - loopJSON['y'];
         const semiWidth = ((defaultCapsuleWidth + 3) * objectScale) / 2;
         const strokeWidth = semiWidth / 2.5;
 
@@ -129,7 +129,7 @@ class Station {
 
         const x = stationJSON['x'];
         this.y = stationJSON['y'];
-        const y = networkDiv.offsetHeight - this.y;
+        const y = getNetworkDivSize().height - this.y;
         const semiWidth = Math.floor(stationWidth / 2);
 
         this.innerCircle = new Konva.Circle({
@@ -239,8 +239,8 @@ class Warehouse {
         this.id = warehouseJSON['id'];
 
         const x = warehouseJSON['x'];
-        this.y = warehouseJSON['y']
-        const y = networkDiv.offsetHeight - this.y;
+        this.y = warehouseJSON['y'];
+        const y = getNetworkDivSize().height - this.y;
         const semiWidth = Math.floor(warehouseWidth / 2);
 
         this.innerRectangle = new Konva.Rect({
@@ -335,11 +335,6 @@ class Warehouse {
         this.info.y(y);
     }
 
-    update(warehouseJSON) {
-        this.json = warehouseJSON;
-        //this.updateColor();
-    }
-
     updateScale(value) {
         this.innerRectangle.scaleX(value);
         this.innerRectangle.scaleY(value);
@@ -347,6 +342,10 @@ class Warehouse {
         this.outerRectangle.scaleY(value);
         this.info.scaleX(value);
         this.info.scaleY(value);
+    }
+
+    update(warehouseJSON) {
+        this.json = warehouseJSON;
     }
 }
 
@@ -357,9 +356,9 @@ class Switch {
         this.id = switchJSON['id'];
 
         const xIn = switchJSON['xIn'];
-        const yIn = networkDiv.offsetHeight - switchJSON['yIn'];
+        const yIn = getNetworkDivSize().height - switchJSON['yIn'];
         const xOut = switchJSON['xOut'];
-        const yOut = networkDiv.offsetHeight - switchJSON['yOut'];
+        const yOut = getNetworkDivSize().height - switchJSON['yOut'];
         const semiWidth = Math.floor(switchWidth / 2);
 
         this.innerInCircle = new Konva.Circle({
@@ -640,6 +639,10 @@ function handCursor() {
     document.body.style.cursor = 'pointer';
 }
 
+function moveCursor() {
+    document.body.style.cursor = 'move';
+}
+
 function resetCursor() {
     document.body.style.cursor = 'auto';
 }
@@ -672,7 +675,7 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 
     innerShape.on('mouseout', () => {
-        resetCursor();
+        moveCursor();
         if (hasInfo) {
             info.hide();
             infoLayer.batchDraw();
@@ -680,7 +683,7 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 
     outerShape.on('mouseout', () => {
-        resetCursor();
+        moveCursor();
         if (hasInfo) {
             info.hide();
             infoLayer.batchDraw();
@@ -809,8 +812,9 @@ function updateNetworkScene() {
 
 function calibrateNetworkScene() {
     calibrateStageScale();
-    objectScale = Math.min(networkSize / networkDiv.offsetHeight, scaleSlider.max);
+    objectScale = Math.min(networkSize / getNetworkDivSize().height, scaleSlider.max);
     scaleSlider.value = objectScale;
+    $('#scale-slider').tooltip({title: "Objects scale : " + scaleSlider.value});
     calibrateStagePosition();
     scaleObjects();
 }
@@ -824,7 +828,7 @@ function getBarycenter() {
         if (object instanceof Loop) {
             loopNumber += 1;
             sumX += object.json['x'];
-            sumY += networkDiv.offsetHeight - object.json['y'];
+            sumY += getNetworkDivSize().height - object.json['y'];
         }
     });
 
@@ -838,15 +842,16 @@ function getBarycenter() {
 function calibrateStagePosition() {
     if (objectScale === 0) return;
     const barycenter = getBarycenter();
+    const scale = networkSize / Math.min(getNetworkDivSize().width, getNetworkDivSize().height);
     const stagePos = {
-        x: -barycenter.x / objectScale + stage.width() / 2,
-        y: -barycenter.y / objectScale + stage.height() / 2
+        x: -barycenter.x / scale + getNetworkDivSize().width / 2,
+        y: -barycenter.y / scale + getNetworkDivSize().height / 2
     };
     stage.position(stagePos);
 }
 
 function calibrateStageScale() {
-    const stageScale = networkDiv.offsetHeight / networkSize;
+    const stageScale = Math.min(getNetworkDivSize().width, getNetworkDivSize().height) / networkSize;
     stage.scale({x: stageScale, y: stageScale});
 }
 
@@ -855,7 +860,6 @@ function scaleObjects() {
 }
 
 function getNetworkDivSize() {
-
     return {
         width: Math.min(networkDiv.offsetWidth, window.innerWidth),
         height: Math.min(networkDiv.offsetHeight, window.innerHeight)

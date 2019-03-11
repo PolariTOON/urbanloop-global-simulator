@@ -131,8 +131,6 @@ def load(file_path=None):
                 caps = model_capsule.Capsule(departure_station=warehouse)
                 warehouse.capsule_queue.put(caps)
                 capsules -= 1
-
-    print(get_size())
     return
 
 

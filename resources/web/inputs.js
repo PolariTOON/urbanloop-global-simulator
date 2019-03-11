@@ -2,6 +2,7 @@
 let startButton = document.getElementById('start-button');
 let stopButton = document.getElementById('stop-button');
 let pauseButton = document.getElementById('pause-button');
+pauseButton.disabled = true;
 backwardButton.disabled = true;
 forwardButton.disabled = true;
 
@@ -91,23 +92,25 @@ stage.on('wheel', event => {
 
 startButton.onclick = () => {
     if (running) return;
+    pauseButton.disabled = false;
+    backwardButton.disabled = false;
+    forwardButton.disabled = false;
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
     $.get('/start');
     running = true;
-    backwardButton.disabled = false;
-    forwardButton.disabled = false;
 };
 
 stopButton.onclick = () => {
     if (!running) return;
-    stopButton.classList.add('not-shown');
-    startButton.classList.remove('not-shown');
-    $.get('/stop');
-    running = false;
-    applyNetworkScene();
+    pauseButton.disabled = true;
     backwardButton.disabled = true;
     forwardButton.disabled = true;
+    stopButton.classList.add('not-shown');
+    $.get('/stop');
+    running = false;
+    startButton.classList.remove('not-shown');
+    applyNetworkScene();
 };
 
 pauseButton.onclick = () => {
@@ -137,10 +140,27 @@ forwardButton.onclick = () => {
 };
 
 scaleSlider.oninput = () => {
-    objectScale = Math.sqrt(scaleSlider.value);
+    $('#scale-slider').attr('data-original-title', 'Objects scale : ' + scaleSlider.value).tooltip('show');
+    objectScale = scaleSlider.value;
     objects.forEach(object => object.updateScale(objectScale));
     stage.batchDraw();
 };
+
+scaleSlider.onmouseleave = () => {
+    $('#scale-slider').tooltip('hide');
+};
+
+document.getElementById('panel-div').onmouseenter = () => {
+    resetCursor();
+};
+
+stage.on('mouseover', event => {
+    event.evt.preventDefault();
+
+    if (networkLayer.getIntersection(stage.getPointerPosition()) === null) {
+        moveCursor();
+    }
+});
 
 stage.on('mousedown', event => {
     event.evt.preventDefault();
@@ -150,5 +170,4 @@ stage.on('mousedown', event => {
     if (selectedObject !== undefined && shape === null) {
         selectedObject.unselect();
     }
-    generateDataPanel();
 });

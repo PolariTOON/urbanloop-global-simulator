@@ -30,7 +30,7 @@ function startUpdateLoop() {
     updateLoop = setInterval(() => {
         if (running) {
             updateNetworkScene();
-            generateDataPanel();
+            updateDataPanel();
         }
     }, 30);
 }

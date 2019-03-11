@@ -260,4 +260,4 @@ def reset_simulation():
     global _capsules
     for capsule in _capsules:
         del capsule
-    _capsules = []
+    _capsules = list()

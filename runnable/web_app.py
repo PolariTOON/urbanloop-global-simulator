@@ -30,6 +30,7 @@ def load_network():
     if not is_network_loaded:
         is_network_loaded = True
         network.load()
+        print("load")
     return Response(dumps(json_serializer.serialize_network()), mimetype="application/json")
 
 
@@ -63,9 +64,12 @@ def resume_simulation():
 @app.route('/stop')
 def stop_simulation():
     global is_simulation_started
+    global is_network_loaded
     if is_simulation_started:
         is_simulation_started = False
         sim_loop.stop_simulation()
+        network.reload()
+        print("stop")
     return redirect(url_for('root'))
 
 
@@ -136,6 +140,5 @@ def generate_capsules_json():
 
 
 if __name__ == '__main__':
-    # logging.info("http://127.0.0.1:8090")
     print("http://127.0.0.1:8090")
     app.run(port=8090)

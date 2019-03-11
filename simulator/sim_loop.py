@@ -41,23 +41,28 @@ class SimLoop:
         global recorder
         _sim_tick = float(config.sim['tick'])
         _visualized_tick_duration = _sim_tick
-        _load_env()
         _start_hour = int(config.sim['start_hour'])
         _sim_state = SimState.RUNNING
-        self.traveler_generator = traveler_generator.TravelerGenerator()
-        self.ascent_generator = ascent_generator.AscentGenerator()
-        self.tick_event = _env.event()
+        self.is_real_time = False
         self.is_endless = False
         self.is_visualized = is_visualized
+<<<<<<< HEAD
         recorder = stats_record.StatsRecorder(0)
 
+=======
+        self.traveler_generator = traveler_generator.TravelerGenerator()
+        self.ascent_generator = ascent_generator.AscentGenerator()
+>>>>>>> 282cf5a368e4a13a6846f9868957342a6ee3af1a
 
+        if config.sim['real_time'] in ['true', 'True']:
+            self.is_real_time = True
         if config.sim['endless'] in ['true', 'True']:
             self.is_endless = True
-            _endless_quit_event = _env.event()
 
-        # Register the loop process in the simulation environment
-        _env.process(self.loop())
+        _load_env(self.is_real_time)
+        self.tick_event = _env.event()
+        _endless_quit_event = _env.event()
+        _env.process(self.loop())  # Register the loop process in the simulation environment
 
     def tick(self):
         """
@@ -81,7 +86,8 @@ class SimLoop:
         tick_start_time = 0
         while True:
             if is_running():
-                if self.is_visualized and _visualized_tick_duration != 0:
+                loop_sleep_boolean = self.is_visualized and not self.is_real_time and _visualized_tick_duration != 0
+                if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()
                 
                 if _modulo_on_seconds(30): # stats
@@ -106,7 +112,7 @@ class SimLoop:
 
                 yield _env.timeout(1)
 
-                if self.is_visualized and _visualized_tick_duration != 0:
+                if loop_sleep_boolean:
                     sleep_time = _visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
             elif is_killed():
@@ -118,16 +124,15 @@ class SimLoop:
                 return
 
 
-def _load_env():
+def _load_env(is_real_time=False):
     """
     Load the simulation environment with configuration, real_time or not
     """
     global _env
-    real_time_boolean = config.sim['real_time']
-    if real_time_boolean in ['false', 'False']:
-        _env = simpy.Environment()
-    else:
+    if is_real_time:
         _env = simpy.rt.RealtimeEnvironment(factor=_sim_tick)
+    else:
+        _env = simpy.Environment()
 
 
 def _change_sim_tick(value=_sim_tick):

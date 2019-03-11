@@ -1,4 +1,4 @@
-from model import identifier
+from model import identifier, station, switch
 from settings import simlog
 
 all_loops = {}
@@ -18,7 +18,7 @@ class Loop:
         self.id = identifier.generate_loop_id()
         self.name = name
         simlog.info("Create station " + self.name)
-        self.clockwise = False
+        self.clockwise = True
         if coordinates is not None:
             self.x = coordinates[0]
             self.y = coordinates[1]
@@ -39,26 +39,48 @@ class Loop:
             :return: void (mise à jour de objects et lengths)
         """
         self.objects = []
-        self.lengths = []
+        self.lengths = [0 for i in order]
         for i in range(len(order)):
             element = order[i]
-            # order[i] = [nature, obj, angle]
-            self.objects += [order[i]]
+        # mise à jour des suivants + object[i] = [nature, obj, angle]
+            if type(element) is switch.Switch and element.other_loop == self:    # switch_in
+                element.next_element_other = order[(i + 1) % len(order)]
+                self.objects += [["switch_in", element, element.angle_other_loop]]
+                self.switches += [element]
+            else:
+                element.next_element = order[(i + 1) % len(order)]
+                if type(element) is switch.Switch : # switch_out
+                    # element.previous_element = order[(i - 1) % len(order)]
+                    self.objects += [["switch_out", element, element.angle_my_loop]]
+                    self.switches += [element]
+                elif type(element) is station.Station:
+                    self.objects += [["station", element, element.angle]]
+                    self.stations += [element]
+                else:
+                    self.objects += [["warehouse", element, element.angle]]
+        # mise à jour des longueurs
+        nb_elements = len(self.objects)
+        for i in range(nb_elements):
+            an_object = self.objects[i]
+            next_object = self.objects[(i+1)%nb_elements]
             if self.clockwise:  # sens horaire des angles
-                angle_next = order[(i + 1) % len(order)][2] - element[2]
+                angle_next = an_object[2] - next_object[2]
             else:  # sens trigonométrique des angles
-                angle_next = element[2] - order[(i + 1) % len(order)][2]
+                angle_next = next_object[2] - an_object[2]
             if angle_next < 0:
                 angle_next += 360
-            self.lengths += [float(angle_next / 360) * self.size]  # arc = D*pi*angle/360  et D = circonference/pi
+            # print(an_object[1].name, next_object[1].name, angle_next)
+            self.lengths[i] = round(float(angle_next / 360) * self.size , 2)  # arc = D*pi*angle/360  et D = circonference/pi
             if self.size is None:
                 self.size = sum(self.lengths)
+        print(self.lengths)
+        print([o[1].name for o in self.objects])
 
     def distance_between(self, element1, element2):
         for i in range(len(self.objects)):
             element = self.objects[i][1]
             if element is element1:
-                if element is element2:
+                if element is element2:  # on veut la taille du switch element1
                     return element.size
                 distance = 0
                 for j in range(i + 1, len(self.objects) + i + 1):
@@ -67,9 +89,15 @@ class Loop:
                     distance += self.lengths[index - 1]
                     if element is element2:
                         return distance
-        return 0
+        return None
 
-    def dist_to_next_object(self, element, element2=None):
+    def get_index_of(self, an_object):
+        for i in range(len(self.objects)):
+            if self.objects[i][1] is an_object:
+                return i
+        return None
+
+    '''def dist_to_next_object(self, element, element2=None):
         """
         determine la distance entre l'element et le second element ou bien le suivant (et dans ce cas on le retourne
         :param  element : element permettant de calculer "le suivant" (Station) OBLIGATOIRE
@@ -91,7 +119,7 @@ class Loop:
                         cost += self.lengths[index]
                         if self.objects[index][1] is element2:
                             return cost, self.objects[index][1]
-        return 0, None
+        return 0, None'''
 
     def show_details(self):
         """

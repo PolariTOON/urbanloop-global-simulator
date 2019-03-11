@@ -1,9 +1,12 @@
 let networkDiv = document.getElementById('network-div');
 
 let clearing = false;
+let networkSize = 1000;
+let objectScale;
 let networkLayer;
 let infoLayer;
 
+let scaleSlider = document.getElementById('scale-slider');
 let backwardButton = document.getElementById('backward-button');
 let forwardButton = document.getElementById('forward-button');
 let timerSpan = document.getElementById('timer-span');
@@ -12,6 +15,7 @@ let speedSpan = document.getElementById('speed-span');
 let selectedObject = undefined;
 let objects;
 
+const defaultCapsuleWidth = 5;
 const loopColor = 'rgb(156, 156, 156)';
 const loopSelectedColor = 'rgb(255, 200, 20)';
 const stationColor = 'rgb(40, 40, 200)';
@@ -28,14 +32,15 @@ const capsuleInnerSelectedColor = 'rgb(255, 200, 20)';
 const capsuleOuterSelectedColor = 'rgb(255, 234, 87)';
 
 class Loop {
-    constructor(loopJSON, loopWidth = 6, strokeWidth = 2) {
+    constructor(loopJSON) {
         this.json = loopJSON;
         this.uuid = loopJSON['uuid'];
         this.id = loopJSON['id'];
 
-        let x = loopJSON['x'];
-        let y = networkDiv.offsetHeight - loopJSON['y'];
-        let semiWidth = Math.floor(loopWidth / 2);
+        const x = loopJSON['x'];
+        const y = getNetworkDivSize().height - loopJSON['y'];
+        const semiWidth = ((defaultCapsuleWidth + 3) * objectScale) / 2;
+        const strokeWidth = semiWidth / 2.5;
 
         this.innerCircle = new Konva.Circle({
             name: this.uuid,
@@ -98,13 +103,19 @@ class Loop {
     }
 
     updatePosition() {
-        const y = networkDiv.offsetHeight - this.json['y'];
+        const y = getNetworkDivSize().height - this.json['y'];
         this.innerCircle.y(y);
         this.outerCircle.y(y);
         this.text.y(y);
     }
 
     updateScale(value) {
+        const semiWidth = ((defaultCapsuleWidth + 3) * objectScale) / 2;
+        const strokeWidth = semiWidth / 2.5;
+        this.innerCircle.radius(this.json['radius'] - semiWidth);
+        this.outerCircle.radius(this.json['radius'] + semiWidth);
+        this.innerCircle.strokeWidth(strokeWidth);
+        this.outerCircle.strokeWidth(strokeWidth);
         this.text.scaleX(value);
         this.text.scaleY(value);
     }
@@ -116,9 +127,10 @@ class Station {
         this.uuid = stationJSON['uuid'];
         this.id = stationJSON['id'];
 
-        let x = stationJSON['x'];
-        let y = networkDiv.offsetHeight - stationJSON['y'];
-        let semiWidth = Math.floor(stationWidth / 2);
+        const x = stationJSON['x'];
+        this.y = stationJSON['y'];
+        const y = getNetworkDivSize().height - this.y;
+        const semiWidth = Math.floor(stationWidth / 2);
 
         this.innerCircle = new Konva.Circle({
             name: this.uuid,
@@ -200,8 +212,7 @@ class Station {
     }
 
     updatePosition() {
-        const height = networkDiv.offsetHeight;
-        const y = height - this.json['y'];
+        const y = getNetworkDivSize().height - this.y;
         this.innerCircle.y(y);
         this.outerCircle.y(y);
         this.info.y(y);
@@ -218,7 +229,6 @@ class Station {
 
     update(stationJSON) {
         this.json = stationJSON;
-        //this.updateColor();
     }
 }
 
@@ -228,9 +238,10 @@ class Warehouse {
         this.uuid = warehouseJSON['uuid'];
         this.id = warehouseJSON['id'];
 
-        let x = warehouseJSON['x'];
-        let y = networkDiv.offsetHeight - warehouseJSON['y'];
-        let semiWidth = Math.floor(warehouseWidth / 2);
+        const x = warehouseJSON['x'];
+        this.y = warehouseJSON['y'];
+        const y = getNetworkDivSize().height - this.y;
+        const semiWidth = Math.floor(warehouseWidth / 2);
 
         this.innerRectangle = new Konva.Rect({
             name: this.uuid,
@@ -318,16 +329,10 @@ class Warehouse {
     }
 
     updatePosition() {
-        const height = networkDiv.offsetHeight;
-        const y = height - this.json['y'];
+        const y = getNetworkDivSize().height - this.y;
         this.innerRectangle.y(y);
         this.outerRectangle.y(y);
         this.info.y(y);
-    }
-
-    update(warehouseJSON) {
-        this.json = warehouseJSON;
-        //this.updateColor();
     }
 
     updateScale(value) {
@@ -338,6 +343,10 @@ class Warehouse {
         this.info.scaleX(value);
         this.info.scaleY(value);
     }
+
+    update(warehouseJSON) {
+        this.json = warehouseJSON;
+    }
 }
 
 class Switch {
@@ -346,11 +355,11 @@ class Switch {
         this.uuid = switchJSON['uuid'];
         this.id = switchJSON['id'];
 
-        let xIn = switchJSON['xIn'];
-        let yIn = networkDiv.offsetHeight - switchJSON['yIn'];
-        let xOut = switchJSON['xOut'];
-        let yOut = networkDiv.offsetHeight - switchJSON['yOut'];
-        let semiWidth = Math.floor(switchWidth / 2);
+        const xIn = switchJSON['xIn'];
+        const yIn = getNetworkDivSize().height - switchJSON['yIn'];
+        const xOut = switchJSON['xOut'];
+        const yOut = getNetworkDivSize().height - switchJSON['yOut'];
+        const semiWidth = Math.floor(switchWidth / 2);
 
         this.innerInCircle = new Konva.Circle({
             x: xIn,
@@ -505,7 +514,7 @@ class Switch {
     }
 
     updatePosition() {
-        const height = networkDiv.offsetHeight;
+        const height = getNetworkDivSize().height;
         const xIn = this.json['xIn'];
         const yIn = height - this.json['yIn'];
         const xOut = this.json['xOut'];
@@ -518,7 +527,7 @@ class Switch {
         this.infoIn.y(yIn);
         this.infoOut.y(yOut);
         this.link.points([xIn, yIn, xOut, yOut]);
-        this.arrow.points([xIn, yIn, (xIn + xOut) / 2, (yIn + yOut) / 2])
+        this.arrow.points([xIn, yIn, (xIn + xOut) / 2, (yIn + yOut) / 2]);
     }
 
     updateScale(value) {
@@ -542,7 +551,7 @@ class Switch {
 }
 
 class Capsule {
-    constructor(capsuleJSON, capsuleWidth = 5) {
+    constructor(capsuleJSON, capsuleWidth = defaultCapsuleWidth) {
         this.json = capsuleJSON;
         this.uuid = capsuleJSON['uuid'];
         this.id = capsuleJSON['id'];
@@ -588,8 +597,8 @@ class Capsule {
     }
 
     update(capsuleJSON) {
-        let x = capsuleJSON['x'];
-        let y = networkDiv.offsetHeight - capsuleJSON['y'];
+        const x = capsuleJSON['x'];
+        const y = getNetworkDivSize().height - capsuleJSON['y'];
         this.innerCircle.x(x);
         this.innerCircle.y(y);
         this.outerCircle.x(x);
@@ -630,12 +639,16 @@ function handCursor() {
     document.body.style.cursor = 'pointer';
 }
 
+function moveCursor() {
+    document.body.style.cursor = 'move';
+}
+
 function resetCursor() {
     document.body.style.cursor = 'auto';
 }
 
 function initBehaviors(object, innerShape, outerShape, info = undefined) {
-    let hasInfo = info !== undefined;
+    const hasInfo = info !== undefined;
 
     innerShape.on('mousedown', () => {
         object.select();
@@ -662,7 +675,7 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 
     innerShape.on('mouseout', () => {
-        resetCursor();
+        moveCursor();
         if (hasInfo) {
             info.hide();
             infoLayer.batchDraw();
@@ -670,7 +683,7 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 
     outerShape.on('mouseout', () => {
-        resetCursor();
+        moveCursor();
         if (hasInfo) {
             info.hide();
             infoLayer.batchDraw();
@@ -679,11 +692,13 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
 }
 
 function initNetworkScene() {
-    $.ajaxSetup({async: false});
-
     objects = [];
 
-    $.get('/load');
+    $.ajaxSetup({async: false});
+
+    $.get('/load.json', function (networkJSON) {
+        networkSize = networkJSON['maxSize'];
+    });
 
     $.get('/loops.json', function (listLoopJSON) {
         listLoopJSON.forEach(function (loopJSON) {
@@ -711,6 +726,8 @@ function initNetworkScene() {
 
     $.ajaxSetup({async: true});
 
+    calibrateNetworkScene();
+
     networkLayer.batchDraw();
     infoLayer.batchDraw();
 }
@@ -729,7 +746,7 @@ function updateNetworkScene() {
                     html: true,
                     title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
                 });
-                $('#backward-button').tooltip('show')
+                $('#backward-button').tooltip('show');
             }
         } else {
             if (!backwardButton.classList.contains("btn-light")) {
@@ -748,7 +765,7 @@ function updateNetworkScene() {
                     html: true,
                     title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
                 });
-                $('#forward-button').tooltip('show')
+                $('#forward-button').tooltip('show');
             }
         } else {
             if (!forwardButton.classList.contains("btn-light")) {
@@ -766,11 +783,10 @@ function updateNetworkScene() {
             let targetCapsules = objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
 
             if (targetCapsules.length <= 0) {
-                new Capsule(capsuleJSON);
+                new Capsule(capsuleJSON).updateScale(objectScale);
             } else {
                 targetCapsules.forEach(capsule => capsule.update(capsuleJSON));
             }
-
         });
     });
 
@@ -792,4 +808,60 @@ function updateNetworkScene() {
 
     networkLayer.batchDraw();
     infoLayer.batchDraw();
+}
+
+function calibrateNetworkScene() {
+    calibrateStageScale();
+    objectScale = Math.min(networkSize / getNetworkDivSize().height, scaleSlider.max);
+    scaleSlider.value = objectScale;
+    $('#scale-slider').tooltip({title: "Objects scale : " + scaleSlider.value});
+    calibrateStagePosition();
+    scaleObjects();
+}
+
+function getBarycenter() {
+    let loopNumber = 0;
+    let sumX = 0;
+    let sumY = 0;
+
+    objects.forEach(object => {
+        if (object instanceof Loop) {
+            loopNumber += 1;
+            sumX += object.json['x'];
+            sumY += getNetworkDivSize().height - object.json['y'];
+        }
+    });
+
+    if (loopNumber === 0) {
+        return {x: 0, y: 0};
+    }
+
+    return {x: sumX / loopNumber, y: sumY / loopNumber};
+}
+
+function calibrateStagePosition() {
+    if (objectScale === 0) return;
+    const barycenter = getBarycenter();
+    const scale = networkSize / Math.min(getNetworkDivSize().width, getNetworkDivSize().height);
+    const stagePos = {
+        x: -barycenter.x / scale + getNetworkDivSize().width / 2,
+        y: -barycenter.y / scale + getNetworkDivSize().height / 2
+    };
+    stage.position(stagePos);
+}
+
+function calibrateStageScale() {
+    const stageScale = Math.min(getNetworkDivSize().width, getNetworkDivSize().height) / networkSize;
+    stage.scale({x: stageScale, y: stageScale});
+}
+
+function scaleObjects() {
+    objects.forEach(object => object.updateScale(objectScale));
+}
+
+function getNetworkDivSize() {
+    return {
+        width: Math.min(networkDiv.offsetWidth, window.innerWidth),
+        height: Math.min(networkDiv.offsetHeight, window.innerHeight)
+    }
 }

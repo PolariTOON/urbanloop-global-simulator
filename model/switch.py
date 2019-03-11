@@ -1,5 +1,6 @@
 from model import identifier
 from model import routing
+from model import switch as model_switch
 from settings import config
 from settings import simlog
 
@@ -36,7 +37,7 @@ class Switch:
         self.my_loop = loop
         self.loop = self.my_loop
         self.angle = angle
-        self.last_element = previous_element
+        # self.last_element = previous_element
         self.next_element = next_element
         self.other_loop = other_loop
         self.next_element_other = next_element_other
@@ -48,6 +49,8 @@ class Switch:
         self.name = "Switch n°%d" % self.id
         self.timers = []
         self.table = {}
+        self.section_my_loop = None
+        self.section_other_loop = None
 
     def route_capsule_to_station(self, station):
         """
@@ -55,8 +58,8 @@ class Switch:
             :param  station: la station de destination vers laquelle la capsule souhaite aller (Station) OBLIGATOIRE
             :return: OUT : True si la capsule doit changer de station, False sinon (boolean)
             """
-        the_loop = station.loop
-        return self.table[the_loop.name][0]
+        # the_loop = station.loop
+        return self.table[station.section_loop][0]
         # if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
         #     simlog.debug("le switch " + str(self.objectId) + " aiguille la capsule voulant aller à " + station.name
         #                  + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
@@ -115,10 +118,11 @@ def init():
         a_switch.size = np.round(np.sqrt((x_out - x_in)**2 + (y_out - y_in)**2), 2)
 
     for a_switch in _switches:  # table de "nouvelles"
-        a_switch.permanent_table = {a_switch.my_loop.name: [False, 0, [a_switch.id, a_switch.my_loop.name]],
-                                    a_switch.other_loop.name: [True, a_switch.size,
-                                                               [a_switch.id, a_switch.other_loop.name]]}
-        a_switch.permanent_cover = {a_switch.my_loop.name: a_switch.id, a_switch.other_loop.name: a_switch.id}
+        a_switch.permanent_table = {a_switch.section_my_loop: [False, 0, [a_switch.id, a_switch.section_my_loop]],
+                                    a_switch.section_other_loop: [True, a_switch.size,
+                                                               [a_switch.id, a_switch.section_other_loop]]}
+        # print (a_switch.name, a_switch.permanent_table)
+        a_switch.permanent_cover = {a_switch.section_my_loop: a_switch.id, a_switch.section_other_loop: a_switch.id}
         a_switch.timers = [timer_other for _ in range(len(_switches))]
         a_switch.timers[a_switch.id] = my_timer
         a_switch.defects = [[False, False] for _ in range(len(_switches))]
@@ -161,24 +165,43 @@ def get_switches():
 
 
 def cost_between(element1, element2):
-    boucle1 = element1.loop
-    boucle2 = element2.loop
-    if boucle1 is boucle2:
-        return boucle1.distance_between(element1, element2)
-    # aller au premier switch sur boucle1
-    cost = float('inf')
-    switch = None
-    for cand_switch in boucle1.switches:
-        d = boucle1.distance_between(element1, cand_switch)
-        if d < cost:
-            switch = cand_switch
-            cost = d
+    if type(element1) is Switch:
+        if type(element2) is not Switch:
+            if element2.loop is element1.my_loop or element2.loop is element1.other_loop:
+                return element2.loop.distance_between(element1, element2)
+        else:
+            if element1.my_loop is element2.my_loop or element1.my_loop is element2.other_loop:
+                return element1.my_loop.distance_between(element1, element2)
+            elif element1.other_loop is element2.my_loop or element1.other_loop is element2.other_loop:
+                return element1.other_loop.distance_between(element1, element2)
+        switch = element1
+        cost = 0
+    else:
+        # aller au premier switch sur boucle1
+        boucle1 = element1.loop
+        cost = float('inf')
+        switch = None
+        for cand_switch in boucle1.switches:
+            d = boucle1.distance_between(element1, cand_switch)
+            if d < cost:
+                switch = cand_switch
+                cost = d
     # ajout du cout de routage jusqu'à la boucle2
-    cost += switch.table[boucle2.name][1]
+    if type(element2) is Switch:
+        cost += switch.table[element2.section_my_loop][1]
+        last_switch = element2
+    else :
+        cost += switch.table[element2.section_loop][1]
     # trajet entre le switch in de fin et l'élément2
-    last_switch = switch.table[boucle2.name][2][len(switch.table[boucle2.name][2]) - 1]
-    for s in _switches:
-        if s.id == last_switch:
-            last_switch = s
-    cost += boucle2.distance_between(s, element2)
+        boucle2 = element2.loop
+        last_switch = switch.table[element2.section_loop][2][len(switch.table[element2.section_loop][2]) - 2]
+        last_switch = model_switch.get_switch_by_id(last_switch)
+        cost += boucle2.distance_between(last_switch, element2)
     return cost
+
+
+def get_switch_by_id(id):
+    for s in _switches:
+        if s.id == id:
+            return s
+    return None

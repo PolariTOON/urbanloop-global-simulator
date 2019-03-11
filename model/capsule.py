@@ -92,6 +92,7 @@ class Capsule:
         :return: Trip event generator
         """
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
+        # print(self.current_element.name, self.next_element.name, dist_to_next_element)
         self.segment_length = dist_to_next_element
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
@@ -258,5 +259,7 @@ def reset_simulation():
     """
     This function will reset every capsules of the network
     """
+    global _capsules
     for capsule in _capsules:
         del capsule
+    _capsules = list()

@@ -1,4 +1,12 @@
-const zoomIntensity = 1.1;
+// Some elements are defined in the above file objects.js
+let startButton = document.getElementById('start-button');
+let stopButton = document.getElementById('stop-button');
+let pauseButton = document.getElementById('pause-button');
+pauseButton.disabled = true;
+backwardButton.disabled = true;
+forwardButton.disabled = true;
+
+const zoomIntensity = 0.9;
 const minScale = 0.01;
 let moveIntensity = 1;
 let pressTimeout;
@@ -6,6 +14,22 @@ let doPan = false;
 let running = false;
 let paused = false;
 
+function fitStageIntoParentContainer() {
+    stage.width(getNetworkDivSize().width);
+    stage.height(getNetworkDivSize().height);
+
+    calibrateNetworkScene();
+
+    objects.forEach(object => {
+        if (!(object instanceof Capsule)) {
+            object.updatePosition();
+        }
+    });
+
+    stage.batchDraw();
+}
+
+window.addEventListener('resize', fitStageIntoParentContainer);
 
 stage.on('mousedown', event => {
     event.evt.preventDefault();
@@ -31,8 +55,9 @@ stage.on('mousemove', event => {
 
         let newPos = {
             x: stage.x() + moveIntensity * deltaX,
-            y: stage.y() + moveIntensity * deltaY,
+            y: stage.y() + moveIntensity * deltaY
         };
+
         stage.position(newPos);
         stage.batchDraw();
     }
@@ -60,51 +85,32 @@ stage.on('wheel', event => {
         x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
         y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
     };
+
     stage.position(newPos);
     stage.batchDraw();
 });
 
-function fitStageIntoParentContainer() {
-    stage.width(networkDiv.offsetWidth);
-    stage.height(networkDiv.offsetWidth);
-
-    objects.forEach(object => {
-        if (!(object instanceof Capsule)) {
-            object.updatePosition();
-        }
-    });
-
-    stage.batchDraw();
-}
-
-window.addEventListener('resize', fitStageIntoParentContainer);
-
-let startButton = document.getElementById('start-button');
-let stopButton = document.getElementById('stop-button');
-let pauseButton = document.getElementById('pause-button');
-let scaleSlider = document.getElementById('scale-slider');
-backwardButton.disabled = true;
-forwardButton.disabled = true;
-
 startButton.onclick = () => {
     if (running) return;
+    pauseButton.disabled = false;
+    backwardButton.disabled = false;
+    forwardButton.disabled = false;
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
     $.get('/start');
     running = true;
-    backwardButton.disabled = false;
-    forwardButton.disabled = false;
 };
 
 stopButton.onclick = () => {
     if (!running) return;
-    stopButton.classList.add('not-shown');
-    startButton.classList.remove('not-shown');
-    $.get('/stop');
-    running = false;
-    applyNetworkScene();
+    pauseButton.disabled = true;
     backwardButton.disabled = true;
     forwardButton.disabled = true;
+    stopButton.classList.add('not-shown');
+    $.get('/stop');
+    running = false;
+    startButton.classList.remove('not-shown');
+    applyNetworkScene();
 };
 
 pauseButton.onclick = () => {
@@ -134,9 +140,27 @@ forwardButton.onclick = () => {
 };
 
 scaleSlider.oninput = () => {
-    objects.forEach(object => object.updateScale(Math.sqrt(scaleSlider.value)));
+    $('#scale-slider').attr('data-original-title', 'Objects scale : ' + scaleSlider.value).tooltip('show');
+    objectScale = scaleSlider.value;
+    objects.forEach(object => object.updateScale(objectScale));
     stage.batchDraw();
 };
+
+scaleSlider.onmouseleave = () => {
+    $('#scale-slider').tooltip('hide');
+};
+
+document.getElementById('panel-div').onmouseenter = () => {
+    resetCursor();
+};
+
+stage.on('mouseover', event => {
+    event.evt.preventDefault();
+
+    if (networkLayer.getIntersection(stage.getPointerPosition()) === null) {
+        moveCursor();
+    }
+});
 
 stage.on('mousedown', event => {
     event.evt.preventDefault();
@@ -146,5 +170,4 @@ stage.on('mousedown', event => {
     if (selectedObject !== undefined && shape === null) {
         selectedObject.unselect();
     }
-    generateDataPanel();
 });

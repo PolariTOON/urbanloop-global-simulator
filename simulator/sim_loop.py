@@ -3,14 +3,14 @@ from enum import Enum
 
 import simpy
 
-from model import capsule
+from model import capsule as model_capsule
 from model import station
-from model import loop
+from model import loop as model_loop
 from settings import config
 from settings import simlog
 from simulator import ascent_generator
 from simulator import traveler_generator
-from stats import stats_record
+#TODO fixer from stats import stats_record
 
 
 class SimState(Enum):
@@ -46,13 +46,13 @@ class SimLoop:
         self.is_real_time = False
         self.is_endless = False
         self.is_visualized = is_visualized
-<<<<<<< HEAD
-        recorder = stats_record.StatsRecorder(0)
+#TODO fixer <<<<<<< HEAD
+        # recorder = stats_record.StatsRecorder(0)
 
-=======
+#TODO fixer=======
         self.traveler_generator = traveler_generator.TravelerGenerator()
         self.ascent_generator = ascent_generator.AscentGenerator()
->>>>>>> 282cf5a368e4a13a6846f9868957342a6ee3af1a
+#TODO fixer >>>>>>> 282cf5a368e4a13a6846f9868957342a6ee3af1a
 
         if config.sim['real_time'] in ['true', 'True']:
             self.is_real_time = True
@@ -93,15 +93,14 @@ class SimLoop:
                 if _modulo_on_seconds(30): # stats
                     # loops
                     loops = []
-                    capsules = []
-                    for loop_name in loop.all_loops:
-                        loops.append(loop.get_by_name(loop_name))
+                    capsules = {}
+                    for loop_name in model_loop.all_loops:
+                        loops.append(model_loop.get_by_name(loop_name))
                         capsules[loop_name] = 0
-                    for capsule in capsule._capsules:
+                    for capsule in model_capsule._capsules:
                         capsules[capsule.loop.name] += 1
-                    for loop in loops:
-                        recorder.add_capsule_average_loop(capsules[loop.name], loop)
-
+                    #TODO fixer for loop in loops:
+                        #TODO fixerrecorder.add_capsule_average_loop(capsules[loop.name], loop)
 
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
@@ -251,8 +250,8 @@ def _quit_endless_simulation():
     that the simulation is endless
     """
     global _env
-    global recorder
-    recorder.stop_listen(get_simulated_time())
+    #TODO fixerglobal recorder
+    #TODO fixer recorder.stop_listen(get_simulated_time())
 
     def _trigger():
         yield _endless_quit_event.succeed()
@@ -267,8 +266,8 @@ def stop_simulation():
     """
     simlog.warn("Simulation KILLED")
     change_state(SimState.KILLED)
-    global recorder
-    recorder.stop_listen()
+    #TODO fixer global recorder
+    #TODO fixer recorder.stop_listen()
 
 def pause_simulation():
     """
@@ -289,7 +288,7 @@ def reset_simulation_parameters():
         return
 
     simlog.warn("Resetting the simulation parameters")
-    capsule.reset_simulation()
+    model_capsule.reset_simulation()
     station.reset_simulation()
     _current_tick = 0
     _sim_tick = 0.05

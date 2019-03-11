@@ -219,11 +219,11 @@ def tri_bulle(tab_objects, the_loop):
         to_permute = False
         cursor += 1
         for i in range(0, len(tab_objects)-cursor):
-            if angles[i] < angles[i+1] and not the_loop.clockwise:
+            if angles[i] < angles[i+1] and the_loop.clockwise:
                 to_permute = True
                 angles[i], angles[i+1] = angles[i+1], angles[i]
                 tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
-            if angles[i] > angles[i+1] and the_loop.clockwise:
+            if angles[i] > angles[i+1] and not the_loop.clockwise:
                 to_permute = True
                 angles[i], angles[i+1] = angles[i+1], angles[i]
                 tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]

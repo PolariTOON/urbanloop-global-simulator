@@ -196,10 +196,10 @@ def get_capsule_position(capsule):
         # In this case, current_element and next_element can be station or switch
         angle = get_element_angle(capsule.loop, capsule.current_element)
         trip_angle = capsule.get_segment_traveled_angle()
-        if capsule.loop.clockwise :
-            radius_angle = math.radians(angle) + trip_angle
-        else :
+        if capsule.loop.clockwise:
             radius_angle = math.radians(angle) - trip_angle
+        else:
+            radius_angle = math.radians(angle) + trip_angle
         loop_radius = get_loop_radius(capsule.loop)
         return capsule.loop.x + math.cos(radius_angle) * loop_radius, capsule.loop.y + math.sin(
             radius_angle) * loop_radius

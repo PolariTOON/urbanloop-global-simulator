@@ -1,6 +1,6 @@
 let dataTab = document.getElementById("data-tab");
 let configTab = document.getElementById("config-tab");
-let interractTab = document.getElementById("interract-tab");
+let interactTab = document.getElementById("interact-tab");
 let viewTab = document.getElementById("view-tab");
 
 let selectedTab = dataTab;
@@ -15,8 +15,8 @@ function generateSelectedTab() {
     case configTab:
       generateConfigPanel();
       break;
-    case interractTab:
-      generateDataPanel();
+    case interactTab:
+      generateInteractPanel();
       break;
     case viewTab:
       generateViewPanel();
@@ -119,11 +119,11 @@ function generateConfigPanel() {
   */
 }
 
-function generateInterractPanel() {
+function generateInteractPanel() {
   // update navbar
   selectedTab.classList.remove("active");
-  interractTab.classList.add("active");
-  selectedTab = interractTab;
+  interactTab.classList.add("active");
+  selectedTab = interactTab;
   // TODO
 }
 

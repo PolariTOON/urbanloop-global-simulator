@@ -24,13 +24,13 @@ def root():
     return app.send_static_file('index.html')
 
 
-@app.route('/load')  # TODO Add file parameter
+@app.route('/load.json')  # TODO Add file parameter
 def load_network():
     global is_network_loaded
     if not is_network_loaded:
         is_network_loaded = True
         network.load()
-    return redirect(url_for('root'))
+    return Response(dumps(json_serializer.serialize_network()), mimetype="application/json")
 
 
 @app.route('/start')

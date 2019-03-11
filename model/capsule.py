@@ -257,5 +257,7 @@ def reset_simulation():
     """
     This function will reset every capsules of the network
     """
+    global _capsules
     for capsule in _capsules:
         del capsule
+    _capsules = []

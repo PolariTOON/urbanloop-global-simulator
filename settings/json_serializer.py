@@ -1,8 +1,15 @@
 import math
 
 from model import switch
-from simulator import sim_loop
+from settings import network
 from simulator import converter
+from simulator import sim_loop
+
+
+def serialize_network():
+    return {
+        'maxSize': network.get_size()
+    }
 
 
 def serialize_time():

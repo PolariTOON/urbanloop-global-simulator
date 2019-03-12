@@ -1,12 +1,13 @@
 import logging
 import os
-from json import dumps
+from json import dumps, loads
 from sys import path
 from threading import Thread
 
-from flask import Flask, Response, redirect, url_for
+from flask import Flask, Response, redirect, url_for, request
 
 from model import loop, station, switch, warehouse, capsule
+from settings import config
 from settings import json_serializer, network
 from simulator import sim_loop
 
@@ -30,7 +31,6 @@ def load_network():
     if not is_network_loaded:
         is_network_loaded = True
         network.load()
-        print("load")
     return Response(dumps(json_serializer.serialize_network()), mimetype="application/json")
 
 
@@ -68,9 +68,6 @@ def stop_simulation():
     if is_simulation_started:
         is_simulation_started = False
         sim_loop.stop_simulation()
-        print("begin start")
-        network.reload(None)
-        print("stop")
     return redirect(url_for('root'))
 
 
@@ -138,6 +135,21 @@ def generate_switches_var_data_json():
 def generate_capsules_json():
     return Response(dumps([json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]),
                     mimetype="application/json")
+
+
+@app.route('/config.json/<int:permanent>', methods=['GET', 'POST'])
+def load_config(permanent):
+    if request.method == 'POST':
+        config.modify(loads(request.form['data']), (True, False)[permanent is None or permanent == 0])
+        config.load_editable()
+    return Response(dumps(json_serializer.serialize_config()), mimetype="application/json")
+
+
+@app.route('/reset-config')
+def reset_config():
+    config.reset()
+    config.load_default()
+    return redirect(url_for('root'))
 
 
 if __name__ == '__main__':

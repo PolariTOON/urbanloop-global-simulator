@@ -1,19 +1,28 @@
 import configparser
+import fileinput
 import sys
 
+from shutil import copyfile
+
 """
- ce fichier permets l'import des différentes valeurs et paramètre du fichier resources/config.ini
+This file permits to import different values of the config files :
+    - resources/default_config.ini
+    - resources/config.ini
  
 https://docs.python.org/dev/library/configparser.html
 """
 
 loaded = False
+modified = False
 default = None
 interface = None
 model = None
 capsule = None
 routing = None
 sim = None
+
+path = '{0}/../resources/config.ini'.format(sys.path[0])
+default_path = '{0}/../resources/default_config.ini'.format(sys.path[0])
 
 
 def load(file_name):
@@ -34,5 +43,58 @@ def load(file_name):
     sim = config['SIM']
 
 
+def load_default():
+    """
+    This function loads the resources/default_config.ini config file.
+    """
+    load(default_path)
+
+
+def load_editable():
+    """
+    This function loads the resources/config.ini config file.
+    """
+    load(path)
+
+
+def modify(config_json, permanent=False):
+    """
+    This function overwrites a new config under a json format and saves it
+    into resources/config.ini
+    :param config_json: A json with exact same value of attributes
+    :param permanent: If permanent is true, both default_config and config
+    will be overwritten.
+    """
+    global modified
+
+    modified_path = path
+    if permanent:
+        modified_path = default_path
+
+    for line in fileinput.input(modified_path, inplace=True):
+        output = line
+        for attribute, value in config_json.items():
+            if attribute in line and '#' not in line:
+                output = line.split('=')[0].lstrip().rstrip() + '=' + str(value) + '\n'
+                break
+        sys.stdout.write(output)
+
+    modified = True
+    if permanent:
+        modified = False
+        modify(config_json, permanent=False)
+
+
+def reset(force=False):
+    """
+    Replace all the values in the config.ini file with default values
+    """
+    global modified
+    if modified or force:
+        copyfile(default_path, path)
+        modified = False
+
+
 if loaded is False:
-    load('{0}/../resources/config.ini'.format(sys.path[0]))
+    reset(force=True)
+    load_default()

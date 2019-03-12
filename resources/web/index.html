@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet"
+          href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
+    <link type="text/css" rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
     <link type="text/css" rel="stylesheet" href="./web/style.css"/>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-          integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link rel="shortcut icon" href="./web/favicon.ico">
     <title>Urbanloop Simulator</title>
 </head>
@@ -44,6 +45,104 @@
                     <div id="data-tab" class="tab-pane fade in active"></div>
                     <div id="config-tab" class="tab-pane fade">
                         <form id="config-form">
+                            <span class="badge badge-warning config-info-span">Travelers</span>
+                            <div class="form-group">
+                                <label for="conf-travelers-0">Travelers per day</label>
+                                <input type="number" min="-1" step="1" class="form-control form-control-sm"
+                                       id="conf-travelers-0">
+                                <small class="form-text text-muted">-1 will disable limitation</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-travelers-1">Number of trips</label>
+                                <input type="number" min="-1" step="1" class="form-control form-control-sm"
+                                       id="conf-travelers-1">
+                                <small class="form-text text-muted">-1 will disable limitation</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-travelers-2">Number of travelers</label>
+                                <input type="number" min="-1" step="1" class="form-control form-control-sm"
+                                       id="conf-travelers-2">
+                                <small class="form-text text-muted">-1 will disable limitation</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-travelers-3">Average time of descent and ascent</label>
+                                <input type="number" min="3" step="1" class="form-control form-control-sm"
+                                       id="conf-travelers-3">
+                                <small class="form-text text-muted">Must be greater or equal than 3</small>
+                            </div>
+
+                            <span class="badge badge-warning config-info-span">Capsules</span>
+                            <div class="form-group">
+                                <label for="conf-capsule-0">Capsule speed</label>
+                                <input type="number" step="0.01" class="form-control form-control-sm"
+                                       id="conf-capsule-0">
+                                <small class="form-text text-muted">In meters per second (m/s)</small>
+                            </div>
+
+                            <span class="badge badge-warning config-info-span">Routing</span>
+                            <div class="form-group">
+                                <label for="conf-routing-0">Cost added if changing loop</label>
+                                <input type="number" min="0" step="1" class="form-control form-control-sm"
+                                       id="conf-routing-0">
+                                <small class="form-text text-muted"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-routing-1">Timer to send alive message"</label>
+                                <input type="number" min="0" step="1" class="form-control form-control-sm"
+                                       id="conf-routing-1">
+                                <small class="form-text text-muted"></small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-routing-2">Timer to wait news from other switches</label>
+                                <input type="number" min="0" step="1" class="form-control form-control-sm"
+                                       id="conf-routing-2">
+                                <small class="form-text text-muted"></small>
+                            </div>
+
+                            <span class="badge badge-warning config-info-span">Topology</span>
+
+                            <div class="custom-file config-inputs">
+                                <input type="file" accept=".json" class="custom-file-input" id="conf-topology-0">
+                                <label class="custom-file-label" for="conf-topology-0">File name</label>
+                            </div>
+
+                            <span class="badge badge-warning config-info-span">Simulation</span>
+                            <div class="custom-control custom-checkbox config-inputs">
+                                <input class="custom-control-input" type="checkbox" id="conf-simulation-0">
+                                <label class="custom-control-label" for="conf-simulation-0">Force RealTime</label>
+                            </div>
+
+                            <div class="custom-control custom-checkbox config-inputs">
+                                <input class="custom-control-input" type="checkbox" id="conf-simulation-1">
+                                <label class="custom-control-label" for="conf-simulation-1">Endless</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-simulation-2">Duration</label>
+                                <input type="number" min="0" step="1" class="form-control form-control-sm"
+                                       id="conf-simulation-2">
+                                <small class="form-text text-muted">Duration time in ticks if endless is false</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-simulation-3">Start hour</label>
+                                <input type="number" min="0" max="23" step="1" class="form-control form-control-sm"
+                                       id="conf-simulation-3">
+                                <small class="form-text text-muted"></small>
+                            </div>
+
+                            <button type="button" class="btn btn-success config-inputs" id="config-save-button">Save
+                            </button>
+                            <button type="button" class="btn btn-info config-inputs" id="config-permanent-button">
+                                <i class='far fa-square'></i> Temporary
+                            </button>
+                            <button type="button" class="btn btn-primary config-inputs" id="config-reset-button">Reset
+                            </button>
                         </form>
                     </div>
                     <div id="stats-tab" class="tab-pane fade">Stats</div>
@@ -51,21 +150,23 @@
                 </div>
             </div>
             <div id="slider-container">
-                <input type="range" min="0.1" max="5" step="0.1" id="scale-slider">
+                <input type="range" min="0.1" max="6" step="0.1" id="scale-slider">
             </div>
         </div>
     </div>
 </div>
 </body>
 <footer>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/konva@3.1.6/konva.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
     <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+            src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/konva@3.1.6/konva.min.js"></script>
     <script type="text/javascript" src="./web/objects.js"></script>
-    <script type="text/javascript" src="./web/renderer.js"></script>
     <script type="text/javascript" src="./web/tabs.js"></script>
+    <script type="text/javascript" src="./web/renderer.js"></script>
     <script type="text/javascript" src="./web/inputs.js"></script>
 </footer>
 </html>

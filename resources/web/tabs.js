@@ -2,6 +2,12 @@ let dataTab = document.getElementById("data-tab");
 let configTab = document.getElementById("config-tab");
 let interactTab = document.getElementById("interact-tab");
 let viewTab = document.getElementById("view-tab");
+let saveConfigButton = document.getElementById('config-save-button');
+let permanentConfigButton = document.getElementById('config-permanent-button');
+let resetConfigButton = document.getElementById('config-reset-button');
+let endlessCheckBox = document.getElementById('conf-simulation-1');
+let startHour = document.getElementById('conf-simulation-2');
+let permanent = false;
 
 function updateDataPanel() {
     let data = "";
@@ -60,3 +66,115 @@ function updateDataPanel() {
     }
     dataTab.innerHTML = data;
 }
+
+function updateConfigPanel() {
+    $.get('/config.json/0', function (configJSON) {
+        document.getElementById('conf-travelers-0').value = configJSON['travelers_per_day'];
+        document.getElementById('conf-travelers-1').value = configJSON['trip_limit'];
+        document.getElementById('conf-travelers-2').value = configJSON['traveler_limit'];
+        document.getElementById('conf-travelers-3').value = configJSON['ascent_descent_duration'];
+        document.getElementById('conf-capsule-0').value = configJSON['max_speed'];
+        document.getElementById('conf-routing-0').value = configJSON['switched_cost'];
+        document.getElementById('conf-routing-1').value = configJSON['my_timer'];
+        document.getElementById('conf-routing-2').value = configJSON['timer_other'];
+        //document.getElementById('conf-topology-0').value = configJSON['network_file'];
+
+        let realTimeCheckBox = document.getElementById('conf-simulation-0');
+        let endlessCheckBox = document.getElementById('conf-simulation-1');
+        realTimeCheckBox.checked = false;
+        endlessCheckBox.checked = false;
+        startHour.disabled = false;
+        if (['true', 'True'].includes(configJSON['real_time'])) {
+            realTimeCheckBox.checked = true;
+        }
+        if (['true', 'True'].includes(configJSON['endless'])) {
+            endlessCheckBox.checked = true;
+            startHour.disabled = true;
+        }
+
+        document.getElementById('conf-simulation-2').value = configJSON['duration'];
+        document.getElementById('conf-simulation-3').value = configJSON['start_hour'];
+    });
+}
+
+function blockTimeoutConfigButtons(timeout=1000) {
+    saveConfigButton.disabled = true;
+    permanentConfigButton.disabled = true;
+    resetConfigButton.disabled = true;
+    setTimeout(() => {
+        saveConfigButton.disabled = false;
+        permanentConfigButton.disabled = false;
+        resetConfigButton.disabled = false;
+        updateConfigPanel();
+    }, timeout);
+}
+
+saveConfigButton.onclick = () => {
+    let configJson = {
+        'travelers_per_day': document.getElementById('conf-travelers-0').value,
+        'trip_limit': document.getElementById('conf-travelers-1').value,
+        'traveler_limit': document.getElementById('conf-travelers-2').value,
+        'ascent_descent_duration': document.getElementById('conf-travelers-3').value,
+        'max_speed': document.getElementById('conf-capsule-0').value,
+        'switched_cost': document.getElementById('conf-routing-0').value,
+        'my_timer': document.getElementById('conf-routing-1').value,
+        'timer_other': document.getElementById('conf-routing-2').value,
+        //'network_file': document.getElementById('conf-topology-0').value,
+        'real_time': document.getElementById('conf-simulation-0').checked,
+        'endless': document.getElementById('conf-simulation-1').checked,
+        'duration': document.getElementById('conf-simulation-2').value,
+        'start_hour': document.getElementById('conf-simulation-3').value
+    };
+
+    $.ajaxSetup({async: false});
+    $.post(String.prototype.concat('/config.json/', permanent ? '1' : '0'), {
+        data: JSON.stringify(configJson)
+    });
+    blockTimeoutConfigButtons();
+    $.ajaxSetup({async: true});
+};
+
+permanentConfigButton.onclick = () => {
+    updateConfigPanel();
+    if (permanent) {
+        permanent = false;
+        permanentConfigButton.innerHTML = "<i class='far fa-square'></i> Temporary"
+        permanentConfigButton.classList.remove("btn-danger");
+        permanentConfigButton.classList.add("btn-info");
+        $('#config-permanent-button').tooltip('hide');
+        $('#config-permanent-button').tooltip('dispose');
+    } else {
+        permanent = true;
+        permanentConfigButton.innerHTML = "<i class='fas fa-check-square'></i> Permanent"
+        permanentConfigButton.classList.remove("btn-info");
+        permanentConfigButton.classList.add("btn-danger");
+        $('#config-permanent-button').tooltip({
+            html: true,
+            title: "<b>Save will overwrite default config with above data</b>"
+        });
+        $('#config-permanent-button').tooltip('show');
+    }
+
+};
+
+permanentConfigButton.onmouseleave = () => {
+    if (permanent) {
+        $('#config-permanent-button').tooltip('hide');
+    }
+};
+
+resetConfigButton.onclick = () => {
+    $.ajaxSetup({async: false});
+    $.get('/reset-config');
+    blockTimeoutConfigButtons();
+    $.ajaxSetup({async: true});
+};
+
+endlessCheckBox.onclick = () => {
+    startHour.disabled = !!endlessCheckBox.checked;
+};
+
+
+
+
+

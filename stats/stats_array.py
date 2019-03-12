@@ -14,11 +14,12 @@ class StatsArray(abstract_array.AbstractArray):
     """
     tick = sim_loop.get_simulated_time()
     key = self._get_key(obj)
+    value = round(tick,2)
     try:
-      self._data[key].append(tick)
+      self._data[key].append(value)
     except KeyError:
       self._data[key] = []
-      self._data[key].append(tick)
+      self._data[key].append(value)
   
   def get_ticks(self, obj):
     """
@@ -59,7 +60,7 @@ class StatsArray(abstract_array.AbstractArray):
     renvoie un string pour l'extraction des stats
     """
     # init
-    buffer = "# " + self.get_info() + "\n # \n"
+    buffer = "# " + self.get_info() + "\n#\n"
     # contenu
     data = self._data
     for key in data:
@@ -67,7 +68,7 @@ class StatsArray(abstract_array.AbstractArray):
       for value in data[key]:
         buffer += str(value) + ";"
       buffer = buffer[:-1]
-      buffer += "#\n"
+      buffer += "\n#\n"
     # fermeture
-    buffer += "# \n# end"
+    buffer += "#\n# end\n\n"
     return buffer

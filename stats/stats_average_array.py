@@ -52,17 +52,17 @@ class StatsAverageArray(abstract_array.AbstractArray):
     renvoie un string pour l'extraction des stats
     """
     # init
-    buffer = "# " + self.get_info() + "\n # \n"
+    buffer = "# " + self.get_info() + "\n#\n"
     # contenu
     data = self._data
     for key in data:
-      buffer += ""
+      buffer += "# " + key + "\n"
       for couple in data[key]:
         buffer += str(couple[0]) + "-" + str(couple[1]) + ";"
       buffer = buffer[:-1]
-      buffer += "#\n"
+      buffer += "\n#\n"
     # fermeture
-    buffer += "# \n# end"
+    buffer += "#\n# end\n"
     return buffer
 
   def get_min(self, obj):

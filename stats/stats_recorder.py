@@ -1,3 +1,4 @@
+import os
 from settings import simlog
 from stats import stats_array as sa, stats_average_array as saa
 
@@ -61,6 +62,8 @@ class StatsRecorder:
     buffer += self._joining_loop.extract()
     buffer += self._capsule_average_loop.extract()
     buffer += "\n"
+    if not os.path.isdir('out/'):
+      os.mkdir('out/')
     stats_file = open("out/latest-stats.txt", "w")
     stats_file.write(buffer)
     stats_file.close()

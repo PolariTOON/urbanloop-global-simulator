@@ -57,11 +57,18 @@ class StatsRecorder:
 
   def extract(self):
     simlog.info("Extracting stats.")
+    # loops stats
     buffer = "# loops stats\n\n"
     buffer += self._exiting_loop.extract()
     buffer += self._joining_loop.extract()
     buffer += self._capsule_average_loop.extract()
     buffer += "\n"
+    # warehouses stats
+    buffer += "# warehouses stats\n\n"
+    buffer += self._sent_capsules_drain.extract()
+    buffer += self._called_capsules_drain.extract()
+    buffer += "\n"
+    # extracting it to a file
     if not os.path.isdir('out/'):
       os.mkdir('out/')
     stats_file = open("out/latest-stats.txt", "w")

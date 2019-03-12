@@ -62,7 +62,7 @@ class StatsAverageArray(abstract_array.AbstractArray):
       buffer = buffer[:-1]
       buffer += "\n#\n"
     # fermeture
-    buffer += "#\n# end\n"
+    buffer += "#\n# end\n\n"
     return buffer
 
   def get_min(self, obj):

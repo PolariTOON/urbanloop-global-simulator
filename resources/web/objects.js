@@ -3,6 +3,7 @@ let networkDiv = document.getElementById('network-div');
 let clearing = false;
 let networkSize = 1000;
 let objectScale;
+let stage;
 let networkLayer;
 let infoLayer;
 

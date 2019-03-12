@@ -95,6 +95,9 @@ startButton.onclick = () => {
     pauseButton.disabled = false;
     backwardButton.disabled = false;
     forwardButton.disabled = false;
+    saveConfigButton.disabled = true;
+    permanentConfigButton.disabled = true;
+    resetConfigButton.disabled = true;
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
     $.get('/start');
@@ -106,6 +109,9 @@ stopButton.onclick = () => {
     pauseButton.disabled = true;
     backwardButton.disabled = true;
     forwardButton.disabled = true;
+    saveConfigButton.disabled = false;
+    permanentConfigButton.disabled = false;
+    resetConfigButton.disabled = false;
     stopButton.classList.add('not-shown');
     $.get('/stop');
     running = false;

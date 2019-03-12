@@ -1,6 +1,7 @@
 import math
 
 from model import switch
+from settings import config
 from settings import network
 from simulator import converter
 from simulator import sim_loop
@@ -9,6 +10,24 @@ from simulator import sim_loop
 def serialize_network():
     return {
         'maxSize': network.get_size()
+    }
+
+
+def serialize_config():
+    return {
+        'travelers_per_day': int(config.default['travelers_per_day']),
+        'trip_limit': int(config.default['trip_limit']),
+        'traveler_limit': int(config.default['traveler_limit']),
+        'ascent_descent_duration': int(config.capsule['ascent_descent_duration']),
+        'max_speed': float(config.capsule['max_speed']),
+        'switched_cost': int(config.routing['switched_cost']),
+        'my_timer': int(config.routing['my_timer']),
+        'timer_other': int(config.routing['timer_other']),
+        'network_file': config.model['network_file'],
+        'real_time': config.sim['real_time'],
+        'endless': config.sim['endless'],
+        'duration': int(config.sim['duration']),
+        'start_hour': int(config.sim['start_hour'])
     }
 
 

@@ -25,6 +25,24 @@ canvas {
     height: 100%;
 }
 
+#config-form {
+    height: 60vh;
+    overflow-y: auto;
+    font-size: 13px;
+}
+
+.config-info-span {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.config-inputs {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 2px;
+}
+
 hr {
     margin: .8rem 10%;
 }
@@ -118,4 +136,11 @@ hr {
     border-radius: 50%;
     background: #328e2c;
     cursor: pointer;
+}
+
+.btn span.glyphicon {
+	opacity: 0;
+}
+.btn.active span.glyphicon {
+	opacity: 1;
 }

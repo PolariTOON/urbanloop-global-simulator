@@ -68,6 +68,11 @@ class StatsRecorder:
     buffer += self._sent_capsules_drain.extract()
     buffer += self._called_capsules_drain.extract()
     buffer += "\n"
+    # travelers stats
+    buffer += "# travelers stats\n\n"
+    buffer += self._waiting_time_traveler.extract()
+    buffer += self._traveling_time_traveler.extract()
+    buffer += "\n"
     # extracting it to a file
     if not os.path.isdir('out/'):
       os.mkdir('out/')
@@ -130,15 +135,15 @@ class StatsRecorder:
     self._called_capsules_drain.add(quantity, loop)
 
   # à propos des travelers
-  def add_waiting_time_traveler(self, quantity, loop):
+  def add_waiting_time_traveler(self, quantity, traveler):
     if not self._is_recording:
       return
-    self._waiting_time_traveler.add(quantity, loop)
+    self._waiting_time_traveler.add(round(quantity, 2), traveler)
   
-  def add_traveling_time_traveler(self, quantity, loop):
+  def add_traveling_time_traveler(self, quantity, traveler):
     if not self._is_recording:
       return
-    self._traveling_time_traveler.add(quantity, loop)
+    self._traveling_time_traveler.add(round(quantity, 2), traveler)
 
   # à propos des stations
   def add_stopped_capsules_station(self, quantity, loop):

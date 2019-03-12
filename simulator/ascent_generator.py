@@ -20,6 +20,7 @@ class AscentGenerator:
                 traveler = a_station.traveler_queue.get()
                 capsule = a_station.capsule_queue.get()
                 capsule.get_in_traveler(traveler=traveler)
+                sim_loop.recorder.add_waiting_time_traveler(traveler.get_waiting_seconds(), traveler)
                 yield sim_loop.get_env().process(ascent_event(capsule))
 
     def can_generate(self):

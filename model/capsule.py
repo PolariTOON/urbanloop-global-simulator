@@ -140,7 +140,7 @@ class Capsule:
         if self.travelers:
             simlog.debug("Start descent in capsule %d" % self.id, self.destination)
             traveler = self.travelers[0]
-            trip_time = sim_loop.get_simulated_time() - traveler.trip_start_tick
+            trip_time = sim_loop.get_simulated_time() - sim_loop.get_simulated_time(traveler.trip_start_tick)
             sim_loop.recorder.add_traveling_time_traveler(trip_time, traveler)
             self.descent_event = sim_loop.get_env().timeout(converter.random_ascent_descent_duration())
             self.descent_event.callbacks.append(lambda event: self.get_out_traveler())

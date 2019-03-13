@@ -36,9 +36,9 @@ class StatsAverageArray(abstract_array.AbstractArray):
     entre les dates @param:tick1 et @param:tick2
     """
     key = self._get_key(obj)
-    start = 0
-    end = 0
     size = self.get_values_count(key)
+    start = 0
+    end = size - 1
 
     for i in range(size):
       entry = self._data[key][i]

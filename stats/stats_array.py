@@ -39,9 +39,9 @@ class StatsArray(abstract_array.AbstractArray):
     """
     renvoie le nombre d'événements apparus entre les dates @param:tick1 et @param:tick2
     """
-    start = 0
-    end = 0
     key = self._get_key(obj)
+    start = 0
+    end = self.get_ticks_count(key) - 1
     ticks = self.get_ticks(key)
     
     for tick in ticks:

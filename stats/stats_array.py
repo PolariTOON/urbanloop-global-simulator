@@ -35,7 +35,7 @@ class StatsArray(abstract_array.AbstractArray):
     key = self._get_key(obj)
     return len(self._data[key])
 
-  def get_value_between(self, obj, tick1, tick2):
+  def get_value_between(self, obj, start_tick, end_tick):
     """
     renvoie le nombre d'événements apparus entre les dates @param:tick1 et @param:tick2
     """
@@ -45,11 +45,11 @@ class StatsArray(abstract_array.AbstractArray):
     ticks = self.get_ticks(key)
     
     for tick in ticks:
-      if tick >= tick1:
+      if tick >= start_tick:
         start = tick
         break
     for tick in ticks[::-1]:
-      if tick <= tick2:
+      if tick <= end_tick:
         end = tick
         break
     

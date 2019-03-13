@@ -30,21 +30,33 @@ class StatsAverageArray(abstract_array.AbstractArray):
     key = self._get_key(obj)
     return len(self._data[key])
 
-  def get_values_between(self, obj, start, end):
+  def get_values_between(self, obj, start_tick, end_tick):
     """
     renvoie les couples [tick; value] des évènements associés à l'objet @param:obj
     entre les dates @param:tick1 et @param:tick2
-    REPRENDRE
     """
     key = self._get_key(obj)
+    start = 0
+    end = 0
+    size = self.get_values_count(key)
+
+    for i in range(size):
+      entry = self._data[key][i]
+      if entry[0] >= start_tick:
+        start = i
+        break
+    for i in range(size):
+      entry = self._data[key][size-1-i]
+      if entry[0] <= end_tick:
+        end = i
+        break
+
     return self._data[key][start:end+1]
   
   def get_values_count_between(self, obj, start, end):
     """
     renvoie le nombre d'évènements associés à l'objet @param:obj
-    REPRENDRE
     """
-    key = self._get_key(obj)
     return len(self.get_values_between(obj, start, end))
 
   def extract(self):

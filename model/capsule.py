@@ -82,6 +82,7 @@ class Capsule:
         """
         simlog.info("Capsule %d (%s) starts its trip to %s" % (self.id, self._get_capacity_state(), self.destination.name),
                     self.current_element)
+        sim_loop.recorder.add_traveling_distance(switch.cost_between(self.current_element, self.destination), self)
         sim_loop.recorder.add_departure_from_station(self.current_element)
         simlog.debug("Amount of capsules : %d" % self.current_element.capsule_queue.qsize(), self.current_element)
         for a_traveler in self.travelers:

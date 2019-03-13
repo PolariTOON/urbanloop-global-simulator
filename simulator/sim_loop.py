@@ -98,6 +98,10 @@ class SimLoop:
                         capsules[capsule.loop.name] += 1
                     for loop in loops:
                         recorder.add_capsule_average_loop(capsules[loop.name], loop)
+                    # stations
+                    for station in Station._stations:
+                        recorder.add_stopped_capsules_station(station.get_waiting_capsules_number(), station)
+                        recorder.add_waiting_travelers(station.get_waiting_travelers_number(), station)
 
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())

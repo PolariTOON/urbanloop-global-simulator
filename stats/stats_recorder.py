@@ -25,8 +25,8 @@ class StatsRecorder:
     self._traveling_time_traveler = saa.StatsAverageArray("Temps de trajet moyen d'un voyageur.", "secs")
     # station
     self._stopped_capsules_station = saa.StatsAverageArray("Nombre de capsules arrêtées moyen d'une station.")
-    self._departure_from_station = saa.StatsAverageArray("Nombre de départs de capsule moyen d'une station.")
-    self._arrival_to_station = saa.StatsAverageArray("Nombre d’arrivées de capsule moyen d'une station.")
+    self._departure_from_station = sa.StatsArray("Nombre de départs de capsules d'une station.")
+    self._arrival_to_station = sa.StatsArray("Nombre d’arrivées de capsules d'une station.")
     self._waiting_travelers = saa.StatsAverageArray("Nombre de voyageurs moyen dans la file d’attente d'une station.")
     # capsule
     self._busy_moving_time = saa.StatsAverageArray("Temps « occupée et mobile » moyen d'une capsule.", "secs")
@@ -73,6 +73,21 @@ class StatsRecorder:
     buffer += self._waiting_time_traveler.extract()
     buffer += self._traveling_time_traveler.extract()
     buffer += "\n"
+    # stations stats
+    buffer += "# stations stats\n\n"
+    buffer += self._stopped_capsules_station.extract()
+    buffer += self._departure_from_station.extract()
+    buffer += self._arrival_to_station.extract()
+    buffer += self._waiting_travelers.extract()
+    buffer += "\n"
+    # capsules stats
+    buffer += self._busy_moving_time.extract()
+    buffer += self._busy_not_moving_time.extract()
+    buffer += self._free_not_moving_time.extract()
+    buffer += self._free_moving_time.extract()
+    buffer += self._time_in_network.extract()
+    buffer += self._time_in_warehouse.extract()
+    buffer += self._traveling_distance.extract()
     # extracting it to a file
     if not os.path.isdir('out/'):
       os.mkdir('out/')
@@ -146,25 +161,25 @@ class StatsRecorder:
     self._traveling_time_traveler.add(round(quantity, 2), traveler)
 
   # à propos des stations
-  def add_stopped_capsules_station(self, quantity, loop):
+  def add_stopped_capsules_station(self, quantity, station):
     if not self._is_recording:
       return
-    self._stopped_capsules_station.add(quantity, loop)
+    self._stopped_capsules_station.add(quantity, station)
 
-  def add__departure_from_station(self, quantity, loop):
+  def add_departure_from_station(self, station):
     if not self._is_recording:
       return
-    self._departure_from_station.add(quantity, loop)
+    self._departure_from_station.add(station)
 
-  def add_arrival_to_station(self, quantity, loop):
+  def add_arrival_to_station(self, station):
     if not self._is_recording:
       return
-    self._arrival_to_station.add(quantity, loop)
+    self._arrival_to_station.add(station)
 
-  def add__arrival_to_station(self, quantity, loop):
+  def add_waiting_travelers(self, quantity, station):
     if not self._is_recording:
       return
-    self._waiting_travelers.add(quantity, loop)
+    self._waiting_travelers.add(quantity, station)
 
   # à propos des capsules
   def add_busy_moving_time(self, quantity, loop):

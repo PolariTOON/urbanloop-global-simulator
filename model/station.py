@@ -79,6 +79,12 @@ class Station:
     def get_string_type(self):
         return ("neutral", "activity zone", "residential zone", "down town")[self.station_type]
 
+    def get_waiting_capsules_number(self):
+        return self.capsule_queue.qsize()
+
+    def get_waiting_travelers_number(self):
+        return self.traveler_queue.qsize()
+
     def drain(self, destination=None):
         """
         This function will drain the first empty capsule if the station is 3/4 full.

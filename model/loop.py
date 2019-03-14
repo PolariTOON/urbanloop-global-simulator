@@ -97,50 +97,6 @@ class Loop:
                 return i
         return None
 
-    '''def dist_to_next_object(self, element, element2=None):
-        """
-        determine la distance entre l'element et le second element ou bien le suivant (et dans ce cas on le retourne
-        :param  element : element permettant de calculer "le suivant" (Station) OBLIGATOIRE
-        :param  element2 : distance entre les 2 elements (Station) OBLIGATOIRE
-        :return:0UT 1 : la distance à parcourir jusqu'au prochain objet sur la boucle (int)
-                OUT 2 : le prochain objet sur la boucle (Station/Switch)
-        """
-        for i in range(len(self.objects)):
-            if self.objects[i][1] == element:
-                if element2 is None:
-                    return self.lengths[i], self.objects[(i + 1) % len(self.objects)][1]
-                else:
-                    if element is element2:
-                        # On veut la distance d'un switch in vers le même switch out
-                        return element.size, element
-                    cost = self.lengths[i]
-                    for j in range(0, len(self.objects)):
-                        index = (i + j) % len(self.objects)
-                        cost += self.lengths[index]
-                        if self.objects[index][1] is element2:
-                            return cost, self.objects[index][1]
-        return 0, None'''
-
-    def show_details(self):
-        """
-        crée un text contenant toutes les informations à propos de la boucle
-        :return: String
-        """
-        details = "Loop Name : " + self.name
-        details += "\nCircumference : " + str(self.size)
-        details += "\nCenter coordinates : x = " + str(self.x) + " ; y = " + str(self.y)
-        details += "\nElements : "
-        for o in self.objects:
-            if o[0] == "station":
-                details += "\n \t Station " + o[1].name
-            else:
-                details += "\n \t Switch "
-                if o[0] == "switch_out":
-                    details += "out " + str(o[1].id) + " to " + o[1].other_loop.name
-                else:
-                    details += "in " + str(o[1].id) + " from " + o[1].my_loop.name
-        return details
-
 
 def get_by_name(search_name):
     """

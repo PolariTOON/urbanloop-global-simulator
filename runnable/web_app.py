@@ -30,7 +30,7 @@ def load_network():
     global is_network_loaded
     if not is_network_loaded:
         is_network_loaded = True
-        network.load()
+        network.reload()
     return Response(dumps(json_serializer.serialize_network()), mimetype="application/json")
 
 
@@ -47,7 +47,6 @@ def start_simulation():
 
 @app.route('/pause')
 def pause_simulation():
-    global is_simulation_started
     if is_simulation_started and not sim_loop.is_paused():
         sim_loop.pause_simulation()
     return redirect(url_for('root'))
@@ -55,7 +54,6 @@ def pause_simulation():
 
 @app.route('/resume')
 def resume_simulation():
-    global is_simulation_started
     if is_simulation_started and sim_loop.is_paused():
         sim_loop.run_simulation_after_pause()
     return redirect(url_for('root'))
@@ -67,8 +65,14 @@ def stop_simulation():
     global is_network_loaded
     if is_simulation_started:
         is_simulation_started = False
+        is_network_loaded = False
         sim_loop.stop_simulation()
     return redirect(url_for('root'))
+
+
+@app.route('/end-signal')
+def end_signal():
+    return Response(dumps({'endSignal': sim_loop.get_off_signal(reset=True)}), mimetype="application/json")
 
 
 @app.route('/accelerate')

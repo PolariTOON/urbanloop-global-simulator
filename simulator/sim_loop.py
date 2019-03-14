@@ -4,8 +4,9 @@ from enum import Enum
 import simpy
 
 from model import capsule as Capsule
-from model import station as Station
 from model import loop as Loop
+from model import station as Station
+from model import warehouse
 from settings import config
 from settings import simlog
 from simulator import ascent_generator
@@ -27,6 +28,7 @@ _visualized_tick_duration = 0.05
 _start_hour = None
 _sim_tick_variations = list()
 _endless_quit_event = None
+_off_signal = False
 recorder = None
 
 
@@ -79,6 +81,7 @@ class SimLoop:
         SimState is RUNNING.
         """
         global _current_tick
+        global _off_signal
         global recorder
         tick_start_time = 0
         while True:
@@ -86,8 +89,8 @@ class SimLoop:
                 loop_sleep_boolean = self.is_visualized and not self.is_real_time and _visualized_tick_duration != 0
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()
-                
-                if _modulo_on_seconds(30): # stats
+
+                if _modulo_on_seconds(30):  # stats
                     # loops
                     loops = []
                     capsules = {}
@@ -116,11 +119,14 @@ class SimLoop:
                     sleep_time = _visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
             elif is_killed():
+                # recorder.stop_listen(get_simulated_time()) # TODO DEBUG BAPTISTE
+                # recorder.extract()
                 reset_simulation_parameters()
                 if self.is_endless:
                     _quit_endless_simulation()
                 else:
                     yield _env.process(_env.exit())
+                _off_signal = True
                 return
 
 
@@ -188,11 +194,11 @@ def accelerate_simulation():
 
     if _visualized_tick_duration > 0:
         _visualized_tick_duration /= 2
-        if _visualized_tick_duration < initial_sim_tick * pow(2, -7):
+        if _visualized_tick_duration < initial_sim_tick * pow(2, -8):
             _visualized_tick_duration = 0
         return
 
-    if _sim_tick < initial_sim_tick * pow(2, 8):
+    if _sim_tick < initial_sim_tick * pow(2, 7):
         _change_sim_tick(_sim_tick * 2)
 
 
@@ -209,7 +215,7 @@ def decelerate_simulation():
     if _visualized_tick_duration < initial_sim_tick:
         _visualized_tick_duration *= 2
         if _visualized_tick_duration == 0:
-            _visualized_tick_duration = initial_sim_tick * pow(2, -7)
+            _visualized_tick_duration = initial_sim_tick * pow(2, -8)
 
 
 def change_state(sim_state=SimState.RUNNING):
@@ -251,9 +257,6 @@ def _quit_endless_simulation():
     that the simulation is endless
     """
     global _env
-    global recorder
-    recorder.stop_listen(get_simulated_time())
-    recorder.extract()
 
     def _trigger():
         yield _endless_quit_event.succeed()
@@ -268,9 +271,7 @@ def stop_simulation():
     """
     simlog.warn("Simulation KILLED")
     change_state(SimState.KILLED)
-    global recorder
-    recorder.stop_listen(get_simulated_time)
-    recorder.extract()
+
 
 def pause_simulation():
     """
@@ -291,8 +292,9 @@ def reset_simulation_parameters():
         return
 
     simlog.warn("Resetting the simulation parameters")
-    Capsule.reset_simulation()
     Station.reset_simulation()
+    warehouse.reset_simulation()
+    Capsule.reset_simulation()
     _current_tick = 0
     _sim_tick = 0.05
     _visualized_tick_duration = 0.05
@@ -370,6 +372,18 @@ def get_start_hour():
     :return: The simulation start hour
     """
     return _start_hour
+
+
+def get_off_signal(reset=False):
+    """
+    :param reset: If reset, _off_signal = False
+    :return: Return a boolean indicating that sim_loop is off
+    """
+    global _off_signal
+    if _off_signal and reset:
+        _off_signal = False
+        return True
+    return _off_signal
 
 
 def get_simulated_time(tick=None):

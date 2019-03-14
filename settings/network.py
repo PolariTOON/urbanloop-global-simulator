@@ -4,13 +4,13 @@ import sys
 import numpy as np
 
 from model import capsule as model_capsule
+from model import identifier
 from model import loop as model_loop
 from model import station as model_station
 from model import switch as model_switch
-from model import warehouse as model_warehouse
 from model import traveler
+from model import warehouse as model_warehouse
 from settings import simlog, config
-from model import identifier
 
 """
 fichier pour l'import des réseaux sur les formats json correspondant
@@ -26,7 +26,7 @@ def load(file_path=None):
         :return: (void) l'ensemble des objets sont créés et configurés.
     """
     if file_path is None:  # aller chercher celui par défaut
-        file_path = '{0}/../resources/mini_network.json'.format(sys.path[0])
+        file_path = '{0}/../resources/networks/mini_network.json'.format(sys.path[0])
 
     model_loop.all_loops = {}  # autrement ca foire quand on charge un autre network
     with open(file_path, 'r') as file:
@@ -116,14 +116,11 @@ def load(file_path=None):
 
     model_switch.init()
     init_capsules()
-
-    print(get_size())
     file.close()
     return
 
 
 def reload(file_path=None):
-    print("a")
     model_loop.all_loops = {}
     model_switch._switches = []
     model_switch.alive_timers = []
@@ -137,17 +134,13 @@ def reload(file_path=None):
     identifier._switch_id = -1
     identifier._capsule_id = -1
     identifier._traveler_id = -1
-    print("b")
-    # init_capsules()
-    print("c")
     load(file_path)
-    print("c")
 
 
 def init_capsules():
     model_capsule._capsules = list()
     identifier._capsule_id = -1
-    nb_capsules = int(config.routing['number_of_capsules'])
+    nb_capsules = int(config.capsule['number_of_capsules'])
     if nb_capsules == -1:  # infini = on rempli toutes les stations et entrepôts à capacity-1
         nb_capsules = sum([(a_station.capacity - 1) for a_station in model_station.get_stations()]
                           + [(a_warehouse.capacity - 1) for a_warehouse in model_warehouse.get_warehouses()])
@@ -193,7 +186,7 @@ def sections_loop(the_loop):
         switch1.section_other_loop = section
     index = the_loop.get_index_of(switch1)
     for j in range(1, len(the_loop.objects)):
-        the_object = the_loop.objects[(index +j)%len(the_loop.objects)][1]
+        the_object = the_loop.objects[(index + j) % len(the_loop.objects)][1]
         # print('\t', the_object.name)
         if type(the_object) is model_station.Station or type(the_object) is model_warehouse.Warehouse:
             the_object.section_loop = section
@@ -201,7 +194,7 @@ def sections_loop(the_loop):
             index_s = (index_s + 1) % len(the_loop.switches)
             section = "%s_%d-%d" % (the_loop.name, the_object.id, the_loop.switches[index_s].id)
             # print('\n \n ', section, '\n \t', the_object.name )
-            if the_object.my_loop is the_loop :
+            if the_object.my_loop is the_loop:
                 # switch out
                 the_object.section_my_loop = section
             else:
@@ -209,7 +202,7 @@ def sections_loop(the_loop):
                 the_object.section_other_loop = section
 
         else:
-            simlog.error("ordre des switchs biaisés dans la boucle %s" % the_loop.name )
+            simlog.error("ordre des switchs biaisés dans la boucle %s" % the_loop.name)
 
 
 # def define_section(the_loop, switch1):
@@ -240,16 +233,16 @@ def tri_bulle(tab_objects, the_loop):
                 angles.append(elm.angle_other_loop)
         else:
             angles.append(elm.angle)
-    while to_permute :
+    while to_permute:
         to_permute = False
         cursor += 1
-        for i in range(0, len(tab_objects)-cursor):
-            if angles[i] < angles[i+1] and the_loop.clockwise:
+        for i in range(0, len(tab_objects) - cursor):
+            if angles[i] < angles[i + 1] and the_loop.clockwise:
                 to_permute = True
-                angles[i], angles[i+1] = angles[i+1], angles[i]
+                angles[i], angles[i + 1] = angles[i + 1], angles[i]
                 tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
-            if angles[i] > angles[i+1] and not the_loop.clockwise:
+            if angles[i] > angles[i + 1] and not the_loop.clockwise:
                 to_permute = True
-                angles[i], angles[i+1] = angles[i+1], angles[i]
+                angles[i], angles[i + 1] = angles[i + 1], angles[i]
                 tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
     return tab_objects

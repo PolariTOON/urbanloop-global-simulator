@@ -1,5 +1,4 @@
 // Some elements are defined in the above file objects.js
-let startButton = document.getElementById('start-button');
 let stopButton = document.getElementById('stop-button');
 let pauseButton = document.getElementById('pause-button');
 pauseButton.disabled = true;
@@ -112,10 +111,11 @@ stopButton.onclick = () => {
     saveConfigButton.disabled = false;
     permanentConfigButton.disabled = false;
     resetConfigButton.disabled = false;
+    document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
     stopButton.classList.add('not-shown');
-    $.get('/stop');
     running = false;
-    startButton.classList.remove('not-shown');
+    $.get('/stop');
+    waitingSimLoopEnd = true;
     applyNetworkScene();
 };
 

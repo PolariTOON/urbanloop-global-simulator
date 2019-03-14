@@ -13,7 +13,7 @@ from simulator import sim_loop
 class TravelerGenerator:
     def __init__(self):
         self.poisson = poisson.Poisson()
-        self.traveler_limit = int(config.sim['traveler_limit'])
+        self.traveler_limit = int(config.traveler['traveler_limit'])
 
     def can_generate(self):
         return self.traveler_limit > 0 or self.traveler_limit == -1

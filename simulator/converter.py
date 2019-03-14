@@ -8,12 +8,12 @@ from settings import config
 from settings import simlog
 from simulator import sim_loop
 
-_ascent_descent_duration = int(config.capsule['ascent_descent_duration'])
-_city_percent = int(config.model['city_percent'])
-_activity_and_residential_percent = int(config.model['activity_and_residential_percent'])
-_activity_and_residential_fluctuation = int(config.model['activity_and_residential_fluctuation'])
-_morning_peak_hour = int(config.model['morning_peak_hour'])
-_evening_peak_hour = int(config.model['evening_peak_hour'])
+_city_percent = int(config.prob['city_percent'])
+_activity_and_residential_percent = int(config.prob['activity_and_residential_percent'])
+_activity_and_residential_fluctuation = int(config.prob['activity_and_residential_fluctuation'])
+_ascent_descent_duration = int(config.traveler['ascent_descent_duration'])
+_morning_peak_hour = int(config.traveler['morning_peak_hour'])
+_evening_peak_hour = int(config.traveler['evening_peak_hour'])
 
 if _activity_and_residential_fluctuation < 0 \
         or _activity_and_residential_fluctuation >= _activity_and_residential_percent:

@@ -42,73 +42,115 @@
                 </ul>
 
                 <div class="tab-content">
-                    <div id="data-tab" class="tab-pane fade in active"></div>
+                    <div id="data-tab" class="tab-pane fade in active show"></div>
                     <div id="config-tab" class="tab-pane fade">
                         <form id="config-form">
                             <span class="badge badge-warning config-info-span">Travelers</span>
                             <div class="form-group">
                                 <label for="conf-travelers-0">Travelers per day</label>
                                 <input type="number" min="-1" step="1" class="form-control form-control-sm"
-                                       id="conf-travelers-0">
+                                       id="conf-travelers-0" required>
                                 <small class="form-text text-muted">-1 will disable limitation</small>
                             </div>
 
                             <div class="form-group">
                                 <label for="conf-travelers-1">Number of trips</label>
                                 <input type="number" min="-1" step="1" class="form-control form-control-sm"
-                                       id="conf-travelers-1">
+                                       id="conf-travelers-1" required>
                                 <small class="form-text text-muted">-1 will disable limitation</small>
                             </div>
 
                             <div class="form-group">
                                 <label for="conf-travelers-2">Number of travelers</label>
                                 <input type="number" min="-1" step="1" class="form-control form-control-sm"
-                                       id="conf-travelers-2">
+                                       id="conf-travelers-2" required>
                                 <small class="form-text text-muted">-1 will disable limitation</small>
                             </div>
 
                             <div class="form-group">
                                 <label for="conf-travelers-3">Average time of descent and ascent</label>
                                 <input type="number" min="3" step="1" class="form-control form-control-sm"
-                                       id="conf-travelers-3">
+                                       id="conf-travelers-3" required>
                                 <small class="form-text text-muted">Must be greater or equal than 3</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-travelers-4">Morning peak hour</label>
+                                <input type="number" min="0" max="11" step="1" class="form-control form-control-sm"
+                                       id="conf-travelers-4" required>
+                                <small class="form-text text-muted">Must be between 0 and 11</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-travelers-5">Evening peak hour</label>
+                                <input type="number" min="12" max="23" step="1" class="form-control form-control-sm"
+                                       id="conf-travelers-5" required>
+                                <small class="form-text text-muted">Must be between 12 and 23</small>
+                            </div>
+
+                            <span class="badge badge-warning config-info-span">Topology</span>
+                            <div class="custom-file config-browse-file">
+                                <label class="custom-file-label" for="conf-topology-0">File name</label>
+                                <input type="file" accept=".json" class="custom-file-input" id="conf-topology-0">
+                            </div>
+
+                            <span class="badge badge-warning config-info-span">Probabilities</span>
+                            <div class="form-group">
+                                <label for="conf-probabilities-0">Activity and residential types probability</label>
+                                <input type="number" min="1" max="49" step="1" class="form-control form-control-sm"
+                                       id="conf-probabilities-0" required>
+                                <small class="form-text text-muted">Must solve : 2 * P(A&R) + P(C) = 100</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-probabilities-1">City type probability</label>
+                                <input type="number" min="1" max="98" step="1" class="form-control form-control-sm"
+                                       id="conf-probabilities-1" required>
+                                <small class="form-text text-muted">Must solve : 2 * P(A&R) + P(C) = 100</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-probabilities-2">Activity and residential types fluctuation</label>
+                                <input type="number" step="1" class="form-control form-control-sm"
+                                       id="conf-probabilities-2" required>
+                                <small class="form-text text-muted">Must be lower than A&R probability</small>
                             </div>
 
                             <span class="badge badge-warning config-info-span">Capsules</span>
                             <div class="form-group">
                                 <label for="conf-capsule-0">Capsule speed</label>
                                 <input type="number" step="0.01" class="form-control form-control-sm"
-                                       id="conf-capsule-0">
+                                       id="conf-capsule-0" required>
                                 <small class="form-text text-muted">In meters per second (m/s)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-capsule-1">Number of capsules</label>
+                                <input type="number" min="-1" step="1" class="form-control form-control-sm"
+                                       id="conf-capsule-1" required>
+                                <small class="form-text text-muted">-1 will fully fill stations and warehouses</small>
                             </div>
 
                             <span class="badge badge-warning config-info-span">Routing</span>
                             <div class="form-group">
                                 <label for="conf-routing-0">Cost added if changing loop</label>
                                 <input type="number" min="0" step="1" class="form-control form-control-sm"
-                                       id="conf-routing-0">
-                                <small class="form-text text-muted"></small>
+                                       id="conf-routing-0" required>
+                                <small class="form-text text-muted">Additional cost for crossing a switch, added to the switch length</small>
                             </div>
 
                             <div class="form-group">
-                                <label for="conf-routing-1">Timer to send alive message"</label>
+                                <label for="conf-routing-1">Timer to send alive message</label>
                                 <input type="number" min="0" step="1" class="form-control form-control-sm"
-                                       id="conf-routing-1">
-                                <small class="form-text text-muted"></small>
+                                       id="conf-routing-1" required>
+                                <small class="form-text text-muted">Time elapsed between each alive notification</small>
                             </div>
 
                             <div class="form-group">
                                 <label for="conf-routing-2">Timer to wait news from other switches</label>
                                 <input type="number" min="0" step="1" class="form-control form-control-sm"
-                                       id="conf-routing-2">
-                                <small class="form-text text-muted"></small>
-                            </div>
-
-                            <span class="badge badge-warning config-info-span">Topology</span>
-
-                            <div class="custom-file config-inputs">
-                                <input type="file" accept=".json" class="custom-file-input" id="conf-topology-0">
-                                <label class="custom-file-label" for="conf-topology-0">File name</label>
+                                       id="conf-routing-2" required>
+                                <small class="form-text text-muted">Time elapsed before request other switches alive tag</small>
                             </div>
 
                             <span class="badge badge-warning config-info-span">Simulation</span>
@@ -125,15 +167,15 @@
                             <div class="form-group">
                                 <label for="conf-simulation-2">Duration</label>
                                 <input type="number" min="0" step="1" class="form-control form-control-sm"
-                                       id="conf-simulation-2">
+                                       id="conf-simulation-2" required>
                                 <small class="form-text text-muted">Duration time in ticks if endless is false</small>
                             </div>
 
                             <div class="form-group">
                                 <label for="conf-simulation-3">Start hour</label>
                                 <input type="number" min="0" max="23" step="1" class="form-control form-control-sm"
-                                       id="conf-simulation-3">
-                                <small class="form-text text-muted"></small>
+                                       id="conf-simulation-3" required>
+                                <small class="form-text text-muted">Must be between 0 and 23</small>
                             </div>
 
                             <button type="button" class="btn btn-success config-inputs" id="config-save-button">Save

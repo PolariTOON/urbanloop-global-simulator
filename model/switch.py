@@ -1,10 +1,10 @@
+import numpy as np
+
 from model import identifier
 from model import routing
 from model import switch as model_switch
 from settings import config
 from settings import simlog
-
-import numpy as np
 
 timer_other = int(config.routing['timer_other'])
 my_timer = int(config.routing['my_timer'])
@@ -69,28 +69,6 @@ class Switch:
         #                   + " sur la boucle " + self.my_loop.name)
         #      return False
 
-    def show_details(self):
-        """
-        crée un text contenant toutes les informations à propos de l'aiguillage
-        :return: String
-        """
-        details = "Switch ID : " + str(self.id)
-        details += "\nLoop of the switch : " + self.my_loop.name
-        details += "\n \t Next element : "
-        if type(self.next_element) is Switch:
-            details += "Switch " + str(self.next_element.id)
-        else:
-            details += "Station " + self.next_element.name
-        details += "\nLoop switched : " + self.other_loop.name
-        details += "\n \t Next element : "
-        if type(self.next_element_other) is Switch:
-            details += "Switch " + str(self.next_element_other.id)
-        else:
-            details += "Station " + self.next_element_other.name
-        details += "\nSize of the link : " + str(self.size)
-        details += "\nRouting Table : " + str(self.table)
-        return details
-
     def is_switch_out(self, the_loop):
         if the_loop is self.my_loop:
             return True
@@ -115,12 +93,12 @@ def init():
         y_out = loop_out.y + np.sin(np.deg2rad(a_switch.angle_my_loop)) * r_out
         x_in = loop_in.x + np.cos(np.deg2rad(a_switch.angle_other_loop)) * r_in
         y_in = loop_in.y + np.sin(np.deg2rad(a_switch.angle_other_loop)) * r_in
-        a_switch.size = np.round(np.sqrt((x_out - x_in)**2 + (y_out - y_in)**2), 2)
+        a_switch.size = np.round(np.sqrt((x_out - x_in) ** 2 + (y_out - y_in) ** 2), 2)
 
     for a_switch in _switches:  # table de "nouvelles"
         a_switch.permanent_table = {a_switch.section_my_loop: [False, 0, [a_switch.id, a_switch.section_my_loop]],
                                     a_switch.section_other_loop: [True, a_switch.size,
-                                                               [a_switch.id, a_switch.section_other_loop]]}
+                                                                  [a_switch.id, a_switch.section_other_loop]]}
         # print (a_switch.name, a_switch.permanent_table)
         a_switch.permanent_cover = {a_switch.section_my_loop: a_switch.id, a_switch.section_other_loop: a_switch.id}
         a_switch.timers = [timer_other for _ in range(len(_switches))]
@@ -190,9 +168,9 @@ def cost_between(element1, element2):
     if type(element2) is Switch:
         cost += switch.table[element2.section_my_loop][1]
         last_switch = element2
-    else :
+    else:
         cost += switch.table[element2.section_loop][1]
-    # trajet entre le switch in de fin et l'élément2
+        # trajet entre le switch in de fin et l'élément2
         boucle2 = element2.loop
         last_switch = switch.table[element2.section_loop][2][len(switch.table[element2.section_loop][2]) - 2]
         last_switch = model_switch.get_switch_by_id(last_switch)

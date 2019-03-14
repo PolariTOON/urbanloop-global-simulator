@@ -14,9 +14,9 @@ https://docs.python.org/dev/library/configparser.html
 
 loaded = False
 modified = False
-default = None
-interface = None
-model = None
+traveler = None
+topology = None
+prob = None
 capsule = None
 routing = None
 sim = None
@@ -27,20 +27,21 @@ default_path = '{0}/../resources/default_config.ini'.format(sys.path[0])
 
 def load(file_name):
     global loaded
-    global default
-    global model
-    global sim
-    global interface
+    global traveler
+    global topology
+    global prob
     global capsule
     global routing
-    loaded = True
+    global sim
     config = configparser.ConfigParser()
     config.read(file_name)
-    default = config['DEFAULT']
-    model = config['MODEL']
+    traveler = config['TRAVELER']
+    topology = config['TOPOLOGY']
+    prob = config['PROB']
     capsule = config['CAPSULE']
     routing = config['ROUTING']
     sim = config['SIM']
+    loaded = True
 
 
 def load_default():

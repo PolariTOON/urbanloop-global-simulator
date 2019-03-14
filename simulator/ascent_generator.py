@@ -7,7 +7,7 @@ from simulator import sim_loop
 class AscentGenerator:
     def __init__(self):
         self.stations = station.get_stations()
-        self.trip_limit = int(config.sim['trip_limit'])
+        self.trip_limit = int(config.traveler['trip_limit'])
 
     def generate(self):
         for a_station in self.stations:
@@ -28,6 +28,6 @@ class AscentGenerator:
 
 
 def ascent_event(capsule):
-    climb_timeout = sim_loop.get_env().timeout(converter.random_ascent_descent_duration())
-    climb_timeout.callbacks.append(lambda event: capsule.start_trip())
-    yield climb_timeout
+    ascent_timeout = sim_loop.get_env().timeout(converter.random_ascent_descent_duration())
+    ascent_timeout.callbacks.append(lambda event: capsule.start_trip())
+    yield ascent_timeout

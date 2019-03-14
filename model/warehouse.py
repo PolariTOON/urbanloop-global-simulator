@@ -1,6 +1,5 @@
 from model import identifier
 from model import queue
-from model import station
 from model import switch
 from settings import simlog
 
@@ -22,25 +21,8 @@ class Warehouse:
         self.name = "warehouse_%s" % self.loop.name
         self.section_loop = None
 
-    def show_details(self):
-        """
-        crée un text contenant toutes les informations à propos de l'entrepôt
-        :return: String
-        """
-        details = "Warehouse objectId : " + str(self.id)
-        details += "\nLoop : " + self.loop.name
-        details += "\nCapacity : " + str(self.capacity)
-        details += "\nNext element : "
-        if type(self.next_element) is station.Station:
-            details += "Station " + self.next_element.name
-        else:
-            details += "Switch " + str(self.next_element.id)
-        details += "\nCapsules (%d): " % self.capsule_queue.qsize()
-        # if self.capsule_queue.qsize() != 0:
-        # l = self.capsule_queue.list()
-        # for c in l:
-        #    details += "\n    Capsule #{0}".format(c.id)
-        return details
+    def reset_simulation(self):
+        self.capsule_queue = queue.Queue(maxsize=self.capacity)
 
     def send_capsule(self, station_destination):
         simlog.info("an empty capsule left warehouse %d to %s" % (self.id, station_destination.name))
@@ -91,3 +73,11 @@ def which_warehouse_after(station_source):
 
 def get_warehouses():
     return _warehouses
+
+
+def reset_simulation():
+    """
+    This function will reset every warehouses of the network
+    """
+    for warehouse in _warehouses:
+        warehouse.reset_simulation()

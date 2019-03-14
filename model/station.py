@@ -2,10 +2,12 @@ import random
 from enum import Enum
 from math import floor
 
-from model import queue
 from model import capsule
-from model import warehouse
 from model import identifier
+from model import queue
+from model import warehouse
+from settings import simlog
+from simulator import converter
 
 from simulator import converter
 from simulator import sim_loop
@@ -49,29 +51,6 @@ class Station:
     def reset_simulation(self):
         self.traveler_queue = queue.Queue()
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
-
-    def show_details(self):
-        """
-        crée un text contenant toutes les informations à propos de la station
-        :return: String
-        """
-        details = "Station name : " + self.name
-        details += "\nStation objectId : " + str(self.id)
-        details += "\nLoop : " + self.loop.name
-        details += "\nStation Type : "
-        details += self.get_string_type()
-        details += "\nCapacity : " + str(self.capacity)
-        details += "\nNext element : "
-        if type(self.next_element) is Station:
-            details += "Station " + self.next_element.name
-        else:
-            details += "Switch " + str(self.next_element.id)
-        if self.capsule_queue.qsize() != 0:
-            details += "\nCapsules (%d): " % self.capsule_queue.qsize()
-            l = self.capsule_queue.list()
-            for c in l:
-                details += "\n    Capsule #{0}".format(c.id)
-        return details
 
     def get_type(self):
         return (Type.NEUTRAL, Type.ACTIVITY, Type.RESIDENTIAL, Type.CITY)[self.station_type]

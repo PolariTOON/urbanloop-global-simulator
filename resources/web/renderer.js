@@ -27,9 +27,9 @@ function applyNetworkScene() {
 
 function startUpdateLoop() {
     updateLoop = setInterval(() => {
+        updateDataPanel();
         if (running) {
             updateNetworkScene();
-            updateDataPanel();
         }
     }, 30);
 }

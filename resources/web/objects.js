@@ -1,6 +1,7 @@
 let networkDiv = document.getElementById('network-div');
 
 let clearing = false;
+let waitingSimLoopEnd = false;
 let networkSize = 1000;
 let objectScale;
 let stage;
@@ -8,6 +9,7 @@ let networkLayer;
 let infoLayer;
 
 let scaleSlider = document.getElementById('scale-slider');
+let startButton = document.getElementById('start-button');
 let backwardButton = document.getElementById('backward-button');
 let forwardButton = document.getElementById('forward-button');
 let timerSpan = document.getElementById('timer-span');
@@ -696,6 +698,14 @@ function initNetworkScene() {
     objects = [];
 
     $.ajaxSetup({async: false});
+
+    while (waitingSimLoopEnd) {
+        $.getJSON('/end-signal', function (endSignalJSON) {
+            waitingSimLoopEnd = !endSignalJSON['endSignal'];
+        });
+    }
+
+    startButton.classList.remove('not-shown');
 
     $.get('/load.json', function (networkJSON) {
         networkSize = networkJSON['maxSize'];

@@ -56,7 +56,8 @@ class Capsule:
         """
         The capsule continues its road to the destination, on the same station
         """
-        simlog.debug("Capsule %d continues its trip to %s" % (self.id, self.destination.name), self.current_element.name, self.next_element.name)
+        simlog.debug("Capsule %d continues its trip to %s" % (self.id, self.destination.name),
+                     self.current_element.name, self.next_element.name)
         self.current_element = self.next_element
 
         if type(self.current_element) is switch.Switch and not self.current_element.is_switch_out(self.loop):
@@ -114,10 +115,14 @@ class Capsule:
         else:
             self._continue()
         # optimisation : si une capsule vide en direction d'un entrepot passe devant une station vide elle se déroute
-        if not (self.is_aboard()) and type(self.next_element) is station.Station and type(self.destination) is warehouse.Warehouse:
+        if not (self.is_aboard()) and type(self.next_element) is station.Station and type(
+                self.destination) is warehouse.Warehouse:
             # simlog.debug("Rerouted ? capsule %d direction %s, station qsize %d, estimated_count %d, capacity %d" % (self.id, self.destination.name, self.next_element.capsule_queue.qsize(), self.next_element.estimated_capsules_number(), self.next_element.capacity), self.next_element.name)
-            if self.next_element.capsule_queue.qsize() <= 1 and (self.next_element.estimated_capsules_number() < self.next_element.capacity - 1 or self.next_element.traveler_queue.qsize()>=1):
-                simlog.debug("The capsule %d direction %s is rerouted to %s (%d/%d)" % (self.id, self.destination.name, self.next_element.name, self.next_element.estimated_capsules_number(), self.next_element.capacity), self.current_element, self.next_element)
+            if self.next_element.capsule_queue.qsize() <= 1 and (
+                    self.next_element.estimated_capsules_number() < self.next_element.capacity - 1 or self.next_element.traveler_queue.qsize() >= 1):
+                simlog.debug("The capsule %d direction %s is rerouted to %s (%d/%d)" % (
+                self.id, self.destination.name, self.next_element.name, self.next_element.estimated_capsules_number(),
+                self.next_element.capacity), self.current_element, self.next_element)
                 self.destination = self.next_element
         if self.current_element == self.destination:
             if self.current_element.capsule_queue.full():
@@ -155,7 +160,8 @@ class Capsule:
         """
         self.destination = traveler.destination_station
         self.travelers.append(traveler)
-        simlog.info("Traveler %s gets in capsule %d" % (self._get_travelers_id(), self.id), traveler.departure_station, self.destination)
+        simlog.info("Traveler %s gets in capsule %d" % (self._get_travelers_id(), self.id), traveler.departure_station,
+                    self.destination)
 
     def get_out_traveler(self):
         """
@@ -226,28 +232,6 @@ class Capsule:
         """
         number = len(self.travelers)
         return ((str(number) + ' traveler', str(number) + ' travelers')[number > 1], 'Empty')[number == 0]
-
-    def show_details(self):
-        """
-        crée un text contenant toutes les informations à propos de la capsule
-        :return: String
-        """
-        details = "Capsule ID : " + str(self.id)
-        details += "\nContains a Travelers : " + str(self.is_aboard())
-        if self.destination is not None:
-            details += "\nDestination : " + self.destination.name
-        details += "\nCurrent Loop : " + self.loop.name
-        details += "\nLast or current element : "
-        if type(self.current_element) is station.Station:
-            details += "Station " + self.current_element.name
-        else:
-            details += "Switch " + str(self.current_element.id)
-        details += "\nNext element : "
-        if type(self.next_element) is station.Station:
-            details += "Station " + self.next_element.name
-        else:
-            details += "Switch " + str(self.next_element.id)
-        return details
 
 
 def get_incoming_capsule(destination):

@@ -1,13 +1,28 @@
+// Some elements are defined in the above file objects.js
 let dataTab = document.getElementById("data-tab");
 let configTab = document.getElementById("config-tab");
 let interactTab = document.getElementById("interact-tab");
 let viewTab = document.getElementById("view-tab");
 let saveConfigButton = document.getElementById('config-save-button');
+let jQuerySaveConfigButton = $('#config-save-button');
 let permanentConfigButton = document.getElementById('config-permanent-button');
+let jQueryPermanentConfigButton = $('#config-permanent-button');
 let resetConfigButton = document.getElementById('config-reset-button');
+let jQueryResetConfigButton = $('#config-reset-button');
+let networkAddButton = document.getElementById('network-add-btn');
+let jQueryNetworkAddButton = $('#network-add-btn');
+let networkDlButton = document.getElementById('network-dl-btn');
+let networkFavButton = document.getElementById('network-fav-btn');
+let jQueryNetworkFavButton = $('#network-fav-btn');
+let networkRemoveButton = document.getElementById('network-remove-btn');
+let jQueryNetworkRemoveButton = $('#network-remove-btn');
+let networkText = document.getElementById('network-text');
+let networkSelection = document.getElementById('conf-topology-0');
+let networkFileInput = document.getElementById('conf-topology-1');
+let networkErrorText = document.getElementById('network-error-text');
 let endlessCheckBox = document.getElementById('conf-simulation-1');
 let startHour = document.getElementById('conf-simulation-2');
-let permanent = false;
+let permanentConfigChange = false;
 
 function updateDataPanel() {
     let data = "";
@@ -16,11 +31,11 @@ function updateDataPanel() {
         data += "<p>Loop " + selectedObject.json["name"] + "</p>";
         data += "<p>Circumference : " + selectedObject.json["size"] + "</p>";
         data += "<p>Center coordinates : [" + selectedObject.json["x"] + ";" + selectedObject.json["y"] + "]</p>";
-        data += "<p>Elements :"
+        data += "<p>Elements :";
         let elements = selectedObject.json["objects"];
-        for (key in elements) {
-            data += "<br>&nbsp;" + elements[key];
-        }
+        for (let key in elements) {
+            data += "<br>&nbsp;" + key;
+        }//TODO CHECK WORKS
         data += "</p>";
     } else if (selectedObject instanceof Switch) {
         data += "<p>Switch #" + selectedObject.json["id"] + "</p>";
@@ -68,15 +83,13 @@ function updateDataPanel() {
 }
 
 function updateConfigPanel() {
-    $.get('/config.json/0', function (configJSON) {
+    $.getJSON('/config.json/0', function (configJSON) {
         document.getElementById('conf-travelers-0').value = configJSON['travelers_per_day'];
         document.getElementById('conf-travelers-1').value = configJSON['trip_limit'];
         document.getElementById('conf-travelers-2').value = configJSON['traveler_limit'];
         document.getElementById('conf-travelers-3').value = configJSON['ascent_descent_duration'];
         document.getElementById('conf-travelers-4').value = configJSON['morning_peak_hour'];
         document.getElementById('conf-travelers-5').value = configJSON['evening_peak_hour'];
-
-        //document.getElementById('conf-topology-0').value = configJSON['network_file'];
 
         document.getElementById('conf-probabilities-0').value = configJSON['activity_and_residential_percent'];
         document.getElementById('conf-probabilities-1').value = configJSON['city_percent'];
@@ -104,19 +117,265 @@ function updateConfigPanel() {
         document.getElementById('conf-simulation-2').value = configJSON['duration'];
         document.getElementById('conf-simulation-3').value = configJSON['start_hour'];
     });
+
+    updateNetworkSelection();
 }
 
-function blockTimeoutConfigButtons(timeout = 1000) {
-    saveConfigButton.disabled = true;
-    permanentConfigButton.disabled = true;
-    resetConfigButton.disabled = true;
-    setTimeout(() => {
-        saveConfigButton.disabled = false;
-        permanentConfigButton.disabled = false;
-        resetConfigButton.disabled = false;
-        updateConfigPanel();
-    }, timeout);
+function updateNetworkSelection() {
+    while (networkSelection.firstChild) {
+        networkSelection.removeChild(networkSelection.firstChild);
+    }
+    $.getJSON('/network-files.json', function (listNetworkFileNameJSON) {
+        listNetworkFileNameJSON.forEach(networkFileNameJSON => {
+            let option = document.createElement('option');
+            option.innerHTML = networkFileNameJSON['fileName'];
+            networkSelection.appendChild(option)
+        });
+    });
 }
+
+function changeNetworkButtonState(disabled = false) {
+    networkAddButton.disabled = disabled;
+    networkDlButton.disabled = disabled;
+    networkFavButton.disabled = disabled;
+    networkRemoveButton.disabled = disabled;
+}
+
+function resetNetworkErrorText() {
+    networkErrorText.innerHTML = "Select, add, remove or download a network JSON file";
+    networkErrorText.classList.remove('form-text-error');
+    networkErrorText.classList.add('text-muted');
+}
+
+function waitConfigChange() {
+    let waitingConfigLoaded = true;
+    let waitStart = new Date();
+
+    while (waitingConfigLoaded && (new Date() - waitStart) < 1000) {
+        $.getJSON('/config-loaded-signal.json', function (configLoadedSignalJSON) {
+            waitingConfigLoaded = !configLoadedSignalJSON['configLoadedSignal'];
+        });
+    }
+
+    saveConfigButton.disabled = false;
+    permanentConfigButton.disabled = false;
+    resetConfigButton.disabled = false;
+    updateConfigPanel();
+}
+
+function waitNetworkSignal(signalUrl) {
+    let waitingNetworkSignal = true;
+    let waitStart = new Date();
+
+    while (waitingNetworkSignal && (new Date() - waitStart) < 1000) {
+        $.getJSON(signalUrl, function (networkSignalJSON) {
+            waitingNetworkSignal = !networkSignalJSON['networkSignal'];
+        });
+    }
+
+    changeNetworkButtonState(false);
+    updateNetworkSelection();
+}
+
+networkSelection.onchange = () => {
+    networkErrorText.innerHTML = "Select, add, remove or download a network JSON file";
+    networkErrorText.classList.remove('form-text-error');
+    networkErrorText.classList.add('text-muted');
+
+    let selectedName = networkSelection[networkSelection.selectedIndex].value;
+    let isDefault = false;
+    if (selectedName.includes('default: ')) {
+        isDefault = true;
+        selectedName = selectedName.replace('default: ', '');
+    }
+
+    applyNetworkScene(selectedName, isDefault)
+};
+
+networkFileInput.onchange = () => {
+    let value = networkFileInput.value;
+    let extension = value.substr(value.lastIndexOf('.') + 1).toLowerCase();
+
+    if (extension !== 'json') {
+        networkErrorText.innerHTML = "Network file extension must be .json";
+        networkErrorText.classList.remove('text-muted');
+        networkErrorText.classList.add('form-text-error');
+        return;
+    }
+
+    resetNetworkErrorText();
+    changeNetworkButtonState(true);
+
+    let name;
+    if (value.includes('/')) {
+        let slashSplit = value.split('/');
+        name = slashSplit[slashSplit.length - 1]
+    } else {
+        let backslashSplit = value.split('\\');
+        name = backslashSplit[backslashSplit.length - 1]
+    }
+
+    let reader = new FileReader();
+    reader.readAsText(networkFileInput.files[0], "UTF-8");
+    reader.onload = (event) => {
+        $.ajaxSetup({async: false});
+
+        let isValidJSON = true;
+        let parsedJSON;
+
+        try {
+            parsedJSON = JSON.parse(event.target.result);
+        } catch (error) {
+            isValidJSON = false;
+        }
+
+        // In the future, isValidJSON should be false if the uploaded file doesn't respect network syntax
+        if (!isValidJSON) {
+            networkErrorText.innerHTML = "The uploaded JSON file isn't valid";
+            networkErrorText.classList.remove('text-muted');
+            networkErrorText.classList.add('form-text-error');
+            changeNetworkButtonState(false);
+            return;
+        }
+
+        $.post('/add-network-file/' + name, {
+            data: JSON.stringify(parsedJSON)
+        });
+        waitNetworkSignal('/network-added-signal.json');
+        jQueryNetworkAddButton.tooltip({
+            html: true,
+            title: "<b style='color: greenyellow'>Network file has been added !</b>"
+        });
+        jQueryNetworkAddButton.tooltip('show');
+        setTimeout(() => {
+            jQueryNetworkAddButton.tooltip('hide');
+            jQueryNetworkAddButton.tooltip('dispose');
+        }, 3000);
+        $.ajaxSetup({async: true});
+    };
+
+    reader.onerror = () => {
+        networkErrorText.innerHTML = "An error occurred while loading file";
+        networkErrorText.classList.remove('text-muted');
+        networkErrorText.classList.add('form-text-error');
+    };
+};
+
+networkAddButton.onclick = () => {
+    $('#conf-topology-1').trigger('click');
+};
+
+networkAddButton.onmouseenter = () => {
+    networkText.innerHTML = "Add network json file"
+};
+
+networkAddButton.onmouseleave = () => {
+    networkText.innerHTML = String();
+};
+
+networkRemoveButton.onclick = () => {
+    let selectedName = networkSelection[networkSelection.selectedIndex].value;
+
+    if (selectedName.includes('default: ')) {
+        networkErrorText.innerHTML = "Cannot remove default file";
+        networkErrorText.classList.remove('text-muted');
+        networkErrorText.classList.add('form-text-error');
+        return;
+    }
+
+    resetNetworkErrorText();
+    changeNetworkButtonState(true);
+
+    $.ajaxSetup({async: false});
+    $.get('/remove-network-file/' + selectedName);
+    waitNetworkSignal('/network-removed-signal.json');
+    $('#conf-topology-0').trigger('change');
+    jQueryNetworkRemoveButton.tooltip({
+        html: true,
+        title: "<b style='color: #ea0000'>Selected network has been removed !</b>"
+    });
+    jQueryNetworkRemoveButton.tooltip('show');
+    setTimeout(() => {
+        jQueryNetworkRemoveButton.tooltip('hide');
+        jQueryNetworkRemoveButton.tooltip('dispose');
+    }, 3000);
+    $.ajaxSetup({async: true});
+};
+
+networkRemoveButton.onmouseenter = () => {
+    networkText.innerHTML = "Remove selected network from the list"
+};
+
+networkRemoveButton.onmouseleave = () => {
+    networkText.innerHTML = String();
+};
+
+networkDlButton.onclick = () => {
+    let selectedName = networkSelection[networkSelection.selectedIndex].value;
+    let isDefault = false;
+    if (selectedName.includes('default: ')) {
+        isDefault = true;
+        selectedName = selectedName.replace('default: ', '');
+    }
+
+    $.getJSON(String.prototype.concat('/dl-network-file.json/', selectedName, '/', isDefault ? '1' : '0'), function (networkJSON) {
+        let downloadLink = window.document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(new Blob([JSON.stringify(networkJSON, null, 2)], {type: "application/json"}));
+        downloadLink.download = selectedName.replace('default : ', '') + '.json';
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    });
+};
+
+networkDlButton.onmouseenter = () => {
+    networkText.innerHTML = "Download selected network file"
+};
+
+networkDlButton.onmouseleave = () => {
+    networkText.innerHTML = String();
+};
+
+networkFavButton.onclick = () => {
+    let selectedName = networkSelection[networkSelection.selectedIndex].value;
+
+    if (selectedName.includes('default: ')) {
+        networkErrorText.innerHTML = "Selected network file is already the default one";
+        networkErrorText.classList.remove('text-muted');
+        networkErrorText.classList.add('form-text-error');
+        return;
+    }
+
+    resetNetworkErrorText();
+    changeNetworkButtonState(true);
+
+    $.ajaxSetup({async: false});
+    $.get('/change-default-network-file/' + selectedName);
+    waitNetworkSignal('/network-default-changed-signal.json');
+    jQueryNetworkFavButton.tooltip({
+        html: true,
+        title: "<b style='color: #f6cc24'>Selected network is now the default one !</b>"
+    });
+    jQueryNetworkFavButton.tooltip('show');
+    setTimeout(() => {
+        jQueryNetworkFavButton.tooltip('hide');
+        jQueryNetworkFavButton.tooltip('dispose');
+    }, 3000);
+    $.ajaxSetup({async: true});
+};
+
+networkFavButton.onmouseenter = () => {
+    networkText.innerHTML = "Make selected network file the default one"
+};
+
+networkFavButton.onmouseleave = () => {
+    networkText.innerHTML = String();
+};
+
+endlessCheckBox.onclick = () => {
+    startHour.disabled = !!endlessCheckBox.checked;
+};
 
 saveConfigButton.onclick = () => {
     let configJson = {
@@ -126,8 +385,6 @@ saveConfigButton.onclick = () => {
         'ascent_descent_duration': document.getElementById('conf-travelers-3').value,
         'morning_peak_hour': document.getElementById('conf-travelers-4').value,
         'evening_peak_hour': document.getElementById('conf-travelers-5').value,
-
-        //'network_file': document.getElementById('conf-topology-0').value,
 
         'activity_and_residential_percent': document.getElementById('conf-probabilities-0').value,
         'city_percent': document.getElementById('conf-probabilities-1').value,
@@ -161,52 +418,71 @@ saveConfigButton.onclick = () => {
         return;
     }
 
+    saveConfigButton.disabled = true;
+    permanentConfigButton.disabled = true;
+    resetConfigButton.disabled = true;
+
     $.ajaxSetup({async: false});
-    $.post(String.prototype.concat('/config.json/', permanent ? '1' : '0'), {
+    $.post(String.prototype.concat('/config.json/', permanentConfigChange ? '1' : '0'), {
         data: JSON.stringify(configJson)
     });
-    blockTimeoutConfigButtons();
+    waitConfigChange();
+    jQuerySaveConfigButton.tooltip({
+        html: true,
+        title: "<b style='color: greenyellow'>Config has been saved !</b>"
+    });
+    jQuerySaveConfigButton.tooltip('show');
+    setTimeout(() => {
+        jQuerySaveConfigButton.tooltip('hide');
+        jQuerySaveConfigButton.tooltip('dispose');
+    }, 2000);
     $.ajaxSetup({async: true});
 };
 
 permanentConfigButton.onclick = () => {
-    updateConfigPanel();
-    if (permanent) {
-        permanent = false;
-        permanentConfigButton.innerHTML = "<i class='far fa-square'></i> Temporary"
+    if (permanentConfigChange) {
+        permanentConfigChange = false;
+        permanentConfigButton.innerHTML = "<i class='far fa-square'></i> Temporary";
         permanentConfigButton.classList.remove("btn-danger");
         permanentConfigButton.classList.add("btn-info");
-        $('#config-permanent-button').tooltip('hide');
-        $('#config-permanent-button').tooltip('dispose');
+        jQueryPermanentConfigButton.tooltip('hide');
+        jQueryPermanentConfigButton.tooltip('dispose');
     } else {
-        permanent = true;
-        permanentConfigButton.innerHTML = "<i class='fas fa-check-square'></i> Permanent"
+        permanentConfigChange = true;
+        permanentConfigButton.innerHTML = "<i class='fas fa-check-square'></i> Permanent";
         permanentConfigButton.classList.remove("btn-info");
         permanentConfigButton.classList.add("btn-danger");
-        $('#config-permanent-button').tooltip({
+        jQueryPermanentConfigButton.tooltip({
             html: true,
-            title: "<b>Save will overwrite default config with above data</b>"
+            title: "<b style='color: #ea0000'>Save will overwrite default config with above data</b>"
         });
-        $('#config-permanent-button').tooltip('show');
+        jQueryPermanentConfigButton.tooltip('show');
     }
-
 };
 
 permanentConfigButton.onmouseleave = () => {
-    if (permanent) {
-        $('#config-permanent-button').tooltip('hide');
+    if (permanentConfigChange) {
+        jQueryPermanentConfigButton.tooltip('hide');
     }
 };
 
 resetConfigButton.onclick = () => {
+    saveConfigButton.disabled = true;
+    permanentConfigButton.disabled = true;
+    resetConfigButton.disabled = true;
     $.ajaxSetup({async: false});
     $.get('/reset-config');
-    blockTimeoutConfigButtons();
+    waitConfigChange();
+    jQueryResetConfigButton.tooltip({
+        html: true,
+        title: "<b style='color: deepskyblue'>Config has been reset !</b>"
+    });
+    jQueryResetConfigButton.tooltip('show');
+    setTimeout(() => {
+        jQueryResetConfigButton.tooltip('hide');
+        jQueryResetConfigButton.tooltip('dispose');
+    }, 2000);
     $.ajaxSetup({async: true});
-};
-
-endlessCheckBox.onclick = () => {
-    startHour.disabled = !!endlessCheckBox.checked;
 };
 
 

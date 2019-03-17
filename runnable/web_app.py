@@ -7,8 +7,8 @@ from threading import Thread
 from flask import Flask, Response, redirect, url_for, request
 
 from model import loop, station, switch, warehouse, capsule
-from settings import config
-from settings import json_serializer, network
+from settings import config, network
+from settings import json_serializer
 from simulator import sim_loop
 
 web_directory = os.path.abspath('%s/../resources/web' % (path[0]))
@@ -16,22 +16,12 @@ app = Flask(__name__, static_folder=web_directory, template_folder=web_directory
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 sim_thread = None
-is_network_loaded = False
 is_simulation_started = False
 
 
 @app.route('/')
 def root():
     return app.send_static_file('index.html')
-
-
-@app.route('/load.json')  # TODO Add file parameter
-def load_network():
-    global is_network_loaded
-    if not is_network_loaded:
-        is_network_loaded = True
-        network.reload()
-    return Response(dumps(json_serializer.serialize_network()), mimetype="application/json")
 
 
 @app.route('/start')
@@ -42,6 +32,15 @@ def start_simulation():
         is_simulation_started = True
         sim_thread = Thread(target=sim_loop.start_simulation, args=[True])
         sim_thread.start()
+    return redirect(url_for('root'))
+
+
+@app.route('/stop')
+def stop_simulation():
+    global is_simulation_started
+    if is_simulation_started:
+        is_simulation_started = False
+        sim_loop.stop_simulation()
     return redirect(url_for('root'))
 
 
@@ -57,22 +56,6 @@ def resume_simulation():
     if is_simulation_started and sim_loop.is_paused():
         sim_loop.run_simulation_after_pause()
     return redirect(url_for('root'))
-
-
-@app.route('/stop')
-def stop_simulation():
-    global is_simulation_started
-    global is_network_loaded
-    if is_simulation_started:
-        is_simulation_started = False
-        is_network_loaded = False
-        sim_loop.stop_simulation()
-    return redirect(url_for('root'))
-
-
-@app.route('/end-signal')
-def end_signal():
-    return Response(dumps({'endSignal': sim_loop.get_off_signal(reset=True)}), mimetype="application/json")
 
 
 @app.route('/accelerate')
@@ -92,6 +75,17 @@ def decelerate_simulation():
 @app.route('/time.json')
 def generate_time_json():
     return Response(dumps(json_serializer.serialize_time()), mimetype="application/json")
+
+
+@app.route('/load.json/', defaults={'file_name': None})
+@app.route('/load.json/<string:file_name>')
+def load_network(file_name):
+    if not is_simulation_started:
+        if file_name is not None:
+            network.reload(file_name)
+        else:
+            network.reload()
+    return Response(dumps(json_serializer.serialize_network_size()), mimetype="application/json")
 
 
 @app.route('/loops.json')
@@ -141,6 +135,40 @@ def generate_capsules_json():
                     mimetype="application/json")
 
 
+@app.route('/network-files.json')
+def network_files():
+    default_name = 'default: ' + network.get_default_file_name()
+    network_file_names = [json_serializer.serialize_network_file_name(default_name)] + \
+                         [json_serializer.serialize_network_file_name(network_file_name) for network_file_name in
+                          network.get_network_file_names()]
+    return Response(dumps(network_file_names), mimetype="application/json")
+
+
+@app.route('/add-network-file/<string:file_name>', methods=['GET', 'POST'])
+def add_network_file(file_name):
+    if request.method == 'POST':
+        network.add_network_file(file_name, loads(request.form['data']))
+    return redirect(url_for('root'))
+
+
+@app.route('/dl-network-file.json/<string:file_name>/<int:is_default>')
+def dl_network_file(file_name, is_default):
+    return Response(dumps(network.get_network_json(file_name, (True, False)[is_default is None or is_default == 0])),
+                    mimetype="application/json")
+
+
+@app.route('/remove-network-file/<string:file_name>')
+def remove_network_file(file_name):
+    network.remove_network_file(file_name)
+    return redirect(url_for('root'))
+
+
+@app.route('/change-default-network-file/<string:file_name>')
+def change_default_network_file(file_name):
+    network.change_default_file(file_name)
+    return redirect(url_for('root'))
+
+
 @app.route('/config.json/<int:permanent>', methods=['GET', 'POST'])
 def load_config(permanent):
     if request.method == 'POST':
@@ -151,9 +179,36 @@ def load_config(permanent):
 
 @app.route('/reset-config')
 def reset_config():
-    config.reset()
+    config.reset_to_default()
     config.load_default()
     return redirect(url_for('root'))
+
+
+@app.route('/loop-off-signal.json')
+def sim_loop_off_signal():
+    return Response(dumps({'loopOffSignal': sim_loop.get_off_signal(reset=True)}), mimetype="application/json")
+
+
+@app.route('/config-loaded-signal.json')
+def config_loaded_signal():
+    return Response(dumps({'configLoadedSignal': config.get_loaded_signal(reset=True)}), mimetype="application/json")
+
+
+@app.route('/network-added-signal.json')
+def network_added_signal():
+    return Response(dumps({'networkSignal': network.get_added_signal(reset=True)}), mimetype="application/json")
+
+
+@app.route('/network-removed-signal.json')
+def network_removed_signal():
+    return Response(dumps({'networkSignal': network.get_removed_signal(reset=True)}),
+                    mimetype="application/json")
+
+
+@app.route('/network-default-changed-signal.json')
+def network_default_changed_signal():
+    return Response(dumps({'networkSignal': network.get_default_changed_signal(reset=True)}),
+                    mimetype="application/json")
 
 
 if __name__ == '__main__':

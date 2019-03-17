@@ -89,12 +89,36 @@
                             </div>
 
                             <span class="badge badge-warning config-info-span">Topology</span>
-                            <div class="custom-file config-browse-file">
-                                <label class="custom-file-label" for="conf-topology-0">File name</label>
-                                <input type="file" accept=".json" class="custom-file-input" id="conf-topology-0">
+                            <div class="form-group">
+                                <label for="conf-topology-0">Select a network</label>
+                                <select class="form-control browser-default custom-select" id="conf-topology-0"
+                                        required>
+                                </select>
+                                <small id="network-error-text" class="form-text text-muted">Select a network JSON file
+                                    for the simulation
+                                </small>
                             </div>
 
-                            <span class="badge badge-warning config-info-span">Probabilities</span>
+                            <div class="form-group">
+                                <div id="config-network-btn-group" class="btn btn-group">
+                                    <button type="button" id="network-add-btn" class="btn btn-success">
+                                        <i class="far fa-plus-square fa-lg"></i>
+                                    </button>
+                                    <button type="button" id="network-dl-btn" class="btn btn-dark">
+                                        <i class="fas fa-download fa-lg"></i>
+                                    </button>
+                                    <button type="button" id="network-fav-btn" class="btn btn-dark">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                    <button type="button" id="network-remove-btn" class="btn btn-danger">
+                                        <i class="far fa-minus-square fa-lg"></i>
+                                    </button>
+                                    <input type="file" style="display:none" accept=".json" id="conf-topology-1">
+                                </div>
+                                <small id="network-text" class="form-text text-muted network-tip-text"></small>
+                            </div>
+
+                            <span class="badge badge-warning config-info-span config-prob-span">Probabilities</span>
                             <div class="form-group">
                                 <label for="conf-probabilities-0">Activity and residential types probability</label>
                                 <input type="number" min="1" max="49" step="1" class="form-control form-control-sm"
@@ -136,7 +160,9 @@
                                 <label for="conf-routing-0">Cost added if changing loop</label>
                                 <input type="number" min="0" step="1" class="form-control form-control-sm"
                                        id="conf-routing-0" required>
-                                <small class="form-text text-muted">Additional cost for crossing a switch, added to the switch length</small>
+                                <small class="form-text text-muted">Additional cost for crossing a switch, added to the
+                                    switch length
+                                </small>
                             </div>
 
                             <div class="form-group">
@@ -150,7 +176,9 @@
                                 <label for="conf-routing-2">Timer to wait news from other switches</label>
                                 <input type="number" min="0" step="1" class="form-control form-control-sm"
                                        id="conf-routing-2" required>
-                                <small class="form-text text-muted">Time elapsed before request other switches alive tag</small>
+                                <small class="form-text text-muted">Time elapsed before request other switches alive
+                                    tag
+                                </small>
                             </div>
 
                             <span class="badge badge-warning config-info-span">Simulation</span>
@@ -178,13 +206,16 @@
                                 <small class="form-text text-muted">Must be between 0 and 23</small>
                             </div>
 
-                            <button type="button" class="btn btn-success config-inputs" id="config-save-button">Save
-                            </button>
-                            <button type="button" class="btn btn-info config-inputs" id="config-permanent-button">
-                                <i class='far fa-square'></i> Temporary
-                            </button>
-                            <button type="button" class="btn btn-primary config-inputs" id="config-reset-button">Reset
-                            </button>
+                            <div id="config-btn-group">
+                                <button type="button" class="btn btn-success config-inputs" id="config-save-button">Save
+                                </button>
+                                <button type="button" class="btn btn-info config-inputs" id="config-permanent-button">
+                                    <i class='far fa-square'></i> Temporary
+                                </button>
+                                <button type="button" class="btn btn-primary config-inputs" id="config-reset-button">
+                                    Reset
+                                </button>
+                            </div>
                         </form>
                     </div>
                     <div id="stats-tab" class="tab-pane fade">Stats</div>
@@ -192,7 +223,7 @@
                 </div>
             </div>
             <div id="slider-container">
-                <input type="range" min="0.1" max="6" step="0.1" id="scale-slider">
+                <label for="scale-slider"></label><input type="range" min="0.1" max="6" step="0.1" id="scale-slider">
             </div>
         </div>
     </div>
@@ -208,7 +239,7 @@
     <script type="text/javascript" src="https://unpkg.com/konva@3.1.6/konva.min.js"></script>
     <script type="text/javascript" src="./web/objects.js"></script>
     <script type="text/javascript" src="./web/tabs.js"></script>
-    <script type="text/javascript" src="./web/renderer.js"></script>
     <script type="text/javascript" src="./web/inputs.js"></script>
+    <script type="text/javascript" src="./web/renderer.js"></script>
 </footer>
 </html>

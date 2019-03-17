@@ -4,14 +4,21 @@ let clearing = false;
 let waitingSimLoopEnd = false;
 let networkSize = 1000;
 let objectScale;
-let stage;
-let networkLayer;
-let infoLayer;
+let stage = new Konva.Stage({
+    container: 'network-div',
+    width: getNetworkDivSize().width,
+    height: getNetworkDivSize().height
+});
+let networkLayer = new Konva.Layer();
+let infoLayer = new Konva.Layer();
 
 let scaleSlider = document.getElementById('scale-slider');
+let jQueryScaleSlider = $('#scale-slider');
 let startButton = document.getElementById('start-button');
 let backwardButton = document.getElementById('backward-button');
+let jQueryBackwardButton = $('#backward-button');
 let forwardButton = document.getElementById('forward-button');
+let jQueryForwardButton = $('#forward-button');
 let timerSpan = document.getElementById('timer-span');
 let speedSpan = document.getElementById('speed-span');
 
@@ -694,42 +701,43 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 }
 
-function initNetworkScene() {
+function initNetworkScene(networkName, isDefaultNetwork) {
     objects = [];
 
     $.ajaxSetup({async: false});
 
-    while (waitingSimLoopEnd) {
-        $.getJSON('/end-signal', function (endSignalJSON) {
-            waitingSimLoopEnd = !endSignalJSON['endSignal'];
+    let waitStart = new Date();
+    while (waitingSimLoopEnd && (new Date() - waitStart) < 1000) {
+        $.getJSON('/loop-off-signal.json', function (offSignalJSON) {
+            waitingSimLoopEnd = !offSignalJSON['loopOffSignal'];
         });
     }
 
     startButton.classList.remove('not-shown');
-
-    $.get('/load.json', function (networkJSON) {
+    
+    $.getJSON(isDefaultNetwork ? '/load.json' : String.prototype.concat('/load.json/', networkName), function (networkJSON) {
         networkSize = networkJSON['maxSize'];
     });
 
-    $.get('/loops.json', function (listLoopJSON) {
+    $.getJSON('/loops.json', function (listLoopJSON) {
         listLoopJSON.forEach(function (loopJSON) {
             new Loop(loopJSON);
         });
     });
 
-    $.get('/stationsSetData.json', function (listStationSetDataJSON) {
+    $.getJSON('/stationsSetData.json', function (listStationSetDataJSON) {
         listStationSetDataJSON.forEach(function (stationSetDataJSON) {
             new Station(stationSetDataJSON);
         });
     });
 
-    $.get('/warehousesSetData.json', function (listWarehouseSetDataJSON) {
+    $.getJSON('/warehousesSetData.json', function (listWarehouseSetDataJSON) {
         listWarehouseSetDataJSON.forEach(function (warehouseSetDataJSON) {
             new Warehouse(warehouseSetDataJSON);
         });
     });
 
-    $.get('/switchesSetData.json', function (listSwitchSetDataJSON) {
+    $.getJSON('/switchesSetData.json', function (listSwitchSetDataJSON) {
         listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
             new Switch(switchSetDataJSON);
         });
@@ -744,7 +752,7 @@ function initNetworkScene() {
 }
 
 function updateNetworkScene() {
-    $.get('/time.json', function (timeJSON) {
+    $.getJSON('/time.json', function (timeJSON) {
         if (clearing) return;
         timerSpan.innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time'];
         speedSpan.innerHTML = timeJSON['speed'];
@@ -753,18 +761,18 @@ function updateNetworkScene() {
             if (!backwardButton.classList.contains("btn-warning")) {
                 backwardButton.classList.remove("btn-light");
                 backwardButton.classList.add("btn-warning");
-                $('#backward-button').tooltip({
+                jQueryBackwardButton.tooltip({
                     html: true,
                     title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
                 });
-                $('#backward-button').tooltip('show');
+                jQueryBackwardButton.tooltip('show');
             }
         } else {
             if (!backwardButton.classList.contains("btn-light")) {
                 backwardButton.classList.remove("btn-warning");
                 backwardButton.classList.add("btn-light");
-                $('#backward-button').tooltip('hide');
-                $('#backward-button').tooltip('dispose');
+                jQueryBackwardButton.tooltip('hide');
+                jQueryBackwardButton.tooltip('dispose');
             }
         }
 
@@ -772,23 +780,23 @@ function updateNetworkScene() {
             if (!forwardButton.classList.contains("btn-warning")) {
                 forwardButton.classList.remove("btn-light");
                 forwardButton.classList.add("btn-warning");
-                $('#forward-button').tooltip({
+                jQueryForwardButton.tooltip({
                     html: true,
                     title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
                 });
-                $('#forward-button').tooltip('show');
+                jQueryForwardButton.tooltip('show');
             }
         } else {
             if (!forwardButton.classList.contains("btn-light")) {
                 forwardButton.classList.remove("btn-warning");
                 forwardButton.classList.add("btn-light");
-                $('#forward-button').tooltip('hide');
-                $('#forward-button').tooltip('dispose');
+                jQueryForwardButton.tooltip('hide');
+                jQueryForwardButton.tooltip('dispose');
             }
         }
     });
 
-    $.get('/capsules.json', function (listCapsuleJSON) {
+    $.getJSON('/capsules.json', function (listCapsuleJSON) {
         if (clearing) return;
         listCapsuleJSON.forEach(function (capsuleJSON) {
             let targetCapsules = objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
@@ -801,7 +809,7 @@ function updateNetworkScene() {
         });
     });
 
-    $.get('/stationsVarData.json', function (listStationJSON) {
+    $.getJSON('/stationsVarData.json', function (listStationJSON) {
         if (clearing) return;
         listStationJSON.forEach(function (stationJSON) {
             let targetStations = objects.filter(station => station.uuid.includes(stationJSON['uuid']));
@@ -809,7 +817,7 @@ function updateNetworkScene() {
         });
     });
 
-    $.get('/warehousesVarData.json', function (listWarehouseJSON) {
+    $.getJSON('/warehousesVarData.json', function (listWarehouseJSON) {
         if (clearing) return;
         listWarehouseJSON.forEach(function (warehouseJSON) {
             let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
@@ -825,7 +833,7 @@ function calibrateNetworkScene() {
     calibrateStageScale();
     objectScale = Math.min(networkSize / getNetworkDivSize().height, scaleSlider.max);
     scaleSlider.value = objectScale;
-    $('#scale-slider').tooltip({title: "Objects scale : " + scaleSlider.value});
+    jQueryScaleSlider.tooltip({title: "Objects scale : " + scaleSlider.value});
     calibrateStagePosition();
     scaleObjects();
 }

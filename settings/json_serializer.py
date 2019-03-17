@@ -7,9 +7,15 @@ from simulator import converter
 from simulator import sim_loop
 
 
-def serialize_network():
+def serialize_network_size():
     return {
         'maxSize': network.get_size()
+    }
+
+
+def serialize_network_file_name(network_file_name):
+    return {
+        'fileName': network_file_name
     }
 
 

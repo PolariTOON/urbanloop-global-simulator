@@ -119,8 +119,8 @@ class SimLoop:
                     sleep_time = _visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
             elif is_killed():
-                # recorder.stop_listen(get_simulated_time()) # TODO DEBUG BAPTISTE
-                # recorder.extract()
+                recorder.stop_listen(get_simulated_time())
+                recorder.extract()
                 reset_simulation_parameters()
                 if self.is_endless:
                     _quit_endless_simulation()

@@ -15,6 +15,7 @@ function applyNetworkScene(networkName = String(), isDefaultNetwork = true) {
     stage.add(infoLayer);
     initNetworkScene(networkName, isDefaultNetwork);
     clearing = false;
+    $.ajaxSetup({timeout: 1000});
     startUpdateLoop();
 }
 
@@ -24,7 +25,7 @@ function startUpdateLoop() {
         if (running) {
             updateNetworkScene();
         }
-    }, 30);
+    }, 41); // 1000/41 = 24 fps
 }
 
 function stopUpdateLoop() {

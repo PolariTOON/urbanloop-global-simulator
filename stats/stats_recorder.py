@@ -96,7 +96,7 @@ class StatsRecorder:
     latest_stats_file.write(buffer)
     latest_stats_file.close()
     now = datetime.datetime.now()
-    file_name = now.strftime("%Y-%m-%d %H:%M")
+    file_name = now.strftime("%Y-%m-%d %H:%M.txt")
     current_stats_file = open("out/%s" % file_name, "w")
     current_stats_file.write(buffer)
     current_stats_file.close()

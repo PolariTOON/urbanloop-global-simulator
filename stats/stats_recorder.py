@@ -1,4 +1,5 @@
 import os
+import datetime
 from settings import simlog
 from stats import stats_array as sa, stats_average_array as saa
 
@@ -91,9 +92,14 @@ class StatsRecorder:
     # extracting it to a file
     if not os.path.isdir('out/'):
       os.mkdir('out/')
-    stats_file = open("out/latest-stats.txt", "w")
-    stats_file.write(buffer)
-    stats_file.close()
+    latest_stats_file = open("out/latest-stats.txt", "w")
+    latest_stats_file.write(buffer)
+    latest_stats_file.close()
+    now = datetime.datetime.now()
+    file_name = now.strftime("%Y-%m-%d %H:%M.txt")
+    current_stats_file = open("out/%s" % file_name, "w")
+    current_stats_file.write(buffer)
+    current_stats_file.close()
 
   def get_running_time(self, tick):
     """

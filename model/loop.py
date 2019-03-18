@@ -42,14 +42,14 @@ class Loop:
         self.lengths = [0 for i in order]
         for i in range(len(order)):
             element = order[i]
-        # mise à jour des suivants + object[i] = [nature, obj, angle]
-            if type(element) is switch.Switch and element.other_loop == self:    # switch_in
+            # mise à jour des suivants + object[i] = [nature, obj, angle]
+            if type(element) is switch.Switch and element.other_loop == self:  # switch_in
                 element.next_element_other = order[(i + 1) % len(order)]
                 self.objects += [["switch_in", element, element.angle_other_loop]]
                 self.switches += [element]
             else:
                 element.next_element = order[(i + 1) % len(order)]
-                if type(element) is switch.Switch : # switch_out
+                if type(element) is switch.Switch:  # switch_out
                     # element.previous_element = order[(i - 1) % len(order)]
                     self.objects += [["switch_out", element, element.angle_my_loop]]
                     self.switches += [element]
@@ -62,7 +62,7 @@ class Loop:
         nb_elements = len(self.objects)
         for i in range(nb_elements):
             an_object = self.objects[i]
-            next_object = self.objects[(i+1)%nb_elements]
+            next_object = self.objects[(i + 1) % nb_elements]
             if self.clockwise:  # sens horaire des angles
                 angle_next = an_object[2] - next_object[2]
             else:  # sens trigonométrique des angles
@@ -70,11 +70,10 @@ class Loop:
             if angle_next < 0:
                 angle_next += 360
             # print(an_object[1].name, next_object[1].name, angle_next)
-            self.lengths[i] = round(float(angle_next / 360) * self.size , 2)  # arc = D*pi*angle/360  et D = circonference/pi
+            self.lengths[i] = round(float(angle_next / 360) * self.size,
+                                    2)  # arc = D*pi*angle/360  et D = circonference/pi
             if self.size is None:
                 self.size = sum(self.lengths)
-        print(self.lengths)
-        print([o[1].name for o in self.objects])
 
     def distance_between(self, element1, element2):
         for i in range(len(self.objects)):

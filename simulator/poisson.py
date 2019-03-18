@@ -20,11 +20,3 @@ class Poisson:
         :return: The number of traveler you would create at the given hour.
         """
         return np.random.poisson(self.traveller_lambda_per_hour[hour], 1)[0]
-
-    def defect(self):
-        """
-        This function gives you the amount of defects you would create.
-        The lambda parameter represents the mean number of defects in a second.
-        :return: The number of traveler you would create.
-        """
-        return np.random.poisson(self.defect_lambda, 1)[0]

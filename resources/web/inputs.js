@@ -97,6 +97,8 @@ startButton.onclick = () => {
     saveConfigButton.disabled = true;
     permanentConfigButton.disabled = true;
     resetConfigButton.disabled = true;
+    networkSelection.disabled = true;
+    changeNetworkButtonState(true);
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
     $.get('/start');
@@ -111,12 +113,17 @@ stopButton.onclick = () => {
     saveConfigButton.disabled = false;
     permanentConfigButton.disabled = false;
     resetConfigButton.disabled = false;
-    document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
+    networkSelection.disabled = false;
+    changeNetworkButtonState(false);
     stopButton.classList.add('not-shown');
     running = false;
-    $.get('/stop');
-    waitingSimLoopEnd = true;
-    applyNetworkScene();
+    $.get('/stop').always([
+        () => {
+            document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
+            waitingSimLoopEnd = true;
+            applyNetworkScene();
+        }
+    ]);
 };
 
 pauseButton.onclick = () => {
@@ -124,13 +131,9 @@ pauseButton.onclick = () => {
         $.get('/resume');
         pauseButton.innerHTML = "Pause";
         paused = false;
-        backwardButton.disabled = false;
-        forwardButton.disabled = false;
     } else {
         $.get('/pause');
         pauseButton.innerHTML = "Resume";
-        backwardButton.disabled = true;
-        forwardButton.disabled = true;
         paused = true;
     }
 };
@@ -146,14 +149,14 @@ forwardButton.onclick = () => {
 };
 
 scaleSlider.oninput = () => {
-    $('#scale-slider').attr('data-original-title', 'Objects scale : ' + scaleSlider.value).tooltip('show');
+    jQueryScaleSlider.attr('data-original-title', 'Objects scale : ' + scaleSlider.value).tooltip('show');
     objectScale = scaleSlider.value;
     objects.forEach(object => object.updateScale(objectScale));
     stage.batchDraw();
 };
 
 scaleSlider.onmouseleave = () => {
-    $('#scale-slider').tooltip('hide');
+    jQueryScaleSlider.tooltip('hide');
 };
 
 document.getElementById('panel-div').onmouseenter = () => {

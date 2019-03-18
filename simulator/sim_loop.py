@@ -3,9 +3,9 @@ from enum import Enum
 
 import simpy
 
-from model import capsule as Capsule
-from model import loop as Loop
-from model import station as Station
+from model import capsule
+from model import loop
+from model import station
 from model import warehouse
 from settings import config
 from settings import simlog
@@ -90,28 +90,27 @@ class SimLoop:
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()
 
-                if _modulo_on_seconds(30):  # stats
-                    # loops
+                # Stats are recorded every 30 simulated seconds
+                if _modulo_on_seconds(30):
                     loops = []
                     capsules = {}
-                    for loop_name in Loop.all_loops:
-                        loops.append(Loop.get_by_name(loop_name))
-                        capsules[loop_name] = 0
-                    for capsule in Capsule._capsules:
-                        capsules[capsule.loop.name] += 1
-                    for loop in loops:
-                        recorder.add_capsule_average_loop(capsules[loop.name], loop)
-                    # stations
-                    for station in Station._stations:
-                        recorder.add_stopped_capsules_station(station.get_waiting_capsules_number(), station)
-                        recorder.add_waiting_travelers(station.get_waiting_travelers_number(), station)
+                    for a_loop_name, a_loop in loop.all_loops.items():
+                        loops.append(a_loop)
+                        capsules[a_loop_name] = 0
+                    for a_capsule in capsule.get_capsules():
+                        capsules[a_capsule.loop.name] += 1
+                    for a_loop in loops:
+                        recorder.add_capsule_average_loop(capsules[a_loop.name], a_loop)
+                    for a_station in station.get_stations():
+                        recorder.add_stopped_capsules_station(a_station.get_waiting_capsules_number(), a_station)
+                        recorder.add_waiting_travelers(a_station.get_waiting_travelers_number(), a_station)
 
                 _env.process(self.tick())
                 _env.process(self.ascent_generator.generate())
                 if _modulo_on_seconds(1):
                     _env.process(self.traveler_generator.generate())
                 if not _current_tick == 0 and _modulo_on_seconds(120):
-                    Station.fill_and_full_stations()
+                    station.fill_and_full_stations()
 
                 yield _env.timeout(1)
 
@@ -377,7 +376,7 @@ def get_start_hour():
 def get_off_signal(reset=False):
     """
     :param reset: If reset, _off_signal = False
-    :return: Return a boolean indicating that sim_loop is off
+    :return: Returns a boolean indicating that sim_loop is off
     """
     global _off_signal
     if _off_signal and reset:

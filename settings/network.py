@@ -1,4 +1,6 @@
+import glob
 import json
+import os
 import sys
 
 import numpy as np
@@ -17,18 +19,24 @@ fichier pour l'import des réseaux sur les formats json correspondant
 """
 
 _size = {}  # {'min_x': 0, 'max_x': 0, 'min_y': 0, 'max_y': 0}
+_added_signal = False
+_removed_signal = False
+_default_changed_signal = False
 
 
-def load(file_path=None):
+def load(file_name=None):
     """
     fonction qui a partir d'un fichier json récupère le réseau correspondant et le traduit en objets
-        :param file_path: fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
+        :param file_name: Nom du fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
         :return: (void) l'ensemble des objets sont créés et configurés.
     """
-    if file_path is None:  # aller chercher celui par défaut
-        file_path = '{0}/../resources/networks/mini_network.json'.format(sys.path[0])
 
-    model_loop.all_loops = {}  # autrement ca foire quand on charge un autre network
+    file_path = ('{0}/../resources/networks/default/' + get_default_file_name() + '.json').format(sys.path[0])
+    if file_name is not None:
+        if '.json' not in file_name:
+            file_name += '.json'
+        file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
+
     with open(file_path, 'r') as file:
         network = json.load(file)
     for loop, info in network.items():
@@ -98,7 +106,6 @@ def load(file_path=None):
         sections_loop(the_loop)
         global _size
         radius = (the_loop.size / (2 * np.pi)) + 10
-        # print(radius)
         if _size == {}:
             _size['min_x'] = the_loop.x - radius
             _size['max_x'] = the_loop.x + radius
@@ -120,7 +127,9 @@ def load(file_path=None):
     return
 
 
-def reload(file_path=None):
+def reload(file_name=None):
+    global _size
+    _size = {}
     model_loop.all_loops = {}
     model_switch._switches = []
     model_switch.alive_timers = []
@@ -134,7 +143,7 @@ def reload(file_path=None):
     identifier._switch_id = -1
     identifier._capsule_id = -1
     identifier._traveler_id = -1
-    load(file_path)
+    load(file_name)
 
 
 def init_capsules():
@@ -246,3 +255,105 @@ def tri_bulle(tab_objects, the_loop):
                 angles[i], angles[i + 1] = angles[i + 1], angles[i]
                 tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
     return tab_objects
+
+
+def get_network_json(file_name, is_default=False):
+    if '.json' not in file_name:
+        file_name += '.json'
+    path = '{0}/../resources/networks/'.format(sys.path[0])
+    if is_default:
+        path = '{0}/../resources/networks/default/'.format(sys.path[0])
+    with open(path + file_name) as network_file:
+        return json.load(network_file)
+
+
+def get_default_file_name():
+    default_network_file_regex_path = '{0}/../resources/networks/default/*.json'.format(sys.path[0])
+    default_network_file_paths = glob.glob(default_network_file_regex_path)
+    if not default_network_file_paths:
+        return
+    default_network_file_path = default_network_file_paths[0]
+    if os.sep in default_network_file_path and '.' in default_network_file_path.split(os.sep)[-1]:
+        return default_network_file_path.split(os.sep)[-1].split('.')[0]
+
+
+def get_network_file_names():
+    network_file_regex_paths = '{0}/../resources/networks/*.json'.format(sys.path[0])
+    network_file_paths = glob.glob(network_file_regex_paths)
+    return [path.split(os.sep)[-1].split('.')[0] for path in network_file_paths if
+            os.sep in path and '.' in path.split(os.sep)[-1]]
+
+
+def add_network_file(file_name, network_json):
+    global _added_signal
+
+    if '.json' not in file_name:
+        file_name += '.json'
+    file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
+
+    if not os.path.exists(file_path):
+        with open(file_path, 'w') as new_network_json_file:
+            json.dump(network_json, new_network_json_file, indent=4)
+        new_network_json_file.close()
+    _added_signal = True
+
+
+def remove_network_file(file_name):
+    global _removed_signal
+
+    if '.json' not in file_name:
+        file_name += '.json'
+    file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    _removed_signal = True
+
+
+def change_default_file(file_name):
+    global _default_changed_signal
+
+    if '.json' not in file_name:
+        file_name += '.json'
+    default_file_path = ('{0}/../resources/networks/default/' + get_default_file_name() + '.json').format(sys.path[0])
+    file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
+    new_default_file_path = default_file_path.replace('/default/', '/')
+    new_file_path = file_path.replace(file_name, '/default/' + file_name)
+    os.rename(default_file_path, new_default_file_path)
+    os.rename(file_path, new_file_path)
+    _default_changed_signal = True
+
+
+def get_added_signal(reset=False):
+    """
+    :param reset: If reset, _added_signal = False
+    :return: Returns a boolean indicating a network file has been added to network directory
+    """
+    global _added_signal
+    if _added_signal and reset:
+        _added_signal = False
+        return True
+    return _added_signal
+
+
+def get_removed_signal(reset=False):
+    """
+    :param reset: If reset, _removed_signal = False
+    :return: Returns a boolean indicating a network file has been removed from network directory
+    """
+    global _removed_signal
+    if _removed_signal and reset:
+        _removed_signal = False
+        return True
+    return _removed_signal
+
+
+def get_default_changed_signal(reset=False):
+    """
+    :param reset: If reset, _removed_signal = False
+    :return: Returns a boolean indicating a network file has been removed from network directory
+    """
+    global _default_changed_signal
+    if _default_changed_signal and reset:
+        _default_changed_signal = False
+        return True
+    return _default_changed_signal

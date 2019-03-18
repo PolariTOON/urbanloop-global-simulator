@@ -39,6 +39,10 @@ canvas {
     font-size: 14px;
 }
 
+.config-prob-span {
+    margin-top: 0;
+}
+
 .form-group {
     margin-left: 2px;
 }
@@ -49,13 +53,31 @@ canvas {
     margin-left: 2px;
 }
 
-.config-browse-file {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    width: 95%;
+#config-btn-group, #config-network-btn-group {
+    display: flex;
+    justify-content: center;
 }
 
+#network-add-btn {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
 
+#network-text {
+    display: flex;
+    justify-content: space-around;
+    min-height: 20px;
+    margin: 0;
+}
+
+.fa-star {
+    color: white;
+}
+
+#network-remove-btn {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
 
 .form-control {
     width: 95%;
@@ -162,8 +184,9 @@ hr {
 }
 
 .btn span.glyphicon {
-	opacity: 0;
+    opacity: 0;
 }
+
 .btn.active span.glyphicon {
-	opacity: 1;
+    opacity: 1;
 }

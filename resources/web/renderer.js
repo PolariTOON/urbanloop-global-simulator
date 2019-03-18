@@ -1,10 +1,3 @@
-stage = new Konva.Stage({
-    container: 'network-div',
-    width: getNetworkDivSize().width,
-    height: getNetworkDivSize().height
-});
-networkLayer = new Konva.Layer();
-infoLayer = new Konva.Layer();
 let updateLoop;
 
 function clearScene() {
@@ -16,11 +9,11 @@ function clearScene() {
     stage.destroyChildren();
 }
 
-function applyNetworkScene() {
+function applyNetworkScene(networkName = String(), isDefaultNetwork = true) {
     clearScene();
     stage.add(networkLayer);
     stage.add(infoLayer);
-    initNetworkScene();
+    initNetworkScene(networkName, isDefaultNetwork);
     clearing = false;
     startUpdateLoop();
 }

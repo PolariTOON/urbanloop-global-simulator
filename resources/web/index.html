@@ -41,7 +41,7 @@
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#view-tab">Views</a></li>
                 </ul>
 
-                <div class="tab-content">
+                <div class="tab-content shadow bg-white p-2 mb-2 rounded">
                     <div id="data-tab" class="tab-pane fade in active show"></div>
                     <div id="config-tab" class="tab-pane fade">
                         <form id="config-form">
@@ -155,6 +155,18 @@
                                 <small class="form-text text-muted">-1 will fully fill stations and warehouses</small>
                             </div>
 
+                            <div class="custom-control custom-checkbox config-inputs">
+                                <input class="custom-control-input" type="checkbox" id="conf-capsule-2">
+                                <label class="custom-control-label" for="conf-capsule-2">Refill stations</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="conf-capsule-3">Stations refill interval</label>
+                                <input type="number" min="1" step="1" class="form-control form-control-sm"
+                                       id="conf-capsule-3" required>
+                                <small class="form-text text-muted">Period in seconds for stations fulfill if enabled</small>
+                            </div>
+
                             <span class="badge badge-warning config-info-span">Routing</span>
                             <div class="form-group">
                                 <label for="conf-routing-0">Cost added if changing loop</label>
@@ -204,6 +216,11 @@
                                 <input type="number" min="0" max="23" step="1" class="form-control form-control-sm"
                                        id="conf-simulation-3" required>
                                 <small class="form-text text-muted">Must be between 0 and 23</small>
+                            </div>
+
+                            <div class="custom-control custom-checkbox config-inputs">
+                                <input class="custom-control-input" type="checkbox" id="conf-simulation-4">
+                                <label class="custom-control-label" for="conf-simulation-4">Logs</label>
                             </div>
 
                             <div id="config-btn-group">

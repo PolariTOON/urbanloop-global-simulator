@@ -33,13 +33,16 @@ def serialize_config():
         'activity_and_residential_fluctuation': int(config.prob['activity_and_residential_fluctuation']),
         'max_speed': float(config.capsule['max_speed']),
         'number_of_capsules': int(config.capsule['number_of_capsules']),
+        'station_refill': config.capsule['station_refill'],
+        'fulfill_period': int(config.capsule['fulfill_period']),
         'switched_cost': int(config.routing['switched_cost']),
         'my_timer': int(config.routing['my_timer']),
         'timer_other': int(config.routing['timer_other']),
         'real_time': config.sim['real_time'],
         'endless': config.sim['endless'],
         'duration': int(config.sim['duration']),
-        'start_hour': int(config.sim['start_hour'])
+        'start_hour': int(config.sim['start_hour']),
+        'logs': config.sim['logs']
     }
 
 
@@ -62,6 +65,7 @@ def serialize_loop(a_loop):
         'y': a_loop.y,
         'radius': math.floor(a_loop.size / (2 * math.pi)),
         'size': a_loop.size,
+        'clockwise': a_loop.clockwise,
         'objects': serialize_objects_list(a_loop.objects)
     }
 
@@ -165,8 +169,6 @@ def serialize_switch_set_data(a_switch):
         'id': a_switch.id,
         'nameIn': a_switch.my_loop.name + ' -> ' + a_switch.other_loop.name,
         'nameOut': a_switch.other_loop.name + ' <- ' + a_switch.my_loop.name,
-        # 'nameIn':  a_switch.id + ': ' + a_switch.my_loop.name + ' -> ' + a_switch.other_loop.name,
-        # 'nameOut': a_switch.id + ': ' + a_switch.other_loop.name + ' <- ' + a_switch.my_loop.name,
         'xIn': switch_positions[0],
         'yIn': switch_positions[1],
         'xOut': switch_positions[2],

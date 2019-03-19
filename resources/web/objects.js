@@ -643,6 +643,10 @@ class Capsule {
     isAboard() {
         return this.travelerNumber > 0;
     }
+
+    isDocked() {
+        return
+    }
 }
 
 function handCursor() {
@@ -714,7 +718,7 @@ function initNetworkScene(networkName, isDefaultNetwork) {
     }
 
     startButton.classList.remove('not-shown');
-    
+
     $.getJSON(isDefaultNetwork ? '/load.json' : String.prototype.concat('/load.json/', networkName), function (networkJSON) {
         networkSize = networkJSON['maxSize'];
     });
@@ -752,6 +756,7 @@ function initNetworkScene(networkName, isDefaultNetwork) {
 }
 
 function updateNetworkScene() {
+    $.ajaxSetup({timeout: 1000});
     $.getJSON('/time.json', function (timeJSON) {
         if (clearing) return;
         timerSpan.innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time'];
@@ -824,6 +829,8 @@ function updateNetworkScene() {
             targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
         });
     });
+
+    $.ajaxSetup({timeout: 0});
 
     networkLayer.batchDraw();
     infoLayer.batchDraw();

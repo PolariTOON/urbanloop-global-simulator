@@ -1,7 +1,6 @@
 import configparser
 import fileinput
 import sys
-
 from shutil import copyfile
 
 """

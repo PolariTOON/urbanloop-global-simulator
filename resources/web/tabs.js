@@ -20,59 +20,61 @@ let networkText = document.getElementById('network-text');
 let networkSelection = document.getElementById('conf-topology-0');
 let networkFileInput = document.getElementById('conf-topology-1');
 let networkErrorText = document.getElementById('network-error-text');
+let refillCheckBox = document.getElementById('conf-capsule-2');
+let fulfillPeriod = document.getElementById('conf-capsule-3');
 let endlessCheckBox = document.getElementById('conf-simulation-1');
-let startHour = document.getElementById('conf-simulation-2');
+let duration = document.getElementById('conf-simulation-2');
 let permanentConfigChange = false;
 
 function updateDataPanel() {
     let data = "";
     // gather data
     if (selectedObject instanceof Loop) {
-        data += "<p>Loop " + selectedObject.json["name"] + "</p>";
-        data += "<p>Circumference : " + selectedObject.json["size"] + "</p>";
-        data += "<p>Center coordinates : [" + selectedObject.json["x"] + ";" + selectedObject.json["y"] + "]</p>";
-        data += "<p>Elements :";
+        data += "<p>Loop: " + selectedObject.json["name"] + "</p>";
+        data += "<p>Circumference: " + selectedObject.json["size"] + "</p>";
+        data += "<p>Center coordinates: [" + selectedObject.json["x"] + ";" + selectedObject.json["y"] + "]</p>";
+        data += "<p>Clockwise: " + selectedObject.json["clockwise"] + "</p>";
+        data += "<p>Elements: ";
         let elements = selectedObject.json["objects"];
-        for (let key in elements) {
-            data += "<br>&nbsp;" + key;
-        }//TODO CHECK WORKS
+        for (key in elements) {
+            data += "<br>&nbsp;" + elements[key];
+        }
         data += "</p>";
     } else if (selectedObject instanceof Switch) {
-        data += "<p>Switch #" + selectedObject.json["id"] + "</p>";
+        data += "<p>Switch n°" + selectedObject.json["id"] + "</p>";
         data += "<p>Loop of the switch: " + selectedObject.json["my_loop_name"] + "</p>";
-        data += "<p><br>&nbsp; Next element:" + selectedObject.json["next_element_name"] + "</p>";
+        data += "<p>&nbsp; Next element : " + selectedObject.json["next_element_name"] + "</p>";
         data += "<p>Loop switched: " + selectedObject.json["other_loop_name"] + "</p>";
-        data += "<p><br>&nbsp; Next element:" + selectedObject.json["next_other_element_name"] + "</p>";
+        data += "<p>&nbsp; Next element: " + selectedObject.json["next_other_element_name"] + "</p>";
         data += "<p>Size of the link: " + selectedObject.json["size"] + "</p>";
         //data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
     } else if (selectedObject instanceof Station) {
-        data += "<p>Station " + selectedObject.json["name"] + "</p>";
-        data += "<p>Type de station: " + selectedObject.json["type"] + "</p>";
+        data += "<p>Station: " + selectedObject.json["name"] + "</p>";
+        data += "<p>Station Type: " + selectedObject.json["type"] + "</p>";
         data += "<p>Loop: " + selectedObject.json["outerCircle"] + "</p>";
         data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
         data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
         data += "<p>Waiting travelers: " + selectedObject.json["nb_travelers"] + "</p>";
-        data += "<p>Capsules:" + selectedObject.json["nb_capsules"];
+        data += "<p>Capsules: " + selectedObject.json["nb_capsules"];
         for (k in selectedObject.json["capsules"]) {
             data += "<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
         }
         data += "</p>";
     } else if (selectedObject instanceof Warehouse) {
-        data += "<p>Warehouse #" + selectedObject.json["id"] + "</p>";
+        data += "<p>Warehouse n°" + selectedObject.json["id"] + "</p>";
         data += "<p>Loop: " + selectedObject.json["outerCircle"] + "</p>";
         data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
         data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
-        data += "<p>Capsules:" + selectedObject.json["nb_capsules"];
+        data += "<p>Capsules: " + selectedObject.json["nb_capsules"];
         /*for (k in selectedObject.json["capsules"]) {
             data += "<br>&nbsp;<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
         }*/
         data += "</p>";
     } else if (selectedObject instanceof Capsule) {
-        data += "<p> Capsule #" + selectedObject.json["id"] + "</p>";
+        data += "<p>Capsule n°" + selectedObject.json["id"] + "</p>";
         data += "<p>Contains a traveler: " + (selectedObject.json["travelerNumber"] !== 0) + "</p>";
-        if (selectedObject.json["destination"] !== undefined) {
-            data += "<p>Destination: " + selectedObject.json["destination"] + "</p>";
-        }
+        let destination = selectedObject.json["destination"] === undefined ? "None" : selectedObject.json["destination"];
+        data += "<p>Destination: " + destination + "</p>";
         data += "<p>Current Loop: " + selectedObject.json["outerCircle"] + "</p>";
         data += "<p>Last or current element: " + selectedObject.json["current_element"] + "</p>";
         data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
@@ -97,25 +99,21 @@ function updateConfigPanel() {
 
         document.getElementById('conf-capsule-0').value = configJSON['max_speed'];
         document.getElementById('conf-capsule-1').value = configJSON['number_of_capsules'];
+        document.getElementById('conf-capsule-2').checked = ['true', 'True'].includes(configJSON['station_refill']);
+        document.getElementById('conf-capsule-3').value = configJSON['fulfill_period'];
 
         document.getElementById('conf-routing-0').value = configJSON['switched_cost'];
         document.getElementById('conf-routing-1').value = configJSON['my_timer'];
         document.getElementById('conf-routing-2').value = configJSON['timer_other'];
 
-        let realTimeCheckBox = document.getElementById('conf-simulation-0');
-        let endlessCheckBox = document.getElementById('conf-simulation-1');
-        realTimeCheckBox.checked = false;
-        endlessCheckBox.checked = false;
-        startHour.disabled = false;
-        if (['true', 'True'].includes(configJSON['real_time'])) {
-            realTimeCheckBox.checked = true;
-        }
-        if (['true', 'True'].includes(configJSON['endless'])) {
-            endlessCheckBox.checked = true;
-            startHour.disabled = true;
-        }
+        document.getElementById('conf-simulation-0').checked = ['true', 'True'].includes(configJSON['real_time']);
+        document.getElementById('conf-simulation-1').checked = ['true', 'True'].includes(configJSON['endless']);
         document.getElementById('conf-simulation-2').value = configJSON['duration'];
         document.getElementById('conf-simulation-3').value = configJSON['start_hour'];
+        document.getElementById('conf-simulation-4').checked = ['true', 'True'].includes(configJSON['logs']);
+
+        duration.disabled = ['true', 'True'].includes(configJSON['endless']);
+        fulfillPeriod.disabled = ['false, False'].includes(configJSON['station_refill']);
     });
 
     updateNetworkSelection();
@@ -176,6 +174,10 @@ function waitNetworkSignal(signalUrl) {
     changeNetworkButtonState(false);
     updateNetworkSelection();
 }
+
+refillCheckBox.onclick = () => {
+    fulfillPeriod.disabled = !refillCheckBox.checked;
+};
 
 networkSelection.onchange = () => {
     networkErrorText.innerHTML = "Select, add, remove or download a network JSON file";
@@ -374,7 +376,7 @@ networkFavButton.onmouseleave = () => {
 };
 
 endlessCheckBox.onclick = () => {
-    startHour.disabled = !!endlessCheckBox.checked;
+    duration.disabled = endlessCheckBox.checked;
 };
 
 saveConfigButton.onclick = () => {
@@ -392,6 +394,8 @@ saveConfigButton.onclick = () => {
 
         'max_speed': document.getElementById('conf-capsule-0').value,
         'number_of_capsules': document.getElementById('conf-capsule-1').value,
+        'station_refill': document.getElementById('conf-capsule-2').checked,
+        'fulfill_period': document.getElementById('conf-capsule-3').value,
 
         'switched_cost': document.getElementById('conf-routing-0').value,
         'my_timer': document.getElementById('conf-routing-1').value,
@@ -400,7 +404,8 @@ saveConfigButton.onclick = () => {
         'real_time': document.getElementById('conf-simulation-0').checked,
         'endless': document.getElementById('conf-simulation-1').checked,
         'duration': document.getElementById('conf-simulation-2').value,
-        'start_hour': document.getElementById('conf-simulation-3').value
+        'start_hour': document.getElementById('conf-simulation-3').value,
+        'logs': document.getElementById('conf-simulation-4').checked,
     };
 
     Array.prototype.forEach.call(document.getElementsByClassName('form-control'), function (input) {
@@ -484,9 +489,3 @@ resetConfigButton.onclick = () => {
     }, 2000);
     $.ajaxSetup({async: true});
 };
-
-
-
-
-
-

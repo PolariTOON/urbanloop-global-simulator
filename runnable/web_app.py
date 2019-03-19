@@ -7,8 +7,7 @@ from threading import Thread
 from flask import Flask, Response, redirect, url_for, request
 
 from model import loop, station, switch, warehouse, capsule
-from settings import config, network
-from settings import json_serializer
+from settings import config, network, json_serializer, simlog
 from simulator import sim_loop
 
 web_directory = os.path.abspath('%s/../resources/web' % (path[0]))
@@ -174,6 +173,7 @@ def load_config(permanent):
     if request.method == 'POST':
         config.modify(loads(request.form['data']), (True, False)[permanent is None or permanent == 0])
         config.load_editable()
+        simlog.load()
     return Response(dumps(json_serializer.serialize_config()), mimetype="application/json")
 
 
@@ -181,6 +181,7 @@ def load_config(permanent):
 def reset_config():
     config.reset_to_default()
     config.load_default()
+    simlog.load()
     return redirect(url_for('root'))
 
 

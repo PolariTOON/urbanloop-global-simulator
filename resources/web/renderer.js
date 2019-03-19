@@ -15,7 +15,6 @@ function applyNetworkScene(networkName = String(), isDefaultNetwork = true) {
     stage.add(infoLayer);
     initNetworkScene(networkName, isDefaultNetwork);
     clearing = false;
-    $.ajaxSetup({timeout: 1000});
     startUpdateLoop();
 }
 
@@ -35,10 +34,3 @@ function stopUpdateLoop() {
 
 applyNetworkScene();
 updateConfigPanel();
-
-
-
-
-
-
-

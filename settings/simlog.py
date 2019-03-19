@@ -3,13 +3,16 @@ import logging
 from model import loop
 from model import station
 from model import switch
+from settings import config
 from simulator import converter
 
 _loaded = False
 
 
-def _load():
+def load():
     global _loaded
+    logging.basicConfig(format='[%(levelname)s]%(message)s', level=logging.DEBUG)
+    update_level_from_config()
     _loaded = True
 
 
@@ -54,6 +57,20 @@ def error(message, *stations_switches_loops_or_strings):
     logging.error(_format(message, *stations_switches_loops_or_strings))
 
 
+def _set_error_level():
+    logging.getLogger().setLevel(logging.ERROR)
+
+
+def _set_debug_level():
+    logging.getLogger().setLevel(logging.DEBUG)
+
+
+def update_level_from_config():
+    if config.sim['logs'] in ['False', 'false']:
+        _set_error_level()
+    else:
+        _set_debug_level()
+
+
 if _loaded is False:
-    _load()
-    logging.basicConfig(format='[%(levelname)s]%(message)s', level=logging.DEBUG)
+    load()

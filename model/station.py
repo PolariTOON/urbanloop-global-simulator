@@ -17,16 +17,15 @@ _stations = list()
 
 
 class Type(Enum):
-    NEUTRAL = 0
-    ACTIVITY = 1
-    RESIDENTIAL = 2
-    CITY = 3
+    ACTIVITY = 0
+    RESIDENTIAL = 1
+    CITY = 2
 
 
 class Station:
     network = None
 
-    def __init__(self, name=None, capacity=4, loop=None, angle=None, station_type=Type.NEUTRAL):
+    def __init__(self, name=None, capacity=4, loop=None, angle=None, station_type=Type.CITY):
         """
         :param name: Name of the station
         :param capacity: Loop circumference (float)
@@ -53,10 +52,10 @@ class Station:
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
 
     def get_type(self):
-        return (Type.NEUTRAL, Type.ACTIVITY, Type.RESIDENTIAL, Type.CITY)[self.station_type]
+        return (Type.ACTIVITY, Type.RESIDENTIAL, Type.CITY)[self.station_type]
 
     def get_string_type(self):
-        return ("neutral", "activity zone", "residential zone", "down town")[self.station_type]
+        return ("Activity", "Residential", "City")[self.station_type]
 
     def get_waiting_capsules_number(self):
         return self.capsule_queue.qsize()

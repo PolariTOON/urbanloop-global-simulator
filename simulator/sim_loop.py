@@ -47,7 +47,10 @@ class SimLoop:
         _sim_state = SimState.RUNNING
         self.is_real_time = False
         self.is_endless = False
+        self.station_refill = True
+        self.fulfill_period = int(config.capsule['fulfill_period'])
         self.is_visualized = is_visualized
+
         recorder = stats_recorder.StatsRecorder(0)
 
         self.traveler_generator = traveler_generator.TravelerGenerator()
@@ -57,6 +60,8 @@ class SimLoop:
             self.is_real_time = True
         if config.sim['endless'] in ['true', 'True']:
             self.is_endless = True
+        if config.capsule['station_refill'] in ['false', 'False']:
+            self.station_refill = False
 
         _load_env(self.is_real_time)
         self.tick_event = _env.event()
@@ -109,7 +114,7 @@ class SimLoop:
                 _env.process(self.ascent_generator.generate())
                 if _modulo_on_seconds(1):
                     _env.process(self.traveler_generator.generate())
-                if not _current_tick == 0 and _modulo_on_seconds(120):
+                if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(self.fulfill_period):
                     station.fill_and_full_stations()
 
                 yield _env.timeout(1)
@@ -291,9 +296,9 @@ def reset_simulation_parameters():
         return
 
     simlog.warn("Resetting the simulation parameters")
-    Station.reset_simulation()
+    station.reset_simulation()
     warehouse.reset_simulation()
-    Capsule.reset_simulation()
+    capsule.reset_simulation()
     _current_tick = 0
     _sim_tick = 0.05
     _visualized_tick_duration = 0.05

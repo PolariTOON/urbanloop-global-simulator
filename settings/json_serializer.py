@@ -46,16 +46,6 @@ def serialize_config():
     }
 
 
-def serialize_time():
-    return {
-        'day': converter.now_to_day(),
-        'time': converter.seconds_to_string(converter.now_to_seconds()),
-        'speed': converter.sim_speed_to_string(),
-        'accelerateJerky': (0, 1)[sim_loop.get_visualized_tick_duration() == 0],
-        'decelerateJerky': (0, 1)[sim_loop.get_initial_sim_tick() * 4 <= sim_loop.get_sim_tick()]
-    }
-
-
 def serialize_loop(a_loop):
     return {
         'uuid': str(a_loop.uuid),
@@ -134,8 +124,20 @@ def serialize_capsule_queue(queue):
     return capsules
 
 
+def serialize_time():
+    return {
+        'jsonType': 'time',
+        'day': converter.now_to_day(),
+        'time': converter.seconds_to_string(converter.now_to_seconds()),
+        'speed': converter.sim_speed_to_string(),
+        'accelerateJerky': (0, 1)[sim_loop.get_visualized_tick_duration() == 0],
+        'decelerateJerky': (0, 1)[sim_loop.get_initial_sim_tick() * 4 <= sim_loop.get_sim_tick()]
+    }
+
+
 def serialize_station_var_data(a_station):
     return {
+        'jsonType': 'station',
         'uuid': str(a_station.uuid),
         'name': a_station.name,
         'capacity': a_station.capacity,
@@ -151,6 +153,7 @@ def serialize_station_var_data(a_station):
 
 def serialize_warehouse_var_data(a_warehouse):
     return {
+        'jsonType': 'warehouse',
         'uuid': str(a_warehouse.uuid),
         'id': a_warehouse.id,
         'name': a_warehouse.name,
@@ -184,12 +187,14 @@ def serialize_switch_set_data(a_switch):
 
 def serialize_switch_var_data(a_switch):
     return {
+        'jsonType': 'switch'
     }
 
 
 def serialize_capsule(a_capsule):
     x, y = get_capsule_position(a_capsule)
     return {
+        'jsonType': 'capsule',
         'uuid': str(a_capsule.uuid),
         'id': a_capsule.id,
         'x': x,

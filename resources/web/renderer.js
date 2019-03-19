@@ -24,7 +24,7 @@ function startUpdateLoop() {
         if (running) {
             updateNetworkScene();
         }
-    }, 41); // 1000/41 = 24 fps
+    }, 32); // 1000/32 = 31 fps
 }
 
 function stopUpdateLoop() {

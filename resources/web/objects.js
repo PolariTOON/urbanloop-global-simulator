@@ -643,10 +643,6 @@ class Capsule {
     isAboard() {
         return this.travelerNumber > 0;
     }
-
-    isDocked() {
-        return
-    }
 }
 
 function handCursor() {
@@ -756,77 +752,28 @@ function initNetworkScene(networkName, isDefaultNetwork) {
 }
 
 function updateNetworkScene() {
-    $.ajaxSetup({timeout: 1000});
-    $.getJSON('/time.json', function (timeJSON) {
+    $.ajaxSetup({timeout: 100});
+
+    $.getJSON('/updatedData.json', function (listDataJSON) {
         if (clearing) return;
-        timerSpan.innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time'];
-        speedSpan.innerHTML = timeJSON['speed'];
-
-        if (timeJSON['decelerateJerky'] === 1) {
-            if (!backwardButton.classList.contains("btn-warning")) {
-                backwardButton.classList.remove("btn-light");
-                backwardButton.classList.add("btn-warning");
-                jQueryBackwardButton.tooltip({
-                    html: true,
-                    title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
-                });
-                jQueryBackwardButton.tooltip('show');
+        listDataJSON.forEach(function (dataJSON) {
+            switch (dataJSON['jsonType']) {
+                case 'time':
+                    updateTimeFromJSON(dataJSON);
+                    break;
+                case 'station':
+                    updateStationFromJSON(dataJSON);
+                    break;
+                case 'warehouse':
+                    updateWarehouseFromJSON(dataJSON);
+                    break;
+                case 'switch':
+                    updateSwitchFromJSON(dataJSON);
+                    break;
+                case 'capsule':
+                    updateCapsuleFromJSON(dataJSON);
+                    break;
             }
-        } else {
-            if (!backwardButton.classList.contains("btn-light")) {
-                backwardButton.classList.remove("btn-warning");
-                backwardButton.classList.add("btn-light");
-                jQueryBackwardButton.tooltip('hide');
-                jQueryBackwardButton.tooltip('dispose');
-            }
-        }
-
-        if (timeJSON['accelerateJerky'] === 1) {
-            if (!forwardButton.classList.contains("btn-warning")) {
-                forwardButton.classList.remove("btn-light");
-                forwardButton.classList.add("btn-warning");
-                jQueryForwardButton.tooltip({
-                    html: true,
-                    title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
-                });
-                jQueryForwardButton.tooltip('show');
-            }
-        } else {
-            if (!forwardButton.classList.contains("btn-light")) {
-                forwardButton.classList.remove("btn-warning");
-                forwardButton.classList.add("btn-light");
-                jQueryForwardButton.tooltip('hide');
-                jQueryForwardButton.tooltip('dispose');
-            }
-        }
-    });
-
-    $.getJSON('/capsules.json', function (listCapsuleJSON) {
-        if (clearing) return;
-        listCapsuleJSON.forEach(function (capsuleJSON) {
-            let targetCapsules = objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
-
-            if (targetCapsules.length <= 0) {
-                new Capsule(capsuleJSON).updateScale(objectScale);
-            } else {
-                targetCapsules.forEach(capsule => capsule.update(capsuleJSON));
-            }
-        });
-    });
-
-    $.getJSON('/stationsVarData.json', function (listStationJSON) {
-        if (clearing) return;
-        listStationJSON.forEach(function (stationJSON) {
-            let targetStations = objects.filter(station => station.uuid.includes(stationJSON['uuid']));
-            targetStations.forEach(station => station.update(stationJSON));
-        });
-    });
-
-    $.getJSON('/warehousesVarData.json', function (listWarehouseJSON) {
-        if (clearing) return;
-        listWarehouseJSON.forEach(function (warehouseJSON) {
-            let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
-            targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
         });
     });
 
@@ -834,6 +781,73 @@ function updateNetworkScene() {
 
     networkLayer.batchDraw();
     infoLayer.batchDraw();
+}
+
+function updateTimeFromJSON(timeJSON) {
+    timerSpan.innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time'];
+    speedSpan.innerHTML = timeJSON['speed'];
+
+    if (timeJSON['decelerateJerky'] === 1) {
+        if (!backwardButton.classList.contains("btn-warning")) {
+            backwardButton.classList.remove("btn-light");
+            backwardButton.classList.add("btn-warning");
+            jQueryBackwardButton.tooltip({
+                html: true,
+                title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
+            });
+            jQueryBackwardButton.tooltip('show');
+        }
+    } else {
+        if (!backwardButton.classList.contains("btn-light")) {
+            backwardButton.classList.remove("btn-warning");
+            backwardButton.classList.add("btn-light");
+            jQueryBackwardButton.tooltip('hide');
+            jQueryBackwardButton.tooltip('dispose');
+        }
+    }
+
+    if (timeJSON['accelerateJerky'] === 1) {
+        if (!forwardButton.classList.contains("btn-warning")) {
+            forwardButton.classList.remove("btn-light");
+            forwardButton.classList.add("btn-warning");
+            jQueryForwardButton.tooltip({
+                html: true,
+                title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
+            });
+            jQueryForwardButton.tooltip('show');
+        }
+    } else {
+        if (!forwardButton.classList.contains("btn-light")) {
+            forwardButton.classList.remove("btn-warning");
+            forwardButton.classList.add("btn-light");
+            jQueryForwardButton.tooltip('hide');
+            jQueryForwardButton.tooltip('dispose');
+        }
+    }
+}
+
+function updateStationFromJSON(stationJSON) {
+    let targetStations = objects.filter(station => station.uuid.includes(stationJSON['uuid']));
+    targetStations.forEach(station => station.update(stationJSON));
+}
+
+function updateWarehouseFromJSON(warehouseJSON) {
+    let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
+    targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
+}
+
+function updateSwitchFromJSON(switchJSON) {
+
+}
+
+function updateCapsuleFromJSON(capsuleJSON) {
+    let targetCapsules = objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
+
+    if (targetCapsules.length <= 0) {
+        new Capsule(capsuleJSON).updateScale(objectScale);
+    } else {
+        targetCapsules.forEach(capsule => capsule.update(capsuleJSON));
+    }
 }
 
 function calibrateNetworkScene() {

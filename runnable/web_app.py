@@ -111,27 +111,22 @@ def generate_switches_set_data_json():
                            switch.get_switches()]), mimetype="application/json")
 
 
-@app.route('/stationsVarData.json')
-def generate_stations_var_data_json():
-    return Response(dumps([json_serializer.serialize_station_var_data(a_station) for a_station in
-                           station.get_stations()]), mimetype="application/json")
+@app.route('/updatedData.json')
+def generate_updated_data_json():
+    list_time_data = [json_serializer.serialize_time()]
+    list_station_var_data = [json_serializer.serialize_station_var_data(a_station) for a_station in
+                             station.get_stations()]
+    list_warehouse_var_data = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in
+                               warehouse.get_warehouses()]
+    list_switch_var_data = []
 
+    list_capsule_data = [json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]
 
-@app.route('/warehousesVarData.json')
-def generate_warehouses_var_data_json():
-    return Response(dumps([json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in
-                           warehouse.get_warehouses()]), mimetype="application/json")
-
-
-@app.route('/switchesVarData.json')
-def generate_switches_var_data_json():
-    return Response(dumps([]), mimetype="application/json")
-
-
-@app.route('/capsules.json')
-def generate_capsules_json():
-    return Response(dumps([json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]),
-                    mimetype="application/json")
+    return Response(dumps(list_time_data +
+                          list_station_var_data +
+                          list_warehouse_var_data +
+                          list_switch_var_data +
+                          list_capsule_data), mimetype="application/json")
 
 
 @app.route('/network-files.json')

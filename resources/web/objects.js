@@ -666,6 +666,7 @@ class Capsule {
             if (capsuleJSON['stationIndex'] === -1) {
                 this.innerCircle.hide();
                 this.outerCircle.hide();
+                return;
             }
             let targetStations = objects.filter(station => station.uuid.includes(capsuleJSON['currentElementUuid']));
             targetStations.forEach(station => {

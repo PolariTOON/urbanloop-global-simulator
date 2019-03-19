@@ -1,6 +1,7 @@
 import glob
 import json
 import os
+import random
 import sys
 
 import numpy as np
@@ -24,10 +25,11 @@ _removed_signal = False
 _default_changed_signal = False
 
 
-def load(file_name=None):
+def load(file_name=None, capsules_fulfill=True):
     """
     fonction qui a partir d'un fichier json récupère le réseau correspondant et le traduit en objets
         :param file_name: Nom du fichier json (Par défaut il charge celui contenu dans settings/conf.ini)
+        :param capsules_fulfill: Should or not do capsules fulfill
         :return: (void) l'ensemble des objets sont créés et configurés.
     """
 
@@ -122,12 +124,13 @@ def load(file_name=None):
                 _size['max_y'] = the_loop.y + radius
 
     model_switch.init()
-    init_capsules()
+    if capsules_fulfill:
+        init_capsules()
     file.close()
     return
 
 
-def reload(file_name=None):
+def reload(file_name=None, capsules_fulfill=True):
     global _size
     _size = {}
     model_loop.all_loops = {}
@@ -143,29 +146,35 @@ def reload(file_name=None):
     identifier._switch_id = -1
     identifier._capsule_id = -1
     identifier._traveler_id = -1
-    load(file_name)
+    load(file_name=file_name, capsules_fulfill=capsules_fulfill)
 
 
 def init_capsules():
     model_capsule._capsules = list()
     identifier._capsule_id = -1
     nb_capsules = int(config.capsule['number_of_capsules'])
-    if nb_capsules == -1:  # infini = on rempli toutes les stations et entrepôts à capacity-1
+    if nb_capsules == -1:  # Fill every stations and warehouses
         nb_capsules = sum([(a_station.capacity - 1) for a_station in model_station.get_stations()]
                           + [(a_warehouse.capacity - 1) for a_warehouse in model_warehouse.get_warehouses()])
-    for i in range(6):
-        for station in model_station.get_stations():
-            if station.capsule_queue.qsize() < max(station.capacity - 1, 2) and nb_capsules > 0:
-                # creating capsules
-                caps = model_capsule.Capsule(departure_station=station)
-                # adding capsules to station
-                station.capsule_queue.put(caps)
-                nb_capsules -= 1
+
     while nb_capsules > 0:
-        for warehouse in model_warehouse.get_warehouses():
-            if warehouse.capsule_queue.qsize() < warehouse.capacity - 1 and nb_capsules > 0:
-                caps = model_capsule.Capsule(departure_station=warehouse)
-                warehouse.capsule_queue.put(caps)
+        all_stations_filled = True
+        for station in sorted(model_station.get_stations(), key=lambda _: random.random()):
+            if nb_capsules <= 0:
+                break
+            if station.capsule_queue.qsize() < max(station.capacity - 1, 2):
+                all_stations_filled = False
+                station.capsule_queue.put(model_capsule.Capsule(departure_station=station))
+                nb_capsules -= 1
+
+        if not all_stations_filled:
+            continue
+
+        for warehouse in sorted(model_warehouse.get_warehouses(), key=lambda _: random.random()):
+            if nb_capsules <= 0:
+                break
+            if warehouse.capsule_queue.qsize() < warehouse.capacity - 1:
+                warehouse.capsule_queue.put(model_capsule.Capsule(departure_station=warehouse))
                 nb_capsules -= 1
 
 

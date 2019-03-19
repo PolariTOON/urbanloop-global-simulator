@@ -28,6 +28,7 @@ def start_simulation():
     global sim_thread
     global is_simulation_started
     if not is_simulation_started:
+        network.init_capsules()
         is_simulation_started = True
         sim_thread = Thread(target=sim_loop.start_simulation, args=[True])
         sim_thread.start()
@@ -81,9 +82,9 @@ def generate_time_json():
 def load_network(file_name):
     if not is_simulation_started:
         if file_name is not None:
-            network.reload(file_name)
+            network.reload(file_name=file_name, capsules_fulfill=False)
         else:
-            network.reload()
+            network.reload(capsules_fulfill=False)
     return Response(dumps(json_serializer.serialize_network_size()), mimetype="application/json")
 
 

@@ -663,7 +663,7 @@ class Capsule {
         this.currentElementUuid = capsuleJSON['currentElementUuid'];
 
         if (this.isDocked) {
-            if (capsuleJSON['stationIndex'] === -1) {
+            if (capsuleJSON['stationIndex'] === -1) { // THIS IS HOTFIX FOR GHOST CAPS
                 this.innerCircle.hide();
                 this.outerCircle.hide();
                 return;

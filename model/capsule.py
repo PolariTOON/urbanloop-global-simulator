@@ -34,6 +34,7 @@ class Capsule:
         self.segment_length = 0
         self.segment_start_tick = 0
         self.segment_ticks_duration = 0
+        self.moving = False
 
         if departure_station is not None:
             self.current_element = departure_station
@@ -75,19 +76,22 @@ class Capsule:
         sim_loop.recorder.add_exiting_loop(self.loop)
         self.loop = current_switch.other_loop
         sim_loop.recorder.add_joining_loop(self.loop)
-        simlog.info("Capsule %d is switched (destination %s)" % (self.id, self.destination.name), current_switch.my_loop, self.loop)
+        simlog.info("Capsule %d is switched (destination %s)" % (self.id, self.destination.name),
+                    current_switch.my_loop, self.loop)
 
     def start_trip(self):
         """
         The capsule starts a trip to its destination
         """
-        simlog.info("Capsule %d (%s) starts its trip to %s" % (self.id, self._get_capacity_state(), self.destination.name),
-                    self.current_element)
+        simlog.info(
+            "Capsule %d (%s) starts its trip to %s" % (self.id, self._get_capacity_state(), self.destination.name),
+            self.current_element)
         sim_loop.recorder.add_traveling_distance(switch.cost_between(self.current_element, self.destination), self)
         sim_loop.recorder.add_departure_from_station(self.current_element)
         simlog.debug("Amount of capsules : %d" % self.current_element.capsule_queue.qsize(), self.current_element)
         for a_traveler in self.travelers:
             a_traveler.trip_start_tick = sim_loop.get_current_tick()
+        self.moving = True
         sim_loop.get_env().process(self.update_trip())
 
     def update_trip(self):
@@ -121,8 +125,9 @@ class Capsule:
             if self.next_element.capsule_queue.qsize() <= 1 and (
                     self.next_element.estimated_capsules_number() < self.next_element.capacity - 1 or self.next_element.traveler_queue.qsize() >= 1):
                 simlog.debug("The capsule %d direction %s is rerouted to %s (%d/%d)" % (
-                self.id, self.destination.name, self.next_element.name, self.next_element.estimated_capsules_number(),
-                self.next_element.capacity), self.current_element, self.next_element)
+                    self.id, self.destination.name, self.next_element.name,
+                    self.next_element.estimated_capsules_number(),
+                    self.next_element.capacity), self.current_element, self.next_element)
                 self.destination = self.next_element
         if self.current_element == self.destination:
             if self.current_element.capsule_queue.full():
@@ -145,6 +150,7 @@ class Capsule:
         self.destination = None
         simlog.debug(
             "Contains %d capsules now" % (self.current_element.capsule_queue.qsize()), self.current_element.name)
+        self.moving = False
         if self.travelers:
             simlog.debug("Start descent in capsule %d" % self.id, self.destination)
             traveler = self.travelers[0]
@@ -214,6 +220,11 @@ class Capsule:
         :return: The distance traveled each tick by a capsule at the defined speed
         """
         return self.get_meter_per_tick() / (self.loop.size / (2 * math.pi))
+
+    def get_station_queue_index(self):
+        if type(self.current_element) is station.Station:
+            return self.current_element.capsule_queue.index_of(self)
+        return -1
 
     def _get_travelers_id(self):
         """

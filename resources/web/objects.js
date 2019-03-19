@@ -132,12 +132,16 @@ class Loop {
 }
 
 class Station {
-    constructor(stationJSON, stationRadius = 12, stationWidth = 4) {
+    constructor(stationJSON, stationRadius = 12, stationWidth = 4, dockSize = 24) {
         this.json = stationJSON;
         this.uuid = stationJSON['uuid'];
         this.id = stationJSON['id'];
+        this.capacity = stationJSON['capacity'];
+        this.stationRadius = stationRadius;
+        this.dockSize = dockSize;
 
-        const x = stationJSON['x'];
+        this.x = stationJSON['x'];
+        const x = this.x;
         this.y = stationJSON['y'];
         const y = getNetworkDivSize().height - this.y;
         const semiWidth = Math.floor(stationWidth / 2);
@@ -161,6 +165,23 @@ class Station {
             stroke: 'black',
             strokeWidth: 0.3,
         });
+
+        this.dockList = [];
+        for (let i = 0; i < this.capacity; i++) {
+            let dockRect = new Konva.Rect({
+                name: this.uuid,
+                x: x + 10 * stationRadius + (6 * i + 2) * dockSize,
+                y: y,
+                width: dockSize,
+                height: dockSize,
+                fill: 'white',
+                stroke: 'black',
+                strokeWidth: 1,
+            });
+            dockRect.offsetX(dockRect.width() / 2);
+            dockRect.offsetY(dockRect.height() / 2);
+            this.dockList.push(dockRect);
+        }
 
         this.info = new Konva.Label({
             x: x,
@@ -198,6 +219,10 @@ class Station {
 
         networkLayer.add(this.outerCircle);
         networkLayer.add(this.innerCircle);
+        this.dockList.forEach(dock => {
+            networkLayer.add(dock);
+            dock.hide();
+        });
         infoLayer.add(this.info);
 
         objects.push(this);
@@ -210,6 +235,11 @@ class Station {
 
         selectedObject = this;
         this.outerCircle.fill(stationSelectedColor);
+
+        this.dockList.forEach(dock => {
+            dock.show();
+        });
+
         networkLayer.batchDraw();
     }
 
@@ -218,6 +248,11 @@ class Station {
             selectedObject = undefined;
         }
         this.outerCircle.fill(stationColor);
+
+        this.dockList.forEach(dock => {
+            dock.hide();
+        });
+
         networkLayer.batchDraw();
     }
 
@@ -226,6 +261,9 @@ class Station {
         this.innerCircle.y(y);
         this.outerCircle.y(y);
         this.info.y(y);
+        this.dockList.forEach(dock => {
+            dock.y(y);
+        });
     }
 
     updateScale(value) {
@@ -233,8 +271,13 @@ class Station {
         this.innerCircle.scaleY(value);
         this.outerCircle.scaleX(value);
         this.outerCircle.scaleY(value);
+        this.dockList.forEach(dock => {
+            dock.scaleX(value);
+            dock.scaleY(value);
+        });
         this.info.scaleX(value);
         this.info.scaleY(value);
+
     }
 
     update(stationJSON) {
@@ -566,6 +609,7 @@ class Capsule {
         this.uuid = capsuleJSON['uuid'];
         this.id = capsuleJSON['id'];
         this.travelerNumber = capsuleJSON['travelerNumber'];
+        this.isDocked = true;
 
         this.innerCircle = new Konva.Circle({
             name: this.uuid,
@@ -613,8 +657,22 @@ class Capsule {
         this.innerCircle.y(y);
         this.outerCircle.x(x);
         this.outerCircle.y(y);
+        this.isDocked = !capsuleJSON['moving'];
         this.travelerNumber = capsuleJSON['travelerNumber'];
         this.json = capsuleJSON;
+        this.currentElementUuid = capsuleJSON['currentElementUuid'];
+
+        if (this.isDocked) {
+            if (capsuleJSON['stationIndex'] === -1) {
+                this.innerCircle.hide();
+                this.outerCircle.hide();
+            }
+            let targetStations = objects.filter(station => station.uuid.includes(capsuleJSON['currentElementUuid']));
+            targetStations.forEach(station => {
+                this.innerCircle.x(x + 10 * station.stationRadius + (6 * capsuleJSON['stationIndex'] + 2) * station.dockSize);
+                this.outerCircle.x(x + 10 * station.stationRadius + (6 * capsuleJSON['stationIndex'] + 2) * station.dockSize);
+            });
+        }
 
         this.updateColor();
     }
@@ -622,6 +680,19 @@ class Capsule {
     updateColor() {
         if (selectedObject === this) {
             return;
+        }
+
+        if (this.isDocked) {
+            if (selectedObject === undefined || this.currentElementUuid !== selectedObject.uuid) {
+                this.innerCircle.hide();
+                this.outerCircle.hide();
+            } else {
+                this.innerCircle.show();
+                this.outerCircle.show();
+            }
+        } else {
+            this.innerCircle.show();
+            this.outerCircle.show();
         }
 
         if (this.isAboard()) {

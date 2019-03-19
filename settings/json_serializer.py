@@ -201,9 +201,12 @@ def serialize_capsule(a_capsule):
         'y': y,
         'travelerNumber': len(a_capsule.travelers),
         'destination': a_capsule.destination.name if a_capsule.destination is not None else "None",
+        'moving': a_capsule.moving,
         'outerCircle': a_capsule.loop.name,
         'current_element': a_capsule.current_element.name,
-        'next_element': a_capsule.next_element.name
+        'next_element': a_capsule.next_element.name,
+        'currentElementUuid': str(a_capsule.current_element.uuid),
+        'stationIndex': a_capsule.get_station_queue_index()
     }
 
 

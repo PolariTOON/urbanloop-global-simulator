@@ -15,6 +15,15 @@ class Queue:
             return None
         return self.items.pop(0)
 
+    def get_no_pop(self):
+        if len(self.items) <= 0:
+            return None
+        return self.items[0]
+
+    def remove(self, item):
+        if item in self.items:
+            self.items.remove(item)
+
     def put(self, item):
         if len(self.items) > 0 and type(self.items[0]) is not type(item):
             return None
@@ -35,7 +44,14 @@ class Queue:
 
     def is_empty(self):
         return len(self.items) == 0
-    
+
     def empty(self):
         self.items = []
         return
+
+    def index_of(self, item):
+        if len(self.items) > 0 and type(self.items[0]) is not type(item):
+            return -1
+        if item in self.items:
+            return self.items.index(item)
+        return -1

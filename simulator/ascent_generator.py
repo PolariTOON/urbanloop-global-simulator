@@ -18,16 +18,21 @@ class AscentGenerator:
                     return
 
                 traveler = a_station.traveler_queue.get()
-                capsule = a_station.capsule_queue.get()
+                capsule = a_station.capsule_queue.get_no_pop()
                 capsule.get_in_traveler(traveler=traveler)
                 sim_loop.recorder.add_waiting_time_traveler(traveler.get_waiting_seconds(), traveler)
-                yield sim_loop.get_env().process(ascent_event(capsule))
+                yield sim_loop.get_env().process(ascent_event(a_station, capsule))
 
     def can_generate(self):
         return self.trip_limit > 0 or self.trip_limit == -1
 
 
-def ascent_event(capsule):
+def ascent_event(a_station, capsule):
     ascent_timeout = sim_loop.get_env().timeout(converter.random_ascent_descent_duration())
-    ascent_timeout.callbacks.append(lambda event: capsule.start_trip())
+    ascent_timeout.callbacks.append(lambda event: ascent_event_callback(a_station, capsule))
     yield ascent_timeout
+
+
+def ascent_event_callback(a_station, capsule):
+    a_station.capsule_queue.remove(capsule)
+    capsule.start_trip()

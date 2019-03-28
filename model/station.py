@@ -17,9 +17,9 @@ _stations = list()
 
 
 class Type(Enum):
-    ACTIVITY = 0
-    RESIDENTIAL = 1
-    CITY = 2
+    ACTIVITY = 1
+    RESIDENTIAL = 2
+    CITY = 3
 
 
 class Station:
@@ -52,10 +52,10 @@ class Station:
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
 
     def get_type(self):
-        return (Type.ACTIVITY, Type.RESIDENTIAL, Type.CITY)[self.station_type]
+        return (Type.ACTIVITY, Type.RESIDENTIAL, Type.CITY)[self.station_type-1]
 
     def get_string_type(self):
-        return ("Activity", "Residential", "City")[self.station_type]
+        return ("Activity", "Residential", "City")[self.station_type-1]
 
     def get_waiting_capsules_number(self):
         return self.capsule_queue.qsize()

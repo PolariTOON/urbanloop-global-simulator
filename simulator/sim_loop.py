@@ -7,6 +7,7 @@ from model import capsule
 from model import loop
 from model import station
 from model import warehouse
+from model import controller
 from settings import config
 from settings import simlog
 from simulator import ascent_generator
@@ -31,6 +32,8 @@ _endless_quit_event = None
 _off_signal = False
 recorder = None
 
+_controller = None
+
 
 class SimLoop:
     def __init__(self, is_visualized=False):
@@ -41,6 +44,8 @@ class SimLoop:
         global _start_hour
         global _endless_quit_event
         global recorder
+        global _controller
+        _controller = Controller()
         _sim_tick = float(config.sim['tick'])
         _visualized_tick_duration = _sim_tick
         _start_hour = int(config.sim['start_hour'])
@@ -114,6 +119,7 @@ class SimLoop:
                 _env.process(self.ascent_generator.generate())
                 if _modulo_on_seconds(1):
                     _env.process(self.traveler_generator.generate())
+                    _controller.update()
                 if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(self.fulfill_period):
                     station.fill_and_full_stations()
 

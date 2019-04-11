@@ -2,13 +2,8 @@ from model import capsule
 from model import switch
 from model import graph
 
-
-_controller = None
-
-
 class Controller:
 	def __init__(self):
-		global _controller
 		self.capsules = capsule.get_capsules()
 		self.switches = switch.get_switches()
 		self.timers = []
@@ -20,7 +15,7 @@ class Controller:
      :param switch : le switch qui a routé la capsule
      :param capsule : la capsule routée
     """
-		graph.update_weights(switch.id, self.timers[capsule.id])
+		self.graph.update_weights(switch.uuid, self.timers[capsule.id])
 
 		self.timers[capsule.id] = 0
 
@@ -28,17 +23,18 @@ class Controller:
 	def update(self):
 		"""
 	     fonction qui est lancée à chaque tour pour actualiser les timers du controller
-	     /!\à compléter avec les vraies valeurs
 	    """
 	    for i in range(len(self.timers)):
 	    	timers[i] += 1
+	    	next_switch = self.capsules[i].next_element.uuid
+	    	previous_switch = self.capsules[i].current_element.uuid
 
-	    	if timers[i] >= 1000:
-	    		disable_way(this.capsules[i].next_element)
+	    	if timers[i] >= self.graph.matrix[previous_switch][next_element]*10:
+	    		disable_way(previous_switch, next_switch)
 
-def disable_way(switch):
+def disable_way(previous_switch, next_switch):
 """
  fonction qui est lancée quand une boucle est coupée
  met à jour le poids de la boucle à +infini dans le graph
 """
-	graph.disable_way(switch.id)
+	graph.disable_way(previous_switch, next_switch)

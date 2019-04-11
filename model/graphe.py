@@ -3,13 +3,19 @@ import numpy as np
 
 class Graph:
 
-    def __init__(self, node_list):
-        self.nodeList = node_list
-        self.size = len(node_list)
-        self.matrix = np.zeros(self.size)
+    def __init__(self):
+        self.size = station.get_stations.size + switch.get_switches.size * 2 + warehouse.get_warehouses.size
+        self.nodes = [None] * size
+
+        """
+        self.matrix = np.zeros(self.size, self.size)
+        self.expected_matrix = np.zeros(self.size, self.size)
+        """
+
 
     def add_edge(self, node1, node2, weight):
         self.matrix[node1][node2] = weight
+        self.expected_matrix[node1][node2] = weight
 
     def delete_edge(self,node1,node2):
         self.matrix[node1][node2] = 0
@@ -26,7 +32,5 @@ class Graph:
     def update_weight(self, node1, node2, new_weight):
         self.matrix[node1][node2] =self.matrix[node1][node2]
 
-    def disable_way(self, node):
-        self.matrix[node-1][node] = inf
-
-
+    def disable_way(self, node1, node2):
+        self.matrix[node1][node2] = inf

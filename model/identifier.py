@@ -6,6 +6,7 @@ _station_id = -1
 _switch_id = -1
 _capsule_id = -1
 _traveler_id = -1
+_node_id = -1
 
 
 def generate_unique():
@@ -46,3 +47,8 @@ def generate_traveler_id():
     global _traveler_id
     _traveler_id += 1
     return _traveler_id
+
+def generate_node_id():
+    global _node_id
+    _node_id += 1
+    return _node_id

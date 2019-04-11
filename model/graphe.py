@@ -26,5 +26,7 @@ class Graph:
     def update_weight(self, node1, node2, new_weight):
         self.matrix[node1][node2] =self.matrix[node1][node2]
 
+    def disable_way(self, node):
+        self.matrix[node-1][node] = inf
 
 

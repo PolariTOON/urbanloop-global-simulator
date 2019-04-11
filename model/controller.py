@@ -14,19 +14,13 @@ class Controller:
 		self.timers = []
 		self.graph = Graph()
 
-	def update_from_switch(self, switch, rule, capsule):
+	def update_from_switch(self, switch, capsule):
 	"""
      fonction qui est lancée à chaque fois qu'une capsule passe un switch
      :param switch : le switch qui a routé la capsule
-     :param rule : la règle utilisée par le routeur pour router la capsule
      :param capsule : la capsule routée
     """
-		if rule.change:
-			loop = switch.loop
-		else:
-			loop = switch.next_loop
-
-		graph.update_weights(loop, self.timers[capsule.id])
+		graph.update_weights(switch.id, self.timers[capsule.id])
 
 		self.timers[capsule.id] = 0
 
@@ -40,11 +34,11 @@ class Controller:
 	    	timers[i] += 1
 
 	    	if timers[i] >= 1000:
-	    		disable_way(this.capsules[i].loop)
+	    		disable_way(this.capsules[i].next_element)
 
-def disable_way(loop):
+def disable_way(switch):
 """
  fonction qui est lancée quand une boucle est coupée
  met à jour le poids de la boucle à +infini dans le graph
 """
-	graph.disable_way(loop)
+	graph.disable_way(switch.id)

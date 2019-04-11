@@ -24,12 +24,12 @@ class Warehouse:
     def reset_simulation(self):
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
 
-    def send_capsule(self, station_destination):
+    def send_capsule(self, station_destination, priority):
         simlog.info("an empty capsule left warehouse %d to %s" % (self.id, station_destination.name))
         if self.capsule_queue.qsize() > 0:
             capsule_to_send = self.capsule_queue.get()
             capsule_to_send.destination = station_destination
-            if True:  # TODO eviter de sortir alors que y'a déjà une cpasule sur la sortie
+            if True:  # TODO eviter de sortir alors que y'a déjà une capsule sur la sortie
                 capsule_to_send.start_trip()
 
 

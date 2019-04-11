@@ -2,7 +2,7 @@ import random
 from enum import Enum
 from math import floor
 
-from model import capsule
+from model import capsule, controller
 from model import identifier
 from model import queue
 from model import warehouse
@@ -25,7 +25,7 @@ class Type(Enum):
 class Station:
     network = None
 
-    def __init__(self, name=None, capacity=4, loop=None, angle=None, station_type=Type.CITY):
+    def __init__(self, nearer_warehouse, name=None, capacity=4, loop=None, angle=None, station_type=Type.CITY):
         """
         :param name: Name of the station
         :param capacity: Loop circumference (float)
@@ -34,6 +34,7 @@ class Station:
         :param station_type: Type of station compared to its affluence (Enum)
         """
         global _stations
+        self.nearer_warehouse
         _stations.append(self)
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_station_id()
@@ -99,6 +100,51 @@ class Station:
     def estimated_capsules_number(self):
         return self.capsule_queue.qsize() + len(capsule.get_incoming_capsule(self))
 
+    def fill_and_full_stations(self):
+        now_second = converter.now_to_seconds()
+        # TODO unused variable -> now_hour = converter.seconds_to_floor_hour(now_second)
+        simlog.debug("Stations drainage and completion process launched.")
+        for station in get_stations():
+            # print("type", station.get_type())
+            if station.estimated_capsules_number() <= max(1, floor(station.capacity / 4)):
+                # quasi vide --> station à compléter
+                simlog.debug("Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
+                nb_to_send = station.capacity - station.estimated_capsules_number() - 1
+                if station.estimated_capsules_number() == 0:
+                    controller.refill(1,self)
+                else:
+                    controller.refill(0.6,self)
+                     # j'en envoie une depuis un entrepot
+                """
+                if nearer_warehouse is not None :
+                    nearer_warehouse.send_capsule(station)
+                    sim_loop.recorder.add_sent_capsules_drain(1, nearer_warehouse)
+            # vérifier que la station n'est pas sujette à être la destination de plein de capsules
+                proba = converter.station_probability(station.get_type(), now_second, True)
+                if proba < 0.3 and nb_to_send>1 and nearer_warehouse is not None: # je ne prends pas trop de risque à en renvoyer d'autres
+                    for i in range(min(nb_to_send-1, 1)):
+                        nearer_warehouse.send_capsule(station)
+                        sim_loop.recorder.add_sent_capsules_drain(1, nearer_warehouse)
+                """
+            if station.estimated_capsules_number() >= min(station.capacity - 1, floor(3 * station.capacity /4)) and station.capsule_queue.qsize() > 1:
+                # quasi pleine --> station à vider
+                simlog.debug("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
+                nb_to_send = 1
+                if station.capsule_queue.qsize() > station.traveler_queue.qsize():
+                    nb_to_send = max(station.capsule_queue.qsize() - station.traveler_queue.qsize() - 1, 1)
+                # j'en envoie une vide (si pas de voyageur) attente vers un entrepot
+                station.drain(self.nearer_warehouse)
+                if self.nearer_warehouse is not None and station.traveler_queue.qsize() <= 1:
+                    station.drain(self.nearer_warehouse)
+                    sim_loop.recorder.add_called_capsules_drain(1, self.nearer_warehouse)
+                # vérifier que la station n'est pas sujette à voir partir plein de voyageurs
+                proba = converter.station_probability(station.get_type(), now_second, False)
+                if proba > 0.3 and nb_to_send > 1 and self.nearer_warehouse is not None:
+                    for i in range(min(nb_to_send - 1, 1)):
+                        self.nearer_warehouse.send_capsule(station)
+                        sim_loop.recorder.add_sent_capsules_drain(1, self.nearer_warehouse)
+
+
 
 def get_stations():
     """
@@ -157,6 +203,8 @@ def drain_all():
 '''
 
 
+
+"""
 def fill_and_full_stations():
     now_second = converter.now_to_seconds()
     # TODO unused variable -> now_hour = converter.seconds_to_floor_hour(now_second)
@@ -168,11 +216,11 @@ def fill_and_full_stations():
             simlog.debug("Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
             nb_to_send = station.capacity - station.estimated_capsules_number() - 1
             nearer_warehouse = warehouse.which_warehouse_before(station)
-        # j'en envoie une depuis un entrepot
+            # j'en envoie une depuis un entrepot
             if nearer_warehouse is not None :
                 nearer_warehouse.send_capsule(station)
                 sim_loop.recorder.add_sent_capsules_drain(1, nearer_warehouse)
-        # vérifier que la station n'est pas sujette à être la destination de plein de capsules
+            # vérifier que la station n'est pas sujette à être la destination de plein de capsules
             proba = converter.station_probability(station.get_type(), now_second, True)
             if proba < 0.3 and nb_to_send>1 and nearer_warehouse is not None: # je ne prends pas trop de risque à en renvoyer d'autres
                 for i in range(min(nb_to_send-1, 1)):
@@ -197,6 +245,7 @@ def fill_and_full_stations():
                 for i in range(min(nb_to_send - 1, 1)):
                     nearer_warehouse.send_capsule(station)
                     sim_loop.recorder.add_sent_capsules_drain(1, nearer_warehouse)
+"""
 
 
 def reset_simulation():
@@ -205,3 +254,23 @@ def reset_simulation():
     """
     for station in _stations:
         station.reset_simulation()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

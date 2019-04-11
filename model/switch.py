@@ -16,7 +16,7 @@ alive_timers = []
 
 class Switch:
     def __init__(self, loop=None, angle=None, other_loop=None, previous_element=None, next_element=None,
-                 next_element_other=None, size=switched_cost):
+                 next_element_other=None, size=switched_cost,rules = None):
         """
         initialisation d'un aiguillage
         :param  loop : boucle où le switch est présent (Loop)
@@ -51,6 +51,7 @@ class Switch:
         self.table = {}
         self.section_my_loop = None
         self.section_other_loop = None
+        self.rules=rules
 
     def route_capsule_to_station(self, capsule):
         """
@@ -79,6 +80,21 @@ class Switch:
             return False
         else:
             simlog.error("The switch %d is not in the station %s" % (str(self.id), the_loop.name))
+
+    def add_rule(self,rule,index):
+        index=len(self.rules)
+        self.rules.insert(index,rule)
+
+    def remove_rule(self,rule):
+        self.rules.remove(rule)
+
+    def modify_rule(self, new_rule, old_rule):
+        index = self.rules.index(old_rule)
+        self.remove_rule(old_rule)
+        self.add_rule(new_rule, index)
+
+
+
 
 
 def init(table):
@@ -197,3 +213,7 @@ def get_switch_by_id(id):
         if s.id == id:
             return s
     return None
+
+
+
+

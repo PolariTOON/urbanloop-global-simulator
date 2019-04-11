@@ -52,14 +52,17 @@ class Switch:
         self.section_my_loop = None
         self.section_other_loop = None
 
-    def route_capsule_to_station(self, station):
+    def route_capsule_to_station(self, capsule):
         """
         la fonction qu'une capsule déclenche lorsqu'elle arrive sur le switch et souhaite être routée
-            :param  station: la station de destination vers laquelle la capsule souhaite aller (Station) OBLIGATOIRE
-            :return: OUT : True si la capsule doit changer de station, False sinon (boolean)
+            :param  capsule: la capsule qui demande a être routée OBLIGATOIRE
+            :return: OUT : True si la capsule doit changer de route, False sinon (boolean)
             """
         # the_loop = station.loop
-        return self.table[station.section_loop][0]
+
+        rule = self.table[capsule.priority][capsule.destination.section_loop][0]
+        controller.update_from_switch(self, rule, capsule)
+        return rule.change
         # if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
         #     simlog.debug("le switch " + str(self.objectId) + " aiguille la capsule voulant aller à " + station.name
         #                  + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
@@ -78,11 +81,12 @@ class Switch:
             simlog.error("The switch %d is not in the station %s" % (str(self.id), the_loop.name))
 
 
-def init():
+def init(table):
     """
     fonction d'initialisation de tous les switchs pour que les longueur dépendent des coordonnées
     et que la taille des tableaux correspondant à tous les objets prévus
     puis création de la table de routage permanente
+        :param  table : la table à l'initialisation du réseau
         :return: 0UT : (void) modification des attributs intrinsèques aux switchs
     """
     for a_switch in _switches:  #  lenght depend des coordonnées
@@ -105,9 +109,13 @@ def init():
         a_switch.timers[a_switch.id] = my_timer
         a_switch.defects = [[False, False] for _ in range(len(_switches))]
     for a_switch in _switches:
-        a_switch.table = routing.dijkstra_route(a_switch, a_switch.permanent_table, a_switch.permanent_cover)
+        a_switch.table = table_init
+
+        """
+        a_switch.table[1] = routing.dijkstra_route(a_switch, a_switch.permanent_table, a_switch.permanent_cover)
         # FINAL
-        a_switch.permanent_table = a_switch.table
+        a_switch.permanent_table = a_switch.table[1]
+        """
 
         # anomalies des switches : [boucle presente, boucle aiguillee] True ==> anomalies
 
@@ -134,6 +142,12 @@ def update():
                 alive_timers[s.id][0] += 1
                 alive_timers[s.id][1] = [float("Inf")]
 
+def set_table(new_table):
+    """
+     updates the tables of all the switches with the new table
+    """
+    for a_switch in _switches:
+        a_switch.table = new_table
 
 def get_switches():
     """

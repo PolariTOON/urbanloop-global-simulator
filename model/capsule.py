@@ -35,6 +35,7 @@ class Capsule:
         self.segment_start_tick = 0
         self.segment_ticks_duration = 0
         self.moving = False
+        self.priority = 1
 
         if departure_station is not None:
             self.current_element = departure_station
@@ -243,7 +244,6 @@ class Capsule:
         """
         number = len(self.travelers)
         return ((str(number) + ' traveler', str(number) + ' travelers')[number > 1], 'Empty')[number == 0]
-
 
 def get_incoming_capsule(destination):
     return [capsule for capsule in _capsules if capsule.destination is destination]

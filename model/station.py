@@ -35,7 +35,7 @@ class Station:
         :param station_type: Type of station compared to its affluence (Enum)
         """
         global _stations
-        self.nearer_warehouse
+        self.nearer_warehouse = nearer_warehouse
         _stations.append(self)
 
         global _controller

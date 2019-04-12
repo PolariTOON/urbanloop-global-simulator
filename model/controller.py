@@ -2,6 +2,7 @@ from model import capsule
 from model import switch
 from model import graph
 from model.capsule import Capsule
+from model.graph import Graph
 from model.rule import *
 from model import station
 from model.warehouse import which_warehouse_before
@@ -10,6 +11,7 @@ _controller = None
 
 
 class Controller:
+
 	def __init__(self):
         global _controller
         _controller = self
@@ -57,13 +59,13 @@ class Controller:
 						trajet[i].add_rule(r)
 			if test:
 				warehouse = which_warehouse_before(destination)
-				warehouse.send(Capsule(warehouse,destination), prio)
+				warehouse.send(Capsule(warehouse, destination), prio)
 			else:
 				warehouse = which_warehouse_before(destination)
-				warehouse.send(Capsule(warehouse,destination), 1)
+				warehouse.send(Capsule(warehouse, destination), 1)
 		else:
 			warehouse = which_warehouse_before(destination)
-			warehouse.send(Capsule(warehouse,destination), prio)
+			warehouse.send(Capsule(warehouse, destination), prio)
 
     def stop_timer(self, capsule):
         self.timers[capsule.id] = -1

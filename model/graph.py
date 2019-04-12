@@ -38,11 +38,11 @@ class Graph:
     def init_next_nodes(self):
         for node in self.nodes:
             if station.get_stations().count(node.switch) > 0 || warehouse.get_warehouses().count(node.switch) > 0:
-                node.add_next_node(self.nodes[get_node_id(node.switch.next_element), node.loop])
+                node.add_next_node(self.nodes[node.get_node_id(node.switch.next_element), node.loop])
             else if node.switch.next_element.loop.uuid != node.loop.uuid:
-                node.add_next_node(self.nodes[get_node_id(node.switch.next_element_other, node.loop)])
+                node.add_next_node(self.nodes[node.get_node_id(node.switch.next_element_other, node.loop)])
             else:
-                node.add_next_node(self.nodes[get_node_id(node.switch.next_element, node.loop)])
+                node.add_next_node(self.nodes[node.get_node_id(node.switch.next_element, node.loop)])
 
     def init_matrices(self):
         #speed : unités à vérifier
@@ -50,7 +50,7 @@ class Graph:
         for node in self.nodes:
             self.matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0]/speed
             self.expected_matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0]/speed
-            if node.next_nodes[1] != None:
+            if node.next_nodes[1] is not None:
                 self.matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1]/speed
                 self.expected_matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0]/speed
 
@@ -67,11 +67,48 @@ class Graph:
     def get_edge_weight(self, node1,node2):
         return self.matrix[node1][node2]
 
-    def update_weight(self, node1, node2, sample_time):
+    def update_weight(self, previous_switch, current_switch, sample_time):
+        """
+         fonction qui met à jour le poids sur le tronçon qui vient d'être parcouru par une capsule
+         :param  previous_switch: le dernier switch que la capsule a parcouru (début du tronçon)
+         :param  current_switch: le switch qui a routé la capsule (fin du tronçon)
+         :param  sample_time: le temps qu'a mis la capsule pour parcourir le tronçon
+         :return: True si il y a congestion, False sinon (boolean)
+        """
+        node1 = node.get_node_id(previous_switch, previous_switch.loop)
+
+        if previous_switch.uuid == current_switch.uuid:
+            node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
+        else:
+            node2 = node.get_node_id(current_switch, current_switch.loop)
+
         self.matrix[node1][node2] = (1-0.125)*self.matrix[node1][node2]+0.125*sample_time
+
+        return matrix[node1][node2] > 3 * expected_matrix[node1][node2]
 
     def calcul(self, node_start, node_arrival):
         """Dijkstra et ça marche"""
 
     def change(node_start, node_dest):
         return node_start.loop.uuid != node_dest.loop.uuid
+
+    def get_time_max(self, previous_switch, next_switch):
+        node1 = node.get_node_id(previous_switch, previous_switch.loop)
+
+        if previous_switch.uuid == current_switch.uuid:
+            node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
+        else:
+            node2 = node.get_node_id(current_switch, current_switch.loop)
+
+        return 10 * expected_matrix[node1][node2]
+
+    def disable_way(self, previous_switch, next_switch):
+        node1 = node.get_node_id(previous_switch, previous_switch.loop)
+
+        if previous_switch.uuid == current_switch.uuid:
+            node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
+        else:
+            node2 = node.get_node_id(current_switch, current_switch.loop)
+
+        matrix[node1][node2] = inf
+

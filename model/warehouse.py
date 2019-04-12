@@ -4,12 +4,15 @@ from model import switch
 from settings import simlog
 
 _warehouses = list()
+_controller = None
 
 
 class Warehouse:
     def __init__(self, loop, angle, capacity=float('inf'), next_element=None):
         global _warehouses
         _warehouses.append(self)
+        global _controller
+        _controller = controller.get_controller()
 
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_warehouse_id()
@@ -32,6 +35,11 @@ class Warehouse:
             if True:  # TODO eviter de sortir alors que y'a déjà une capsule sur la sortie
                 capsule_to_send.start_trip()
 
+    def capsule_passing(self, capsule):
+        _controller.update_from_switch(capsule)
+
+    def end_capsule_trip(self, capsule)
+        _controller.stop_timer(capsule)
 
 def which_warehouse_before(station_destination):
     """

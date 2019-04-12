@@ -118,6 +118,7 @@ class Capsule:
         if type(self.next_element) == switch.Switch and self.next_element.is_switch_out(self.loop):
             self.ask_route(self.next_element)
         else:
+            self.next_element.capsule_passing(self)
             self._continue()
         # optimisation : si une capsule vide en direction d'un entrepot passe devant une station vide elle se déroute
         if not (self.is_aboard()) and type(self.next_element) is station.Station and type(
@@ -144,6 +145,7 @@ class Capsule:
         sim_loop.get_env().process(self.update_trip())
 
     def end_trip(self):
+        self.current_element.end_capsule_trip(self)
         simlog.info("Capsule %d (%s) ends its trip" %
                     (self.id, self._get_capacity_state()), self.destination.name)
         sim_loop.recorder.add_arrival_to_station(self.current_element)

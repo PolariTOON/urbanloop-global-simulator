@@ -1,10 +1,22 @@
 class Rule:
-    def __init__(self,destination=None,priority=0,switch_state=None,id_pod=None,time=None,empty=None,num_rule=None,change=None):
+    def __init__(self, destination=None, priority=None, empty=None, change=None, id_pod=None, time=None, num_rule=None):
         self.destination = destination
         self.priority = priority
-        self.switch_state = switch_state
-        self.id_pod = id_pod
-        self.time = time
+        self.empty = empty
+        #self.id_pod = id_pod
+        #self.time = time
         #self.num_rule = num_rule
         self.change = change
-        self.empty = empty
+        
+
+    def match(self, destination=None, priority=None, empty=None, id_pod=None, time=None):
+    	"""
+        :return: true if the rule matches
+        """
+    	#id_pod et time à ajouter si on s'en sert finalement
+    	if (destination is not None and destination == self.destination) || self.destination is None:
+    		if (priority is not None and priority == self.priority) || self.priority is None:
+    			if (empty is not None and empty == self.empty) || self.empty is None:
+    				return True
+    	return False
+

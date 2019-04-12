@@ -14,6 +14,7 @@ from simulator import sim_loop
 from settings import simlog
 
 _stations = list()
+_controller = None
 
 
 class Type(Enum):
@@ -36,6 +37,10 @@ class Station:
         global _stations
         self.nearer_warehouse
         _stations.append(self)
+
+        global _controller
+        _controller = controller.get_controller()
+
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_station_id()
         self.name = "Station #{0}".format(self.id) if (name is None) else name
@@ -85,6 +90,9 @@ class Station:
                 return
             else:
                 self.capsule_queue.put(a_capsule)
+
+    def capsule_passing(self, capsule):
+        _controller.update_from_switch(capsule)
 
     '''    
     def complete(self):
@@ -144,6 +152,8 @@ class Station:
                         self.nearer_warehouse.send_capsule(station)
                         sim_loop.recorder.add_sent_capsules_drain(1, self.nearer_warehouse)
 
+    def end_capsule_trip(self, capsule)
+        _controller.stop_timer(capsule)
 
 
 def get_stations():

@@ -4,7 +4,6 @@ from model import graph
 from model.graph import Graph
 from model.rule import *
 from model import station
-from model.warehouse import which_warehouse_before
 from model import warehouse
 
 _controller = None
@@ -54,7 +53,14 @@ class Controller:
                     self.graph.disable_way(previous_switch, next_switch)
 
     def refill(self, prio, destination, nb_to_send=1):
-        if prio == 1:
+        """
+        Réapprovisionne une station qui en effectue la demande
+        :param prio: Priorité de la demande (10 si critique) OBLIGATOIRE
+        :param destination: Station qui effectue la demande OBLIGATOIRE
+        :param nb_to_send: Nombre de capsule vide à envoyer à la station
+        """
+
+        if prio == 10:
             test = False
             for capsule in self.capsules:
                 if capsule.travelers==list() and capsule.priority <= 6:
@@ -65,13 +71,20 @@ class Controller:
                         trajet[i].add_rule(r)
             if test:
                 warehouse = which_warehouse_before(destination)
-                warehouse.send_capsule(Capsule(warehouse, destination), prio)
+                warehouse.send(Capsule(warehouse, destination), prio)
             else:
                 warehouse = which_warehouse_before(destination)
-                warehouse.send_capsule(Capsule(warehouse, destination), 1)
+                warehouse.send(Capsule(warehouse, destination), 1)
         else:
             warehouse = which_warehouse_before(destination)
-            warehouse.send_capsule(Capsule(warehouse, destination), prio)
+            warehouse.send(Capsule(warehouse, destination), prio)
+
+    def drain(self, destination):
+        """
+        Décharge une station qui en effectue la demande
+        :param destination: Station qui effectue la demande OBLIGATOIRE
+        """
+        destination.drain(which_warehouse_after)
 
     def stop_timer(self, capsule):
         self.timers[capsule.id] = -1

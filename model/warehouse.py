@@ -1,4 +1,4 @@
-from model import identifier
+from model import identifier, controller
 from model import queue
 from model import switch
 from model import controller
@@ -24,15 +24,18 @@ class Warehouse:
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
         self.name = "warehouse_%s" % self.loop.name
         self.section_loop = None
+        self.nb_to_send = 0
 
     def reset_simulation(self):
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
 
     def send_capsule(self, station_destination, priority):
-        simlog.info("an empty capsule left warehouse %d to %s" % (self.id, station_destination.name))
+        simlog.info("an empty capsule left warehouse %d to %s with priority %d" % (self.id, station_destination.name,
+                                                                                   priority))
         if self.capsule_queue.qsize() > 0:
             capsule_to_send = self.capsule_queue.get()
             capsule_to_send.destination = station_destination
+            capsule_to_send.priority = priority
             if True:  # TODO eviter de sortir alors que y'a déjà une capsule sur la sortie
                 capsule_to_send.start_trip()
 

@@ -35,7 +35,7 @@ class Capsule:
         self.segment_start_tick = 0
         self.segment_ticks_duration = 0
         self.moving = False
-        self.priority = 1
+        self.priority = 10
 
         if departure_station is not None:
             self.current_element = departure_station
@@ -266,3 +266,4 @@ def reset_simulation():
     for capsule in _capsules:
         del capsule
     _capsules = list()
+

@@ -13,8 +13,8 @@ class Graph:
     def __init__(self):
         self.size = len(station.get_stations()) + len(switch.get_switches()) * 2 + len(warehouse.get_warehouses())
         self.nodes = [] * self.size
-        self.matrix = [[0] * self.size] * self.size
-        self.expected_matrix = [[0] * self.size] * self.size
+        self.matrix = [[inf for j in range(self.size)] for i in range(self.size)]
+        self.expected_matrix = [[inf for j in range(self.size)] for i in range(self.size)]
 
         self.init_nodes()
         self.init_next_nodes()
@@ -53,7 +53,7 @@ class Graph:
             self.expected_matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0]/speed
             if node.next_nodes[1] is not None:
                 self.matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1]/speed
-                self.expected_matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0]/speed
+                self.expected_matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1]/speed
 
 
     def add_edge(self, node1, node2, weight):
@@ -100,11 +100,11 @@ class Graph:
         current_node = node_start
         distance_min[current_node.id] = 0
         non_visited_node.remove(current_node)
-        while non_visited_node.size() is not None:
-            for next_node in self.matrix[current_node.id]:
-                if not (next_node in non_visited_node):
-                    distance_min[next_node.id] = min(distance_min[next_node.id], distance_min[current_node.id]
-                                                     + self.get_edge_weight(current_node, next_node))
+        while len(non_visited_node) > 0:
+            for next_node_id in range(self.size):
+                if not (next_node_id in non_visited_node):
+                    distance_min[next_node_id] = min(distance_min[next_node_id], distance_min[current_node.id]
+                                                     + self.get_edge_weight(current_node.id, next_node_id))
             next_min = inf
             next = None
             for next_node in non_visited_node:
@@ -115,17 +115,19 @@ class Graph:
             non_visited_node.remove(current_node)
 
         path = []
-        while current_node is not node_start:
+        while current_node.id != node_start.id:
             path = [current_node] + path
             pred_min = inf
             pred = None
             for predecessor in self.nodes:
-                if self.get_edge_existence(predecessor, current_node):
+                if self.get_edge_existence(predecessor.id, current_node.id):
                     if distance_min[predecessor.id] < pred_min:
                         pred_min = distance_min[predecessor.id]
                         pred = predecessor
             current_node = pred
             path = [node_start] + path
+            #print(path)
+            #print(distance_min)
         return path
 
     def change(node_start, node_dest):

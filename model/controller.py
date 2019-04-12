@@ -16,7 +16,7 @@ class Controller:
         _controller = self
         self.capsules = capsule.get_capsules()
         self.switches = switch.get_switches()
-        self.warehouse = warehouse.get_warehouses()
+        self.warehouses = warehouse.get_warehouses()
         self.stations = station.get_stations()
         self.timers = [-1] * len(self.capsules)
         self.graph = Graph()
@@ -91,11 +91,11 @@ class Controller:
 
     def init_rules(self):
         for warehouse in self.warehouses:
-            end_node = self.graph.get_node_from_switch()
+            end_node = self.graph.get_node_from_switch(warehouse)
             unvisited_nodes = self.graph.get_switches_nodes().copy()
 
             for node in unvisited_nodes:
-                node_list = self.graph.calcul_with_switches(node, end_node)
+                node_list = self.graph.calcul(node, end_node)
                 for i in range(len(node_list)):
                     if unvisited_nodes.count(node_list[i]) > 0:
                         change = node_list[i].loop.id != node_list[i+1].loop.id
@@ -103,11 +103,11 @@ class Controller:
                         unvisited_nodes.remove(node_list[i])
 
         for station in self.stations:
-            end_node = self.graph.get_node_from_switch()
+            end_node = self.graph.get_node_from_switch(station)
             unvisited_nodes = self.graph.get_switches_nodes().copy()
 
             for node in unvisited_nodes:
-                node_list = self.graph.calcul_with_switches(node, end_node)
+                node_list = self.graph.calcul(node, end_node)
                 for i in range(len(node_list)):
                     if unvisited_nodes.count(node_list[i]) > 0:
                         change = node_list[i].loop.id != node_list[i+1].loop.id

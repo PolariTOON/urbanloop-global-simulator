@@ -18,7 +18,7 @@ _controller = None
 
 
 class Switch:
-    def __init__(self, loop=None, angle=None, other_loop=None, previous_element=None, next_element=None,
+    def __init__(self, loop=None, angle=-1, other_loop=None, previous_element=None, next_element=None,
                  next_element_other=None, size=switched_cost,rules = None):
         """
         initialisation d'un aiguillage

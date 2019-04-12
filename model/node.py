@@ -19,7 +19,7 @@ class Node:
         self.previous_nodes = [None] * 2
         self.next_nodes = [None] * 2
         self.distance_to_next_node = [-1] * 2
-        self.id = identifier.generate_node_id
+        self.id = identifier.generate_node_id()
 
     def add_next_node(self, node):
         node.add_previous_node(self)
@@ -37,7 +37,7 @@ class Node:
         else:
             self.previous_nodes[1] = node
 
-    def calculate_distance(self, switch):
+    def calculate_distance(self, a_switch):
         """
         Calcule la longueur du troncon entre lui même et le switch/warehouse/station entré en paramètre
         :param switch: switch/warehouse/station d'arrivée du troncon dont on calcule la longeur
@@ -45,11 +45,37 @@ class Node:
         """
         distance = -1
 
-        if self.switch.uuid == switch.uuid:
+        if self.switch.uuid == a_switch.uuid:
             distance = self.switch.size
+        elif type(self.switch) is switch.Switch:
+            if self.switch.loop.uuid == self.loop.uuid:
+                angle2 = self.switch.angle_my_loop
+            else:
+                angle2 = self.switch.angle_other_loop
+
+            if type(a_switch) is switch.Switch:
+                if a_switch.loop.uuid == self.loop.uuid:
+                    angle1 = a_switch.angle_my_loop
+                else:
+                    angle1 = a_switch.angle_other_loop
+            else:
+                angle1 = a_switch.angle
+
+            angle = min(360-abs(angle1-angle2), abs(angle1-angle2))
+            distance = self.loop.size/360 * (angle)
         else:
-            angle = min(360-abs(switch.angle-self.switch.angle), abs(switch.angle-self.switch.angle))
-            distance = switch.loop.size/360 * (angle)
+            angle2 = self.switch.angle
+
+            if type(a_switch) is switch.Switch:
+                if a_switch.loop.uuid == self.loop.uuid:
+                    angle1 = a_switch.angle_my_loop
+                else:
+                    angle1 = a_switch.angle_other_loop
+            else:
+                angle1 = a_switch.angle
+
+            angle = min(360-abs(angle1-angle2), abs(angle1-angle2))
+            distance = self.loop.size/360 * (angle)
 
         if self.distance_to_next_node[0] == -1:
             self.distance_to_next_node[0] = distance

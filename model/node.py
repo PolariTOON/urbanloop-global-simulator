@@ -2,6 +2,7 @@ import numpy as np
 
 from model import switch
 from model import loop
+from model import identifier
 
 
 _nodes = list()
@@ -21,7 +22,7 @@ class Node:
         self.id = identifier.generate_node_id
 
     def add_next_node(self, node):
-        self.node.add_previous_node(self)
+        node.add_previous_node(self)
 
         if self.next_nodes[0] == None :
             self.next_nodes[0] = node

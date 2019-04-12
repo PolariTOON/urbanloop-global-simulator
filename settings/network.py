@@ -56,7 +56,7 @@ def load(file_name=None, capsules_fulfill=True):
             e += 1
             el_type = element["type"]
             if el_type == "station":
-                elms += [model_station.Station(name=element["name"], capacity=element["capacity"], loop=the_loop,
+                elms += [model_station.Station(nearer_warehouse=None, name=element["name"], capacity=element["capacity"], loop=the_loop,
                                                angle=element["angle"], station_type=element["station_type"])]
                 # the_loop.stations += [elms[e]]
             elif "switch" in el_type:

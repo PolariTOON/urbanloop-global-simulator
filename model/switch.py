@@ -3,6 +3,7 @@ import numpy as np
 from model import identifier
 from model import routing
 from model import switch as model_switch
+from model import controller
 from settings import config
 from settings import simlog
 
@@ -56,7 +57,7 @@ class Switch:
         self.table = {}
         self.section_my_loop = None
         self.section_other_loop = None
-        self.rules= []
+        self.rules = []
         if rules is not None :
             self.rules == rules
 
@@ -69,7 +70,7 @@ class Switch:
         # the_loop = station.loop
 
         for rule in self.rules:
-            if rule.match(capsule.destination, capsule.priority, len(capsule.travelers)==0):
+            if rule.match(self.id, capsule.loop.id, capsule.destination, capsule.priority, len(capsule.travelers)==0):
                 _controller.update_from_switch(capsule)
                 return rule.change
 

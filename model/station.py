@@ -152,7 +152,7 @@ class Station:
                         self.nearer_warehouse.send_capsule(station)
                         sim_loop.recorder.add_sent_capsules_drain(1, self.nearer_warehouse)
 
-    def end_capsule_trip(self, capsule)
+    def end_capsule_trip(self, capsule):
         _controller.stop_timer(capsule)
 
 

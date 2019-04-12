@@ -5,9 +5,6 @@ from model import warehouse, node
 from model import switch
 from model import station
 from model.node import Node
-from model.station import get_stations
-from model.switch import get_switches
-from model.warehouse import get_warehouses
 from settings import config
 
 
@@ -15,24 +12,24 @@ class Graph:
 
     def __init__(self):
         self.size = len(station.get_stations()) + len(switch.get_switches()) * 2 + len(warehouse.get_warehouses())
-        self.nodes = [None] * self.size
-        self.matrix = np.zeros(self.size, self.size)
-        self.expected_matrix = np.zeros(self.size, self.size)
+        self.nodes = [] * self.size
+        self.matrix = [[0] * self.size] * self.size
+        self.expected_matrix = [[0] * self.size] * self.size
 
         self.init_nodes()
         self.init_next_nodes()
         self.init_matrices()
 
     def init_nodes(self):
-        for station in get_stations():
-            self.nodes.append(Node(station, station.loop))
+        for a_station in station.get_stations():
+            self.nodes.append(Node(a_station, a_station.loop))
 
-        for warehouse in get_warehouses():
-            self.nodes.append(Node(warehouse, warehouse.loop))
+        for a_warehouse in warehouse.get_warehouses():
+            self.nodes.append(Node(a_warehouse, a_warehouse.loop))
 
-        for switch in get_switches():
-            node1 = Node(switch, switch.my_loop)
-            node2 = Node(switch, switch.other_loop)
+        for a_switch in switch.get_switches():
+            node1 = Node(a_switch, a_switch.my_loop)
+            node2 = Node(a_switch, a_switch.other_loop)
 
             node1.add_next_node(node2)
 
@@ -40,13 +37,13 @@ class Graph:
             self.nodes.append(node2)
 
     def init_next_nodes(self):
-        for node in self.nodes:
-            if station.get_stations().count(node.switch) > 0 or warehouse.get_warehouses().count(node.switch) > 0:
-                node.add_next_node(self.nodes[node.get_node_id(node.switch.next_element), node.loop])
-            elif node.switch.next_element.loop.uuid != node.loop.uuid:
-                node.add_next_node(self.nodes[node.get_node_id(node.switch.next_element_other, node.loop)])
+        for a_node in self.nodes:
+            if station.get_stations().count(a_node.switch) > 0 or warehouse.get_warehouses().count(a_node.switch) > 0:
+                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.loop)])
+            elif a_node.switch.next_element.loop.uuid != a_node.loop.uuid:
+                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element_other, a_node.loop)])
             else:
-                node.add_next_node(self.nodes[node.get_node_id(node.switch.next_element, node.loop)])
+                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.loop)])
 
     def init_matrices(self):
         #speed : unités à vérifier
@@ -145,3 +142,16 @@ class Graph:
             node2 = node.get_node_id(current_switch, current_switch.loop)
 
         self.matrix[node1][node2] = inf
+
+    def get_switches_nodes(self):
+    	list_nodes = list()
+    	for node in self.nodes:
+    		if type(node.switch) is switch.Switch:
+    			list_nodes.append(node)
+    	return list_nodes
+
+    def get_node_from_switch(self, switch):
+    	for node in self.nodes:
+    		if node.switch.uuid == switch.uuid:
+    			return node
+    	return None

@@ -53,8 +53,6 @@ class SimLoop:
         self.fulfill_period = int(config.capsule['fulfill_period'])
         self.is_visualized = is_visualized
 
-        self.controller = Controller()
-
         recorder = stats_recorder.StatsRecorder(0)
 
         self.traveler_generator = traveler_generator.TravelerGenerator()
@@ -66,6 +64,8 @@ class SimLoop:
             self.is_endless = True
         if config.capsule['station_refill'] in ['false', 'False']:
             self.station_refill = False
+
+        self.controller = controller.Controller()
 
         _load_env(self.is_real_time)
         self.tick_event = _env.event()

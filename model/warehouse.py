@@ -1,6 +1,7 @@
 from model import identifier
 from model import queue
 from model import switch
+from model import controller
 from settings import simlog
 
 _warehouses = list()
@@ -38,7 +39,7 @@ class Warehouse:
     def capsule_passing(self, capsule):
         _controller.update_from_switch(capsule)
 
-    def end_capsule_trip(self, capsule)
+    def end_capsule_trip(self, capsule):
         _controller.stop_timer(capsule)
 
 def which_warehouse_before(station_destination):

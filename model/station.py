@@ -26,7 +26,7 @@ class Type(Enum):
 class Station:
     network = None
 
-    def __init__(self, nearer_warehouse, name=None, capacity=4, loop=None, angle=None, station_type=Type.CITY):
+    def __init__(self, name=None, capacity=4, loop=None, angle=None, station_type=Type.CITY):
         """
         :param name: Name of the station
         :param capacity: Loop circumference (float)
@@ -35,7 +35,6 @@ class Station:
         :param station_type: Type of station compared to its affluence (Enum)
         """
         global _stations
-        self.nearer_warehouse = nearer_warehouse
         _stations.append(self)
 
         global _controller
@@ -148,16 +147,9 @@ class Station:
                 if station.capsule_queue.qsize() > station.traveler_queue.qsize():
                     nb_to_send = max(station.capsule_queue.qsize() - station.traveler_queue.qsize() - 1, 1)
                 # j'en envoie une vide (si pas de voyageur) attente vers un entrepot
+                controller.drain(self)
                 station.drain(self.nearer_warehouse)
-                if self.nearer_warehouse is not None and station.traveler_queue.qsize() <= 1:
-                    station.drain(self.nearer_warehouse)
-                    sim_loop.recorder.add_called_capsules_drain(1, self.nearer_warehouse)
-                # vérifier que la station n'est pas sujette à voir partir plein de voyageurs
-                proba = converter.station_probability(station.get_type(), now_second, False)
-                if proba > 0.3 and nb_to_send > 1 and self.nearer_warehouse is not None:
-                    for i in range(min(nb_to_send - 1, 1)):
-                        self.nearer_warehouse.send_capsule(station)
-                        sim_loop.recorder.add_sent_capsules_drain(1, self.nearer_warehouse)
+
 
     def end_capsule_trip(self, capsule):
         _controller.stop_timer(capsule)

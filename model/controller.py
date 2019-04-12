@@ -6,6 +6,7 @@ from model.graph import Graph
 from model.rule import *
 from model import station
 from model.warehouse import which_warehouse_before
+from model.warehouse import which_warehouse_after
 
 _controller = None
 
@@ -72,6 +73,16 @@ class Controller:
         else:
             warehouse = which_warehouse_before(destination)
             warehouse.send(Capsule(warehouse, destination), prio)
+
+    def drain(self, destination):
+        """
+        Décharge une station qui en effectue la demande
+        :param destination: Station qui effectue la demande OBLIGATOIRE
+        """
+        destination.drain(which_warehouse_after)
+
+
+
 
 	def stop_timer(self, capsule):
 		self.timers[capsule.id] = -1

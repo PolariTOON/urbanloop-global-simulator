@@ -52,6 +52,7 @@ class Station:
         self.capsule_queue = queue.Queue(maxsize=capacity)
         self.next_element = None
         self.section_loop = None
+        self.nb_to_send = 0
 
     def reset_simulation(self):
         self.traveler_queue = queue.Queue()
@@ -109,6 +110,12 @@ class Station:
         return self.capsule_queue.qsize() + len(capsule.get_incoming_capsule(self))
 
     def fill_and_full_stations(self):
+        """
+        Appel le controleur pour completer la station. On considère que la station est en situation critique si il ne
+        reste aucune capsule disponible. La demande est alors effectué avec une priorité maximale(1). La capsule vide
+        sera donc autant prioritaire qu'une capsule pleine. Si il reste au moins une capsule alors la demande est
+        effectué avec une priorité faible
+        """
         now_second = converter.now_to_seconds()
         # TODO unused variable -> now_hour = converter.seconds_to_floor_hour(now_second)
         simlog.debug("Stations drainage and completion process launched.")
@@ -119,9 +126,9 @@ class Station:
                 simlog.debug("Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
                 nb_to_send = station.capacity - station.estimated_capsules_number() - 1
                 if station.estimated_capsules_number() == 0:
-                    controller.refill(1,self)
+                    controller.refill(10,self)
                 else:
-                    controller.refill(0.6,self)
+                    controller.refill(6,self)
                      # j'en envoie une depuis un entrepot
                 """
                 if nearer_warehouse is not None :
@@ -152,7 +159,7 @@ class Station:
                         self.nearer_warehouse.send_capsule(station)
                         sim_loop.recorder.add_sent_capsules_drain(1, self.nearer_warehouse)
 
-    def end_capsule_trip(self, capsule)
+    def end_capsule_trip(self, capsule):
         _controller.stop_timer(capsule)
 
 

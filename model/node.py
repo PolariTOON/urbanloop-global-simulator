@@ -38,6 +38,11 @@ class Node:
             self.previous_nodes[1] = node
 
     def calculate_distance(self, switch):
+        """
+        Calcule la longueur du troncon entre lui même et le switch/warehouse/station entré en paramètre
+        :param switch: switch/warehouse/station d'arrivée du troncon dont on calcule la longeur
+        :return: met jour l'attribut distance_to_next_node
+        """
         distance = -1
 
         if self.switch.uuid == switch.uuid:

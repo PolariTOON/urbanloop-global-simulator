@@ -10,13 +10,13 @@ class Rule:
         
 
     def match(self, destination=None, priority=None, empty=None, id_pod=None, time=None):
-    	"""
+        """
         :return: true if the rule matches
         """
-    	#id_pod et time à ajouter si on s'en sert finalement
-    	if (destination is not None and destination == self.destination) || self.destination is None:
-    		if (priority is not None and priority == self.priority) || self.priority is None:
-    			if (empty is not None and empty == self.empty) || self.empty is None:
-    				return True
-    	return False
+        #id_pod et time à ajouter si on s'en sert finalement
+        if (destination is not None and destination == self.destination) or self.destination is None:
+            if (priority is not None and priority == self.priority) or self.priority is None:
+                if (empty is not None and empty == self.empty) or self.empty is None:
+                    return True
+        return False
 

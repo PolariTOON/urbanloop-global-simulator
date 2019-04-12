@@ -1,6 +1,6 @@
 import numpy as np
 
-from model import identifier
+from model import identifier, controller
 from model import routing
 from model import switch as model_switch
 from settings import config
@@ -74,7 +74,7 @@ class Switch:
                 return rule.change
 
         print("NO MATCHING RULE : STAY ON SAME LOOP")
-        return false
+        return False
         # if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
         #     simlog.debug("le switch " + str(self.objectId) + " aiguille la capsule voulant aller à " + station.name
         #                  + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)

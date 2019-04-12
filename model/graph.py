@@ -91,6 +91,13 @@ class Graph:
         return self.matrix[node1][node2] > 3 * self.expected_matrix[node1][node2]
 
     def calcul(self, node_start, node_arrival):
+        """
+        calcul du chemin optimal entre un noeud (switch, warehouse, station) et une destination
+        :param node_arrival: destination OBLIGATOIRE
+        :param  node_start : depart OBLIGATOIRE
+        :return: path : le chemin optimal : liste ordonnée (sens croissant) des noeuds traversés pour aller du départ à
+        la destination
+    """
         distance_min = self.size * [inf]
         non_visited_node = list(self.nodes)
         current_node = node_start
@@ -121,12 +128,20 @@ class Graph:
                         pred_min = distance_min[predecessor.id]
                         pred = predecessor
             current_node = pred
-        return [node_start] + path
+            path = [node_start] + path
+        return path
 
     def change(node_start, node_dest):
         return node_start.loop.uuid != node_dest.loop.uuid
 
     def get_time_max(self, previous_switch, current_switch):
+        """
+        Retourne le temps à partir duquel on considère un troncon comme coupé. On prends comme limite
+        10 * le temps de parcours en conditions normales
+        :param previous_switch: switch, warehouse ou station d'où commence le troncon
+        :param current_switch: switch, warehouse ou station où arrive le troncon
+        :return: temps à partir duquel on considère un troncon comme coupé
+        """
         node1 = node.get_node_id(previous_switch, previous_switch.loop)
 
         if previous_switch.uuid == current_switch.uuid:
@@ -137,6 +152,13 @@ class Graph:
         return 10 * self.expected_matrix[node1][node2]
 
     def disable_way(self, previous_switch, current_switch):
+        """
+        Coupe un troncon entre deux noeuds. Concretement cela place la valeur inf (infini) comme poids de l'arc
+        dans le graphe
+        :param previous_switch: switch, warehouse ou station d'où commence le troncon
+        :param current_switch: switch, warehouse ou station où arrive le troncon
+        """
+
         node1 = node.get_node_id(previous_switch, previous_switch.loop)
 
         if previous_switch.uuid == current_switch.uuid:

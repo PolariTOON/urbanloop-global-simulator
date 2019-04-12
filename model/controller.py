@@ -12,43 +12,49 @@ _controller = None
 
 class Controller:
 
-	def __init__(self):
+    def __init__(self):
         global _controller
         _controller = self
-		self.capsules = capsule.get_capsules()
-		self.switches = switch.get_switches()
-		self.timers = [-1] * len(capsules)
-		self.graph = Graph()
+        self.capsules = capsule.get_capsules()
+        self.switches = switch.get_switches()
+        self.timers = [-1] * len(self.capsules)
+        self.graph = Graph()
 
-	def update_from_switch(self, capsule):
-    	"""
-         fonction qui est lancée à chaque fois qu'une capsule passe un switch
-         :param previous_switch : le dernier switch/station/warehouse parcouru
-         :param current_switch : le switch qui a routé la capsule
-         :param capsule : la capsule routée
-        """
-        previous_switch = capsule.current_element
-        current_switch = capsule.next_element
+    def update_from_switch(self, capsule):
+		"""
+		fonction qui est lancée à chaque fois qu'une capsule passe un switch
+		:param previous_switch : le dernier switch/station/warehouse parcouru
+		:param current_switch : le switch qui a routé la capsule
+		:param capsule : la capsule routée
+		"""
+		previous_switch = capsule.current_element
+		current_switch = capsule.next_element
 		if self.graph.update_weights(previous_switch, current_switch, self.timers[capsule.id]):
-            print("CONGESTION")
-
+			print("CONGESTION")
 		self.timers[capsule.id] = 0
 
-	def update(self):
+    def update(self):
 		"""
-	     fonction qui est lancée à chaque tour pour actualiser les timers du controller
-	    """
-	    for i in range(len(self.timers)):
-            if timers[i] != -1:
-    	    	timers[i] += 1
-    	    	next_switch = self.capsules[i].next_element
-    	    	previous_switch = self.capsules[i].current_element
+		fonction qui est lancée à chaque tour pour actualiser les timers du controller
+		"""
+		for i in range(len(self.timers)):
+			if self.timers[i] != -1:
+				self.timers[i] += 1
+				next_switch = self.capsules[i].next_element
+				previous_switch = self.capsules[i].current_element
 
-    	    	if timers[i] >= self.graph.get_time_max(previous_switch, next_switch):
-    	    		self.graph.disable_way(previous_switch, next_switch)
+				if self.timers[i] >= self.graph.get_time_max(previous_switch, next_switch):
+					self.graph.disable_way(previous_switch, next_switch)
 
-	def refill(self, prio, destination, nb_to_send=1):
-		if prio == 1:
+    def refill(self, prio, destination, nb_to_send=1):
+        """
+        Réapprovisionne une station qui en effectue la demande
+        :param prio: Priorité de la demande (10 si critique) OBLIGATOIRE
+        :param destination: Station qui effectue la demande OBLIGATOIRE
+        :param nb_to_send: Nombre de capsule vide à envoyer à la station
+        """
+
+        if prio == 10:
 			test = False
 			for capsule in self.capsules:
 				if capsule.travelers==list() and capsule.priority <= 6:
@@ -63,12 +69,12 @@ class Controller:
 			else:
 				warehouse = which_warehouse_before(destination)
 				warehouse.send(Capsule(warehouse, destination), 1)
-		else:
-			warehouse = which_warehouse_before(destination)
-			warehouse.send(Capsule(warehouse, destination), prio)
+        else:
+            warehouse = which_warehouse_before(destination)
+            warehouse.send(Capsule(warehouse, destination), prio)
 
-    def stop_timer(self, capsule):
-        self.timers[capsule.id] = -1
+	def stop_timer(self, capsule):
+		self.timers[capsule.id] = -1
 
 def get_controller():
     return _controller

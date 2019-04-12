@@ -2,13 +2,16 @@ from model import capsule
 from model import switch
 from model import graph
 from model.capsule import Capsule
+from model.graph import Graph
 from model.rule import *
 from model import station
 from model.warehouse import which_warehouse_before
 
 _controller = None
 
+
 class Controller:
+
 	def __init__(self):
 		self.capsules = capsule.get_capsules()
 		self.switches = switch.get_switches()
@@ -16,49 +19,46 @@ class Controller:
 		self.graph = Graph()
 
 	def update_from_switch(self, switch, capsule):
-	"""
-     fonction qui est lancée à chaque fois qu'une capsule passe un switch
-     :param switch : le switch qui a routé la capsule
-     :param capsule : la capsule routée
-    """
+		"""
+		 fonction qui est lancée à chaque fois qu'une capsule passe un switch
+		 :param switch : le switch qui a routé la capsule
+		 :param capsule : la capsule routée
+		"""
 		self.graph.update_weights(switch.uuid, self.timers[capsule.id])
 
 		self.timers[capsule.id] = 0
 
-
 	def update(self):
 		"""
-	     fonction qui est lancée à chaque tour pour actualiser les timers du controller
-	    """
-	    for i in range(len(self.timers)):
-	    	timers[i] += 1
-	    	next_switch = self.capsules[i].next_element.uuid
-	    	previous_switch = self.capsules[i].current_element.uuid
+		fonction qui est lancée à chaque tour pour actualiser les timers du controller
+		"""
+		for i in range(len(self.timers)):
+			self.timers[i] += 1
+			next_switch = self.capsules[i].next_element.uuid
+			previous_switch = self.capsules[i].current_element.uuid
 
-	    	if timers[i] >= self.graph.matrix[previous_switch][next_element]*10:
-	    		disable_way(previous_switch, next_switch)
+			if self.timers[i] >= self.graph.matrix[previous_switch][next_element]*10:
+				disable_way(previous_switch, next_switch)
 
 	def refill(self, prio, destination, nb_to_send=1):
 		if prio == 1:
-			test=False
+			test = False
 			for capsule in self.capsules:
 				if capsule.travelers==list() and capsule.priority <= 6:
 					test=True
-					trajet = graph.calcul(self.get_next(capsule) ,destination)
+					trajet = graph.calcul(self.get_next(capsule), destination)
 					for i in range(len(trajet)):
-						r = Rule(priority=6, empty=True, change=graph.change(trajet[i],trajet[i+1]))
+						r = Rule(priority=6, empty=True, change=graph.change(trajet[i], trajet[i+1]))
 						trajet[i].add_rule(r)
 			if test:
-				warehouse=which_warehouse_before(destination)
-				warehouse.send(Capsule(warehouse,destination),prio)
+				warehouse = which_warehouse_before(destination)
+				warehouse.send(Capsule(warehouse, destination), prio)
 			else:
-				warehouse=which_warehouse_before(destination)
-				warehouse.send(Capsule(warehouse,destination),1)
-
-
+				warehouse = which_warehouse_before(destination)
+				warehouse.send(Capsule(warehouse, destination), 1)
 		else:
-			warehouse=which_warehouse_before(destination)
-			warehouse.send(Capsule(warehouse,destination),prio)
+			warehouse = which_warehouse_before(destination)
+			warehouse.send(Capsule(warehouse, destination), prio)
 
 
 def disable_way(previous_switch, next_switch):

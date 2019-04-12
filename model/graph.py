@@ -1,9 +1,13 @@
 import numpy as np
 from math import *
 
-from model import warehouse
+from model import warehouse, node
 from model import switch
 from model import station
+from model.node import Node
+from model.station import get_stations
+from model.switch import get_switches
+from model.warehouse import get_warehouses
 from settings import config
 
 
@@ -11,7 +15,7 @@ class Graph:
 
     def __init__(self):
         self.size = len(station.get_stations()) + len(switch.get_switches()) * 2 + len(warehouse.get_warehouses())
-        self.nodes = [None] * size
+        self.nodes = [None] * self.size
         self.matrix = np.zeros(self.size, self.size)
         self.expected_matrix = np.zeros(self.size, self.size)
 
@@ -20,13 +24,13 @@ class Graph:
         self.init_matrices()
 
     def init_nodes(self):
-        for station in station.get_stations():
+        for station in get_stations():
             self.nodes.append(Node(station, station.loop))
 
-        for warehouse in warehouse.get_warehouses():
+        for warehouse in get_warehouses():
             self.nodes.append(Node(warehouse, warehouse.loop))
 
-        for switch in switch.get_stations():
+        for switch in get_switches():
             node1 = Node(switch, switch.my_loop)
             node2 = Node(switch, switch.other_loop)
 
@@ -37,7 +41,7 @@ class Graph:
 
     def init_next_nodes(self):
         for node in self.nodes:
-            if station.get_stations().count(node.switch) > 0 || warehouse.get_warehouses().count(node.switch) > 0:
+            if station.get_stations().count(node.switch) > 0 or warehouse.get_warehouses().count(node.switch) > 0:
                 node.add_next_node(self.nodes[node.get_node_id(node.switch.next_element), node.loop])
             elif node.switch.next_element.loop.uuid != node.loop.uuid:
                 node.add_next_node(self.nodes[node.get_node_id(node.switch.next_element_other, node.loop)])
@@ -84,7 +88,7 @@ class Graph:
 
         self.matrix[node1][node2] = (1-0.125)*self.matrix[node1][node2]+0.125*sample_time
 
-        return matrix[node1][node2] > 3 * expected_matrix[node1][node2]
+        return self.matrix[node1][node2] > 3 * self.expected_matrix[node1][node2]
 
     def calcul(self, node_start, node_arrival):
         distance_min = self.size * [inf]
@@ -122,7 +126,7 @@ class Graph:
     def change(node_start, node_dest):
         return node_start.loop.uuid != node_dest.loop.uuid
 
-    def get_time_max(self, previous_switch, next_switch):
+    def get_time_max(self, previous_switch, current_switch):
         node1 = node.get_node_id(previous_switch, previous_switch.loop)
 
         if previous_switch.uuid == current_switch.uuid:
@@ -130,9 +134,9 @@ class Graph:
         else:
             node2 = node.get_node_id(current_switch, current_switch.loop)
 
-        return 10 * expected_matrix[node1][node2]
+        return 10 * self.expected_matrix[node1][node2]
 
-    def disable_way(self, previous_switch, next_switch):
+    def disable_way(self, previous_switch, current_switch):
         node1 = node.get_node_id(previous_switch, previous_switch.loop)
 
         if previous_switch.uuid == current_switch.uuid:
@@ -140,4 +144,4 @@ class Graph:
         else:
             node2 = node.get_node_id(current_switch, current_switch.loop)
 
-        matrix[node1][node2] = inf
+        self.matrix[node1][node2] = inf

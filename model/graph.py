@@ -63,7 +63,7 @@ class Graph:
         self.matrix[node1][node2] = 0
 
     def get_edge_existence(self, node1, node2):
-        return self.matrix[node1][node2] > 0
+        return self.matrix[node1][node2] < inf
 
     def get_edge_weight(self, node1,node2):
         return self.matrix[node1][node2]
@@ -113,19 +113,25 @@ class Graph:
                     next = next_node
             current_node = next
             non_visited_node.remove(current_node)
-
+        print(distance_min)
         path = []
+        current_node = node_arrival
         while current_node.id != node_start.id:
             path = [current_node] + path
             pred_min = inf
             pred = None
             for predecessor in self.nodes:
                 if self.get_edge_existence(predecessor.id, current_node.id):
+                    print("ddd")
+                    print(current_node.id)
+                    print(predecessor.id)
+                    print(distance_min[predecessor.id])
                     if distance_min[predecessor.id] < pred_min:
                         pred_min = distance_min[predecessor.id]
                         pred = predecessor
             current_node = pred
-            path = [node_start] + path
+
+        path = [node_start] + path
             #print(path)
             #print(distance_min)
         return path

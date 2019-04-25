@@ -95,7 +95,14 @@ class Controller:
             unvisited_nodes = self.graph.get_switches_nodes().copy()
 
             for node in unvisited_nodes:
+                print("deb")
+                print(node.id)
+                print(end_node.id)
+
                 node_list = self.graph.calcul(node, end_node)
+                for a in node_list:
+                    print(a.id)
+                print("fin")
                 for i in range(len(node_list)):
                     if unvisited_nodes.count(node_list[i]) > 0:
                         change = node_list[i].loop.id != node_list[i+1].loop.id

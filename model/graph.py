@@ -39,7 +39,6 @@ class Graph:
 
     def init_next_nodes(self):
         for a_node in self.nodes:
-            print("node", a_node.id)
             if station.get_stations().count(a_node.switch) > 0 or warehouse.get_warehouses().count(a_node.switch) > 0:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.loop)])
             elif a_node.switch.loop.uuid == a_node.loop.uuid:

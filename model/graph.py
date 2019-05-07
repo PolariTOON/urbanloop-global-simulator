@@ -1,5 +1,6 @@
 import numpy as np
 from math import *
+import copy
 
 from model import warehouse, node
 from model import switch
@@ -136,7 +137,6 @@ class Graph:
             current_node = predecessor[current_node.id]
 
         path.append(node_start)
-
         return path
 
 

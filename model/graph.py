@@ -1,5 +1,6 @@
 import numpy as np
 from math import *
+import copy
 
 from model import warehouse, node
 from model import switch
@@ -96,27 +97,53 @@ class Graph:
         la destination
     """
         distance_min = self.size * [inf]
-        non_visited_node = list(self.nodes)
+        non_visited_node = [0] * self.size
+        print(self.size)
+        for i in range (self.size):
+            non_visited_node[i] = i
         current_node = node_start
         distance_min[current_node.id] = 0
-        non_visited_node.remove(current_node)
+        print(non_visited_node)
+        #non_visited_node.remove(current_node.id)
+        print(non_visited_node)
         while len(non_visited_node) > 0:
-            for next_node_id in range(self.size):
-                if not (next_node_id in non_visited_node):
-                    distance_min[next_node_id] = min(distance_min[next_node_id], distance_min[current_node.id]
-                                                     + self.get_edge_weight(current_node.id, next_node_id))
+            print("tar")
             next_min = inf
             next = None
-            for next_node in non_visited_node:
-                if distance_min[next_node.id] <= next_min:
-                    next_min = distance_min[next_node.id]
-                    next = next_node
+            for next_node_id in non_visited_node:
+                if distance_min[next_node_id] < next_min:
+                    print("bouiacahca")
+                    next_min = distance_min[next_node_id]
+                    next =self.nodes[next_node_id]
             current_node = next
-            non_visited_node.remove(current_node)
-        print(distance_min)
+            non_visited_node.remove(current_node.id)
+
+
+            for next_node_id in range(self.size):
+                if (self.get_edge_weight(current_node.id, next_node_id)<inf):
+                    print("chog")
+                    print(next_node_id)
+                    print(non_visited_node)
+                    #if (next_node_id in non_visited_node):
+                    print("ozef",distance_min[current_node.id])
+                    distance_min[next_node_id] = min(distance_min[next_node_id], distance_min[current_node.id]
+                                                     + self.get_edge_weight(current_node.id, next_node_id))
+
+                    print("zrt",distance_min[current_node.id])
+                    print("aze",self.get_edge_weight(current_node.id, next_node_id))
+                    print("rrr",distance_min[next_node_id])
+                    print(next_node_id)
+                    print(non_visited_node)
+
+
+
         path = []
         current_node = node_arrival
+
+        print("efg",distance_min)
         while current_node.id != node_start.id:
+            print("ici")
+            print(current_node.id)
             path = [current_node] + path
             pred_min = inf
             pred = None

@@ -147,6 +147,13 @@ class Graph:
         return path
 
 
+    def delete_section(node):
+        for i in range(self.size):
+            node[i]=inf;
+
+
+
+
     def change(node_start, node_dest):
         return node_start.loop.uuid != node_dest.loop.uuid
 

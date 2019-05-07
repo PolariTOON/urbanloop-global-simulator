@@ -65,7 +65,7 @@ class Graph:
     def get_edge_existence(self, node1, node2):
         return self.matrix[node1][node2] < inf
 
-    def get_edge_weight(self, node1,node2):
+    def get_edge_weight(self, node1, node2):
         return self.matrix[node1][node2]
 
     def update_weight(self, previous_switch, current_switch, sample_time):
@@ -95,46 +95,50 @@ class Graph:
         :return: path : le chemin optimal : liste ordonnée (sens croissant) des noeuds traversés pour aller du départ à
         la destination
     """
-        distance_min = self.size * [inf]
-        non_visited_node = list(self.nodes)
-        current_node = node_start
-        distance_min[current_node.id] = 0
-        non_visited_node.remove(current_node)
-        while len(non_visited_node) > 0:
-            for next_node_id in range(self.size):
-                if not (next_node_id in non_visited_node):
-                    distance_min[next_node_id] = min(distance_min[next_node_id], distance_min[current_node.id]
-                                                     + self.get_edge_weight(current_node.id, next_node_id))
-            next_min = inf
-            next = None
-            for next_node in non_visited_node:
-                if distance_min[next_node.id] <= next_min:
-                    next_min = distance_min[next_node.id]
-                    next = next_node
-            current_node = next
-            non_visited_node.remove(current_node)
-        print(distance_min)
-        path = []
-        current_node = node_arrival
-        while current_node.id != node_start.id:
-            path = [current_node] + path
-            pred_min = inf
-            pred = None
-            for predecessor in self.nodes:
-                if self.get_edge_existence(predecessor.id, current_node.id):
-                    print("ddd")
-                    print(current_node.id)
-                    print(predecessor.id)
-                    print(distance_min[predecessor.id])
-                    if distance_min[predecessor.id] < pred_min:
-                        pred_min = distance_min[predecessor.id]
-                        pred = predecessor
-            current_node = pred
+        distance = self.size * [inf]
+        distance[node_start.id] = 0
 
-        path = [node_start] + path
-            #print(path)
-            #print(distance_min)
+        VISITED = self.size+100
+        visited_nodes = [-1] * self.size
+
+        predecessor = self.size * [None]
+
+        def maj_distances(node1, node2):
+            if(distance[node2.id] > distance[node1.id]+ self.get_edge_weight(node1.id,node2.id)):
+                distance[node2.id] = distance[node1.id]+ self.get_edge_weight(node1.id,node2.id)
+                predecessor[node2.id] = node1
+                if(distance[node2.id] == inf):
+                    print("CEST LA MERDE")
+
+        def f(node, pred_Node):
+            if(visited_nodes[node.id]<VISITED):
+                if(node.id == node_start.id):
+                    visited_nodes[node.id]=VISITED
+                if(visited_nodes[node.id]==-1):
+                    visited_nodes[node.id]=pred_Node.id
+                elif(visited_nodes[node.id]<VISITED):
+                    visited_nodes[node.id]=VISITED
+
+                for n in node.next_nodes:
+                    if(n is not None):
+                        maj_distances(node, n)
+
+                for n in node.next_nodes:
+                    if(n is not None):
+                        f(n, node)
+
+        f(node_start,None)
+
+        path = list()
+        current_node = node_arrival
+        while(current_node.id != node_start.id):
+            path.append(current_node)
+            current_node = predecessor[current_node.id]
+
+        path.append(node_start)
+
         return path
+
 
     def change(node_start, node_dest):
         return node_start.loop.uuid != node_dest.loop.uuid
@@ -185,3 +189,9 @@ class Graph:
     		if node.switch.uuid == switch.uuid:
     			return node
     	return None
+
+    def get_node_from_id(self, id):
+        for node in self.nodes:
+            if node.id == id:
+                return node
+        return None

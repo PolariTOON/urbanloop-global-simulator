@@ -95,15 +95,16 @@ class Controller:
             unvisited_nodes = self.graph.get_switches_nodes().copy()
 
             for node in unvisited_nodes:
-                print("deb")
+                #beacoup de print pour test (à enlever quand ça marchera)
+                print("debut")
                 print(node.id)
                 print(end_node.id)
-
                 node_list = self.graph.calcul(node, end_node)
-                for a in node_list:
-                    print(a.id)
+                for kkk in node_list:
+                    print(kkk.id)
                 print("fin")
-                for i in range(len(node_list)):
+
+                for i in range(len(node_list)-1):
                     if unvisited_nodes.count(node_list[i]) > 0:
                         change = node_list[i].loop.id != node_list[i+1].loop.id
                         self.rules.append(Rule(node.switch.id, node.loop.id, warehouse, None, change))
@@ -115,7 +116,7 @@ class Controller:
 
             for node in unvisited_nodes:
                 node_list = self.graph.calcul(node, end_node)
-                for i in range(len(node_list)):
+                for i in range(len(node_list)-1):
                     if unvisited_nodes.count(node_list[i]) > 0:
                         change = node_list[i].loop.id != node_list[i+1].loop.id
                         self.rules.append(Rule(node.switch.id, node.loop.id, station, None, change))

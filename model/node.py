@@ -86,5 +86,7 @@ class Node:
 def get_node_id(switch, loop):
     for a_node in _nodes:
         if a_node.switch.uuid == switch.uuid and a_node.loop.uuid == loop.uuid:
+            print("ICI:", switch.uuid, loop.uuid)
             return a_node.id
+    print("LAA", switch.uuid, loop.uuid)
     return -1

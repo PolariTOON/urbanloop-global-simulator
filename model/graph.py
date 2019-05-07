@@ -39,12 +39,13 @@ class Graph:
 
     def init_next_nodes(self):
         for a_node in self.nodes:
+            print("node", a_node.id)
             if station.get_stations().count(a_node.switch) > 0 or warehouse.get_warehouses().count(a_node.switch) > 0:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.loop)])
-            elif a_node.switch.next_element.loop.uuid != a_node.loop.uuid:
-                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element_other, a_node.loop)])
+            elif a_node.switch.loop.uuid == a_node.loop.uuid:
+                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.switch.loop)])
             else:
-                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.loop)])
+                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element_other, a_node.switch.other_loop)])
 
     def init_matrices(self):
         #speed : unités à vérifier
@@ -108,13 +109,20 @@ class Graph:
             if(distance[node2.id] > distance[node1.id]+ self.get_edge_weight(node1.id,node2.id)):
                 distance[node2.id] = distance[node1.id]+ self.get_edge_weight(node1.id,node2.id)
                 predecessor[node2.id] = node1
-                if(distance[node2.id] == inf):
-                    print("CEST LA MERDE")
 
         def f(node, pred_Node):
-            if(visited_nodes[node.id]<VISITED):
-                if(node.id == node_start.id):
-                    visited_nodes[node.id]=VISITED
+            if(pred_Node is None):
+                visited_nodes[node.id]=VISITED
+
+                for n in node.next_nodes:
+                    if(n is not None):
+                        maj_distances(node, n)
+
+                for n in node.next_nodes:
+                    if(n is not None):
+                        f(n, node)
+
+            elif(visited_nodes[node.id]<VISITED and visited_nodes[node.id]!=pred_Node.id):
                 if(visited_nodes[node.id]==-1):
                     visited_nodes[node.id]=pred_Node.id
                 elif(visited_nodes[node.id]<VISITED):

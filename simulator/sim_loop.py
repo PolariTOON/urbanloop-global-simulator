@@ -119,8 +119,9 @@ class SimLoop:
                 if _modulo_on_seconds(1):
                     _env.process(self.traveler_generator.generate())
                     self.controller.update()
-                if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(self.fulfill_period):
-                    station.fill_and_full_stations()
+
+                #if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(self.fulfill_period):
+                    #station.fill_and_full_stations()
 
                 yield _env.timeout(1)
 

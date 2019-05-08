@@ -47,7 +47,7 @@ class Capsule:
         Ask to the selectedObject switch if the capsule should switch or not to another station to reach its destination.
         :param current_switch: The current switch which decide whether the capsule needs to go on another station
         """
-        change = current_switch.route_capsule_to_station(self.destination)
+        change = current_switch.route_capsule_to_station(self)
         if change:
             self._change_loop(current_switch)
         else:

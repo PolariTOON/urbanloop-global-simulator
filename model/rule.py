@@ -19,6 +19,6 @@ class Rule:
             if (destination is not None and destination == self.destination) or self.destination is None:
                 if (priority is not None and priority == self.priority) or self.priority is None:
                     if (empty is not None and empty == self.empty) or self.empty is None:
-                            return True
+                        return True
         return False
 

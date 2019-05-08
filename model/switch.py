@@ -14,8 +14,6 @@ switched_cost = int(config.routing['switched_cost'])
 _switches = []
 alive_timers = []
 
-_controller = None
-
 
 class Switch:
     def __init__(self, loop=None, angle=-1, other_loop=None, previous_element=None, next_element=None,
@@ -34,9 +32,6 @@ class Switch:
         global alive_timers
         _switches.append(self)
         alive_timers += [float('inf'), float('inf')]
-
-        global _controller
-        _controller = controller.get_controller()
 
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_switch_id()
@@ -71,7 +66,7 @@ class Switch:
 
         for rule in self.rules:
             if rule.match(self.id, capsule.loop.id, capsule.destination, capsule.priority, len(capsule.travelers)==0):
-                _controller.update_from_switch(capsule)
+                controller.get_controller().update_from_switch(capsule)
                 return rule.change
 
         print("NO MATCHING RULE : STAY ON SAME LOOP")
@@ -84,6 +79,9 @@ class Switch:
         #      simlog.debug("le switch " + str(self.objectId) + " laisse la capsule voulant aller à " + station.name
         #                   + " sur la boucle " + self.my_loop.name)
         #      return False
+
+    def capsule_passing(self, capsule):
+        controller.get_controller().update_from_switch(capsule)
 
     def is_switch_out(self, the_loop):
         if the_loop is self.my_loop:
@@ -112,7 +110,6 @@ def init():
     fonction d'initialisation de tous les switchs pour que les longueur dépendent des coordonnées
     et que la taille des tableaux correspondant à tous les objets prévus
     puis création de la table de routage permanente
-        :param  table : la table à l'initialisation du réseau
         :return: 0UT : (void) modification des attributs intrinsèques aux switchs
     """
     for a_switch in _switches:  #  lenght depend des coordonnées
@@ -135,9 +132,9 @@ def init():
         a_switch.timers[a_switch.id] = my_timer
         a_switch.defects = [[False, False] for _ in range(len(_switches))]
     for a_switch in _switches:
-        a_switch.table[1] = routing.dijkstra_route(a_switch, a_switch.permanent_table, a_switch.permanent_cover)
+        a_switch.table = routing.dijkstra_route(a_switch, a_switch.permanent_table, a_switch.permanent_cover)
         # FINAL
-        a_switch.permanent_table = a_switch.table[1]
+        a_switch.permanent_table = a_switch.table
 
         # anomalies des switches : [boucle presente, boucle aiguillee] True ==> anomalies
 

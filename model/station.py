@@ -14,8 +14,6 @@ from simulator import sim_loop
 from settings import simlog
 
 _stations = list()
-_controller = None
-
 
 class Type(Enum):
     ACTIVITY = 1
@@ -36,9 +34,6 @@ class Station:
         """
         global _stations
         _stations.append(self)
-
-        global _controller
-        _controller = controller.get_controller()
 
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_station_id()
@@ -92,7 +87,7 @@ class Station:
                 self.capsule_queue.put(a_capsule)
 
     def capsule_passing(self, capsule):
-        _controller.update_from_switch(capsule)
+        controller.get_controller().update_from_switch(capsule)
 
     '''    
     def complete(self):
@@ -151,7 +146,7 @@ class Station:
                 station.drain(self.nearer_warehouse)
 
     def end_capsule_trip(self, capsule):
-        _controller.stop_timer(capsule)
+        controller.get_controller().stop_timer(capsule)
 
 
 def get_stations():
@@ -262,23 +257,3 @@ def reset_simulation():
     """
     for station in _stations:
         station.reset_simulation()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -20,6 +20,7 @@ class Graph:
         self.init_nodes()
         self.init_next_nodes()
         self.init_matrices()
+        #self.delete_section(12)
 
     def init_nodes(self):
         for a_station in station.get_stations():
@@ -61,7 +62,7 @@ class Graph:
         self.matrix[node1][node2] = weight
 
     def delete_edge(self,node1,node2):
-        self.matrix[node1][node2] = 0
+        self.matrix[node1][node2] = inf
 
     def get_edge_existence(self, node1, node2):
         return self.matrix[node1][node2] < inf
@@ -148,6 +149,13 @@ class Graph:
 
         path.append(node_start)
         return path
+
+
+    def delete_section(self,id):
+        for i in range(self.size):
+            self.matrix[id][i]=inf;
+
+
 
 
     def change(node_start, node_dest):

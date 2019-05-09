@@ -111,6 +111,9 @@ class Graph:
             if(distance[node2.id] > distance[node1.id]+ self.get_edge_weight(node1.id,node2.id)):
                 distance[node2.id] = distance[node1.id]+ self.get_edge_weight(node1.id,node2.id)
                 predecessor[node2.id] = node1
+                for i in range(len(visited_nodes)):
+                    if(visited_nodes[i]==node2.id):
+                        visited_nodes[i]=-1
 
         def f(node, pred_Node):
             if(pred_Node is None):

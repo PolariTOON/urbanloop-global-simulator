@@ -34,8 +34,9 @@ class Controller:
         """
         previous_switch = capsule.current_element
         current_switch = capsule.next_element
-        if self.graph.update_weights(previous_switch, current_switch, self.timers[capsule.id]):
+        if self.graph.update_weight(previous_switch, current_switch, self.timers[capsule.id]):
             print("CONGESTION")
+            new_rules = self.update_rules()
 
         self.timers[capsule.id] = 0
 
@@ -59,7 +60,6 @@ class Controller:
         :param destination: Station qui effectue la demande OBLIGATOIRE
         :param nb_to_send: Nombre de capsule vide à envoyer à la station
         """
-
         if prio == 10:
             test = False
             for capsule in self.capsules:
@@ -79,6 +79,7 @@ class Controller:
             warehouse = which_warehouse_before(destination)
             warehouse.send(Capsule(warehouse, destination), prio)
 
+
     def drain(self, destination):
         """
         Décharge une station qui en effectue la demande
@@ -90,29 +91,47 @@ class Controller:
         self.timers[capsule.id] = -1
 
     def init_rules(self):
-        for warehouse in self.warehouses:
-            end_node = self.graph.get_node_from_switch(warehouse)
-            unvisited_nodes = self.graph.get_switches_nodes().copy()
-
-            for node in unvisited_nodes:
-                node_list = self.graph.calcul(node, end_node)
-                for i in range(len(node_list)-1):
-                    if unvisited_nodes.count(node_list[i]) > 0:
-                        change = node_list[i].loop.id != node_list[i+1].loop.id
-                        self.rules.append(Rule(node.switch.id, node.loop.id, warehouse, None, change))
-                        unvisited_nodes.remove(node_list[i])
-
-        for station in self.stations:
+        def create_rules(station):
             end_node = self.graph.get_node_from_switch(station)
             unvisited_nodes = self.graph.get_switches_nodes().copy()
 
-            for node in unvisited_nodes:
-                node_list = self.graph.calcul(node, end_node)
-                for i in range(len(node_list)-1):
-                    if unvisited_nodes.count(node_list[i]) > 0:
-                        change = node_list[i].loop.id != node_list[i+1].loop.id
-                        self.rules.append(Rule(node.switch.id, node.loop.id, station, None, change))
-                        unvisited_nodes.remove(node_list[i])
+            while(len(unvisited_nodes)>0):
+                for node in unvisited_nodes:
+                    node_list = self.graph.calcul(node, end_node)
+                    for i in range(1,len(node_list)):
+                        if unvisited_nodes.count(node_list[i]) > 0:
+                            change = node_list[i].loop.id != node_list[i-1].loop.id
+                            self.rules.append(Rule(node_list[i].switch.id, node_list[i].loop.id, station, None, None, change))
+                            unvisited_nodes.remove(node_list[i])
+
+        for warehouse in self.warehouses:
+            create_rules(warehouse)
+
+        for station in self.stations:
+            create_rules(station)
+
+    def update_rules(self):
+        new_rules = []
+
+        def create_rules(station):
+            end_node = self.graph.get_node_from_switch(station)
+            unvisited_nodes = self.graph.get_switches_nodes().copy()
+
+            while(len(unvisited_nodes)>0):
+                for node in unvisited_nodes:
+                    node_list = self.graph.calcul(node, end_node)
+                    for i in range(1,len(node_list)):
+                        if unvisited_nodes.count(node_list[i]) > 0:
+                            change = node_list[i].loop.id != node_list[i-1].loop.id
+                            new_rules.append(Rule(node_list[i].switch.id, node_list[i].loop.id, station, None, None, change))
+                            unvisited_nodes.remove(node_list[i])
+
+        for warehouse in self.warehouses:
+            create_rules(warehouse)
+
+        for station in self.stations:
+            create_rules(station)
+        return new_rules
 
     def send_all_rules(self):
         for rule in self.rules:

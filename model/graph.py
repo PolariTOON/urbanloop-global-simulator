@@ -20,9 +20,13 @@ class Graph:
         self.init_nodes()
         self.init_next_nodes()
         self.init_matrices()
-        for i in range(self.size):
-            print(self.matrix[i])
-        self.delete_section(1,0)
+        for i in self.matrix:
+            print(i)
+
+        self.delete_section(12,13)
+        for i in self.matrix:
+            print(i)
+
 
     def init_nodes(self):
         for a_station in station.get_stations():
@@ -141,10 +145,14 @@ class Graph:
                     if(n is not None):
                         f(n, node)
 
-        f(node_start,None)
 
+        f(node_start,None)
         path = list()
         current_node = node_arrival
+        while predecessor[current_node.id] is  None:
+            print("impossible d'aller au noeud" , current_node.id)
+            print("redirection au noeud" , current_node.previous_nodes[0].id)
+            current_node = current_node.previous_nodes[0]
         while(current_node.id != node_start.id):
             path.append(current_node)
             current_node = predecessor[current_node.id]

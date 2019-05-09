@@ -20,7 +20,9 @@ class Graph:
         self.init_nodes()
         self.init_next_nodes()
         self.init_matrices()
-        #self.delete_section(12)
+        for i in range(self.size):
+            print(self.matrix[i])
+        self.delete_section(1,0)
 
     def init_nodes(self):
         for a_station in station.get_stations():
@@ -148,11 +150,13 @@ class Graph:
         return path
 
 
-    def delete_section(self,id):
+    def delete_section(self,id_dep,id_fin):
         for i in range(self.size):
-            self.matrix[id][i]=inf;
+            self.matrix[id_dep][id_fin]=inf
 
-
+    def repare_section(self,id_dep,id_fin):
+        for i in range(self.size):
+            self.matrix[id_dep][id_fin]= self.expected_matrix[id_dep][id_fin]
 
 
     def change(node_start, node_dest):

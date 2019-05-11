@@ -26,13 +26,20 @@ class Warehouse:
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
 
     def send_capsule(self, station_destination, priority):
-        simlog.info("an empty capsule left warehouse %d to %s with priority %d" % (self.id, station_destination.name,
-                                                                                   priority))
+
         if self.capsule_queue.qsize() > 0:
             capsule_to_send = self.capsule_queue.get()
             capsule_to_send.destination = station_destination
             capsule_to_send.priority = priority
-            if True:  # TODO eviter de sortir alors que y'a déjà une capsule sur la sortie
+            test = True
+            for i in get_capsules:
+                if i.get_segment_trip_percentage() >= 90 && i.next_element == self:
+                    test=false
+                if i.get_segment_trip_percentage() <= 10 && i.current_element == self:
+                    test=false
+            if test:
+                simlog.info("an empty capsule left warehouse %d to %s with priority %d" % (self.id, station_destination.name,
+                                                                                           priority))
                 capsule_to_send.start_trip()
 
     def capsule_passing(self, capsule):

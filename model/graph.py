@@ -207,6 +207,23 @@ class Graph:
 
         self.matrix[node1][node2] = inf
 
+        def enable_way(self, previous_switch, current_switch):
+            """
+            Rétablit un troncon entre deux noeuds. Concretement cela place la valeur de départ comme poids de l'arc
+            dans le graphe
+            :param previous_switch: switch, warehouse ou station d'où commence le troncon
+            :param current_switch: switch, warehouse ou station où arrive le troncon
+            """
+
+            node1 = node.get_node_id(previous_switch, previous_switch.loop)
+
+            if previous_switch.uuid == current_switch.uuid:
+                node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
+            else:
+                node2 = node.get_node_id(current_switch, current_switch.loop)
+
+            self.matrix[node1][node2] = self.expected_matrix[node1][node2]
+
     def get_switches_nodes(self):
     	list_nodes = list()
     	for node in self.nodes:

@@ -80,8 +80,15 @@ class Station:
                     destination = get_almost_empty_station(self)
                 a_capsule.destination = destination
                 # simlog.debug("Station %s (%s/%d capsules) drained to %s (%d/%d capsules)" % (self.name, qsize, self.capacity, destination.name, destination.capsule_queue.qsize(), destination.capacity))
-                simlog.debug("Station %s (%s/%d capsules) drained to %s" % (self.name, qsize, self.capacity, destination.name))
-                a_capsule.start_trip()
+                test = True
+                for i in get_capsules:
+                    if i.get_segment_trip_percentage() >= 90 && i.next_element == self:
+                        test=false
+                    if i.get_segment_trip_percentage() <= 10 && i.current_element == self:
+                        test=false
+                if test:
+                    simlog.debug("Station %s (%s/%d capsules) drained to %s" % (self.name, qsize, self.capacity, destination.name))
+                    capsule_to_send.start_trip()
                 return
             else:
                 self.capsule_queue.put(a_capsule)
@@ -89,7 +96,7 @@ class Station:
     def capsule_passing(self, capsule):
         controller.get_controller().update_from_switch(capsule)
 
-    '''    
+    '''
     def complete(self):
         """
         This function will search to recover a capsule from a station 3/4 full.

@@ -266,4 +266,3 @@ def reset_simulation():
     for capsule in _capsules:
         del capsule
     _capsules = list()
-

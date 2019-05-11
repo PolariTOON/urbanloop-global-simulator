@@ -9,7 +9,7 @@ class Rule:
         #self.time = time
         #self.num_rule = num_rule
         self.change = change
-        
+
     def match(self, switch_id, loop_id, destination=None, priority=None, empty=None, id_pod=None, time=None):
         """
         :return: true if the rule matches
@@ -21,4 +21,3 @@ class Rule:
                     if (empty is not None and empty == self.empty) or self.empty is None:
                         return True
         return False
-

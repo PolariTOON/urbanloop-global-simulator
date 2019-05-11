@@ -88,7 +88,7 @@ def dijkstra_route(switch, table, to_cover):
 
 def update_switch(s):
     """
-    
+
     mise à jour de la table en fonction des données reçues ou non + envoie de notre état
         :param  s : switch a tester et impacter (Switch) OBLIGATOIRE
         :return: 0UT : notre information (String : 'alive', '0_down', '1_down' ou None )

@@ -2,6 +2,7 @@ from model import identifier, controller
 from model import queue
 from model import switch
 from model import controller
+from model import capsule
 from settings import simlog
 
 _warehouses = list()
@@ -10,7 +11,7 @@ class Warehouse:
     def __init__(self, loop, angle, capacity=float('inf'), next_element=None):
         global _warehouses
         _warehouses.append(self)
-
+        self.capsules=capsule.get_capsules()
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_warehouse_id()
         self.angle = angle
@@ -32,10 +33,10 @@ class Warehouse:
             capsule_to_send.destination = station_destination
             capsule_to_send.priority = priority
             test = True
-            for i in get_capsules:
-                if i.get_segment_trip_percentage() >= 90 && i.next_element == self:
+            for i in self.capsules:
+                if i.get_segment_trip_percentage() >= 90 and i.next_element == self:
                     test=false
-                if i.get_segment_trip_percentage() <= 10 && i.current_element == self:
+                if i.get_segment_trip_percentage() <= 10 and i.current_element == self:
                     test=false
             if test:
                 simlog.info("an empty capsule left warehouse %d to %s with priority %d" % (self.id, station_destination.name,

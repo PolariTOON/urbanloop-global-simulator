@@ -40,6 +40,7 @@ const capsuleInnerAboardColor = 'rgb(96, 167, 27)';
 const capsuleOuterAboardColor = 'rgb(128, 214, 30)';
 const capsuleInnerSelectedColor = 'rgb(255, 200, 20)';
 const capsuleOuterSelectedColor = 'rgb(255, 234, 87)';
+//const disabledWay = 'rgb(217, 1, 21)';
 
 class Loop {
     constructor(loopJSON) {
@@ -284,7 +285,124 @@ class Station {
         this.json = stationJSON;
     }
 }
+/*
+class Star {
+    constructor(warehouseJSON, starRadius = 12, starWidth = 4) {
+        this.json = warehouseJSON;
+        this.uuid = warehouseJSON['uuid'];
+        this.id = warehouseJSON['id'];
 
+        const x = warehouseJSON['x'];
+        this.y = warehouseJSON['y'];
+        const y = getNetworkDivSize().height - this.y;
+        const semiWidth = Math.floor(warehouseWidth / 2);
+
+        var star = new Konva.Star({
+          x: x,
+          y: y,
+          numPoints: 5,
+          innerRadius: 70,
+          outerRadius: 70,
+          fill: 'red',
+          stroke: 'black',
+          strokeWidth: 4
+        });
+        this.innerRectangle.offsetX(this.innerRectangle.width() / 2);
+        this.innerRectangle.offsetY(this.innerRectangle.height() / 2);
+
+        this.outerRectangle = new Konva.Rect({
+            name: this.uuid,
+            x: x,
+            y: y,
+            width: 2 * (warehouseRadius + semiWidth),
+            height: 2 * (warehouseRadius + semiWidth),
+            fill: warehouseColor,
+            stroke: 'black',
+            strokeWidth: 0.3,
+        });
+        this.outerRectangle.offsetX(this.outerRectangle.width() / 2);
+        this.outerRectangle.offsetY(this.outerRectangle.height() / 2);
+
+        this.info = new Konva.Label({
+            x: x,
+            y: y,
+            opacity: 0.75,
+            visible: false,
+            listening: false
+        });
+
+        this.info.add(
+            new Konva.Tag({
+                fill: 'black',
+                pointerDirection: 'down',
+                pointerWidth: 10,
+                pointerHeight: 10,
+                lineJoin: 'round',
+                shadowColor: 'black',
+                shadowBlur: 10,
+                shadowOffset: 10,
+                shadowOpacity: 0.2
+            })
+        );
+
+        this.info.add(
+            new Konva.Text({
+                text: 'Route coupée'],
+                fontFamily: 'Calibri',
+                fontSize: 18,
+                padding: 5,
+                fill: 'white'
+            })
+        );
+
+        initBehaviors(this, this.innerRectangle, this.outerRectangle, this.info);
+
+        networkLayer.add(this.outerRectangle);
+        networkLayer.add(this.innerRectangle);
+        infoLayer.add(this.info);
+
+        objects.push(this);
+    }
+
+    select() {
+        if (selectedObject !== undefined && selectedObject !== this) {
+            selectedObject.unselect();
+        }
+
+        selectedObject = this;
+        this.outerRectangle.fill(warehouseSelectedColor);
+        networkLayer.batchDraw();
+    }
+
+    unselect() {
+        if (selectedObject === this) {
+            selectedObject = undefined;
+        }
+        this.outerRectangle.fill(warehouseColor);
+        networkLayer.batchDraw();
+    }
+
+    updatePosition() {
+        const y = getNetworkDivSize().height - this.y;
+        this.innerRectangle.y(y);
+        this.outerRectangle.y(y);
+        this.info.y(y);
+    }
+
+    updateScale(value) {
+        this.innerRectangle.scaleX(value);
+        this.innerRectangle.scaleY(value);
+        this.outerRectangle.scaleX(value);
+        this.outerRectangle.scaleY(value);
+        this.info.scaleX(value);
+        this.info.scaleY(value);
+    }
+
+    update(warehouseJSON) {
+        this.json = warehouseJSON;
+    }
+}
+*/
 class Warehouse {
     constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
         this.json = warehouseJSON;

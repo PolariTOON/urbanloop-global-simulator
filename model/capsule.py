@@ -47,6 +47,7 @@ class Capsule:
         Ask to the selectedObject switch if the capsule should switch or not to another station to reach its destination.
         :param current_switch: The current switch which decide whether the capsule needs to go on another station
         """
+
         change = current_switch.route_capsule_to_station(self)
         if change:
             self._change_loop(current_switch)
@@ -99,6 +100,7 @@ class Capsule:
         """
         :return: Trip event generator
         """
+
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
         # print(self.current_element.name, self.next_element.name, dist_to_next_element)
         self.segment_length = dist_to_next_element
@@ -106,8 +108,11 @@ class Capsule:
         self.segment_start_tick = sim_loop.get_current_tick()
         self.segment_ticks_duration = time_to_next_element * sim_loop.get_tick_per_second()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
+
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
+
+
 
     def callback_trip_event(self):
         """
@@ -115,6 +120,20 @@ class Capsule:
         This function is called when the capsule arrives to the next_element which isn't
         updated yet as the current_element.
         """
+        """test = True
+        for i in get_capsules():
+            print("nextid",i.next_element.id)
+            print("selfid",self.next_element.id)
+            if (i.next_element == self.next_element):
+                print("n",i.get_segment_trip_percentage())
+            if i.get_segment_trip_percentage() >= 90 and i.next_element == self.next_element:
+                test=False
+            if (i.current_element == self.next_element):
+                print("c",i.get_segment_trip_percentage())
+            if i.get_segment_trip_percentage() <= 10 and i.current_element == self.next_element:
+                test=False
+        if test:"""
+        self.speed=float(config.capsule['max_speed'])
         if type(self.next_element) == switch.Switch and self.next_element.is_switch_out(self.loop):
             self.ask_route(self.next_element)
         else:
@@ -143,6 +162,7 @@ class Capsule:
                 return
 
         sim_loop.get_env().process(self.update_trip())
+
 
     def end_trip(self):
         self.current_element.end_capsule_trip(self)
@@ -210,7 +230,7 @@ class Capsule:
         if self.destination is None or self.segment_ticks_duration == 0:
             return 0
 
-        return (sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration
+        return ((sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration)*100
 
     def get_meter_per_tick(self):
         """

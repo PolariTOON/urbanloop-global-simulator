@@ -53,6 +53,9 @@ class SimLoop:
         self.fulfill_period = int(config.capsule['fulfill_period'])
         self.is_visualized = is_visualized
 
+        self.controller = controller.Controller()
+        print("here")
+
         recorder = stats_recorder.StatsRecorder(0)
 
         self.traveler_generator = traveler_generator.TravelerGenerator()
@@ -65,12 +68,33 @@ class SimLoop:
         if config.capsule['station_refill'] in ['false', 'False']:
             self.station_refill = False
 
-        self.controller = controller.Controller()
+
 
         _load_env(self.is_real_time)
         self.tick_event = _env.event()
         _endless_quit_event = _env.event()
         _env.process(self.loop())  # Register the loop process in the simulation environment
+
+    def collision(self):
+        from model import capsule
+        from model import switch
+        for i in capsule.get_capsules():
+            if i.next_element in switch.get_switches() and i.current_element in switch.get_switches():
+                if i.get_segment_trip_percentage() >=95:
+                    print(i.get_segment_trip_percentage())
+                    test = False
+                    for j in capsule.get_capsules():
+                        if j != i:
+                            if j.get_segment_trip_percentage() >= 90 and i.next_element == j.next_element:
+                                test=True
+                            if j.get_segment_trip_percentage() <= 10 and i.current_element == j.next_element:
+                                test=True
+                    if test:
+                        i.speed = 0.1
+                    else:
+                        i.speed = float(config.capsule['max_speed'])
+
+
 
     def tick(self):
         """
@@ -120,8 +144,10 @@ class SimLoop:
                     _env.process(self.traveler_generator.generate())
                     self.controller.update()
 
-                #if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(self.fulfill_period):
-                    #station.fill_and_full_stations()
+                if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(2):
+                    station.fill_and_full_stations()
+
+                self.collision()
 
                 yield _env.timeout(1)
 

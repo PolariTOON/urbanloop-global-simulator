@@ -20,12 +20,13 @@ class Graph:
         self.init_nodes()
         self.init_next_nodes()
         self.init_matrices()
-        for i in self.matrix:
-            print(i)
+
 
         self.delete_section(12,13)
+        j=0
         for i in self.matrix:
-            print(i)
+            print(j,i)
+            j+=1
 
 
     def init_nodes(self):
@@ -120,6 +121,7 @@ class Graph:
                         visited_nodes[i]=-1
 
         def f(node, pred_Node):
+
             if(pred_Node is None):
                 visited_nodes[node.id]=VISITED
 
@@ -170,7 +172,7 @@ class Graph:
             self.matrix[id_dep][id_fin]= self.expected_matrix[id_dep][id_fin]
 
 
-    def change(node_start, node_dest):
+    def change(self,node_start, node_dest):
         return node_start.loop.uuid != node_dest.loop.uuid
 
     def get_time_max(self, previous_switch, current_switch):
@@ -207,22 +209,22 @@ class Graph:
 
         self.matrix[node1][node2] = inf
 
-        def enable_way(self, previous_switch, current_switch):
-            """
-            Rétablit un troncon entre deux noeuds. Concretement cela place la valeur de départ comme poids de l'arc
-            dans le graphe
-            :param previous_switch: switch, warehouse ou station d'où commence le troncon
-            :param current_switch: switch, warehouse ou station où arrive le troncon
-            """
+    def enable_way(self, previous_switch, current_switch):
+        """
+        Rétablit un troncon entre deux noeuds. Concretement cela place la valeur de départ comme poids de l'arc
+        dans le graphe
+        :param previous_switch: switch, warehouse ou station d'où commence le troncon
+        :param current_switch: switch, warehouse ou station où arrive le troncon
+        """
 
-            node1 = node.get_node_id(previous_switch, previous_switch.loop)
+        node1 = node.get_node_id(previous_switch, previous_switch.loop)
 
-            if previous_switch.uuid == current_switch.uuid:
-                node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
-            else:
-                node2 = node.get_node_id(current_switch, current_switch.loop)
+        if previous_switch.uuid == current_switch.uuid:
+            node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
+        else:
+            node2 = node.get_node_id(current_switch, current_switch.loop)
 
-            self.matrix[node1][node2] = self.expected_matrix[node1][node2]
+        self.matrix[node1][node2] = self.expected_matrix[node1][node2]
 
     def get_switches_nodes(self):
     	list_nodes = list()

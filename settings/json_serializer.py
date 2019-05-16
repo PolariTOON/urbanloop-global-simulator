@@ -190,16 +190,6 @@ def serialize_switch_var_data(a_switch):
         'jsonType': 'switch'
     }
 
-def serialize_star(a_star):
-    x, y = get_star_position(a_star)
-    return {
-        'jsonType': 'star',
-        'uuid': str(a_star.uuid),
-        'id': a_star.id,
-        'x': x,
-        'y': y,
-    }
-
 
 def serialize_capsule(a_capsule):
     x, y = get_capsule_position(a_capsule)
@@ -262,26 +252,6 @@ def get_capsule_position(capsule):
         return capsule.loop.x + math.cos(radius_angle) * loop_radius, capsule.loop.y + math.sin(
             radius_angle) * loop_radius
 
-def get_star_position(star):
-    """
-    :param capsule:
-    :return: (x, y)
-    """
-    if star.departure is star.destination:
-        # In this case, current_element and next_element can only be switches
-        x_in, y_in, x_out, y_out = get_switch_positions(star.departure)
-        return x_in * (1 - 0.5) + x_out * 0.5, y_in * (1 - 0.5) + y_out * 0.5
-    else:
-        # In this case, current_element and next_element can be station or switch
-        angle = get_element_angle(star.loop, star.departure)
-        trip_angle = star.get_segment_angle()
-        if star.loop.clockwise:
-            radius_angle = math.radians(angle) - trip_angle
-        else:
-            radius_angle = math.radians(angle) + trip_angle
-        loop_radius = get_loop_radius(star.loop)
-        return star.loop.x + math.cos(radius_angle) * loop_radius, star.loop.y + math.sin(
-            radius_angle) * loop_radius
 
 def get_switch_positions(a_switch):
     """

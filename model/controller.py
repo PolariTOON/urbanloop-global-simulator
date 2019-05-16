@@ -131,7 +131,6 @@ class Controller:
         :param destination: Station qui effectue la demande OBLIGATOIRE
         :param nb_to_send: Nombre de capsule vide à envoyer à la station
         """
-
         if prio == 10:
             test = False
             for capsule_t in capsule.get_capsules():
@@ -144,16 +143,13 @@ class Controller:
                         self.send_all_rules()
             if test:
                 test_warehouse = warehouse.which_warehouse_before(destination)
-                if test_warehouse.capsule_queue.qsize()>0:
-                    test_warehouse.send_capsule(destination, prio)
+                test_warehouse.send_capsule(destination, prio)
             else:
                 test_warehouse = warehouse.which_warehouse_before(destination)
-                if test_warehouse.capsule_queue.qsize()>0:
-                    test_warehouse.send_capsule(destination, 1)
+                test_warehouse.send_capsule(destination, 1)
         else:
             test_warehouse = warehouse.which_warehouse_before(destination)
-            if test_warehouse.capsule_queue.qsize()>0:
-                test_warehouse.send_capsule(destination, prio)
+            test_warehouse.send_capsule(destination, prio)
 
 
 def get_controller():

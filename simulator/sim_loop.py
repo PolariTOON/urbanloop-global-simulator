@@ -90,11 +90,9 @@ class SimLoop:
                             if j.get_segment_trip_percentage() <= 10 and i.current_element == j.next_element:
                                 test=True
                     if test:
-                        #i.stopped = True
-                        i.segment_real_tick -= 1
+                        i.speed = 0.1
                     else:
-                        #i.stopped = False
-                        i.segment_real_tick -= 1
+                        i.speed = float(config.capsule['max_speed'])
 
 
 

@@ -93,6 +93,16 @@ class Graph:
 
         return self.matrix[node1][node2] > 3 * self.expected_matrix[node1][node2]
 
+    def no_more_congestion(self, previous_switch, current_switch, sample_time):
+        node1 = node.get_node_id(previous_switch, previous_switch.loop)
+
+        if previous_switch.uuid == current_switch.uuid:
+            node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
+        else:
+            node2 = node.get_node_id(current_switch, current_switch.loop)
+
+        return self.matrix[node1][node2] < 2 * self.expected_matrix[node1][node2]
+
     def calcul(self, node_start, node_arrival):
         """
         calcul du chemin optimal entre un noeud (switch, warehouse, station) et une destination

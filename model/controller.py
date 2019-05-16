@@ -153,5 +153,4 @@ class Controller:
 
 
 def get_controller():
-    print("holla",_controller)
     return _controller

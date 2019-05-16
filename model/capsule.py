@@ -33,8 +33,10 @@ class Capsule:
         self.speed = float(config.capsule['max_speed'])
         self.segment_length = 0
         self.segment_start_tick = 0
+        self.segment_real_tick = 0
         self.segment_ticks_duration = 0
         self.moving = False
+        self.stopped = False
         self.priority = 10
 
         if departure_station is not None:
@@ -100,12 +102,13 @@ class Capsule:
         """
         :return: Trip event generator
         """
-
+        print(self.segment_start_tick)
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
         # print(self.current_element.name, self.next_element.name, dist_to_next_element)
         self.segment_length = dist_to_next_element
         time_to_next_element = dist_to_next_element / self.speed
         self.segment_start_tick = sim_loop.get_current_tick()
+        self.segment_real_tick = self.segment_start_tick
         self.segment_ticks_duration = time_to_next_element * sim_loop.get_tick_per_second()
         self.trip_event = sim_loop.get_env().timeout(self.segment_ticks_duration)
 
@@ -132,8 +135,8 @@ class Capsule:
                 print("c",i.get_segment_trip_percentage())
             if i.get_segment_trip_percentage() <= 10 and i.current_element == self.next_element:
                 test=False
-        if test:"""
-        self.speed=float(config.capsule['max_speed'])
+        if test:
+            self.speed=float(config.capsule['max_speed'])"""
         if type(self.next_element) == switch.Switch and self.next_element.is_switch_out(self.loop):
             self.ask_route(self.next_element)
         else:
@@ -212,7 +215,7 @@ class Capsule:
         if self.destination is None or self.segment_ticks_duration == 0:
             return 0
 
-        return (sim_loop.get_current_tick() - self.segment_start_tick) * self.get_angle_per_tick()
+        return (sim_loop.get_current_tick() - self.segment_real_tick) * self.get_angle_per_tick()
 
     def get_segment_traveled_distance(self):
         """
@@ -221,7 +224,7 @@ class Capsule:
         if self.destination is None or self.segment_ticks_duration == 0:
             return 0
 
-        return (sim_loop.get_current_tick() - self.segment_start_tick) * self.get_meter_per_tick()
+        return (sim_loop.get_current_tick() - self.segment_real_tick) * self.get_meter_per_tick()
 
     def get_segment_trip_percentage(self):
         """
@@ -230,7 +233,7 @@ class Capsule:
         if self.destination is None or self.segment_ticks_duration == 0:
             return 0
 
-        return ((sim_loop.get_current_tick() - self.segment_start_tick) / self.segment_ticks_duration)*100
+        return ((sim_loop.get_current_tick() - self.segment_real_tick) / self.segment_ticks_duration)*100
 
     def get_meter_per_tick(self):
         """

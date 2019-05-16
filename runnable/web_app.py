@@ -6,7 +6,7 @@ from threading import Thread
 
 from flask import Flask, Response, redirect, url_for, request
 
-from model import loop, station, switch, warehouse, capsule
+from model import loop, station, switch, warehouse, capsule, star
 from settings import config, network, json_serializer, simlog
 from simulator import sim_loop
 
@@ -123,11 +123,14 @@ def generate_updated_data_json():
 
     list_capsule_data = [json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]
 
+    list_star_data = [json_serializer.serialize_star(a_star) for a_star in star.get_stars()]
+
     return Response(dumps(list_time_data +
                           list_station_var_data +
                           list_warehouse_var_data +
                           list_switch_var_data +
-                          list_capsule_data), mimetype="application/json")
+                          list_capsule_data +
+                          list_star_data), mimetype="application/json")
 
 
 @app.route('/network-files.json')

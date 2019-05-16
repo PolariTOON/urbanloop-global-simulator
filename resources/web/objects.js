@@ -285,15 +285,15 @@ class Station {
         this.json = stationJSON;
     }
 }
-/*
-class Star {
-    constructor(warehouseJSON, starRadius = 12, starWidth = 4) {
-        this.json = warehouseJSON;
-        this.uuid = warehouseJSON['uuid'];
-        this.id = warehouseJSON['id'];
 
-        const x = warehouseJSON['x'];
-        this.y = warehouseJSON['y'];
+class Star {
+    constructor(starJSON, starRadius = 12, starWidth = 4) {
+        this.json = starJSON;
+        this.uuid = starJSON['uuid'];
+        this.id = starJSON['id'];
+
+        const x = starJSON['x'];
+        this.y = starJSON['y'];
         const y = getNetworkDivSize().height - this.y;
         const semiWidth = Math.floor(warehouseWidth / 2);
 
@@ -307,10 +307,10 @@ class Star {
           stroke: 'black',
           strokeWidth: 4
         });
-        this.innerRectangle.offsetX(this.innerRectangle.width() / 2);
-        this.innerRectangle.offsetY(this.innerRectangle.height() / 2);
+        this.star.offsetX(this.star.width() / 2);
+        this.star.offsetY(this.star.height() / 2);
 
-        this.outerRectangle = new Konva.Rect({
+        this.outerStar = new Konva.Star({
             name: this.uuid,
             x: x,
             y: y,
@@ -320,8 +320,8 @@ class Star {
             stroke: 'black',
             strokeWidth: 0.3,
         });
-        this.outerRectangle.offsetX(this.outerRectangle.width() / 2);
-        this.outerRectangle.offsetY(this.outerRectangle.height() / 2);
+        this.outerStar.offsetX(this.outerStar.width() / 2);
+        this.outerStar.offsetY(this.outerStar.height() / 2);
 
         this.info = new Konva.Label({
             x: x,
@@ -355,10 +355,10 @@ class Star {
             })
         );
 
-        initBehaviors(this, this.innerRectangle, this.outerRectangle, this.info);
+        initBehaviors(this, this.innerStar, this.outerStar, this.info);
 
-        networkLayer.add(this.outerRectangle);
-        networkLayer.add(this.innerRectangle);
+        networkLayer.add(this.outerStar);
+        networkLayer.add(this.innerStar);
         infoLayer.add(this.info);
 
         objects.push(this);
@@ -370,7 +370,7 @@ class Star {
         }
 
         selectedObject = this;
-        this.outerRectangle.fill(warehouseSelectedColor);
+        this.outerStar.fill(warehouseSelectedColor);
         networkLayer.batchDraw();
     }
 
@@ -378,31 +378,31 @@ class Star {
         if (selectedObject === this) {
             selectedObject = undefined;
         }
-        this.outerRectangle.fill(warehouseColor);
+        this.outerStar.fill(warehouseColor);
         networkLayer.batchDraw();
     }
 
     updatePosition() {
         const y = getNetworkDivSize().height - this.y;
-        this.innerRectangle.y(y);
-        this.outerRectangle.y(y);
+        this.innerStar.y(y);
+        this.outerStar.y(y);
         this.info.y(y);
     }
 
     updateScale(value) {
-        this.innerRectangle.scaleX(value);
-        this.innerRectangle.scaleY(value);
-        this.outerRectangle.scaleX(value);
-        this.outerRectangle.scaleY(value);
+        this.innerStar.scaleX(value);
+        this.innerStar.scaleY(value);
+        this.outerStar.scaleX(value);
+        this.outerStar.scaleY(value);
         this.info.scaleX(value);
         this.info.scaleY(value);
     }
 
-    update(warehouseJSON) {
-        this.json = warehouseJSON;
+    update(starJSON) {
+        this.json = starJSON;
     }
 }
-*/
+
 class Warehouse {
     constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
         this.json = warehouseJSON;
@@ -963,6 +963,9 @@ function updateNetworkScene() {
                 case 'capsule':
                     updateCapsuleFromJSON(dataJSON);
                     break;
+                case 'star':
+                    updateStarFromJSON(dataJSON);
+                    break;
             }
         });
     });
@@ -1038,6 +1041,12 @@ function updateCapsuleFromJSON(capsuleJSON) {
     } else {
         targetCapsules.forEach(capsule => capsule.update(capsuleJSON));
     }
+}
+
+function updateStarFromJSON(starJSON) {
+    let targetStars = objects.filter(star => star.uuid.includes(starJSON['uuid']));
+    targetStars.forEach(star => star.update(starJSON));
+
 }
 
 function calibrateNetworkScene() {

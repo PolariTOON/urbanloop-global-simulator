@@ -5,6 +5,7 @@ import copy
 from model import warehouse, node
 from model import switch
 from model import station
+
 from model.node import Node
 from settings import config
 
@@ -164,6 +165,8 @@ class Graph:
 
 
     def delete_section(self,id_dep,id_fin):
+        from model import star
+        star = star.Star(self.get_node_from_id(id_dep),self.get_node_from_id(id_fin))
         for i in range(self.size):
             self.matrix[id_dep][id_fin]=inf
 
@@ -199,7 +202,7 @@ class Graph:
         :param previous_switch: switch, warehouse ou station d'où commence le troncon
         :param current_switch: switch, warehouse ou station où arrive le troncon
         """
-
+        star = Star(previous_switch,current_switch)
         node1 = node.get_node_id(previous_switch, previous_switch.loop)
 
         if previous_switch.uuid == current_switch.uuid:

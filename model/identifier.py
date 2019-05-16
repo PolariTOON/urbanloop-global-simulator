@@ -42,6 +42,11 @@ def generate_capsule_id():
     _capsule_id += 1
     return _capsule_id
 
+def generate_star_id():
+    global _star_id
+    _star_id += 1
+    return _star_id
+
 
 def generate_traveler_id():
     global _traveler_id

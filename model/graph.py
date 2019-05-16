@@ -21,10 +21,7 @@ class Graph:
         self.init_next_nodes()
         self.init_matrices()
 
-
         self.delete_section(12,13)
-        for i in self.matrix:
-            print(i)
 
     def init_nodes(self):
         for a_station in station.get_stations():

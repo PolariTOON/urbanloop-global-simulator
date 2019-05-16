@@ -54,7 +54,7 @@ class SimLoop:
         self.is_visualized = is_visualized
 
         self.controller = controller.Controller()
-        print("here")
+        #print("here")
 
         recorder = stats_recorder.StatsRecorder(0)
 
@@ -81,7 +81,7 @@ class SimLoop:
         for i in capsule.get_capsules():
             if i.next_element in switch.get_switches() and i.current_element in switch.get_switches():
                 if i.get_segment_trip_percentage() >=95:
-                    print(i.get_segment_trip_percentage())
+                    #print(i.get_segment_trip_percentage())
                     test = False
                     for j in capsule.get_capsules():
                         if j != i:

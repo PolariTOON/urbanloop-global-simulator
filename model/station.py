@@ -35,7 +35,6 @@ class Station:
         global _stations
         _stations.append(self)
         self.controller= controller.get_controller()
-        print("rrr",self.controller)
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_station_id()
         self.name = "Station #{0}".format(self.id) if (name is None) else name

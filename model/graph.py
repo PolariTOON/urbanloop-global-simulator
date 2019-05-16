@@ -23,11 +23,8 @@ class Graph:
 
 
         self.delete_section(12,13)
-        j=0
         for i in self.matrix:
-            print(j,i)
-            j+=1
-
+            print(i)
 
     def init_nodes(self):
         for a_station in station.get_stations():
@@ -164,12 +161,12 @@ class Graph:
 
 
     def delete_section(self,id_dep,id_fin):
-        for i in range(self.size):
-            self.matrix[id_dep][id_fin]=inf
+        self.matrix[id_dep][id_fin]=inf
+        self.get_node_from_id(id_dep).remove_next(self.get_node_from_id(id_fin))
+
 
     def repare_section(self,id_dep,id_fin):
-        for i in range(self.size):
-            self.matrix[id_dep][id_fin]= self.expected_matrix[id_dep][id_fin]
+        self.matrix[id_dep][id_fin] = self.expected_matrix[id_dep][id_fin]
 
 
     def change(self,node_start, node_dest):

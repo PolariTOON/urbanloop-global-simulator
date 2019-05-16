@@ -209,3 +209,6 @@ def get_switch_by_id(id):
         if s.id == id:
             return s
     return None
+
+def get_switch_by_node(id):
+    return node.switch

@@ -21,10 +21,7 @@ class Graph:
         self.init_next_nodes()
         self.init_matrices()
 
-
         self.delete_section(12,13)
-        for i in self.matrix:
-            print(i)
 
     def init_nodes(self):
         for a_station in station.get_stations():
@@ -92,6 +89,16 @@ class Graph:
         self.matrix[node1][node2] = (1-0.125)*self.matrix[node1][node2]+0.125*sample_time
 
         return self.matrix[node1][node2] > 3 * self.expected_matrix[node1][node2]
+
+    def no_more_congestion(self, previous_switch, current_switch, sample_time):
+        node1 = node.get_node_id(previous_switch, previous_switch.loop)
+
+        if previous_switch.uuid == current_switch.uuid:
+            node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
+        else:
+            node2 = node.get_node_id(current_switch, current_switch.loop)
+
+        return self.matrix[node1][node2] < 2 * self.expected_matrix[node1][node2]
 
     def calcul(self, node_start, node_arrival):
         """

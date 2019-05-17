@@ -21,6 +21,7 @@ class Controller:
         self.timers = [-1] * len(self.capsules)
         self.graph = Graph()
         self.rules = []
+        self.congestions = [[False for j in range(self.graph.size)] for i in range(self.graph.size)]
 
         self.init_rules()
         self.send_all_rules()
@@ -37,6 +38,9 @@ class Controller:
         if self.graph.update_weight(previous_switch, current_switch, self.timers[capsule.id]):
             print("CONGESTION")
             new_rules = self.update_rules()
+            self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] = True
+        elif self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] == True and self.graph.no_more_congestion(previous_switch, current_switch, self.timers[capsule.id]):
+            self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] = False
 
         self.timers[capsule.id] = 0
 

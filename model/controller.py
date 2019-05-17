@@ -138,13 +138,15 @@ class Controller:
         if prio == 10:
             test = False
             for capsule_t in capsule.get_capsules():
-                if capsule_t.travelers==list() and capsule_t.priority <= 6:
+                if len(capsule_t.travelers)==0 and capsule_t.priority <= 6:
                     test = True
                     trajet = self.graph.calcul(self.graph.get_node_from_switch(capsule_t.next_element), self.graph.get_node_from_switch(destination))
                     for i in range(len(trajet)-1):
                         r = Rule(trajet[i].switch.id, trajet[i+1].loop.id, priority=6, empty=True, change=self.graph.change(trajet[i], trajet[i+1]))
                         self.rules.append(r)
                         self.send_all_rules()
+                if test==True:
+                    break;
             if test:
                 test_warehouse = warehouse.which_warehouse_before(destination)
                 if test_warehouse.capsule_queue.qsize()>0:
@@ -159,6 +161,7 @@ class Controller:
             test_warehouse = warehouse.which_warehouse_before(destination)
             if test_warehouse.capsule_queue.qsize()>0:
                     test_warehouse.send_capsule(destination, prio)
+        print("LA")
 
 
 

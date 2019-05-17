@@ -143,13 +143,19 @@ class Controller:
                         self.send_all_rules()
             if test:
                 test_warehouse = warehouse.which_warehouse_before(destination)
-                test_warehouse.send_capsule(destination, prio)
+                if test_warehouse.capsule_queue.qsize()>0:
+                    test_warehouse.send_capsule(destination, prio)
+
             else:
                 test_warehouse = warehouse.which_warehouse_before(destination)
-                test_warehouse.send_capsule(destination, 1)
+                if test_warehouse.capsule_queue.qsize()>1:
+                    test_warehouse.send_capsule(destination, prio)
+
         else:
             test_warehouse = warehouse.which_warehouse_before(destination)
-            test_warehouse.send_capsule(destination, prio)
+            if test_warehouse.capsule_queue.qsize()>0:
+                    test_warehouse.send_capsule(destination, prio)
+
 
 
 def get_controller():

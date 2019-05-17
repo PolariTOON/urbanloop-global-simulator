@@ -58,13 +58,13 @@ def which_warehouse_before(station_destination):
     go_from = None
     cost_go_from = float('inf')
     for cand_warehouse in _warehouses:
-        if cand_warehouse.capsule_queue.qsize() > 0:
-            if cand_warehouse.loop is station_destination.loop:
-                return cand_warehouse
-            cost = switch.cost_between(cand_warehouse, station_destination)
-            if cost < cost_go_from:
-                go_from = cand_warehouse
-                cost_go_from = cost
+        #if cand_warehouse.capsule_queue.qsize() > 0:
+        if cand_warehouse.loop is station_destination.loop:
+            return cand_warehouse
+        cost = switch.cost_between(cand_warehouse, station_destination)
+        if cost < cost_go_from:
+            go_from = cand_warehouse
+            cost_go_from = cost
     return go_from
 
 
@@ -77,13 +77,13 @@ def which_warehouse_after(station_source):
     go_to = None
     cost_go_to = float('inf')
     for cand_warehouse in _warehouses:
-        if cand_warehouse.capsule_queue.qsize() < cand_warehouse.capacity:
-            if cand_warehouse.loop is station_source.loop:
-                return cand_warehouse
-            cost = switch.cost_between(station_source, cand_warehouse)
-            if cost < cost_go_to:
-                go_to = cand_warehouse
-                cost_go_to = cost
+        #if cand_warehouse.capsule_queue.qsize() < cand_warehouse.capacity:
+        if cand_warehouse.loop is station_source.loop:
+            return cand_warehouse
+        cost = switch.cost_between(station_source, cand_warehouse)
+        if cost < cost_go_to:
+            go_to = cand_warehouse
+            cost_go_to = cost
     return go_to
 
 

@@ -54,7 +54,7 @@ class SimLoop:
         self.is_visualized = is_visualized
 
         self.controller = controller.Controller()
-        print("here")
+
 
         recorder = stats_recorder.StatsRecorder(0)
 
@@ -81,7 +81,6 @@ class SimLoop:
         for i in capsule.get_capsules():
             if i.next_element in switch.get_switches() and i.current_element in switch.get_switches():
                 if i.get_segment_trip_percentage() >=95:
-                    print(i.get_segment_trip_percentage())
                     test = False
                     for j in capsule.get_capsules():
                         if j != i:
@@ -90,9 +89,15 @@ class SimLoop:
                             if j.get_segment_trip_percentage() <= 10 and i.current_element == j.next_element:
                                 test=True
                     if test:
-                        i.speed = 0.1
+                        #i.speed = 0.1
+                        #i.stopped = True
+                        i.segment_real_tick -= 1
+
                     else:
-                        i.speed = float(config.capsule['max_speed'])
+                        #i.speed = float(config.capsule['max_speed'])
+                        #i.stopped = False
+                        i.segment_real_tick -= 1
+
 
 
 
@@ -144,7 +149,7 @@ class SimLoop:
                     _env.process(self.traveler_generator.generate())
                     self.controller.update()
 
-                if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(2):
+                if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(1):
                     station.fill_and_full_stations()
 
                 self.collision()

@@ -126,15 +126,18 @@ class SimLoop:
         tick_start_time = 0
         while True:
             if is_running():
-                if _sim_tick*_current_tick == 3600/4:
-                    controller.get_controller().disable_way(12,13)
+                #if _sim_tick*_current_tick == 3600/4:
+                #    controller.get_controller().disable_way(12,13)
                 loop_sleep_boolean = self.is_visualized and not self.is_real_time and _visualized_tick_duration != 0
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()
 
                 # Stats are recorded every 30 simulated seconds
-                if _current_tick==100000:
-                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ",controller.get_controller().temps_moy(), "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                if _modulo_on_seconds(10):
+                    latest_stats_file = open("out/staats.txt", "a")
+                    buffer = str(controller.get_controller().temps_moy())+","
+                    latest_stats_file.write(buffer)
+                    latest_stats_file.close()
 
 
 

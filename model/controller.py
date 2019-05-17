@@ -43,7 +43,6 @@ class Controller:
         if self.graph.update_weight(previous_switch, current_switch, self.timers[capsule.id]):
             print("CONGESTION")
             new_rules = self.update_rules()
-            self.send_list_rules(new_rules)
             self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] = True
         elif self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] == True and self.graph.no_more_congestion(previous_switch, current_switch, self.timers[capsule.id]):
             self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] = False
@@ -62,6 +61,10 @@ class Controller:
 
                 if self.timers[i] >= self.graph.get_time_max(previous_switch, next_switch):
                     self.graph.disable_way(previous_switch, next_switch)
+
+
+
+
 
     def stop_timer(self, capsule):
         self.timers[capsule.id] = -1
@@ -108,19 +111,12 @@ class Controller:
 
         for station in self.stations:
             create_rules(station)
+        self.rules= new_rule.copy()
+        self.send_all_rules()
         return new_rules
 
     def send_all_rules(self):
         for rule in self.rules:
-            for switch in self.switches:
-                switch.add_rule(rule)
-
-    def send_list_rules(self, r):
-        for rule in self.rules:
-            for switch in self.switches:
-                switch.remove_rule(rule)
-        for rule in r:
-            self.rules.append(rule)
             for switch in self.switches:
                 switch.add_rule(rule)
 
@@ -170,12 +166,7 @@ class Controller:
             test_warehouse = warehouse.which_warehouse_before(destination)
             if test_warehouse.capsule_queue.qsize()>0:
                     test_warehouse.send_capsule(destination, prio)
-
-    def disable_way(self, id1, id2):
-        self.graph.delete_section(id1,id2)
-        new_rules = self.update_rules()
-        self.send_list_rules(new_rules)
-        print("COUPURE D'UNE VOIE")
+        print("LA")
 
     def temps_moy_stat(self,id,temps):
         test=True
@@ -211,7 +202,13 @@ class Controller:
         for i in self.tab_temps:
             j+=1
             moy += i
-        return moy/j
+        if j==0:
+            return(0)
+        else:
+            return moy/j
+
+
+
 
 
 def get_controller():

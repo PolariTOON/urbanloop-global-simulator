@@ -19,6 +19,11 @@ class Controller:
         self.warehouses = warehouse.get_warehouses()
         self.stations = station.get_stations()
         self.timers = [-1] * len(self.capsules)
+        self.tab_depart = []
+        self.tab_temps = []
+        self.tab_depart_voy = []
+        self.tab_temps_voy = []
+
         self.graph = Graph()
         self.rules = []
         self.congestions = [[False for j in range(self.graph.size)] for i in range(self.graph.size)]
@@ -171,6 +176,41 @@ class Controller:
         new_rules = self.update_rules()
         self.send_list_rules(new_rules)
         print("COUPURE D'UNE VOIE")
+
+    def temps_moy_stat(self,id,temps):
+        test=True
+        for i in self.tab_depart:
+            if i[0]==id:
+                test=False
+                self.tab_temps.append(temps-i[1])
+        if test :
+            self.tab_depart.append([id,temps])
+
+    def temps_moy_voy_stat(self,id,temps):
+        test=True
+        for i in self.tab_depart_voy:
+            if i[0]==id:
+                test=False
+                self.tab_temps_voy.append(temps-i[1])
+                self.tab_depart_voy.remove(i)
+        if test :
+            self.tab_depart_voy.append([id,temps])
+
+    def temps_moy_voy(self):
+        moy = 0
+        j=0
+        for i in self.tab_temps_voy:
+            j+=1
+            moy += i
+        return moy/j
+
+    def temps_moy(self):
+        moy = 0
+        j=0
+        for i in self.tab_temps:
+            j+=1
+            moy += i
+        return moy/j
 
 
 def get_controller():

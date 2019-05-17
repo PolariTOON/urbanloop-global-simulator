@@ -131,6 +131,12 @@ class SimLoop:
                     tick_start_time = time.perf_counter()
 
                 # Stats are recorded every 30 simulated seconds
+                if _current_tick==80000:
+                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ",controller.get_controller().temps_moy(), "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
+
+
+
                 if _modulo_on_seconds(30):
                     loops = []
                     capsules = {}

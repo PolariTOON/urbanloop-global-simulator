@@ -130,7 +130,7 @@ class SimLoop:
 
                 # Stats are recorded every 30 simulated seconds
                 if _current_tick==80000:
-                    print(controller.get_controller().temps_moy())
+                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ",controller.get_controller().temps_moy(), "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
 
 

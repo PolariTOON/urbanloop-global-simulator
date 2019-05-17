@@ -3,6 +3,7 @@ import math
 from model import identifier
 from model import station
 from model import switch
+from model import controller
 from model import warehouse
 from settings import config
 from settings import simlog
@@ -20,9 +21,9 @@ class Capsule:
         """
         global _capsules
         _capsules.append(self)
-
         self.segment_real_tick = 0
         self.stopped = False
+        self.controller = controller.get_controller()
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_capsule_id()
         self.current_element = None
@@ -87,6 +88,9 @@ class Capsule:
         """
         The capsule starts a trip to its destination
         """
+        from model import controller
+        self.controller = controller.get_controller()
+        self.controller.temps_moy_stat(self.id,sim_loop.get_simulated_time())
         simlog.info(
             "Capsule %d (%s) starts its trip to %s" % (self.id, self._get_capacity_state(), self.destination.name),
             self.current_element)
@@ -168,6 +172,7 @@ class Capsule:
 
 
     def end_trip(self):
+        self.controller.temps_moy_stat(self.id,sim_loop.get_simulated_time())
         self.current_element.end_capsule_trip(self)
         simlog.info("Capsule %d (%s) ends its trip" %
                     (self.id, self._get_capacity_state()), self.destination.name)

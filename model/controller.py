@@ -19,6 +19,9 @@ class Controller:
         self.warehouses = warehouse.get_warehouses()
         self.stations = station.get_stations()
         self.timers = [-1] * len(self.capsules)
+        self.tab_depart = []
+        self.tab_temps = []
+
         self.graph = Graph()
         self.rules = []
         self.congestions = [[False for j in range(self.graph.size)] for i in range(self.graph.size)]
@@ -159,6 +162,27 @@ class Controller:
             test_warehouse = warehouse.which_warehouse_before(destination)
             if test_warehouse.capsule_queue.qsize()>0:
                     test_warehouse.send_capsule(destination, prio)
+
+    def temps_moy_stat(self,id,temps):
+        test=True
+        for i in self.tab_depart:
+            if i[0]==id:
+                test=False
+                self.tab_temps.append(temps-i[1])
+        if test :
+            self.tab_depart.append([id,temps])
+
+
+
+    def temps_moy(self):
+        moy = 0
+        j=0
+        for i in self.tab_temps:
+            j+=1
+            moy += i
+        return moy
+
+
 
 
 

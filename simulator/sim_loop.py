@@ -80,10 +80,7 @@ class SimLoop:
         for i in capsule.get_capsules():
             if i.next_element in switch.get_switches() and i.current_element in switch.get_switches():
                 if i.get_segment_trip_percentage() >=95:
-<<<<<<< HEAD
-=======
-                    #print(i.get_segment_trip_percentage())
->>>>>>> 7d373852c1ff95d3cccb4f03684eebfe347e6234
+
                     test = False
                     for j in capsule.get_capsules():
                         if j != i:

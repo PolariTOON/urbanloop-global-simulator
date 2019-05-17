@@ -52,6 +52,8 @@ class SimLoop:
         self.station_refill = True
         self.fulfill_period = int(config.capsule['fulfill_period'])
         self.is_visualized = is_visualized
+        self.tab_depart = []
+        self.tab_temps = []
 
         self.controller = controller.Controller()
 
@@ -129,8 +131,8 @@ class SimLoop:
                     tick_start_time = time.perf_counter()
 
                 # Stats are recorded every 30 simulated seconds
-                if _current_tick==80000:
-                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ",controller.get_controller().temps_moy(), "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                if _current_tick==100000:
+                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ",controller.get_controller().temps_moy(), "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
 
 

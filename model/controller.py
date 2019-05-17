@@ -174,6 +174,7 @@ class Controller:
             if i[0]==id:
                 test=False
                 self.tab_temps.append(temps-i[1])
+                i[0]=-1
         if test :
             self.tab_depart.append([id,temps])
 

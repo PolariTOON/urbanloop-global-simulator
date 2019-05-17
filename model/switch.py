@@ -91,8 +91,8 @@ class Switch:
         else:
             simlog.error("The switch %d is not in the station %s" % (str(self.id), the_loop.name))
 
-    def add_rule(self,rule,index=-1):
-        if index == -1 :
+    def add_rule(self, rule, index=-1):
+        if index == -1:
             index = 0
         self.rules.insert(index,rule)
 

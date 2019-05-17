@@ -47,6 +47,7 @@ class Station:
         self.next_element = None
         self.section_loop = None
         self.nb_to_send = 0
+        self.capsule_arriving = False
 
     def reset_simulation(self):
         self.traveler_queue = queue.Queue()
@@ -116,6 +117,7 @@ class Station:
 
     def end_capsule_trip(self, capsule):
         self.controller.stop_timer(capsule)
+        self.capsule_arriving = False
 
 
 def get_stations():
@@ -140,10 +142,12 @@ def fill_and_full_stations():
             # quasi vide --> station à compléter
             simlog.debug("Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
             nb_to_send = station.capacity - station.estimated_capsules_number() - 1
-            if station.estimated_capsules_number() == 0:
-                controller.get_controller().refill(10,station)
-            else:
-                controller.get_controller().refill(6,station)
+            if station.estimated_capsules_number() == 0 and station.capsule_arriving==False:
+                controller.get_controller().refill(10,station,nb_to_send)
+                station.capsule_arriving = True
+            elif station.capsule_arriving==False:
+                controller.get_controller().refill(6,station,nb_to_send)
+                capsule_arriving = True
                  # j'en envoie une depuis un entrepot
             """
             if nearer_warehouse is not None :

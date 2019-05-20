@@ -144,8 +144,6 @@ class SimLoop:
                     latest_stats_file.close()
 
 
-
-
                 if _modulo_on_seconds(30):
                     loops = []
                     capsules = {}
@@ -169,7 +167,7 @@ class SimLoop:
                 if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(1):
                     station.fill_and_full_stations()
 
-                self.collision()
+                #self.collision()
 
                 yield _env.timeout(1)
 

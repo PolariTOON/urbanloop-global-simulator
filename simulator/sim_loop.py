@@ -126,8 +126,8 @@ class SimLoop:
         tick_start_time = 0
         while True:
             if is_running():
-                #if _sim_tick*_current_tick == 3600:
-                #    controller.get_controller().disable_way(12,13)
+                if _sim_tick*_current_tick == 3600:
+                    controller.get_controller().disable_way(12,13)
                 loop_sleep_boolean = self.is_visualized and not self.is_real_time and _visualized_tick_duration != 0
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()

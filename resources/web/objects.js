@@ -216,6 +216,7 @@ class Station {
             })
         );
 
+
         initBehaviors(this, this.innerCircle, this.outerCircle, this.info);
 
         networkLayer.add(this.outerCircle);
@@ -267,22 +268,26 @@ class Station {
         });
     }
 
-    updateScale(value) {
-        this.innerCircle.scaleX(value);
-        this.innerCircle.scaleY(value);
-        this.outerCircle.scaleX(value);
-        this.outerCircle.scaleY(value);
-        this.dockList.forEach(dock => {
-            dock.scaleX(value);
-            dock.scaleY(value);
+    class Star {
+    constructor(x,y, starRadius = 12, starWidth = 4) {
+        this.x = x;
+        this.y = y;
+        const y = getNetworkDivSize().height - this.y;
+        const semiWidth = Math.floor(warehouseWidth / 2);
+
+        var star = new Konva.Star({
+          x: x,
+          y: y,
+          numPoints: 5,
+          innerRadius: 70,
+          outerRadius: 70,
+          fill: 'red',
+          stroke: 'black',
+          strokeWidth: 4
         });
-        this.info.scaleX(value);
-        this.info.scaleY(value);
 
-    }
-
-    update(stationJSON) {
-        this.json = stationJSON;
+        networkLayer.add(star);
+        //objects.push(this);
     }
 }
 /*
@@ -943,6 +948,16 @@ function initNetworkScene(networkName, isDefaultNetwork) {
 
 function updateNetworkScene() {
     $.ajaxSetup({timeout: 100});
+
+    $.ajax({
+      type: "GET",
+      url: "model/star.py",
+      data: { param: get_list_pos()}
+    }).done(function( o ) {
+       for (int k=0;k<data.size();k++){
+           var mystar = new Star(data[k][0],data[k][1);
+       }
+    });
 
     $.getJSON('/updatedData.json', function (listDataJSON) {
         if (clearing) return;

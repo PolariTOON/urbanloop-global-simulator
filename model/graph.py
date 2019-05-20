@@ -166,7 +166,9 @@ class Graph:
 
 
     def delete_section(self,id_dep,id_fin):
+        from model import star
         self.matrix[id_dep][id_fin]=inf
+        star.Star(self.get_node_from_id(id_dep),self.get_node_from_id(id_fin))
         self.get_node_from_id(id_dep).remove_next(self.get_node_from_id(id_fin))
 
 

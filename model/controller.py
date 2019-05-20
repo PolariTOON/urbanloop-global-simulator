@@ -193,7 +193,7 @@ class Controller:
             if i[0]==id:
                 test=False
                 self.tab_temps_voy.append(temps-i[1])
-                self.tab_depart_voy.remove(i)
+                i[0]=-1
         if test :
             self.tab_depart_voy.append([id,temps])
 

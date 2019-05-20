@@ -138,6 +138,10 @@ class SimLoop:
                     buffer = str(controller.get_controller().temps_moy())+","
                     latest_stats_file.write(buffer)
                     latest_stats_file.close()
+                    latest_stats_file = open("out/staatsvoy.txt", "a")
+                    buffer = str(controller.get_controller().temps_moy_voy())+","
+                    latest_stats_file.write(buffer)
+                    latest_stats_file.close()
 
 
 

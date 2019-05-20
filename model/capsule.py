@@ -172,6 +172,7 @@ class Capsule:
 
 
     def end_trip(self):
+
         self.controller.temps_moy_stat(self.id,sim_loop.get_simulated_time())
         self.current_element.end_capsule_trip(self)
         simlog.info("Capsule %d (%s) ends its trip" %
@@ -185,6 +186,7 @@ class Capsule:
         if self.travelers:
             simlog.debug("Start descent in capsule %d" % self.id, self.destination)
             traveler = self.travelers[0]
+            traveler.stats()
             trip_time = sim_loop.get_simulated_time() - sim_loop.get_simulated_time(traveler.trip_start_tick)
             sim_loop.recorder.add_traveling_time_traveler(trip_time, traveler)
             self.descent_event = sim_loop.get_env().timeout(converter.random_ascent_descent_duration())

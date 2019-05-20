@@ -203,7 +203,10 @@ class Controller:
         for i in self.tab_temps_voy:
             j+=1
             moy += i
-        return moy/j
+        if j==0:
+            return(0)
+        else:
+            return moy/j
 
     def temps_moy(self):
         moy = 0

@@ -27,7 +27,7 @@ class Queue:
     def put(self, item):
         if len(self.items) > 0 and type(self.items[0]) is not type(item):
             return None
-        if self._is_bounded and self._maxsize <= len(self.items) + 1:
+        if self._is_bounded and self._maxsize <= len(self.items):
             return None
         return self.items.append(item)
 

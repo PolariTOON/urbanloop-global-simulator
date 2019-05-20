@@ -69,8 +69,6 @@ class SimLoop:
         if config.capsule['station_refill'] in ['false', 'False']:
             self.station_refill = False
 
-
-
         _load_env(self.is_real_time)
         self.tick_event = _env.event()
         _endless_quit_event = _env.event()

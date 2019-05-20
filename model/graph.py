@@ -174,6 +174,7 @@ class Graph:
 
     def repare_section(self,id_dep,id_fin):
         self.matrix[id_dep][id_fin] = self.expected_matrix[id_dep][id_fin]
+        self.get_node_from_id(id_dep).add_next_node(self.get_node_from_id(id_fin))
 
 
     def change(self,node_start, node_dest):

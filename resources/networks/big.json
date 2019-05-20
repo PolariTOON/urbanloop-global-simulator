@@ -10,8 +10,8 @@
                 {"type":"switch_in","other_loop":"Est", "angle":190},
                 {"type":"switch_in","other_loop":"Sud", "angle":320},
                 {"type":"switch_out","other_loop":"Sud", "angle":300},
-                {"type":"switch_out","other_loop":"Nord_Ouest", "angle":0 },
-                {"type":"switch_in","other_loop":"Nord_Ouest", "angle":20 }
+                {"type":"switch_out","other_loop":"Nord/Ouest", "angle":0 },
+                {"type":"switch_in","other_loop":"Nord/Ouest", "angle":20 }
     ]
   },
   "Maxeville": {
@@ -20,8 +20,8 @@
     "clockwise" : true,
     "content": [{"type":"switch_out","other_loop":"Est", "angle":250 },
                 {"type":"switch_in","other_loop":"Est", "angle":230 },
-                {"type":"switch_out","other_loop":"Nord_Ouest", "angle":0 },
-                {"type":"switch_in","other_loop":"Nord_Ouest", "angle":20 },
+                {"type":"switch_out","other_loop":"Nord/Ouest", "angle":0 },
+                {"type":"switch_in","other_loop":"Nord/Ouest", "angle":20 },
                 {"type":"station","name":"Station1", "angle":20, "station_type": 2, "capacity": 5},
                 {"type":"station","name":"Station2", "angle":50, "station_type": 1, "capacity": 3},
                 {"type":"station","name":"Station3", "angle":80, "station_type": 2, "capacity": 3},
@@ -29,7 +29,7 @@
                 {"type":"warehouse", "capacity": 100, "angle":160}
     ]
 },
-"Nord_Ouest": {
+"Nord/Ouest": {
   "center": [3700,3800],
   "circonference": 5400,
   "clockwise" : false,

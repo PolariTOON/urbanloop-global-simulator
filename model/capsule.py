@@ -11,6 +11,7 @@ from simulator import converter
 from simulator import sim_loop
 
 _capsules = list()
+_empty_capsules = list()
 
 
 class Capsule:
@@ -21,6 +22,9 @@ class Capsule:
         """
         global _capsules
         _capsules.append(self)
+        global _empty_capsules
+        _empty_capsules.append(self)
+
         self.segment_real_tick = 0
         self.stopped = False
         self.controller = controller.get_controller()
@@ -99,6 +103,8 @@ class Capsule:
         simlog.debug("Amount of capsules : %d" % self.current_element.capsule_queue.qsize(), self.current_element)
         for a_traveler in self.travelers:
             a_traveler.trip_start_tick = sim_loop.get_current_tick()
+        if self.travelers:
+            _empty_capsules.remove(self)
         self.moving = True
         sim_loop.get_env().process(self.update_trip())
 
@@ -184,6 +190,7 @@ class Capsule:
             "Contains %d capsules now" % (self.current_element.capsule_queue.qsize()), self.current_element.name)
         self.moving = False
         if self.travelers:
+            _empty_capsules.append(self)
             simlog.debug("Start descent in capsule %d" % self.id, self.destination)
             traveler = self.travelers[0]
             traveler.stats()
@@ -287,6 +294,11 @@ def get_capsules():
     """
     return _capsules
 
+def get_empty_capsules():
+    """
+    :return: All the empty capsules of the network
+    """
+    return _empty_capsules
 
 def reset_simulation():
     """

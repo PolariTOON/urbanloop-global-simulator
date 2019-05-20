@@ -43,7 +43,7 @@ class Controller:
         if self.graph.update_weight(previous_switch, current_switch, self.timers[capsule.id]):
             print("CONGESTION")
             new_rules = self.update_rules()
-            self.send_list_rules(new_rules)
+            self.replace_rules(new_rules)
             self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] = True
         elif self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] == True and self.graph.no_more_congestion(previous_switch, current_switch, self.timers[capsule.id]):
             self.congestions[self.graph.get_node_from_switch(previous_switch).id][self.graph.get_node_from_switch(current_switch).id] = False
@@ -115,14 +115,24 @@ class Controller:
             for switch in self.switches:
                 switch.add_rule(rule)
 
-    def send_list_rules(self, r):
+    def replace_rules(self, r):
         for rule in self.rules:
-            for switch in self.switches:
-                switch.remove_rule(rule)
+            if rule.priority is None:
+                for switch in self.switches:
+                    switch.remove_rule(rule)
+                self.rules.remove(rule)
         for rule in r:
-            self.rules.append(rule)
-            for switch in self.switches:
-                switch.add_rule(rule)
+            if self.rules.count(rule)==0:
+                self.rules.append(rule)
+                for switch in self.switches:
+                    switch.add_rule(rule)
+
+    def send_list_rules(self, r):
+        for rule in r:
+            if self.rules.count(rule)==0:
+                self.rules.append(rule)
+                for switch in self.switches:
+                    switch.add_rule(rule)
 
     def drain(self,destination):
         """
@@ -146,14 +156,15 @@ class Controller:
         """
         if prio == 10:
             test = False
-            for capsule_t in capsule.get_capsules():
+            for capsule_t in capsule.get_empty_capsules():
                 if len(capsule_t.travelers)==0 and capsule_t.priority <= 6:
                     test = True
                     trajet = self.graph.calcul(self.graph.get_node_from_switch(capsule_t.next_element), self.graph.get_node_from_switch(destination))
                     for i in range(len(trajet)-1):
+                        new_rules = list()
                         r = Rule(trajet[i].switch.id, trajet[i+1].loop.id, priority=6, empty=True, change=self.graph.change(trajet[i], trajet[i+1]))
-                        self.rules.append(r)
-                        self.send_all_rules()
+                        new_rules.append(r)
+                        self.send_list_rules(new_rules)
                 if test==True:
                     break;
             if test:
@@ -174,7 +185,7 @@ class Controller:
     def disable_way(self, id1, id2):
         self.graph.delete_section(id1,id2)
         new_rules = self.update_rules()
-        self.send_list_rules(new_rules)
+        self.replace_rules(new_rules)
         print("COUPURE D'UNE VOIE")
 
     def temps_moy_stat(self,id,temps):

@@ -1,3 +1,4 @@
+import os
 import time
 from enum import Enum
 
@@ -132,11 +133,15 @@ class SimLoop:
 
                 # Stats are recorded every 30 simulated seconds
                 if _modulo_on_seconds(10):
-                    latest_stats_file = open("out/staats.txt", "a")
+                    try:
+                        os.mkdir("out")
+                    except:
+                        pass
+                    latest_stats_file = open("out/staats.txt", "a+")
                     buffer = str(controller.get_controller().temps_moy())+","
                     latest_stats_file.write(buffer)
                     latest_stats_file.close()
-                    latest_stats_file = open("out/staatsvoy.txt", "a")
+                    latest_stats_file = open("out/staatsvoy.txt", "a+")
                     buffer = str(controller.get_controller().temps_moy_voy())+","
                     latest_stats_file.write(buffer)
                     latest_stats_file.close()

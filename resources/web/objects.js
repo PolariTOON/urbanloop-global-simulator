@@ -37,7 +37,6 @@ const capsuleInnerAboardColor = 'rgb(96, 167, 27)';
 const capsuleOuterAboardColor = 'rgb(128, 214, 30)';
 const capsuleInnerSelectedColor = 'rgb(255, 200, 20)';
 const capsuleOuterSelectedColor = 'rgb(255, 234, 87)';
-//const disabledWay = 'rgb(217, 1, 21)';
 
 function fetchTimeout(timeout, url, options) {
     const controller = new AbortController();

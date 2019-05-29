@@ -127,7 +127,6 @@ def init():
         a_switch.permanent_table = {a_switch.section_my_loop: [False, 0, [a_switch.id, a_switch.section_my_loop]],
                                     a_switch.section_other_loop: [True, a_switch.size,
                                                                   [a_switch.id, a_switch.section_other_loop]]}
-        # print (a_switch.name, a_switch.permanent_table)
         a_switch.permanent_cover = {a_switch.section_my_loop: a_switch.id, a_switch.section_other_loop: a_switch.id}
         a_switch.timers = [timer_other for _ in range(len(_switches))]
         a_switch.timers[a_switch.id] = my_timer

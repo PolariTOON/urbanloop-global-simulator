@@ -15,6 +15,7 @@ from settings import simlog
 
 _stations = list()
 
+
 class Type(Enum):
     ACTIVITY = 1
     RESIDENTIAL = 2
@@ -34,7 +35,7 @@ class Station:
         """
         global _stations
         _stations.append(self)
-        self.controller= controller.get_controller()
+        self.controller = controller.get_controller()
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_station_id()
         self.name = "Station #{0}".format(self.id) if (name is None) else name
@@ -54,10 +55,10 @@ class Station:
         self.capsule_queue = queue.Queue(maxsize=self.capacity)
 
     def get_type(self):
-        return (Type.ACTIVITY, Type.RESIDENTIAL, Type.CITY)[self.station_type-1]
+        return (Type.ACTIVITY, Type.RESIDENTIAL, Type.CITY)[self.station_type - 1]
 
     def get_string_type(self):
-        return ("Activity", "Residential", "City")[self.station_type-1]
+        return ("Activity", "Residential", "City")[self.station_type - 1]
 
     def get_waiting_capsules_number(self):
         return self.capsule_queue.qsize()
@@ -80,23 +81,23 @@ class Station:
                 if destination is None:
                     destination = get_almost_empty_station(self)
                 a_capsule.destination = destination
-                # simlog.debug("Station %s (%s/%d capsules) drained to %s (%d/%d capsules)" % (self.name, qsize, self.capacity, destination.name, destination.capsule_queue.qsize(), destination.capacity))
                 test = True
 
                 for i in capsule.get_capsules():
                     if i.get_segment_trip_percentage() >= 90 and i.next_element == self:
-                        test=False
+                        test = False
                     if i.get_segment_trip_percentage() <= 10 and i.current_element == self:
-                        test=False
+                        test = False
                 if test:
-                    simlog.debug("Station %s (%s/%d capsules) drained to %s" % (self.name, qsize, self.capacity, destination.name))
-                    capsule_to_send.start_trip()
+                    simlog.debug("Station %s (%s/%d capsules) drained to %s" % (
+                    self.name, qsize, self.capacity, destination.name))
+                    a_capsule.start_trip()
                 return
             else:
                 self.capsule_queue.put(a_capsule)
 
     def capsule_passing(self, capsule):
-        self.controller= controller.get_controller()
+        self.controller = controller.get_controller()
         self.controller.update_from_switch(capsule)
 
     '''
@@ -113,8 +114,6 @@ class Station:
     def estimated_capsules_number(self):
         return self.capsule_queue.qsize() + len(capsule.get_incoming_capsule(self))
 
-
-
     def end_capsule_trip(self, capsule):
         self.controller.stop_timer(capsule)
         self.capsule_arriving = False
@@ -126,6 +125,7 @@ def get_stations():
     """
     return _stations
 
+
 def fill_and_full_stations():
     """
     Appel le controleur pour completer la station. On considère que la station est en situation critique si il ne
@@ -133,17 +133,15 @@ def fill_and_full_stations():
     sera donc autant prioritaire qu'une capsule pleine. Si il reste au moins une capsule alors la demande est
     effectué avec une priorité faible
     """
-    now_second = converter.now_to_seconds()
-    # TODO unused variable -> now_hour = converter.seconds_to_floor_hour(now_second)
     simlog.debug("Stations drainage and completion process launched.")
     for station in get_stations():
-        # print("type", station.get_type())
         if station.estimated_capsules_number() <= max(1, floor(station.capacity / 4)):
             # quasi vide --> station à compléter
-            simlog.debug("Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
+            simlog.debug(
+                "Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
             nb_to_send = station.capacity - station.estimated_capsules_number() - 1
-            if station.estimated_capsules_number() == 0 and station.capsule_arriving==False:
-                controller.get_controller().refill(10,station,nb_to_send)
+            if station.estimated_capsules_number() == 0 and not station.capsule_arriving :
+                controller.get_controller().refill(10, station, nb_to_send)
                 station.capsule_arriving = True
             elif station.capsule_arriving==False:
                 controller.get_controller().refill(6,station,nb_to_send)
@@ -162,13 +160,15 @@ def fill_and_full_stations():
             """
         if station.estimated_capsules_number() >= min(station.capacity - 1, floor(3 * station.capacity /4)) and station.capsule_queue.qsize() > 1:
             # quasi pleine --> station à vider
-            simlog.debug("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
+            simlog.debug("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (
+            station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
             nb_to_send = 1
             if station.capsule_queue.qsize() > station.traveler_queue.qsize():
                 nb_to_send = max(station.capsule_queue.qsize() - station.traveler_queue.qsize() - 1, 1)
             # j'en envoie une vide (si pas de voyageur) attente vers un entrepot
             controller.get_controller().drain(station)
-            #station.drain(warehouse.which_warehouse_before(station(station)))
+            # station.drain(warehouse.which_warehouse_before(station(station)))
+
 
 def get_station_by_name(name):
     """

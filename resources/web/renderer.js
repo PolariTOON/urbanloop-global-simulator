@@ -21,6 +21,7 @@ async function applyNetworkScene(networkName = String(), isDefaultNetwork = true
 function startUpdateLoop() {
     updateLoop = setInterval(() => {
         updateDataPanel();
+        updateViewPanel();
         if (running) {
             updateNetworkScene();
         }

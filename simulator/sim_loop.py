@@ -80,15 +80,14 @@ class SimLoop:
         from model import switch
         for i in capsule.get_capsules():
             if i.next_element in switch.get_switches() and i.current_element in switch.get_switches():
-                if i.get_segment_trip_percentage() >=95:
-
+                if i.get_segment_trip_percentage() >= 95:
                     test = False
                     for j in capsule.get_capsules():
                         if j != i:
                             if j.get_segment_trip_percentage() >= 90 and i.next_element == j.next_element:
-                                test=True
+                                test = True
                             if j.get_segment_trip_percentage() <= 10 and i.current_element == j.next_element:
-                                test=True
+                                test = True
                     if test:
                         #i.speed = 0.1
                         #i.stopped = True
@@ -98,9 +97,6 @@ class SimLoop:
                         #i.speed = float(config.capsule['max_speed'])
                         #i.stopped = False
                         i.segment_real_tick -= 1
-
-
-
 
     def tick(self):
         """
@@ -129,26 +125,24 @@ class SimLoop:
                 #    controller.get_controller().disable_way(12,13)
                 loop_sleep_boolean = self.is_visualized and not self.is_real_time and _visualized_tick_duration != 0
                 if loop_sleep_boolean:
-                    tick_start_time = time.perf_counter()
+                    tick_start_time = time.perf_counter()  # temps de la boucle
 
                 # Stats are recorded every 30 simulated seconds
-                if _modulo_on_seconds(10):
+                if _modulo_on_seconds(30):
                     try:
                         os.mkdir("out")
                     except:
                         pass
                     latest_stats_file = open("out/staats.txt", "a+")
-                    buffer = str(controller.get_controller().temps_moy())+","
+                    buffer = str(controller.get_controller().temps_moy()) + ","
                     latest_stats_file.write(buffer)
                     latest_stats_file.close()
                     latest_stats_file = open("out/staatsvoy.txt", "a+")
-                    buffer = str(controller.get_controller().temps_moy_voy())+","
+                    buffer = str(controller.get_controller().temps_moy_voy()) + ","
                     latest_stats_file.write(buffer)
                     latest_stats_file.close()
 
-
-
-
+                # Information about the network
                 if _modulo_on_seconds(30):
                     loops = []
                     capsules = {}

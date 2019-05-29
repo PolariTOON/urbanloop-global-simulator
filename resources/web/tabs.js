@@ -5,7 +5,6 @@ import {applyNetworkScene} from "./renderer.js";
 let dataTab = document.getElementById("data-tab");
 let configTab = document.getElementById("config-tab");
 let interactTab = document.getElementById("interact-tab");
-let viewTab = document.getElementById("view-tab");
 let saveConfigButton = document.getElementById('config-save-button');
 let permanentConfigButton = document.getElementById('config-permanent-button');
 let resetConfigButton = document.getElementById('config-reset-button');
@@ -53,7 +52,7 @@ export function updateDataPanel() {
         data += "<p>Next element: " + appState.selectedObject.json["next_element"] + "</p>";
         data += "<p>Waiting travelers: " + appState.selectedObject.json["nb_travelers"] + "</p>";
         data += "<p>Capsules: " + appState.selectedObject.json["nb_capsules"];
-        for (k in appState.selectedObject.json["capsules"]) {
+        for (const k in appState.selectedObject.json["capsules"]) {
             data += "<br>&nbsp;Capsule #" + appState.selectedObject.json["capsules"][k];
         }
         data += "</p>";

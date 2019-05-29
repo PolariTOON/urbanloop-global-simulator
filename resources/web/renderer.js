@@ -1,6 +1,7 @@
 import {appState, infoLayer, initNetworkScene, networkLayer, stage, updateNetworkScene} from "./objects.js";
 import {updateDataPanel} from "./tabs.js";
 import {running} from "./inputs.js";
+import {updateViewPanel} from "./viewPanel.js";
 
 let updateLoop;
 
@@ -25,6 +26,7 @@ export async function applyNetworkScene(networkName = String(), isDefaultNetwork
 function startUpdateLoop() {
     updateLoop = setInterval(() => {
         updateDataPanel();
+        updateViewPanel();
         if (running) {
             updateNetworkScene();
         }

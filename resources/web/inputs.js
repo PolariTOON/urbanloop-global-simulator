@@ -1,6 +1,18 @@
+import {Capsule, appState, calibrateNetworkScene, getNetworkDivSize, moveCursor, networkLayer, resetCursor, stage} from "./objects.js";
+import {changeNetworkButtonState} from "./tabs.js";
+import {applyNetworkScene} from "./renderer.js";
+
 // Some elements are defined in the above file objects.js
+let scaleSlider = document.getElementById('scale-slider');
+let startButton = document.getElementById('start-button');
 let stopButton = document.getElementById('stop-button');
 let pauseButton = document.getElementById('pause-button');
+let backwardButton = document.getElementById('backward-button');
+let forwardButton = document.getElementById('forward-button');
+let saveConfigButton = document.getElementById('config-save-button');
+let permanentConfigButton = document.getElementById('config-permanent-button');
+let resetConfigButton = document.getElementById('config-reset-button');
+let networkSelection = document.getElementById('conf-topology-0');
 pauseButton.disabled = true;
 backwardButton.disabled = true;
 forwardButton.disabled = true;
@@ -10,7 +22,7 @@ const minScale = 0.01;
 let moveIntensity = 1;
 let pressTimeout;
 let doPan = false;
-let running = false;
+export let running = false;
 let paused = false;
 
 function fitStageIntoParentContainer() {
@@ -19,7 +31,7 @@ function fitStageIntoParentContainer() {
 
     calibrateNetworkScene();
 
-    objects.forEach(object => {
+    appState.objects.forEach(object => {
         if (!(object instanceof Capsule)) {
             object.updatePosition();
         }
@@ -119,7 +131,7 @@ stopButton.onclick = async () => {
     running = false;
     await fetch('/stop');
     document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
-    waitingSimLoopEnd = true;
+    appState.waitingSimLoopEnd = true;
     applyNetworkScene();
 };
 
@@ -147,8 +159,8 @@ forwardButton.onclick = () => {
 
 scaleSlider.oninput = () => {
     scaleSlider.title = 'Objects scale : ' + scaleSlider.value;
-    objectScale = scaleSlider.value;
-    objects.forEach(object => object.updateScale(objectScale));
+    appState.objectScale = scaleSlider.value;
+    appState.objects.forEach(object => object.updateScale(appState.objectScale));
     stage.batchDraw();
 };
 
@@ -173,7 +185,7 @@ stage.on('mousedown', event => {
 
     let shape = networkLayer.getIntersection(stage.getPointerPosition());
 
-    if (selectedObject !== undefined && shape === null) {
-        selectedObject.unselect();
+    if (appState.selectedObject !== undefined && shape === null) {
+        appState.selectedObject.unselect();
     }
 });

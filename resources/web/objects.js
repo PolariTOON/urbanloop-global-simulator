@@ -1,16 +1,20 @@
 let networkDiv = document.getElementById('network-div');
 
-let clearing = false;
-let waitingSimLoopEnd = false;
+export const appState = {
+    clearing: false,
+    objectScale: undefined,
+    objects: undefined,
+    selectedObject: undefined,
+    waitingSimLoopEnd: false
+};
 let networkSize = 1000;
-let objectScale;
-let stage = new Konva.Stage({
+export let stage = new Konva.Stage({
     container: 'network-div',
     width: getNetworkDivSize().width,
     height: getNetworkDivSize().height
 });
-let networkLayer = new Konva.Layer();
-let infoLayer = new Konva.Layer();
+export let networkLayer = new Konva.Layer();
+export let infoLayer = new Konva.Layer();
 
 let scaleSlider = document.getElementById('scale-slider');
 let startButton = document.getElementById('start-button');
@@ -18,9 +22,6 @@ let backwardButton = document.getElementById('backward-button');
 let forwardButton = document.getElementById('forward-button');
 let timerSpan = document.getElementById('timer-span');
 let speedSpan = document.getElementById('speed-span');
-
-let selectedObject = undefined;
-let objects;
 
 const defaultCapsuleWidth = 5;
 const loopColor = 'rgb(156, 156, 156)';
@@ -46,7 +47,7 @@ function fetchTimeout(timeout, url, options) {
     return fetch(url, {...options, signal});
 }
 
-class Loop {
+export class Loop {
     constructor(loopJSON) {
         this.json = loopJSON;
         this.uuid = loopJSON['uuid'];
@@ -54,7 +55,7 @@ class Loop {
 
         const x = loopJSON['x'];
         const y = getNetworkDivSize().height - loopJSON['y'];
-        const semiWidth = ((defaultCapsuleWidth + 3) * objectScale) / 2;
+        const semiWidth = ((defaultCapsuleWidth + 3) * appState.objectScale) / 2;
         const strokeWidth = semiWidth / 2.5;
 
         this.innerCircle = new Konva.Circle({
@@ -96,22 +97,22 @@ class Loop {
         networkLayer.add(this.innerCircle);
         networkLayer.add(this.text);
 
-        objects.push(this);
+        appState.objects.push(this);
     }
 
     select() {
-        if (selectedObject !== undefined && selectedObject !== this) {
-            selectedObject.unselect();
+        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
+            appState.selectedObject.unselect();
         }
 
-        selectedObject = this;
+        appState.selectedObject = this;
         this.outerCircle.fill(loopSelectedColor);
         networkLayer.batchDraw();
     }
 
     unselect() {
-        if (selectedObject === this) {
-            selectedObject = undefined;
+        if (appState.selectedObject === this) {
+            appState.selectedObject = undefined;
         }
         this.outerCircle.fill(loopColor);
         networkLayer.batchDraw();
@@ -125,7 +126,7 @@ class Loop {
     }
 
     updateScale(value) {
-        const semiWidth = ((defaultCapsuleWidth + 3) * objectScale) / 2;
+        const semiWidth = ((defaultCapsuleWidth + 3) * appState.objectScale) / 2;
         const strokeWidth = semiWidth / 2.5;
         this.innerCircle.radius(this.json['radius'] - semiWidth);
         this.outerCircle.radius(this.json['radius'] + semiWidth);
@@ -136,7 +137,7 @@ class Loop {
     }
 }
 
-class Station {
+export class Station {
     constructor(stationJSON, stationRadius = 12, stationWidth = 4, dockSize = 24) {
         this.json = stationJSON;
         this.uuid = stationJSON['uuid'];
@@ -230,15 +231,15 @@ class Station {
         });
         infoLayer.add(this.info);
 
-        objects.push(this);
+        appState.objects.push(this);
     }
 
     select() {
-        if (selectedObject !== undefined && selectedObject !== this) {
-            selectedObject.unselect();
+        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
+            appState.selectedObject.unselect();
         }
 
-        selectedObject = this;
+        appState.selectedObject = this;
         this.outerCircle.fill(stationSelectedColor);
 
         this.dockList.forEach(dock => {
@@ -249,8 +250,8 @@ class Station {
     }
 
     unselect() {
-        if (selectedObject === this) {
-            selectedObject = undefined;
+        if (appState.selectedObject === this) {
+            appState.selectedObject = undefined;
         }
         this.outerCircle.fill(stationColor);
 
@@ -365,22 +366,22 @@ class Star {
         networkLayer.add(this.innerRectangle);
         infoLayer.add(this.info);
 
-        objects.push(this);
+        appState.objects.push(this);
     }
 
     select() {
-        if (selectedObject !== undefined && selectedObject !== this) {
-            selectedObject.unselect();
+        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
+            appState.selectedObject.unselect();
         }
 
-        selectedObject = this;
+        appState.selectedObject = this;
         this.outerRectangle.fill(warehouseSelectedColor);
         networkLayer.batchDraw();
     }
 
     unselect() {
-        if (selectedObject === this) {
-            selectedObject = undefined;
+        if (appState.selectedObject === this) {
+            appState.selectedObject = undefined;
         }
         this.outerRectangle.fill(warehouseColor);
         networkLayer.batchDraw();
@@ -407,7 +408,7 @@ class Star {
     }
 }
 */
-class Warehouse {
+export class Warehouse {
     constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
         this.json = warehouseJSON;
         this.uuid = warehouseJSON['uuid'];
@@ -482,22 +483,22 @@ class Warehouse {
         networkLayer.add(this.innerRectangle);
         infoLayer.add(this.info);
 
-        objects.push(this);
+        appState.objects.push(this);
     }
 
     select() {
-        if (selectedObject !== undefined && selectedObject !== this) {
-            selectedObject.unselect();
+        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
+            appState.selectedObject.unselect();
         }
 
-        selectedObject = this;
+        appState.selectedObject = this;
         this.outerRectangle.fill(warehouseSelectedColor);
         networkLayer.batchDraw();
     }
 
     unselect() {
-        if (selectedObject === this) {
-            selectedObject = undefined;
+        if (appState.selectedObject === this) {
+            appState.selectedObject = undefined;
         }
         this.outerRectangle.fill(warehouseColor);
         networkLayer.batchDraw();
@@ -524,7 +525,7 @@ class Warehouse {
     }
 }
 
-class Switch {
+export class Switch {
     constructor(switchJSON, switchRadius = 12, switchWidth = 4) {
         this.json = switchJSON;
         this.uuid = switchJSON['uuid'];
@@ -661,15 +662,15 @@ class Switch {
         infoLayer.add(this.infoIn);
         infoLayer.add(this.infoOut);
 
-        objects.push(this);
+        appState.objects.push(this);
     }
 
     select() {
-        if (selectedObject !== undefined && selectedObject !== this) {
-            selectedObject.unselect();
+        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
+            appState.selectedObject.unselect();
         }
 
-        selectedObject = this;
+        appState.selectedObject = this;
         this.arrow.stroke(switchSelectedColor);
         this.arrow.fill(switchSelectedColor);
         this.outerInCircle.fill(switchSelectedColor);
@@ -678,8 +679,8 @@ class Switch {
     }
 
     unselect() {
-        if (selectedObject === this) {
-            selectedObject = undefined;
+        if (appState.selectedObject === this) {
+            appState.selectedObject = undefined;
         }
         this.arrow.stroke('black');
         this.arrow.fill('black');
@@ -725,7 +726,7 @@ class Switch {
     }
 }
 
-class Capsule {
+export class Capsule {
     constructor(capsuleJSON, capsuleWidth = defaultCapsuleWidth) {
         this.json = capsuleJSON;
         this.uuid = capsuleJSON['uuid'];
@@ -749,23 +750,23 @@ class Capsule {
         networkLayer.add(this.innerCircle);
         this.update(capsuleJSON);
 
-        objects.push(this);
+        appState.objects.push(this);
     }
 
     select() {
-        if (selectedObject !== undefined && selectedObject !== this) {
-            selectedObject.unselect();
+        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
+            appState.selectedObject.unselect();
         }
 
-        selectedObject = this;
+        appState.selectedObject = this;
         this.innerCircle.fill(capsuleInnerSelectedColor);
         this.outerCircle.fill(capsuleOuterSelectedColor);
         networkLayer.batchDraw();
     }
 
     unselect() {
-        if (selectedObject === this) {
-            selectedObject = undefined;
+        if (appState.selectedObject === this) {
+            appState.selectedObject = undefined;
         }
 
         this.updateColor();
@@ -790,7 +791,7 @@ class Capsule {
                 this.outerCircle.hide();
                 return;
             }
-            let targetStations = objects.filter(station => station.uuid.includes(capsuleJSON['currentElementUuid']));
+            let targetStations = appState.objects.filter(station => station.uuid.includes(capsuleJSON['currentElementUuid']));
             targetStations.forEach(station => {
                 this.innerCircle.x(x + 10 * station.stationRadius + (6 * capsuleJSON['stationIndex'] + 2) * station.dockSize);
                 this.outerCircle.x(x + 10 * station.stationRadius + (6 * capsuleJSON['stationIndex'] + 2) * station.dockSize);
@@ -801,12 +802,12 @@ class Capsule {
     }
 
     updateColor() {
-        if (selectedObject === this) {
+        if (appState.selectedObject === this) {
             return;
         }
 
         if (this.isDocked) {
-            if (selectedObject === undefined || this.currentElementUuid !== selectedObject.uuid) {
+            if (appState.selectedObject === undefined || this.currentElementUuid !== appState.selectedObject.uuid) {
                 this.innerCircle.hide();
                 this.outerCircle.hide();
             } else {
@@ -843,11 +844,11 @@ function handCursor() {
     document.body.style.cursor = 'pointer';
 }
 
-function moveCursor() {
+export function moveCursor() {
     document.body.style.cursor = 'move';
 }
 
-function resetCursor() {
+export function resetCursor() {
     document.body.style.cursor = 'auto';
 }
 
@@ -895,13 +896,13 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 }
 
-async function initNetworkScene(networkName, isDefaultNetwork) {
-    objects = [];
+export async function initNetworkScene(networkName, isDefaultNetwork) {
+    appState.objects = [];
 
     let waitStart = new Date();
-    while (waitingSimLoopEnd && (new Date() - waitStart) < 1000) {
+    while (appState.waitingSimLoopEnd && (new Date() - waitStart) < 1000) {
         const offSignalJSON = await (await fetch('/loop-off-signal.json')).json();
-        waitingSimLoopEnd = !offSignalJSON['loopOffSignal'];
+        appState.waitingSimLoopEnd = !offSignalJSON['loopOffSignal'];
     }
 
     startButton.classList.remove('not-shown');
@@ -935,10 +936,10 @@ async function initNetworkScene(networkName, isDefaultNetwork) {
     infoLayer.batchDraw();
 }
 
-async function updateNetworkScene() {
+export async function updateNetworkScene() {
     const listDataJSON = await (await fetchTimeout(100, '/updatedData.json')).json();
 
-    if (!clearing) {
+    if (!appState.clearing) {
         for (const dataJSON of listDataJSON) {
             switch (dataJSON['jsonType']) {
                 case 'time':
@@ -998,12 +999,12 @@ function updateTimeFromJSON(timeJSON) {
 }
 
 function updateStationFromJSON(stationJSON) {
-    let targetStations = objects.filter(station => station.uuid.includes(stationJSON['uuid']));
+    let targetStations = appState.objects.filter(station => station.uuid.includes(stationJSON['uuid']));
     targetStations.forEach(station => station.update(stationJSON));
 }
 
 function updateWarehouseFromJSON(warehouseJSON) {
-    let targetWarehouses = objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
+    let targetWarehouses = appState.objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
     targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
 }
 
@@ -1012,19 +1013,19 @@ function updateSwitchFromJSON(switchJSON) {
 }
 
 function updateCapsuleFromJSON(capsuleJSON) {
-    let targetCapsules = objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
+    let targetCapsules = appState.objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
 
     if (targetCapsules.length <= 0) {
-        new Capsule(capsuleJSON).updateScale(objectScale);
+        new Capsule(capsuleJSON).updateScale(appState.objectScale);
     } else {
         targetCapsules.forEach(capsule => capsule.update(capsuleJSON));
     }
 }
 
-function calibrateNetworkScene() {
+export function calibrateNetworkScene() {
     calibrateStageScale();
-    objectScale = Math.min(networkSize / getNetworkDivSize().height, scaleSlider.max);
-    scaleSlider.value = objectScale;
+    appState.objectScale = Math.min(networkSize / getNetworkDivSize().height, scaleSlider.max);
+    scaleSlider.value = appState.objectScale;
     scaleSlider.title = "Objects scale : " + scaleSlider.value;
     calibrateStagePosition();
     scaleObjects();
@@ -1035,7 +1036,7 @@ function getBarycenter() {
     let sumX = 0;
     let sumY = 0;
 
-    objects.forEach(object => {
+    appState.objects.forEach(object => {
         if (object instanceof Loop) {
             loopNumber += 1;
             sumX += object.json['x'];
@@ -1051,7 +1052,7 @@ function getBarycenter() {
 }
 
 function calibrateStagePosition() {
-    if (objectScale === 0) return;
+    if (appState.objectScale === 0) return;
     const barycenter = getBarycenter();
     const scale = networkSize / Math.min(getNetworkDivSize().width, getNetworkDivSize().height);
     const stagePos = {
@@ -1067,10 +1068,10 @@ function calibrateStageScale() {
 }
 
 function scaleObjects() {
-    objects.forEach(object => object.updateScale(objectScale));
+    appState.objects.forEach(object => object.updateScale(appState.objectScale));
 }
 
-function getNetworkDivSize() {
+export function getNetworkDivSize() {
     return {
         width: Math.min(networkDiv.offsetWidth, window.innerWidth),
         height: Math.min(networkDiv.offsetHeight, window.innerHeight)

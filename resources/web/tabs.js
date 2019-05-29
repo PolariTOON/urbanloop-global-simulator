@@ -1,3 +1,6 @@
+import {Capsule, Loop, Station, Switch, Warehouse, appState} from "./objects.js";
+import {applyNetworkScene} from "./renderer.js";
+
 // Some elements are defined in the above file objects.js
 let dataTab = document.getElementById("data-tab");
 let configTab = document.getElementById("config-tab");
@@ -20,65 +23,65 @@ let endlessCheckBox = document.getElementById('conf-simulation-1');
 let duration = document.getElementById('conf-simulation-2');
 let permanentConfigChange = false;
 
-function updateDataPanel() {
+export function updateDataPanel() {
     let data = "";
     // gather data
-    if (selectedObject instanceof Loop) {
-        data += "<p>Loop: " + selectedObject.json["name"] + "</p>";
-        data += "<p>Circumference: " + selectedObject.json["size"] + "</p>";
-        data += "<p>Center coordinates: [" + selectedObject.json["x"] + ";" + selectedObject.json["y"] + "]</p>";
-        data += "<p>Clockwise: " + selectedObject.json["clockwise"] + "</p>";
+    if (appState.selectedObject instanceof Loop) {
+        data += "<p>Loop: " + appState.selectedObject.json["name"] + "</p>";
+        data += "<p>Circumference: " + appState.selectedObject.json["size"] + "</p>";
+        data += "<p>Center coordinates: [" + appState.selectedObject.json["x"] + ";" + appState.selectedObject.json["y"] + "]</p>";
+        data += "<p>Clockwise: " + appState.selectedObject.json["clockwise"] + "</p>";
         data += "<p>Elements: ";
-        let elements = selectedObject.json["objects"];
-        for (key in elements) {
+        let elements = appState.selectedObject.json["objects"];
+        for (const key in elements) {
             data += "<br>&nbsp;" + elements[key];
         }
         data += "</p>";
-    } else if (selectedObject instanceof Switch) {
-        data += "<p>Switch n°" + selectedObject.json["id"] + "</p>";
-        data += "<p>Loop of the switch: " + selectedObject.json["my_loop_name"] + "</p>";
-        data += "<p>&nbsp; Next element : " + selectedObject.json["next_element_name"] + "</p>";
-        data += "<p>Loop switched: " + selectedObject.json["other_loop_name"] + "</p>";
-        data += "<p>&nbsp; Next element: " + selectedObject.json["next_other_element_name"] + "</p>";
-        data += "<p>Size of the link: " + selectedObject.json["size"] + "</p>";
-        //data += "<p>Routing table: " + selectedObject.json["table"] + "</p>";
-    } else if (selectedObject instanceof Station) {
-        data += "<p>Station: " + selectedObject.json["name"] + "</p>";
-        data += "<p>Station Type: " + selectedObject.json["type"] + "</p>";
-        data += "<p>Loop: " + selectedObject.json["outerCircle"] + "</p>";
-        data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
-        data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
-        data += "<p>Waiting travelers: " + selectedObject.json["nb_travelers"] + "</p>";
-        data += "<p>Capsules: " + selectedObject.json["nb_capsules"];
-        for (k in selectedObject.json["capsules"]) {
-            data += "<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
+    } else if (appState.selectedObject instanceof Switch) {
+        data += "<p>Switch n°" + appState.selectedObject.json["id"] + "</p>";
+        data += "<p>Loop of the switch: " + appState.selectedObject.json["my_loop_name"] + "</p>";
+        data += "<p>&nbsp; Next element : " + appState.selectedObject.json["next_element_name"] + "</p>";
+        data += "<p>Loop switched: " + appState.selectedObject.json["other_loop_name"] + "</p>";
+        data += "<p>&nbsp; Next element: " + appState.selectedObject.json["next_other_element_name"] + "</p>";
+        data += "<p>Size of the link: " + appState.selectedObject.json["size"] + "</p>";
+        //data += "<p>Routing table: " + appState.selectedObject.json["table"] + "</p>";
+    } else if (appState.selectedObject instanceof Station) {
+        data += "<p>Station: " + appState.selectedObject.json["name"] + "</p>";
+        data += "<p>Station Type: " + appState.selectedObject.json["type"] + "</p>";
+        data += "<p>Loop: " + appState.selectedObject.json["outerCircle"] + "</p>";
+        data += "<p>Capacity: " + appState.selectedObject.json["capacity"] + "</p>";
+        data += "<p>Next element: " + appState.selectedObject.json["next_element"] + "</p>";
+        data += "<p>Waiting travelers: " + appState.selectedObject.json["nb_travelers"] + "</p>";
+        data += "<p>Capsules: " + appState.selectedObject.json["nb_capsules"];
+        for (k in appState.selectedObject.json["capsules"]) {
+            data += "<br>&nbsp;Capsule #" + appState.selectedObject.json["capsules"][k];
         }
         data += "</p>";
-    } else if (selectedObject instanceof Warehouse) {
-        data += "<p>Warehouse n°" + selectedObject.json["id"] + "</p>";
-        data += "<p>Loop: " + selectedObject.json["outerCircle"] + "</p>";
-        data += "<p>Capacity: " + selectedObject.json["capacity"] + "</p>";
-        data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
-        data += "<p>Capsules: " + selectedObject.json["nb_capsules"];
-        /*for (k in selectedObject.json["capsules"]) {
-            data += "<br>&nbsp;<br>&nbsp;Capsule #" + selectedObject.json["capsules"][k];
+    } else if (appState.selectedObject instanceof Warehouse) {
+        data += "<p>Warehouse n°" + appState.selectedObject.json["id"] + "</p>";
+        data += "<p>Loop: " + appState.selectedObject.json["outerCircle"] + "</p>";
+        data += "<p>Capacity: " + appState.selectedObject.json["capacity"] + "</p>";
+        data += "<p>Next element: " + appState.selectedObject.json["next_element"] + "</p>";
+        data += "<p>Capsules: " + appState.selectedObject.json["nb_capsules"];
+        /*for (k in appState.selectedObject.json["capsules"]) {
+            data += "<br>&nbsp;<br>&nbsp;Capsule #" + appState.selectedObject.json["capsules"][k];
         }*/
         data += "</p>";
-    } else if (selectedObject instanceof Capsule) {
-        data += "<p>Capsule n°" + selectedObject.json["id"] + "</p>";
-        data += "<p>Contains a traveler: " + (selectedObject.json["travelerNumber"] !== 0) + "</p>";
-        let destination = selectedObject.json["destination"] === undefined ? "None" : selectedObject.json["destination"];
+    } else if (appState.selectedObject instanceof Capsule) {
+        data += "<p>Capsule n°" + appState.selectedObject.json["id"] + "</p>";
+        data += "<p>Contains a traveler: " + (appState.selectedObject.json["travelerNumber"] !== 0) + "</p>";
+        let destination = appState.selectedObject.json["destination"] === undefined ? "None" : appState.selectedObject.json["destination"];
         data += "<p>Destination: " + destination + "</p>";
-        data += "<p>Current Loop: " + selectedObject.json["outerCircle"] + "</p>";
-        data += "<p>Last or current element: " + selectedObject.json["current_element"] + "</p>";
-        data += "<p>Next element: " + selectedObject.json["next_element"] + "</p>";
+        data += "<p>Current Loop: " + appState.selectedObject.json["outerCircle"] + "</p>";
+        data += "<p>Last or current element: " + appState.selectedObject.json["current_element"] + "</p>";
+        data += "<p>Next element: " + appState.selectedObject.json["next_element"] + "</p>";
     } else {
         data += "<p>Nothing selected.</p>";
     }
     dataTab.innerHTML = data;
 }
 
-async function updateConfigPanel() {
+export async function updateConfigPanel() {
     const configJSON = await (await fetch('/config.json/0')).json();
     document.getElementById('conf-travelers-0').value = configJSON['travelers_per_day'];
     document.getElementById('conf-travelers-1').value = configJSON['trip_limit'];
@@ -124,7 +127,7 @@ async function updateNetworkSelection() {
     }
 }
 
-function changeNetworkButtonState(disabled = false) {
+export function changeNetworkButtonState(disabled = false) {
     networkAddButton.disabled = disabled;
     networkDlButton.disabled = disabled;
     networkFavButton.disabled = disabled;
@@ -296,7 +299,7 @@ networkDlButton.onclick = async () => {
         selectedName = selectedName.replace('default: ', '');
     }
 
-    const networkJSON = await (await fetch('/dl-network-file.json/', selectedName + '/' + (isDefault ? '1' : '0'))).json();
+    const networkJSON = await (await fetch('/dl-network-file.json/' + selectedName + '/' + (isDefault ? '1' : '0'))).json();
     let downloadLink = window.document.createElement('a');
     downloadLink.href = window.URL.createObjectURL(new Blob([JSON.stringify(networkJSON, null, 2)], {type: "application/json"}));
     downloadLink.download = selectedName.replace('default : ', '') + '.json';

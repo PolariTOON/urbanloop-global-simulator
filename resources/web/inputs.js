@@ -101,7 +101,7 @@ stage.on('wheel', event => {
     stage.batchDraw();
 });
 
-startButton.onclick = () => {
+startButton.onclick = async () => {
     if (running) return;
     pauseButton.disabled = false;
     backwardButton.disabled = false;
@@ -113,7 +113,7 @@ startButton.onclick = () => {
     changeNetworkButtonState(true);
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
-    fetch('/start');
+    await fetch('/start');
     running = true;
 };
 

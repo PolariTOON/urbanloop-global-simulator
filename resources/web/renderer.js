@@ -9,11 +9,11 @@ function clearScene() {
     stage.destroyChildren();
 }
 
-function applyNetworkScene(networkName = String(), isDefaultNetwork = true) {
+async function applyNetworkScene(networkName = String(), isDefaultNetwork = true) {
     clearScene();
     stage.add(networkLayer);
     stage.add(infoLayer);
-    initNetworkScene(networkName, isDefaultNetwork);
+    await initNetworkScene(networkName, isDefaultNetwork);
     clearing = false;
     startUpdateLoop();
 }
@@ -32,5 +32,7 @@ function stopUpdateLoop() {
     updateLoop = undefined;
 }
 
-applyNetworkScene();
-updateConfigPanel();
+(async () => {
+    await applyNetworkScene();
+    updateConfigPanel();
+}) ();

@@ -101,11 +101,11 @@ startButton.onclick = () => {
     changeNetworkButtonState(true);
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
-    $.get('/start');
+    fetch('/start');
     running = true;
 };
 
-stopButton.onclick = () => {
+stopButton.onclick = async () => {
     if (!running) return;
     pauseButton.disabled = true;
     backwardButton.disabled = true;
@@ -117,22 +117,19 @@ stopButton.onclick = () => {
     changeNetworkButtonState(false);
     stopButton.classList.add('not-shown');
     running = false;
-    $.get('/stop').always([
-        () => {
-            document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
-            waitingSimLoopEnd = true;
-            applyNetworkScene();
-        }
-    ]);
+    await fetch('/stop');
+    document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
+    waitingSimLoopEnd = true;
+    applyNetworkScene();
 };
 
 pauseButton.onclick = () => {
     if (paused) {
-        $.get('/resume');
+        fetch('/resume');
         pauseButton.innerHTML = "Pause";
         paused = false;
     } else {
-        $.get('/pause');
+        fetch('/pause');
         pauseButton.innerHTML = "Resume";
         paused = true;
     }
@@ -140,23 +137,23 @@ pauseButton.onclick = () => {
 
 backwardButton.onclick = () => {
     if (!running) return;
-    $.get('/decelerate');
+    fetch('/decelerate');
 };
 
 forwardButton.onclick = () => {
     if (!running) return;
-    $.get('/accelerate');
+    fetch('/accelerate');
 };
 
 scaleSlider.oninput = () => {
-    jQueryScaleSlider.attr('data-original-title', 'Objects scale : ' + scaleSlider.value).tooltip('show');
+    scaleSlider.title = 'Objects scale : ' + scaleSlider.value;
     objectScale = scaleSlider.value;
     objects.forEach(object => object.updateScale(objectScale));
     stage.batchDraw();
 };
 
 scaleSlider.onmouseleave = () => {
-    jQueryScaleSlider.tooltip('hide');
+    scaleSlider.removeAttribute("title");
 };
 
 document.getElementById('panel-div').onmouseenter = () => {

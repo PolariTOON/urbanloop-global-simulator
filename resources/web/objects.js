@@ -13,12 +13,9 @@ let networkLayer = new Konva.Layer();
 let infoLayer = new Konva.Layer();
 
 let scaleSlider = document.getElementById('scale-slider');
-let jQueryScaleSlider = $('#scale-slider');
 let startButton = document.getElementById('start-button');
 let backwardButton = document.getElementById('backward-button');
-let jQueryBackwardButton = $('#backward-button');
 let forwardButton = document.getElementById('forward-button');
-let jQueryForwardButton = $('#forward-button');
 let timerSpan = document.getElementById('timer-span');
 let speedSpan = document.getElementById('speed-span');
 
@@ -41,6 +38,13 @@ const capsuleOuterAboardColor = 'rgb(128, 214, 30)';
 const capsuleInnerSelectedColor = 'rgb(255, 200, 20)';
 const capsuleOuterSelectedColor = 'rgb(255, 234, 87)';
 //const disabledWay = 'rgb(217, 1, 21)';
+
+function fetchTimeout(timeout, url, options) {
+    const controller = new AbortController();
+    const {signal} = controller;
+    setTimeout(() => controller.abort(), timeout);
+    return fetch(url, {...options, signal});
+}
 
 class Loop {
     constructor(loopJSON) {
@@ -891,49 +895,39 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 }
 
-function initNetworkScene(networkName, isDefaultNetwork) {
+async function initNetworkScene(networkName, isDefaultNetwork) {
     objects = [];
-
-    $.ajaxSetup({async: false});
 
     let waitStart = new Date();
     while (waitingSimLoopEnd && (new Date() - waitStart) < 1000) {
-        $.getJSON('/loop-off-signal.json', function (offSignalJSON) {
-            waitingSimLoopEnd = !offSignalJSON['loopOffSignal'];
-        });
+        const offSignalJSON = await (await fetch('/loop-off-signal.json')).json();
+        waitingSimLoopEnd = !offSignalJSON['loopOffSignal'];
     }
 
     startButton.classList.remove('not-shown');
 
-    $.getJSON(isDefaultNetwork ? '/load.json' : String.prototype.concat('/load.json/', networkName), function (networkJSON) {
-        networkSize = networkJSON['maxSize'];
-    });
+    const networkJSON = await (await fetch(isDefaultNetwork ? '/load.json' : '/load.json/' + networkName)).json();
+    networkSize = networkJSON['maxSize'];
 
-    $.getJSON('/loops.json', function (listLoopJSON) {
-        listLoopJSON.forEach(function (loopJSON) {
-            new Loop(loopJSON);
-        });
-    });
+    const listLoopJSON = await (await fetch('/loops.json')).json();
+    for (const loopJSON of listLoopJSON) {
+        new Loop(loopJSON);
+    }
 
-    $.getJSON('/stationsSetData.json', function (listStationSetDataJSON) {
-        listStationSetDataJSON.forEach(function (stationSetDataJSON) {
-            new Station(stationSetDataJSON);
-        });
-    });
+    const listStationSetDataJSON = await (await fetch('/stationsSetData.json')).json();
+    for (const stationSetDataJSON of listStationSetDataJSON) {
+        new Station(stationSetDataJSON);
+    }
 
-    $.getJSON('/warehousesSetData.json', function (listWarehouseSetDataJSON) {
-        listWarehouseSetDataJSON.forEach(function (warehouseSetDataJSON) {
-            new Warehouse(warehouseSetDataJSON);
-        });
-    });
+    const listWarehouseSetDataJSON = await (await fetch('/warehousesSetData.json')).json();
+    for (const warehouseSetDataJSON of listWarehouseSetDataJSON) {
+        new Warehouse(warehouseSetDataJSON);
+    }
 
-    $.getJSON('/switchesSetData.json', function (listSwitchSetDataJSON) {
-        listSwitchSetDataJSON.forEach(function (switchSetDataJSON) {
-            new Switch(switchSetDataJSON);
-        });
-    });
-
-    $.ajaxSetup({async: true});
+    const listSwitchSetDataJSON = await (await fetch('/switchesSetData.json')).json();
+    for (const switchSetDataJSON of listSwitchSetDataJSON) {
+        new Switch(switchSetDataJSON);
+    }
 
     calibrateNetworkScene();
 
@@ -941,12 +935,11 @@ function initNetworkScene(networkName, isDefaultNetwork) {
     infoLayer.batchDraw();
 }
 
-function updateNetworkScene() {
-    $.ajaxSetup({timeout: 100});
+async function updateNetworkScene() {
+    const listDataJSON = await (await fetchTimeout(100, '/updatedData.json')).json();
 
-    $.getJSON('/updatedData.json', function (listDataJSON) {
-        if (clearing) return;
-        listDataJSON.forEach(function (dataJSON) {
+    if (!clearing) {
+        for (const dataJSON of listDataJSON) {
             switch (dataJSON['jsonType']) {
                 case 'time':
                     updateTimeFromJSON(dataJSON);
@@ -964,10 +957,8 @@ function updateNetworkScene() {
                     updateCapsuleFromJSON(dataJSON);
                     break;
             }
-        });
-    });
-
-    $.ajaxSetup({timeout: 0});
+        }
+    }
 
     networkLayer.batchDraw();
     infoLayer.batchDraw();
@@ -981,18 +972,13 @@ function updateTimeFromJSON(timeJSON) {
         if (!backwardButton.classList.contains("btn-warning")) {
             backwardButton.classList.remove("btn-light");
             backwardButton.classList.add("btn-warning");
-            jQueryBackwardButton.tooltip({
-                html: true,
-                title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
-            });
-            jQueryBackwardButton.tooltip('show');
+            backwardButton.title = "Jerky Mode ! Simulation will be less accurate";
         }
     } else {
         if (!backwardButton.classList.contains("btn-light")) {
             backwardButton.classList.remove("btn-warning");
             backwardButton.classList.add("btn-light");
-            jQueryBackwardButton.tooltip('hide');
-            jQueryBackwardButton.tooltip('dispose');
+            backwardButton.removeAttribute("title");
         }
     }
 
@@ -1000,18 +986,13 @@ function updateTimeFromJSON(timeJSON) {
         if (!forwardButton.classList.contains("btn-warning")) {
             forwardButton.classList.remove("btn-light");
             forwardButton.classList.add("btn-warning");
-            jQueryForwardButton.tooltip({
-                html: true,
-                title: "<b>Jerky Mode ! Simulation will be less accurate</b>"
-            });
-            jQueryForwardButton.tooltip('show');
+            forwardButton.title = "Jerky Mode ! Simulation will be less accurate";
         }
     } else {
         if (!forwardButton.classList.contains("btn-light")) {
             forwardButton.classList.remove("btn-warning");
             forwardButton.classList.add("btn-light");
-            jQueryForwardButton.tooltip('hide');
-            jQueryForwardButton.tooltip('dispose');
+            forwardButton.removeAttribute("title");
         }
     }
 }
@@ -1044,7 +1025,7 @@ function calibrateNetworkScene() {
     calibrateStageScale();
     objectScale = Math.min(networkSize / getNetworkDivSize().height, scaleSlider.max);
     scaleSlider.value = objectScale;
-    jQueryScaleSlider.tooltip({title: "Objects scale : " + scaleSlider.value});
+    scaleSlider.title = "Objects scale : " + scaleSlider.value;
     calibrateStagePosition();
     scaleObjects();
 }

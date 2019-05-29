@@ -4,18 +4,12 @@ let configTab = document.getElementById("config-tab");
 let interactTab = document.getElementById("interact-tab");
 let viewTab = document.getElementById("view-tab");
 let saveConfigButton = document.getElementById('config-save-button');
-let jQuerySaveConfigButton = $('#config-save-button');
 let permanentConfigButton = document.getElementById('config-permanent-button');
-let jQueryPermanentConfigButton = $('#config-permanent-button');
 let resetConfigButton = document.getElementById('config-reset-button');
-let jQueryResetConfigButton = $('#config-reset-button');
 let networkAddButton = document.getElementById('network-add-btn');
-let jQueryNetworkAddButton = $('#network-add-btn');
 let networkDlButton = document.getElementById('network-dl-btn');
 let networkFavButton = document.getElementById('network-fav-btn');
-let jQueryNetworkFavButton = $('#network-fav-btn');
 let networkRemoveButton = document.getElementById('network-remove-btn');
-let jQueryNetworkRemoveButton = $('#network-remove-btn');
 let networkText = document.getElementById('network-text');
 let networkSelection = document.getElementById('conf-topology-0');
 let networkFileInput = document.getElementById('conf-topology-1');
@@ -84,52 +78,50 @@ function updateDataPanel() {
     dataTab.innerHTML = data;
 }
 
-function updateConfigPanel() {
-    $.getJSON('/config.json/0', function (configJSON) {
-        document.getElementById('conf-travelers-0').value = configJSON['travelers_per_day'];
-        document.getElementById('conf-travelers-1').value = configJSON['trip_limit'];
-        document.getElementById('conf-travelers-2').value = configJSON['traveler_limit'];
-        document.getElementById('conf-travelers-3').value = configJSON['ascent_descent_duration'];
-        document.getElementById('conf-travelers-4').value = configJSON['morning_peak_hour'];
-        document.getElementById('conf-travelers-5').value = configJSON['evening_peak_hour'];
+async function updateConfigPanel() {
+    const configJSON = await (await fetch('/config.json/0')).json();
+    document.getElementById('conf-travelers-0').value = configJSON['travelers_per_day'];
+    document.getElementById('conf-travelers-1').value = configJSON['trip_limit'];
+    document.getElementById('conf-travelers-2').value = configJSON['traveler_limit'];
+    document.getElementById('conf-travelers-3').value = configJSON['ascent_descent_duration'];
+    document.getElementById('conf-travelers-4').value = configJSON['morning_peak_hour'];
+    document.getElementById('conf-travelers-5').value = configJSON['evening_peak_hour'];
 
-        document.getElementById('conf-probabilities-0').value = configJSON['activity_and_residential_percent'];
-        document.getElementById('conf-probabilities-1').value = configJSON['city_percent'];
-        document.getElementById('conf-probabilities-2').value = configJSON['activity_and_residential_fluctuation'];
+    document.getElementById('conf-probabilities-0').value = configJSON['activity_and_residential_percent'];
+    document.getElementById('conf-probabilities-1').value = configJSON['city_percent'];
+    document.getElementById('conf-probabilities-2').value = configJSON['activity_and_residential_fluctuation'];
 
-        document.getElementById('conf-capsule-0').value = configJSON['max_speed'];
-        document.getElementById('conf-capsule-1').value = configJSON['number_of_capsules'];
-        document.getElementById('conf-capsule-2').checked = ['true', 'True'].includes(configJSON['station_refill']);
-        document.getElementById('conf-capsule-3').value = configJSON['fulfill_period'];
+    document.getElementById('conf-capsule-0').value = configJSON['max_speed'];
+    document.getElementById('conf-capsule-1').value = configJSON['number_of_capsules'];
+    document.getElementById('conf-capsule-2').checked = ['true', 'True'].includes(configJSON['station_refill']);
+    document.getElementById('conf-capsule-3').value = configJSON['fulfill_period'];
 
-        document.getElementById('conf-routing-0').value = configJSON['switched_cost'];
-        document.getElementById('conf-routing-1').value = configJSON['my_timer'];
-        document.getElementById('conf-routing-2').value = configJSON['timer_other'];
+    document.getElementById('conf-routing-0').value = configJSON['switched_cost'];
+    document.getElementById('conf-routing-1').value = configJSON['my_timer'];
+    document.getElementById('conf-routing-2').value = configJSON['timer_other'];
 
-        document.getElementById('conf-simulation-0').checked = ['true', 'True'].includes(configJSON['real_time']);
-        document.getElementById('conf-simulation-1').checked = ['true', 'True'].includes(configJSON['endless']);
-        document.getElementById('conf-simulation-2').value = configJSON['duration'];
-        document.getElementById('conf-simulation-3').value = configJSON['start_hour'];
-        document.getElementById('conf-simulation-4').checked = ['true', 'True'].includes(configJSON['logs']);
+    document.getElementById('conf-simulation-0').checked = ['true', 'True'].includes(configJSON['real_time']);
+    document.getElementById('conf-simulation-1').checked = ['true', 'True'].includes(configJSON['endless']);
+    document.getElementById('conf-simulation-2').value = configJSON['duration'];
+    document.getElementById('conf-simulation-3').value = configJSON['start_hour'];
+    document.getElementById('conf-simulation-4').checked = ['true', 'True'].includes(configJSON['logs']);
 
-        duration.disabled = ['true', 'True'].includes(configJSON['endless']);
-        fulfillPeriod.disabled = ['false, False'].includes(configJSON['station_refill']);
-    });
+    duration.disabled = ['true', 'True'].includes(configJSON['endless']);
+    fulfillPeriod.disabled = ['false, False'].includes(configJSON['station_refill']);
 
     updateNetworkSelection();
 }
 
-function updateNetworkSelection() {
+async function updateNetworkSelection() {
     while (networkSelection.firstChild) {
         networkSelection.removeChild(networkSelection.firstChild);
     }
-    $.getJSON('/network-files.json', function (listNetworkFileNameJSON) {
-        listNetworkFileNameJSON.forEach(networkFileNameJSON => {
-            let option = document.createElement('option');
-            option.innerHTML = networkFileNameJSON['fileName'];
-            networkSelection.appendChild(option)
-        });
-    });
+    const listNetworkFileNameJSON = await (await fetch('/network-files.json')).json();
+    for (const networkFileNameJSON of listNetworkFileNameJSON) {
+        let option = document.createElement('option');
+        option.innerHTML = networkFileNameJSON['fileName'];
+        networkSelection.appendChild(option);
+    }
 }
 
 function changeNetworkButtonState(disabled = false) {
@@ -145,14 +137,13 @@ function resetNetworkErrorText() {
     networkErrorText.classList.add('text-muted');
 }
 
-function waitConfigChange() {
+async function waitConfigChange() {
     let waitingConfigLoaded = true;
     let waitStart = new Date();
 
     while (waitingConfigLoaded && (new Date() - waitStart) < 1000) {
-        $.getJSON('/config-loaded-signal.json', function (configLoadedSignalJSON) {
-            waitingConfigLoaded = !configLoadedSignalJSON['configLoadedSignal'];
-        });
+        const configLoadedSignalJSON = await (await fetch('/config-loaded-signal.json')).json();
+        waitingConfigLoaded = !configLoadedSignalJSON['configLoadedSignal'];
     }
 
     saveConfigButton.disabled = false;
@@ -161,14 +152,13 @@ function waitConfigChange() {
     updateConfigPanel();
 }
 
-function waitNetworkSignal(signalUrl) {
+async function waitNetworkSignal(signalUrl) {
     let waitingNetworkSignal = true;
     let waitStart = new Date();
 
     while (waitingNetworkSignal && (new Date() - waitStart) < 1000) {
-        $.getJSON(signalUrl, function (networkSignalJSON) {
-            waitingNetworkSignal = !networkSignalJSON['networkSignal'];
-        });
+        const networkSignalJSON = await (await fetch(signalUrl)).json();
+        waitingNetworkSignal = !networkSignalJSON['networkSignal'];
     }
 
     changeNetworkButtonState(false);
@@ -219,9 +209,7 @@ networkFileInput.onchange = () => {
 
     let reader = new FileReader();
     reader.readAsText(networkFileInput.files[0], "UTF-8");
-    reader.onload = (event) => {
-        $.ajaxSetup({async: false});
-
+    reader.onload = async (event) => {
         let isValidJSON = true;
         let parsedJSON;
 
@@ -240,20 +228,15 @@ networkFileInput.onchange = () => {
             return;
         }
 
-        $.post('/add-network-file/' + name, {
-            data: JSON.stringify(parsedJSON)
+        await fetch('/add-network-file/' + name, {
+            method: 'POST',
+            body: JSON.stringify(parsedJSON)
         });
-        waitNetworkSignal('/network-added-signal.json');
-        jQueryNetworkAddButton.tooltip({
-            html: true,
-            title: "<b style='color: greenyellow'>Network file has been added !</b>"
-        });
-        jQueryNetworkAddButton.tooltip('show');
+        await waitNetworkSignal('/network-added-signal.json');
+        networkAddButton.title = "Network file has been added !";
         setTimeout(() => {
-            jQueryNetworkAddButton.tooltip('hide');
-            jQueryNetworkAddButton.tooltip('dispose');
+            networkAddButton.removeAttribute("title");
         }, 3000);
-        $.ajaxSetup({async: true});
     };
 
     reader.onerror = () => {
@@ -264,7 +247,7 @@ networkFileInput.onchange = () => {
 };
 
 networkAddButton.onclick = () => {
-    $('#conf-topology-1').trigger('click');
+    document.getElementById('conf-topology-1').dispatchEvent(new CustomEvent('click'));
 };
 
 networkAddButton.onmouseenter = () => {
@@ -275,7 +258,7 @@ networkAddButton.onmouseleave = () => {
     networkText.innerHTML = String();
 };
 
-networkRemoveButton.onclick = () => {
+networkRemoveButton.onclick = async () => {
     let selectedName = networkSelection[networkSelection.selectedIndex].value;
 
     if (selectedName.includes('default: ')) {
@@ -288,20 +271,13 @@ networkRemoveButton.onclick = () => {
     resetNetworkErrorText();
     changeNetworkButtonState(true);
 
-    $.ajaxSetup({async: false});
-    $.get('/remove-network-file/' + selectedName);
-    waitNetworkSignal('/network-removed-signal.json');
-    $('#conf-topology-0').trigger('change');
-    jQueryNetworkRemoveButton.tooltip({
-        html: true,
-        title: "<b style='color: #ea0000'>Selected network has been removed !</b>"
-    });
-    jQueryNetworkRemoveButton.tooltip('show');
+    await fetch('/remove-network-file/' + selectedName);
+    await waitNetworkSignal('/network-removed-signal.json');
+    document.getElementById('conf-topology-0').dispatchEvent(new CustomEvent('change'));
+    networkRemoveButton.title = "Selected network has been removed !";
     setTimeout(() => {
-        jQueryNetworkRemoveButton.tooltip('hide');
-        jQueryNetworkRemoveButton.tooltip('dispose');
+        networkRemoveButton.removeAttribute("title");
     }, 3000);
-    $.ajaxSetup({async: true});
 };
 
 networkRemoveButton.onmouseenter = () => {
@@ -312,7 +288,7 @@ networkRemoveButton.onmouseleave = () => {
     networkText.innerHTML = String();
 };
 
-networkDlButton.onclick = () => {
+networkDlButton.onclick = async () => {
     let selectedName = networkSelection[networkSelection.selectedIndex].value;
     let isDefault = false;
     if (selectedName.includes('default: ')) {
@@ -320,15 +296,14 @@ networkDlButton.onclick = () => {
         selectedName = selectedName.replace('default: ', '');
     }
 
-    $.getJSON(String.prototype.concat('/dl-network-file.json/', selectedName, '/', isDefault ? '1' : '0'), function (networkJSON) {
-        let downloadLink = window.document.createElement('a');
-        downloadLink.href = window.URL.createObjectURL(new Blob([JSON.stringify(networkJSON, null, 2)], {type: "application/json"}));
-        downloadLink.download = selectedName.replace('default : ', '') + '.json';
+    const networkJSON = await (await fetch('/dl-network-file.json/', selectedName + '/' + (isDefault ? '1' : '0'))).json();
+    let downloadLink = window.document.createElement('a');
+    downloadLink.href = window.URL.createObjectURL(new Blob([JSON.stringify(networkJSON, null, 2)], {type: "application/json"}));
+    downloadLink.download = selectedName.replace('default : ', '') + '.json';
 
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-    });
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
 };
 
 networkDlButton.onmouseenter = () => {
@@ -339,7 +314,7 @@ networkDlButton.onmouseleave = () => {
     networkText.innerHTML = String();
 };
 
-networkFavButton.onclick = () => {
+networkFavButton.onclick = async () => {
     let selectedName = networkSelection[networkSelection.selectedIndex].value;
 
     if (selectedName.includes('default: ')) {
@@ -352,19 +327,12 @@ networkFavButton.onclick = () => {
     resetNetworkErrorText();
     changeNetworkButtonState(true);
 
-    $.ajaxSetup({async: false});
-    $.get('/change-default-network-file/' + selectedName);
-    waitNetworkSignal('/network-default-changed-signal.json');
-    jQueryNetworkFavButton.tooltip({
-        html: true,
-        title: "<b style='color: #f6cc24'>Selected network is now the default one !</b>"
-    });
-    jQueryNetworkFavButton.tooltip('show');
+    await fetch('/change-default-network-file/' + selectedName);
+    await waitNetworkSignal('/network-default-changed-signal.json');
+    networkFavButton.title = "Selected network is now the default one !";
     setTimeout(() => {
-        jQueryNetworkFavButton.tooltip('hide');
-        jQueryNetworkFavButton.tooltip('dispose');
+        networkFavButton.removeAttribute("title");
     }, 3000);
-    $.ajaxSetup({async: true});
 };
 
 networkFavButton.onmouseenter = () => {
@@ -379,7 +347,7 @@ endlessCheckBox.onclick = () => {
     duration.disabled = endlessCheckBox.checked;
 };
 
-saveConfigButton.onclick = () => {
+saveConfigButton.onclick = async () => {
     let configJson = {
         'travelers_per_day': document.getElementById('conf-travelers-0').value,
         'trip_limit': document.getElementById('conf-travelers-1').value,
@@ -408,7 +376,7 @@ saveConfigButton.onclick = () => {
         'logs': document.getElementById('conf-simulation-4').checked,
     };
 
-    Array.prototype.forEach.call(document.getElementsByClassName('form-control'), function (input) {
+    for (const input of document.getElementsByClassName('form-control')) {
         let inputClassList = input.nextElementSibling.classList;
         if (input.checkValidity()) {
             inputClassList.add('text-muted');
@@ -417,7 +385,7 @@ saveConfigButton.onclick = () => {
             inputClassList.remove('text-muted');
             inputClassList.add('form-text-error');
         }
-    });
+    }
 
     if (!document.getElementById('config-form').checkValidity()) {
         return;
@@ -427,21 +395,16 @@ saveConfigButton.onclick = () => {
     permanentConfigButton.disabled = true;
     resetConfigButton.disabled = true;
 
-    $.ajaxSetup({async: false});
-    $.post(String.prototype.concat('/config.json/', permanentConfigChange ? '1' : '0'), {
-        data: JSON.stringify(configJson)
+
+    await fetch('/config.json/' + (permanentConfigChange ? '1' : '0'), {
+        method: "POST",
+        body: JSON.stringify(configJson)
     });
-    waitConfigChange();
-    jQuerySaveConfigButton.tooltip({
-        html: true,
-        title: "<b style='color: greenyellow'>Config has been saved !</b>"
-    });
-    jQuerySaveConfigButton.tooltip('show');
+    await waitConfigChange();
+    saveConfigButton.title = "Config has been saved !";
     setTimeout(() => {
-        jQuerySaveConfigButton.tooltip('hide');
-        jQuerySaveConfigButton.tooltip('dispose');
+        saveConfigButton.removeAttribute("title");
     }, 2000);
-    $.ajaxSetup({async: true});
 };
 
 permanentConfigButton.onclick = () => {
@@ -450,42 +413,30 @@ permanentConfigButton.onclick = () => {
         permanentConfigButton.innerHTML = "<i class='far fa-square'></i> Temporary";
         permanentConfigButton.classList.remove("btn-danger");
         permanentConfigButton.classList.add("btn-info");
-        jQueryPermanentConfigButton.tooltip('hide');
-        jQueryPermanentConfigButton.tooltip('dispose');
+        permanentConfigButton.removeAttribute("title");
     } else {
         permanentConfigChange = true;
         permanentConfigButton.innerHTML = "<i class='fas fa-check-square'></i> Permanent";
         permanentConfigButton.classList.remove("btn-info");
         permanentConfigButton.classList.add("btn-danger");
-        jQueryPermanentConfigButton.tooltip({
-            html: true,
-            title: "<b style='color: #ea0000'>Save will overwrite default config with above data</b>"
-        });
-        jQueryPermanentConfigButton.tooltip('show');
+        permanentConfigButton.title = "Save will overwrite default config with above data";
     }
 };
 
 permanentConfigButton.onmouseleave = () => {
     if (permanentConfigChange) {
-        jQueryPermanentConfigButton.tooltip('hide');
+        permanentConfigButton.removeAttribute("title");
     }
 };
 
-resetConfigButton.onclick = () => {
+resetConfigButton.onclick = async () => {
     saveConfigButton.disabled = true;
     permanentConfigButton.disabled = true;
     resetConfigButton.disabled = true;
-    $.ajaxSetup({async: false});
-    $.get('/reset-config');
-    waitConfigChange();
-    jQueryResetConfigButton.tooltip({
-        html: true,
-        title: "<b style='color: deepskyblue'>Config has been reset !</b>"
-    });
-    jQueryResetConfigButton.tooltip('show');
+    await fetch('/reset-config');
+    await waitConfigChange();
+    resetConfigButton.title = "Config has been reset !"
     setTimeout(() => {
-        jQueryResetConfigButton.tooltip('hide');
-        jQueryResetConfigButton.tooltip('dispose');
+        resetConfigButton.removeAttribute("title");
     }, 2000);
-    $.ajaxSetup({async: true});
 };

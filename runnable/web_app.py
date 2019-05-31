@@ -141,8 +141,7 @@ def network_files():
 
 @app.route('/add-network-file/<string:file_name>', methods=['POST'])
 def add_network_file(file_name):
-    if request.method == 'POST':
-        network.add_network_file(file_name, loads(request.form['data']))
+    network.add_network_file(file_name, loads(request.form['data']))
     return redirect(url_for('root'))
 
 
@@ -164,14 +163,12 @@ def change_default_network_file(file_name):
     return redirect(url_for('root'))
 
 
-@app.route('/config.json/<int:permanent>', methods=['GET', 'POST'])
-def load_config(permanent):
-    if request.method == 'POST':
-        config.modify(loads(request.form['data']), (True, False)[permanent is None or permanent == 0])
-        config.load_editable()
-        simlog.load()
-    return Response(dumps(json_serializer.serialize_config()), mimetype="application/json")
-
+@app.route('/change-config/<int:permanent>', methods=['POST'])
+def change_config(permanent):
+    config.modify(loads(request.form['data']), (True, False)[permanent is None or permanent == 0])
+    config.load_editable()
+    simlog.load()
+    return redirect(url_for('root'))
 
 @app.route('/reset-config', methods=['POST'])
 def reset_config():
@@ -180,6 +177,9 @@ def reset_config():
     simlog.load()
     return redirect(url_for('root'))
 
+@app.route('/config.json/<int:permanent>', methods=['GET'])
+def load_config(permanent):
+    return Response(dumps(json_serializer.serialize_config()), mimetype="application/json")
 
 @app.route('/loop-off-signal.json', methods=['GET'])
 def sim_loop_off_signal():

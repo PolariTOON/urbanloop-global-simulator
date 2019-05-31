@@ -404,7 +404,7 @@ saveConfigButton.onclick = async () => {
     resetConfigButton.disabled = true;
 
 
-    await fetch('/config.json/' + (permanentConfigChange ? '1' : '0'), {
+    await fetch('/change-config/' + (permanentConfigChange ? '1' : '0'), {
         method: "POST",
         body: JSON.stringify(configJson)
     });

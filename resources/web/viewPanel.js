@@ -28,7 +28,7 @@ function updateViewLoop() {
 
     layer.add(circle);
     stageView.add(layer);
-    layer.batchDraw();
+    //layer.batchDraw();
     stageView.batchDraw();
 
 }
@@ -47,28 +47,36 @@ function updateViewSwitch() {
     let layer = new Konva.Layer();
 
     let insert = new Konva.Line({
-      x: 10,
+      x: 5,
       y: 10,
-      points: [10, 10, 145, 60, 290, 10],
-      stroke: 'red',
+      points: [10, 10, 290, 10],
+      stroke: '#000000',
       strokeWidth: 6,
       tension: 1
     });
 
     let goal = new Konva.Line({
-      x: 10,
-      y: 290,
-      points: [10, 290, 145, 230, 290, 290],
-      stroke: 'blue',
+      x: 5,
+      y: 130,
+      points: [10, 10, 290, 10],
+      stroke: '#000000',
+      strokeWidth: 6,
+      tension: 1
+    });
+
+    let link = new Konva.Line({
+      x: 5,
+      y: 10,
+      points: [50, 10, 260, 130],
+      stroke: '#000000',
       strokeWidth: 6,
       tension: 1
     });
 
     layer.add(insert);
     layer.add(goal);
+    layer.add(link);
     stageView.add(layer);
-    //layer.batchDraw();
-    stageView.batchDraw();
 }
 
 function updateViewStation() {

@@ -17,7 +17,7 @@ class Loop:
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_loop_id()
         self.name = name
-        simlog.info("Create station " + self.name)
+        simlog.info("Create loop " + self.name)
         self.clockwise = True
         if coordinates is not None:
             self.x = coordinates[0]

@@ -94,7 +94,7 @@ class Capsule:
         """
         from model import controller
         self.controller = controller.get_controller()
-        self.controller.temps_moy_stat(self.id,sim_loop.get_simulated_time())
+        self.controller.temps_moy_stat(self.id, sim_loop.get_simulated_time())
         simlog.info(
             "Capsule %d (%s) starts its trip to %s" % (self.id, self._get_capacity_state(), self.destination.name),
             self.current_element)
@@ -123,8 +123,6 @@ class Capsule:
 
         self.trip_event.callbacks.append(lambda event: self.callback_trip_event())
         yield self.trip_event
-
-
 
     def callback_trip_event(self):
         """
@@ -175,10 +173,9 @@ class Capsule:
 
         sim_loop.get_env().process(self.update_trip())
 
-
     def end_trip(self):
 
-        self.controller.temps_moy_stat(self.id,sim_loop.get_simulated_time())
+        self.controller.temps_moy_stat(self.id, sim_loop.get_simulated_time())
         self.current_element.end_capsule_trip(self)
         simlog.info("Capsule %d (%s) ends its trip" %
                     (self.id, self._get_capacity_state()), self.destination.name)
@@ -246,7 +243,7 @@ class Capsule:
         if self.destination is None or self.segment_ticks_duration == 0:
             return 0
 
-        return ((sim_loop.get_current_tick() - self.segment_real_tick) / self.segment_ticks_duration)*100
+        return ((sim_loop.get_current_tick() - self.segment_real_tick) / self.segment_ticks_duration) * 100
 
     def get_meter_per_tick(self):
         """
@@ -283,6 +280,7 @@ class Capsule:
         number = len(self.travelers)
         return ((str(number) + ' traveler', str(number) + ' travelers')[number > 1], 'Empty')[number == 0]
 
+
 def get_incoming_capsule(destination):
     return [capsule for capsule in _capsules if capsule.destination is destination]
 
@@ -293,11 +291,13 @@ def get_capsules():
     """
     return _capsules
 
+
 def get_empty_capsules():
     """
     :return: All the empty capsules of the network
     """
     return _empty_capsules
+
 
 def reset_simulation():
     """

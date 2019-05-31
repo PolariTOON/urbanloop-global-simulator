@@ -89,13 +89,9 @@ class SimLoop:
                             if j.get_segment_trip_percentage() <= 10 and i.current_element == j.next_element:
                                 test = True
                     if test:
-                        #i.speed = 0.1
-                        #i.stopped = True
                         i.segment_real_tick -= 1
 
                     else:
-                        #i.speed = float(config.capsule['max_speed'])
-                        #i.stopped = False
                         i.segment_real_tick -= 1
 
     def tick(self):
@@ -121,8 +117,6 @@ class SimLoop:
         tick_start_time = 0
         while True:
             if is_running():
-                #if _sim_tick*_current_tick == 3600:
-                #    controller.get_controller().disable_way(12,13)
                 loop_sleep_boolean = self.is_visualized and not self.is_real_time and _visualized_tick_duration != 0
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()  # temps de la boucle

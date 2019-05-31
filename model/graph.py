@@ -22,11 +22,16 @@ class Graph:
         self.init_matrices()
 
     def init_nodes(self):
+        print("INIT NODEs")
         for a_station in station.get_stations():
-            self.nodes.append(Node(a_station, a_station.loop))
+            a = Node(a_station, a_station.loop)
+            self.nodes.append(a)
+            print(a.id, "station")
 
         for a_warehouse in warehouse.get_warehouses():
-            self.nodes.append(Node(a_warehouse, a_warehouse.loop))
+            a = Node(a_warehouse, a_warehouse.loop)
+            print(a.id, "garage")
+            self.nodes.append(a)
 
         for a_switch in switch.get_switches():
             node1 = Node(a_switch, a_switch.my_loop)
@@ -40,6 +45,8 @@ class Graph:
     def init_next_nodes(self):
         for a_node in self.nodes:
             if station.get_stations().count(a_node.switch) > 0 or warehouse.get_warehouses().count(a_node.switch) > 0:
+                print("Taille de self.nodes : ", len(self.nodes))
+                print("loop :", a_node.loop.name, "|switch :", a_node.switch.name, "|id :", a_node.id)
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.loop)])
             elif a_node.switch.loop.uuid == a_node.loop.uuid:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.switch.loop)])

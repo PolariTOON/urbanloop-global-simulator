@@ -4,7 +4,6 @@ from model import switch, identifier
 from model import loop
 from model import identifier
 
-
 _nodes = list()
 
 
@@ -24,9 +23,9 @@ class Node:
     def add_next_node(self, node):
         node.add_previous_node(self)
 
-        if self.next_nodes[0] is None :
+        if self.next_nodes[0] is None:
             self.next_nodes[0] = node
-        else :
+        else:
             self.next_nodes[1] = node
 
         self.calculate_distance(node.switch)
@@ -77,8 +76,8 @@ class Node:
             else:
                 angle1 = a_switch.angle
 
-            angle = min(360-abs(angle1-angle2), abs(angle1-angle2))
-            distance = self.loop.size/360 * (angle)
+            angle = min(360 - abs(angle1 - angle2), abs(angle1 - angle2))
+            distance = self.loop.size / 360 * angle
         else:
             angle2 = self.switch.angle
 
@@ -90,8 +89,8 @@ class Node:
             else:
                 angle1 = a_switch.angle
 
-            angle = min(360-abs(angle1-angle2), abs(angle1-angle2))
-            distance = self.loop.size/360 * (angle)
+            angle = min(360 - abs(angle1 - angle2), abs(angle1 - angle2))
+            distance = self.loop.size / 360 * angle
 
         if self.distance_to_next_node[0] == -1:
             self.distance_to_next_node[0] = distance
@@ -101,6 +100,6 @@ class Node:
 
 def get_node_id(switch, loop):
     for a_node in _nodes:
-        if a_node.switch.uuid == switch.uuid and a_node.loop.uuid == loop.uuid:
+        if a_node.loop.uuid == loop.uuid and a_node.switch.uuid == switch.uuid:
             return a_node.id
     return -1

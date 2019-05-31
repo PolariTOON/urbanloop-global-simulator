@@ -74,7 +74,6 @@ def load(file_name=None, capsules_fulfill=True):
                     if len(elms) != e + 1:  # existe pas
                         elms += [model_switch.Switch(loop=the_loop, other_loop=other_l)]
                     elms[e].angle_my_loop = element["angle"]
-                    # elms[e].size = element["length"]
                 else:  # "switch_in":
                     if other_l.switches is not None:
                         for s in other_l.switches:
@@ -83,7 +82,6 @@ def load(file_name=None, capsules_fulfill=True):
                     if len(elms) != e + 1:  # existe pas
                         elms += [model_switch.Switch(loop=other_l, other_loop=the_loop)]
                     elms[e].angle_other_loop = element["angle"]
-                # the_loop.switches += [elms[e]]
             elif el_type == "warehouse":
                 elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"])]
             else:
@@ -101,7 +99,6 @@ def load(file_name=None, capsules_fulfill=True):
                              "\n \t \t \t {'type':'switch_in','other_loop':<loop_name(String)>, 'angle':<placing(int["
                              "0,359)>} "
                              "\n \t ]}}")
-        order = []
         the_loop.clockwise = info["clockwise"]
         tri_bulle(elms, the_loop)
         the_loop.add_order(elms)

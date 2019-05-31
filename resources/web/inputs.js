@@ -113,7 +113,9 @@ startButton.onclick = async () => {
     changeNetworkButtonState(true);
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
-    await fetch('/start');
+    await fetch('/start', {
+        method: "POST"
+    });
     running = true;
 };
 
@@ -129,7 +131,9 @@ stopButton.onclick = async () => {
     changeNetworkButtonState(false);
     stopButton.classList.add('not-shown');
     running = false;
-    await fetch('/stop');
+    await fetch('/stop', {
+        method: "POST"
+    });
     document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
     appState.waitingSimLoopEnd = true;
     applyNetworkScene();
@@ -137,11 +141,15 @@ stopButton.onclick = async () => {
 
 pauseButton.onclick = () => {
     if (paused) {
-        fetch('/resume');
+        fetch('/resume', {
+            method: "POST"
+        });
         pauseButton.innerHTML = "Pause";
         paused = false;
     } else {
-        fetch('/pause');
+        fetch('/pause', {
+            method: "POST"
+        });
         pauseButton.innerHTML = "Resume";
         paused = true;
     }
@@ -149,12 +157,16 @@ pauseButton.onclick = () => {
 
 backwardButton.onclick = () => {
     if (!running) return;
-    fetch('/decelerate');
+    fetch('/decelerate', {
+        method: "POST"
+    });
 };
 
 forwardButton.onclick = () => {
     if (!running) return;
-    fetch('/accelerate');
+    fetch('/accelerate', {
+        method: "POST"
+    });
 };
 
 scaleSlider.oninput = () => {

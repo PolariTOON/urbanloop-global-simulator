@@ -273,7 +273,9 @@ networkRemoveButton.onclick = async () => {
     resetNetworkErrorText();
     changeNetworkButtonState(true);
 
-    await fetch('/remove-network-file/' + selectedName);
+    await fetch('/remove-network-file/' + selectedName, {
+        method: "POST"
+    });
     await waitNetworkSignal('/network-removed-signal.json');
     document.getElementById('conf-topology-0').dispatchEvent(new CustomEvent('change'));
     networkRemoveButton.title = "Selected network has been removed !";
@@ -298,7 +300,9 @@ networkDlButton.onclick = async () => {
         selectedName = selectedName.replace('default: ', '');
     }
 
-    const networkJSON = await (await fetch('/dl-network-file.json/' + selectedName + '/' + (isDefault ? '1' : '0'))).json();
+    const networkJSON = await (await fetch('/dl-network-file.json/' + selectedName + '/' + (isDefault ? '1' : '0'), {
+        method: "POST"
+    })).json();
     let downloadLink = window.document.createElement('a');
     downloadLink.href = window.URL.createObjectURL(new Blob([JSON.stringify(networkJSON, null, 2)], {type: "application/json"}));
     downloadLink.download = selectedName.replace('default : ', '') + '.json';
@@ -329,7 +333,9 @@ networkFavButton.onclick = async () => {
     resetNetworkErrorText();
     changeNetworkButtonState(true);
 
-    await fetch('/change-default-network-file/' + selectedName);
+    await fetch('/change-default-network-file/' + selectedName, {
+        method: "POST"
+    });
     await waitNetworkSignal('/network-default-changed-signal.json');
     networkFavButton.title = "Selected network is now the default one !";
     setTimeout(() => {
@@ -435,7 +441,9 @@ resetConfigButton.onclick = async () => {
     saveConfigButton.disabled = true;
     permanentConfigButton.disabled = true;
     resetConfigButton.disabled = true;
-    await fetch('/reset-config');
+    await fetch('/reset-config', {
+        method: "POST"
+    });
     await waitConfigChange();
     resetConfigButton.title = "Config has been reset !"
     setTimeout(() => {

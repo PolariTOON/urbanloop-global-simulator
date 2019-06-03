@@ -137,13 +137,12 @@ def fill_and_full_stations():
     for station in get_stations():
         if station.estimated_capsules_number() <= max(1, floor(station.capacity / 4)):
             # quasi vide --> station à compléter
-            simlog.debug(
-                "Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
+            simlog.debug("Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
             nb_to_send = station.capacity - station.estimated_capsules_number() - 1
-            if station.estimated_capsules_number() == 0 and not station.capsule_arriving :
+            if station.estimated_capsules_number() == 0 and not station.capsule_arriving:
                 controller.get_controller().refill(10, station, nb_to_send)
                 station.capsule_arriving = True
-            elif station.capsule_arriving==False:
+            elif not station.capsule_arriving:
                 controller.get_controller().refill(6,station,nb_to_send)
                 capsule_arriving = True
                  # j'en envoie une depuis un entrepot

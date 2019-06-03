@@ -4,7 +4,7 @@ from enum import Enum
 
 import simpy
 
-from model import capsule
+from model import capsule, identifier
 from model import loop
 from model import station
 from model import warehouse
@@ -341,6 +341,7 @@ def reset_simulation_parameters():
         return
 
     simlog.warn("Resetting the simulation parameters")
+    identifier._node_id = -1
     station.reset_simulation()
     warehouse.reset_simulation()
     capsule.reset_simulation()

@@ -135,7 +135,6 @@ stopButton.onclick = async () => {
         method: "POST"
     });
     document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
-    appState.waitingSimLoopEnd = true;
     applyNetworkScene();
 };
 

@@ -20,10 +20,6 @@ fichier pour l'import des réseaux sur les formats json correspondant
 """
 
 _size = {}  # {'min_x': 0, 'max_x': 0, 'min_y': 0, 'max_y': 0}
-_added_signal = False
-_removed_signal = False
-_default_changed_signal = False
-
 
 def load(file_name=None, capsules_fulfill=True):
     """
@@ -291,8 +287,6 @@ def get_network_file_names():
 
 
 def add_network_file(file_name, network_json):
-    global _added_signal
-
     if '.json' not in file_name:
         file_name += '.json'
     file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
@@ -301,23 +295,17 @@ def add_network_file(file_name, network_json):
         with open(file_path, 'w') as new_network_json_file:
             json.dump(network_json, new_network_json_file, indent=4)
         new_network_json_file.close()
-    _added_signal = True
 
 
 def remove_network_file(file_name):
-    global _removed_signal
-
     if '.json' not in file_name:
         file_name += '.json'
     file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
     if os.path.exists(file_path):
         os.remove(file_path)
-    _removed_signal = True
 
 
 def change_default_file(file_name):
-    global _default_changed_signal
-
     if '.json' not in file_name:
         file_name += '.json'
     default_file_path = ('{0}/../resources/networks/default/' + get_default_file_name() + '.json').format(sys.path[0])
@@ -326,40 +314,3 @@ def change_default_file(file_name):
     new_file_path = file_path.replace(file_name, '/default/' + file_name)
     os.rename(default_file_path, new_default_file_path)
     os.rename(file_path, new_file_path)
-    _default_changed_signal = True
-
-
-def get_added_signal(reset=False):
-    """
-    :param reset: If reset, _added_signal = False
-    :return: Returns a boolean indicating a network file has been added to network directory
-    """
-    global _added_signal
-    if _added_signal and reset:
-        _added_signal = False
-        return True
-    return _added_signal
-
-
-def get_removed_signal(reset=False):
-    """
-    :param reset: If reset, _removed_signal = False
-    :return: Returns a boolean indicating a network file has been removed from network directory
-    """
-    global _removed_signal
-    if _removed_signal and reset:
-        _removed_signal = False
-        return True
-    return _removed_signal
-
-
-def get_default_changed_signal(reset=False):
-    """
-    :param reset: If reset, _removed_signal = False
-    :return: Returns a boolean indicating a network file has been removed from network directory
-    """
-    global _default_changed_signal
-    if _default_changed_signal and reset:
-        _default_changed_signal = False
-        return True
-    return _default_changed_signal

@@ -1,4 +1,4 @@
-import {Capsule, Loop, Station, Switch, Warehouse, appState} from "./objects.js";
+import {Capsule, Loop, Station, Switch, Warehouse, appState, fetchTimeout} from "./objects.js";
 import {applyNetworkScene} from "./renderer.js";
 
 // Some elements are defined in the above file objects.js
@@ -139,34 +139,6 @@ function resetNetworkErrorText() {
     networkErrorText.classList.add('text-muted');
 }
 
-async function waitConfigChange() {
-    let waitingConfigLoaded = true;
-    let waitStart = new Date();
-
-    while (waitingConfigLoaded && (new Date() - waitStart) < 1000) {
-        const configLoadedSignalJSON = await (await fetch('/config-loaded-signal.json')).json();
-        waitingConfigLoaded = !configLoadedSignalJSON['configLoadedSignal'];
-    }
-
-    saveConfigButton.disabled = false;
-    permanentConfigButton.disabled = false;
-    resetConfigButton.disabled = false;
-    updateConfigPanel();
-}
-
-async function waitNetworkSignal(signalUrl) {
-    let waitingNetworkSignal = true;
-    let waitStart = new Date();
-
-    while (waitingNetworkSignal && (new Date() - waitStart) < 1000) {
-        const networkSignalJSON = await (await fetch(signalUrl)).json();
-        waitingNetworkSignal = !networkSignalJSON['networkSignal'];
-    }
-
-    changeNetworkButtonState(false);
-    updateNetworkSelection();
-}
-
 refillCheckBox.onclick = () => {
     fulfillPeriod.disabled = !refillCheckBox.checked;
 };
@@ -230,11 +202,10 @@ networkFileInput.onchange = () => {
             return;
         }
 
-        await fetch('/add-network-file/' + name, {
+        await fetchTimeout(1000, '/add-network-file/' + name, {
             method: 'POST',
             body: JSON.stringify(parsedJSON)
         });
-        await waitNetworkSignal('/network-added-signal.json');
         networkAddButton.title = "Network file has been added !";
         setTimeout(() => {
             networkAddButton.removeAttribute("title");
@@ -273,10 +244,9 @@ networkRemoveButton.onclick = async () => {
     resetNetworkErrorText();
     changeNetworkButtonState(true);
 
-    await fetch('/remove-network-file/' + selectedName, {
+    await fetchTimeout(1000, '/remove-network-file/' + selectedName, {
         method: "POST"
     });
-    await waitNetworkSignal('/network-removed-signal.json');
     document.getElementById('conf-topology-0').dispatchEvent(new CustomEvent('change'));
     networkRemoveButton.title = "Selected network has been removed !";
     setTimeout(() => {
@@ -333,10 +303,9 @@ networkFavButton.onclick = async () => {
     resetNetworkErrorText();
     changeNetworkButtonState(true);
 
-    await fetch('/change-default-network-file/' + selectedName, {
+    await fetchTimeout(1000, '/change-default-network-file/' + selectedName, {
         method: "POST"
     });
-    await waitNetworkSignal('/network-default-changed-signal.json');
     networkFavButton.title = "Selected network is now the default one !";
     setTimeout(() => {
         networkFavButton.removeAttribute("title");
@@ -408,7 +377,10 @@ saveConfigButton.onclick = async () => {
         method: "POST",
         body: JSON.stringify(configJson)
     });
-    await waitConfigChange();
+    saveConfigButton.disabled = false;
+    permanentConfigButton.disabled = false;
+    resetConfigButton.disabled = false;
+    updateConfigPanel();
     saveConfigButton.title = "Config has been saved !";
     setTimeout(() => {
         saveConfigButton.removeAttribute("title");
@@ -444,7 +416,10 @@ resetConfigButton.onclick = async () => {
     await fetch('/reset-config', {
         method: "POST"
     });
-    await waitConfigChange();
+    saveConfigButton.disabled = false;
+    permanentConfigButton.disabled = false;
+    resetConfigButton.disabled = false;
+    updateConfigPanel();
     resetConfigButton.title = "Config has been reset !"
     setTimeout(() => {
         resetConfigButton.removeAttribute("title");

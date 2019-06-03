@@ -170,6 +170,7 @@ def change_config(permanent):
     simlog.load()
     return redirect(url_for('root'))
 
+
 @app.route('/reset-config', methods=['POST'])
 def reset_config():
     config.reset_to_default()
@@ -177,35 +178,10 @@ def reset_config():
     simlog.load()
     return redirect(url_for('root'))
 
+
 @app.route('/config.json/<int:permanent>', methods=['GET'])
 def load_config(permanent):
     return Response(dumps(json_serializer.serialize_config()), mimetype="application/json")
-
-@app.route('/loop-off-signal.json', methods=['GET'])
-def sim_loop_off_signal():
-    return Response(dumps({'loopOffSignal': sim_loop.get_off_signal(reset=True)}), mimetype="application/json")
-
-
-@app.route('/config-loaded-signal.json', methods=['GET'])
-def config_loaded_signal():
-    return Response(dumps({'configLoadedSignal': config.get_loaded_signal(reset=True)}), mimetype="application/json")
-
-
-@app.route('/network-added-signal.json', methods=['GET'])
-def network_added_signal():
-    return Response(dumps({'networkSignal': network.get_added_signal(reset=True)}), mimetype="application/json")
-
-
-@app.route('/network-removed-signal.json', methods=['GET'])
-def network_removed_signal():
-    return Response(dumps({'networkSignal': network.get_removed_signal(reset=True)}),
-                    mimetype="application/json")
-
-
-@app.route('/network-default-changed-signal.json', methods=['GET'])
-def network_default_changed_signal():
-    return Response(dumps({'networkSignal': network.get_default_changed_signal(reset=True)}),
-                    mimetype="application/json")
 
 
 if __name__ == '__main__':

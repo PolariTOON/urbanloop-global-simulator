@@ -30,7 +30,6 @@ _visualized_tick_duration = 0.05
 _start_hour = None
 _sim_tick_variations = list()
 _endless_quit_event = None
-_off_signal = False
 recorder = None
 
 
@@ -112,7 +111,6 @@ class SimLoop:
         SimState is RUNNING.
         """
         global _current_tick
-        global _off_signal
         global recorder
         tick_start_time = 0
         while True:
@@ -175,7 +173,6 @@ class SimLoop:
                     _quit_endless_simulation()
                 else:
                     yield _env.process(_env.exit())
-                _off_signal = True
                 return
 
 
@@ -422,18 +419,6 @@ def get_start_hour():
     :return: The simulation start hour
     """
     return _start_hour
-
-
-def get_off_signal(reset=False):
-    """
-    :param reset: If reset, _off_signal = False
-    :return: Returns a boolean indicating that sim_loop is off
-    """
-    global _off_signal
-    if _off_signal and reset:
-        _off_signal = False
-        return True
-    return _off_signal
 
 
 def get_simulated_time(tick=None):

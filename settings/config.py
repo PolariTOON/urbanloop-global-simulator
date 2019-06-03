@@ -7,7 +7,7 @@ from shutil import copyfile
 This file permits to import different values of the config files :
     - resources/default_config.ini
     - resources/config.ini
- 
+
 https://docs.python.org/dev/library/configparser.html
 """
 
@@ -19,7 +19,6 @@ prob = None
 capsule = None
 routing = None
 sim = None
-_loaded_signal = False
 
 path = '{0}/../resources/config.ini'.format(sys.path[0])
 default_path = '{0}/../resources/default_config.ini'.format(sys.path[0])
@@ -33,7 +32,6 @@ def load(file_name):
     global capsule
     global routing
     global sim
-    global _loaded_signal
     config = configparser.ConfigParser()
     config.read(file_name)
     traveler = config['TRAVELER']
@@ -42,8 +40,6 @@ def load(file_name):
     capsule = config['CAPSULE']
     routing = config['ROUTING']
     sim = config['SIM']
-    if loaded:
-        _loaded_signal = True
     loaded = True
 
 
@@ -102,15 +98,3 @@ def reset_to_default(force=False):
 if loaded is False:
     reset_to_default(force=True)
     load_default()
-
-
-def get_loaded_signal(reset=False):
-    """
-    :param reset: If reset, _modified_signal = False
-    :return: Returns a boolean indicating that config modification has ended
-    """
-    global _loaded_signal
-    if _loaded_signal and reset:
-        _loaded_signal = False
-        return True
-    return _loaded_signal

@@ -4,8 +4,7 @@ export const appState = {
     clearing: false,
     objectScale: undefined,
     objects: undefined,
-    selectedObject: undefined,
-    waitingSimLoopEnd: false
+    selectedObject: undefined
 };
 let networkSize = 1000;
 export let stage = new Konva.Stage({
@@ -39,7 +38,7 @@ const capsuleOuterAboardColor = 'rgb(128, 214, 30)';
 const capsuleInnerSelectedColor = 'rgb(255, 200, 20)';
 const capsuleOuterSelectedColor = 'rgb(255, 234, 87)';
 
-function fetchTimeout(timeout, url, options) {
+export function fetchTimeout(timeout, url, options) {
     const controller = new AbortController();
     const {signal} = controller;
     setTimeout(() => controller.abort(), timeout);
@@ -897,13 +896,6 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
 
 export async function initNetworkScene(networkName, isDefaultNetwork) {
     appState.objects = [];
-
-    let waitStart = new Date();
-    while (appState.waitingSimLoopEnd && (new Date() - waitStart) < 1000) {
-        const offSignalJSON = await (await fetch('/loop-off-signal.json')).json();
-        appState.waitingSimLoopEnd = !offSignalJSON['loopOffSignal'];
-    }
-
     startButton.classList.remove('not-shown');
 
     const networkJSON = await (await fetch(isDefaultNetwork ? '/load.json' : '/load.json/' + networkName)).json();
@@ -936,7 +928,7 @@ export async function initNetworkScene(networkName, isDefaultNetwork) {
 }
 
 export async function updateNetworkScene() {
-    const listDataJSON = await (await fetchTimeout(100, '/updatedData.json')).json();
+    const listDataJSON = await (await fetchTimeout(1000, '/updatedData.json')).json();
 
     if (!appState.clearing) {
         for (const dataJSON of listDataJSON) {

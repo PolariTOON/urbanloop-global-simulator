@@ -170,6 +170,7 @@ def change_config(permanent):
     simlog.load()
     return redirect(url_for('root'))
 
+
 @app.route('/reset-config', methods=['POST'])
 def reset_config():
     config.reset_to_default()
@@ -177,9 +178,11 @@ def reset_config():
     simlog.load()
     return redirect(url_for('root'))
 
+
 @app.route('/config.json/<int:permanent>', methods=['GET'])
 def load_config(permanent):
     return Response(dumps(json_serializer.serialize_config()), mimetype="application/json")
+
 
 @app.route('/loop-off-signal.json', methods=['GET'])
 def sim_loop_off_signal():

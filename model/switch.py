@@ -1,6 +1,6 @@
 import numpy as np
 
-from model import identifier, controller
+from model import identifier, controller, node
 from model import routing
 from model import switch as model_switch
 from model import controller
@@ -16,13 +16,12 @@ alive_timers = []
 
 
 class Switch:
-    def __init__(self, loop=None, angle=-1, other_loop=None, previous_element=None, next_element=None,
-                 next_element_other=None, size=switched_cost,rules = None):
+    def __init__(self, loop=None, angle=-1, other_loop=None, next_element=None,
+                 next_element_other=None, size=switched_cost, rules=None):
         """
         initialisation d'un aiguillage
         :param  loop : boucle où le switch est présent (Loop)
         :param  other_loop : boucle aiguillée (Loop)
-        :param  previous_element : l'element avant le switch de la station où le switch est (Station/Switch)
         :param  next_element : la station après le switch sur la station où le switch est (Station/Switch)
         :param  next_element_other : la station après le switch sur la station aiguillée (Station/Switch)
         :param  size : la taille de l'aiguillage
@@ -38,7 +37,6 @@ class Switch:
         self.my_loop = loop
         self.loop = self.my_loop
         self.angle = angle
-        # self.last_element = previous_element
         self.next_element = next_element
         self.other_loop = other_loop
         self.next_element_other = next_element_other
@@ -53,7 +51,7 @@ class Switch:
         self.section_my_loop = None
         self.section_other_loop = None
         self.rules = []
-        if rules is not None :
+        if rules is not None:
             self.rules == rules
 
     def route_capsule_to_station(self, capsule):
@@ -65,7 +63,7 @@ class Switch:
         # the_loop = station.loop
 
         for rule in self.rules:
-            if rule.match(self.id, capsule.loop.id, capsule.destination, capsule.priority, len(capsule.travelers)==0):
+            if rule.match(self.id, capsule.loop.id, capsule.destination, capsule.priority, len(capsule.travelers) == 0):
                 controller.get_controller().update_from_switch(capsule)
                 return rule.change
 
@@ -92,18 +90,13 @@ class Switch:
             simlog.error("The switch %d is not in the station %s" % (str(self.id), the_loop.name))
 
     def add_rule(self, rule, index=-1):
-        if self.rules.count(rule)==0:
+        if self.rules.count(rule) == 0:
             if index == -1:
                 index = 0
-            self.rules.insert(index,rule)
+            self.rules.insert(index, rule)
 
-    def remove_rule(self,rule):
+    def remove_rule(self, rule):
         self.rules.remove(rule)
-
-    def modify_rule(self, new_rule, old_rule):
-        index = self.rules.index(old_rule)
-        self.remove_rule(old_rule)
-        self.add_rule(new_rule, index)
 
 
 def init():
@@ -138,28 +131,6 @@ def init():
 
         # anomalies des switches : [boucle presente, boucle aiguillee] True ==> anomalies
 
-
-def update():
-    """
-     fonction qui est lancée à chaque tour pour actualiser les états des switchs et leur table (pour le routage)
-        :return: (void) modifications des éléments, attributs des switches
-    """
-    for s in _switches:
-        # if s.is_routing_to_loop:
-        info = routing.update_switch(s)
-        # maj des timers suivant infoIn
-        if info == "alive":
-            alive_timers[s.id] = [0, 0]
-        elif info is None:
-            alive_timers[s.id][0] += 1
-            alive_timers[s.id][1] += 1
-        else:
-            if "0_down" in info:
-                alive_timers[s.id][0] = [float("Inf")]
-                alive_timers[s.id][1] += 1
-            if info == "1_down":
-                alive_timers[s.id][0] += 1
-                alive_timers[s.id][1] = [float("Inf")]
 
 def get_switches():
     """
@@ -209,6 +180,3 @@ def get_switch_by_id(id):
         if s.id == id:
             return s
     return None
-
-def get_switch_by_node(id):
-    return node.switch

@@ -24,7 +24,7 @@ class Controller:
         self.tab_depart_voy = []
         self.tab_temps_voy = []
 
-        self.graph = Graph()
+        self.graph = Graph(self.warehouses, self.stations, self.switches)
         self.rules = []
         self.congestions = [[False for j in range(self.graph.size)] for i in range(self.graph.size)]
 
@@ -173,17 +173,17 @@ class Controller:
             if test:
                 test_warehouse = warehouse.which_warehouse_before(destination)
                 if test_warehouse.capsule_queue.qsize() > 0:
-                    test_warehouse.send_capsule(destination, prio)
+                    test_warehouse.drain(destination, prio)
 
             else:
                 test_warehouse = warehouse.which_warehouse_before(destination)
                 if test_warehouse.capsule_queue.qsize() > 1:
-                    test_warehouse.send_capsule(destination, prio)
+                    test_warehouse.drain(destination, prio)
 
         else:
             test_warehouse = warehouse.which_warehouse_before(destination)
             if test_warehouse.capsule_queue.qsize() > 0:
-                test_warehouse.send_capsule(destination, prio)
+                test_warehouse.drain(destination, prio)
 
     def disable_way(self, id1, id2):
         self.graph.delete_section(id1, id2)

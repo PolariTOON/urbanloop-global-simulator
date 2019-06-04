@@ -2,35 +2,34 @@ import numpy as np
 from math import *
 import copy
 
-from model import warehouse, node
+from model import node
 from model import switch
-from model import station
 from model.node import Node
 from settings import config
 
 
 class Graph:
 
-    def __init__(self):
-        self.size = len(station.get_stations()) + len(switch.get_switches()) * 2 + len(warehouse.get_warehouses())
+    def __init__(self, warehouses, stations, switches):
+        self.size = len(stations) + len(switches) * 2 + len(warehouses)
         self.nodes = [] * self.size
         self.matrix = [[inf for j in range(self.size)] for i in range(self.size)]
         self.expected_matrix = [[inf for j in range(self.size)] for i in range(self.size)]
 
-        self.init_nodes()
-        self.init_next_nodes()
+        self.init_nodes(warehouses, stations, switches)
+        self.init_next_nodes(warehouses, stations)
         self.init_matrices()
 
-    def init_nodes(self):
-        for a_station in station.get_stations():
+    def init_nodes(self, warehouses, stations, switches):
+        for a_station in stations:
             a = Node(a_station, a_station.loop)
             self.nodes.append(a)
 
-        for a_warehouse in warehouse.get_warehouses():
+        for a_warehouse in warehouses:
             a = Node(a_warehouse, a_warehouse.loop)
             self.nodes.append(a)
 
-        for a_switch in switch.get_switches():
+        for a_switch in switches:
             node1 = Node(a_switch, a_switch.my_loop)
             node2 = Node(a_switch, a_switch.other_loop)
 
@@ -39,9 +38,9 @@ class Graph:
             self.nodes.append(node1)
             self.nodes.append(node2)
 
-    def init_next_nodes(self):
+    def init_next_nodes(self, warehouses, stations):
         for a_node in self.nodes:
-            if station.get_stations().count(a_node.switch) > 0 or warehouse.get_warehouses().count(a_node.switch) > 0:
+            if stations.count(a_node.switch) > 0 or warehouses.count(a_node.switch) > 0:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.loop)])
             elif a_node.switch.loop.uuid == a_node.loop.uuid:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.switch.loop)])
@@ -242,6 +241,7 @@ class Graph:
     	for node in self.nodes:
     		if node.switch.uuid == switch.uuid:
     			return node
+    	print(switch)
     	return None
 
     def get_node_from_id(self, id):

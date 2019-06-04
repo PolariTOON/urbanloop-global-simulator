@@ -35,7 +35,6 @@ class Station:
         """
         global _stations
         _stations.append(self)
-        self.controller = controller.get_controller()
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_station_id()
         self.name = "Station #{0}".format(self.id) if (name is None) else name
@@ -66,7 +65,7 @@ class Station:
     def get_waiting_travelers_number(self):
         return self.traveler_queue.qsize()
 
-    def drain(self, destination=None):
+    def drain(self, destination=None, priority=-1):
         """
         This function will drain the first empty capsule if the station is 3/4 full.
         in order to make room for other capsules
@@ -81,6 +80,8 @@ class Station:
                 if destination is None:
                     destination = get_almost_empty_station(self)
                 a_capsule.destination = destination
+                if priority >= 0:
+                    a_capsule.priority = priority
                 test = True
 
                 for i in capsule.get_capsules():
@@ -92,13 +93,13 @@ class Station:
                     simlog.debug("Station %s (%s/%d capsules) drained to %s" % (
                     self.name, qsize, self.capacity, destination.name))
                     a_capsule.start_trip()
-                return
+                else:
+                    self.capsule_queue.put(a_capsule)
             else:
                 self.capsule_queue.put(a_capsule)
 
     def capsule_passing(self, capsule):
-        self.controller = controller.get_controller()
-        self.controller.update_from_switch(capsule)
+        controller.get_controller().update_from_switch(capsule)
 
     '''
     def complete(self):
@@ -115,7 +116,7 @@ class Station:
         return self.capsule_queue.qsize() + len(capsule.get_incoming_capsule(self))
 
     def end_capsule_trip(self, capsule):
-        self.controller.stop_timer(capsule)
+        controller.get_controller().stop_timer(capsule)
         self.capsule_arriving = False
 
 
@@ -144,7 +145,7 @@ def fill_and_full_stations():
                 station.capsule_arriving = True
             elif not station.capsule_arriving:
                 controller.get_controller().refill(6,station,nb_to_send)
-                capsule_arriving = True
+                station.capsule_arriving = True
                  # j'en envoie une depuis un entrepot
             """
             if nearer_warehouse is not None :

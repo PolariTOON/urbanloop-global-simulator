@@ -134,7 +134,7 @@ def fill_and_full_stations():
     sera donc autant prioritaire qu'une capsule pleine. Si il reste au moins une capsule alors la demande est
     effectué avec une priorité faible
     """
-    simlog.debug("Stations drainage and completion process launched.")
+    #simlog.debug("Stations drainage and completion process launched.")
     for station in get_stations():
         if station.estimated_capsules_number() <= max(1, floor(station.capacity / 4)):
             # quasi vide --> station à compléter

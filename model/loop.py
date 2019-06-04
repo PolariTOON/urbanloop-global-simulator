@@ -29,6 +29,7 @@ class Loop:
         self.switches = []
         self.objects = []
         self.lengths = []
+        self.sensors = []
 
     def add_order(self, order):
         """

@@ -68,17 +68,17 @@ class Controller:
 
     def init_rules(self):
         def create_rules(station):
-            end_node = self.graph.get_node_from_switch(station)
-            unvisited_nodes = self.graph.get_switches_nodes().copy()
+            end_node = self.graph.get_node_from_switch(station) # ??
+            unvisited_nodes = self.graph.get_switches_nodes().copy() # copie de tous les switchs
 
-            while (len(unvisited_nodes) > 0):
+            while len(unvisited_nodes) > 0: # Tant qu'on a des noeud non visités
                 for node in unvisited_nodes:
-                    node_list = self.graph.calcul(node, end_node)
+                    node_list = self.graph.calcul(node, end_node) # Calcul du plus court chemin entre node et end_node
                     for i in range(1, len(node_list)):
                         if unvisited_nodes.count(node_list[i]) > 0:
                             change = node_list[i].loop.id != node_list[i - 1].loop.id
                             self.rules.append(
-                                Rule(node_list[i].switch.id, node_list[i].loop.id, station, None, None, change))
+                                Rule(node_list[i].elt.id, node_list[i].loop.id, station, None, None, change))
                             unvisited_nodes.remove(node_list[i])
 
         for warehouse in self.warehouses:
@@ -101,7 +101,7 @@ class Controller:
                         if unvisited_nodes.count(node_list[i]) > 0:
                             change = node_list[i].loop.id != node_list[i - 1].loop.id
                             new_rules.append(
-                                Rule(node_list[i].switch.id, node_list[i].loop.id, station, None, None, change))
+                                Rule(node_list[i].elt.id, node_list[i].loop.id, station, None, None, change))
                             unvisited_nodes.remove(node_list[i])
 
         for warehouse in self.warehouses:
@@ -164,7 +164,7 @@ class Controller:
                                                self.graph.get_node_from_switch(destination))
                     for i in range(len(trajet) - 1):
                         new_rules = list()
-                        r = Rule(trajet[i].switch.id, trajet[i + 1].loop.id, priority=6, empty=True,
+                        r = Rule(trajet[i].elt.id, trajet[i + 1].loop.id, priority=6, empty=True,
                                  change=self.graph.change(trajet[i], trajet[i + 1]))
                         new_rules.append(r)
                         self.send_list_rules(new_rules)

@@ -1,0 +1,32 @@
+{
+  "Nancy": {
+    "center": [3300,2600],
+    "clockwise" : false,
+    "circonference": 5000,
+    "content": [{"type":"station","name":"Gare", "angle":149.2, "station_type": 3, "capacity": 5},
+                {"type":"switch_out","other_loop":"Villers-les-Nancy", "angle":245.6},
+                {"type":"switch_in","other_loop":"Laxou", "angle":175.2},
+                {"type": "sensor","angle":180.0}
+    ]
+  },
+  "Villers-les-Nancy": {
+    "center": [2000,1000],
+    "circonference": 6000,
+    "clockwise" : true,
+    "content": [{"type":"switch_in","other_loop":"Nancy", "angle":20 },
+                {"type":"station","name":"TELECOM Nancy", "angle":314, "station_type": 1, "capacity": 4},
+                {"type":"warehouse", "capacity": 50, "angle":200},
+                {"type":"switch_out","other_loop":"Laxou", "angle":180}
+    ]
+  },
+  "Laxou": {
+    "center": [800,3000],
+    "circonference": 5800,
+    "clockwise" : true,
+    "content": [{"type":"switch_out","other_loop":"Nancy", "angle":345.5 },
+                {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":260 },
+                {"type":"warehouse", "capacity": 100, "angle":100},
+                {"type":"station", "name":"Fac. de Lettres", "capacity": 3, "station_type": 1,"angle":320}
+    ]
+  }
+}

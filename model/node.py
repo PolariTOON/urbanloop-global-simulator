@@ -9,11 +9,11 @@ _nodes = list()
 
 class Node:
 
-    def __init__(self, switch, loop):
+    def __init__(self, elt, loop):
         global _nodes
         _nodes.append(self)
 
-        self.switch = switch
+        self.elt = elt
         self.loop = loop
         self.previous_nodes = [None] * 2
         self.next_nodes = [None] * 2
@@ -28,7 +28,7 @@ class Node:
         else:
             self.next_nodes[1] = node
 
-        self.calculate_distance(node.switch)
+        self.calculate_distance(node.elt)
 
     def add_previous_node(self, node):
         if self.previous_nodes[0] is None:
@@ -52,43 +52,34 @@ class Node:
         else:
             self.previous_nodes[1] = None
 
-    def calculate_distance(self, a_switch):
+    def calculate_distance(self, elt_cible):
         """
         Calcule la longueur du troncon entre lui même et le switch/warehouse/station entré en paramètre
-        :param switch: switch/warehouse/station d'arrivée du troncon dont on calcule la longeur
+        :param elt_suivant: switch/warehouse/station d'arrivée du troncon dont on calcule la longeur
         :return: met jour l'attribut distance_to_next_node
         """
-        distance = -1
-
-        if self.switch.uuid == a_switch.uuid:
-            distance = self.switch.size
-        elif type(self.switch) is switch.Switch:
-            if self.switch.loop.uuid == self.loop.uuid:
-                angle2 = self.switch.angle_my_loop
-            else:
-                angle2 = self.switch.angle_other_loop
-
-            if type(a_switch) is switch.Switch:
-                if a_switch.loop.uuid == self.loop.uuid:
-                    angle1 = a_switch.angle_my_loop
-                else:
-                    angle1 = a_switch.angle_other_loop
-            else:
-                angle1 = a_switch.angle
-
-            angle = min(360 - abs(angle1 - angle2), abs(angle1 - angle2))
-            distance = self.loop.size / 360 * angle
+        if self.elt.uuid == elt_cible.uuid:
+            distance = self.elt.size
         else:
-            angle2 = self.switch.angle
-
-            if type(a_switch) is switch.Switch:
-                if a_switch.loop.uuid == self.loop.uuid:
-                    angle1 = a_switch.angle_my_loop
+            if type(elt_cible) is switch.Switch:
+                # On gère le cas spécifique du switch en se plaçant sur la bonne boucle
+                if elt_cible.loop.uuid == self.loop.uuid:
+                    angle1 = elt_cible.angle_my_loop
                 else:
-                    angle1 = a_switch.angle_other_loop
+                    angle1 = elt_cible.angle_other_loop
             else:
-                angle1 = a_switch.angle
+                angle1 = elt_cible.angle
 
+            if type(self.elt) is switch.Switch:
+                # On se place sur la bonne boucle
+                if self.elt.loop.uuid == self.loop.uuid:
+                    angle2 = self.elt.angle_my_loop
+                else:
+                    angle2 = self.elt.angle_other_loop
+            else:
+                angle2 = self.elt.angle
+
+            # On prend la portion du cercle de la boucle entre les deux elts
             angle = min(360 - abs(angle1 - angle2), abs(angle1 - angle2))
             distance = self.loop.size / 360 * angle
 
@@ -98,8 +89,8 @@ class Node:
             self.distance_to_next_node[1] = distance
 
 
-def get_node_id(switch, loop):
+def get_node_id(elt, loop):
     for a_node in _nodes:
-        if a_node.loop.uuid == loop.uuid and a_node.switch.uuid == switch.uuid:
+        if a_node.loop.uuid == loop.uuid and a_node.elt.uuid == elt.uuid:
             return a_node.id
     return -1

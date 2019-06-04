@@ -1,6 +1,7 @@
 import math
 
 from model import switch
+from model.sensor import Sensor
 from settings import config
 from settings import network
 from simulator import converter
@@ -67,11 +68,8 @@ def serialize_objects_list(objects):
         obj_type = objects[i][0]
         if "station" in obj_type:
             data[i] = "Station " + obj.name
-            # data[i] = serialize_switch_set_data(true_obj) if isinstance(true_obj, switch.Switch)
-            # else serialize_station_set_data(true_obj)
         elif "warehouse" in obj_type:
             data[i] = "Warehouse %d in %s " % (obj.id, obj.loop.name)
-            #  data[i] = serialize_warehouse_set_data(obj)
         elif "out" in obj_type:
             data[i] = "Switch out #%d to %s" % (obj.id, obj.loop.name)
         elif "in" in obj_type:

@@ -2,7 +2,7 @@ import numpy as np
 from math import *
 import copy
 
-from model import node
+from model import node, sensor
 from model import switch
 from model.node import Node
 from settings import config
@@ -40,28 +40,28 @@ class Graph:
 
     def init_next_nodes(self, warehouses, stations):
         for a_node in self.nodes:
-            if stations.count(a_node.switch) > 0 or warehouses.count(a_node.switch) > 0:
-                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.loop)])
-            elif a_node.switch.loop.uuid == a_node.loop.uuid:
-                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element, a_node.switch.loop)])
-            else:
-                a_node.add_next_node(self.nodes[node.get_node_id(a_node.switch.next_element_other, a_node.switch.other_loop)])
+            if stations.count(a_node.elt) > 0 or warehouses.count(a_node.elt) > 0:
+                # Le noeud est une station ou un garage
+                a_node.add_next_node(self.nodes[node.get_node_id(a_node.elt.next_element, a_node.loop)])
+            elif a_node.elt.loop.uuid == a_node.loop.uuid:  # Le noeud est un switch sur la boucle actuelle
+                a_node.add_next_node(self.nodes[node.get_node_id(a_node.elt.next_element, a_node.elt.loop)])
+            else:  # Le noeud est un switch sur la boucle aiguillée
+                a_node.add_next_node(self.nodes[node.get_node_id(a_node.elt.next_element_other, a_node.elt.other_loop)])
 
     def init_matrices(self):
-        #speed : unités à vérifier
+        # speed : unités à vérifier
         speed = float(config.capsule['max_speed'])
         for node in self.nodes:
-            self.matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0]/speed
-            self.expected_matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0]/speed
+            self.matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0] / speed
+            self.expected_matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0] / speed
             if node.next_nodes[1] is not None:
-                self.matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1]/speed
-                self.expected_matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1]/speed
-
+                self.matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1] / speed
+                self.expected_matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1] / speed
 
     def add_edge(self, node1, node2, weight):
         self.matrix[node1][node2] = weight
 
-    def delete_edge(self,node1,node2):
+    def delete_edge(self, node1, node2):
         self.matrix[node1][node2] = inf
 
     def get_edge_existence(self, node1, node2):
@@ -85,7 +85,7 @@ class Graph:
         else:
             node2 = node.get_node_id(current_switch, current_switch.loop)
 
-        self.matrix[node1][node2] = (1-0.125)*self.matrix[node1][node2]+0.125*sample_time
+        self.matrix[node1][node2] = (1 - 0.125) * self.matrix[node1][node2] + 0.125 * sample_time
 
         return self.matrix[node1][node2] > 3 * self.expected_matrix[node1][node2]
 
@@ -107,76 +107,74 @@ class Graph:
         :return: path : le chemin optimal : liste ordonnée (sens croissant) des noeuds traversés pour aller du départ à
         la destination
     """
+        print("start :", node_start.id, " end :", node_arrival.id)
         distance = self.size * [inf]
         distance[node_start.id] = 0
 
-        VISITED = self.size+100
+        VISITED = inf
         visited_nodes = [-1] * self.size
 
         predecessor = self.size * [None]
 
         def maj_distances(node1, node2):
-            if(distance[node2.id] > distance[node1.id]+ self.get_edge_weight(node1.id,node2.id)):
-                distance[node2.id] = distance[node1.id]+ self.get_edge_weight(node1.id,node2.id)
+            poids12 = self.get_edge_weight(node1.id, node2.id)
+            if distance[node2.id] > distance[node1.id] + poids12:
+                distance[node2.id] = distance[node1.id] + poids12
                 predecessor[node2.id] = node1
                 for i in range(len(visited_nodes)):
-                    if(visited_nodes[i]==node2.id):
-                        visited_nodes[i]=-1
+                    if visited_nodes[i] == node2.id:
+                        visited_nodes[i] = -1
 
         def f(node, pred_Node):
-
-            if(pred_Node is None):
-                visited_nodes[node.id]=VISITED
+            # Initialisation
+            if pred_Node is None:
+                visited_nodes[node.id] = VISITED
 
                 for n in node.next_nodes:
-                    if(n is not None):
+                    if n is not None:
                         maj_distances(node, n)
 
                 for n in node.next_nodes:
-                    if(n is not None):
+                    if n is not None:
                         f(n, node)
 
-            elif(visited_nodes[node.id]<VISITED and visited_nodes[node.id]!=pred_Node.id):
-                if(visited_nodes[node.id]==-1):
-                    visited_nodes[node.id]=pred_Node.id
-                elif(visited_nodes[node.id]<VISITED):
-                    visited_nodes[node.id]=VISITED
+            elif visited_nodes[node.id] < VISITED and visited_nodes[node.id] != pred_Node.id:
+                if visited_nodes[node.id] == -1:
+                    visited_nodes[node.id] = pred_Node.id
+                elif visited_nodes[node.id] < VISITED:
+                    visited_nodes[node.id] = VISITED
 
                 for n in node.next_nodes:
-                    if(n is not None):
+                    if n is not None:
                         maj_distances(node, n)
 
                 for n in node.next_nodes:
-                    if(n is not None):
+                    if n is not None:
                         f(n, node)
 
-
-        f(node_start,None)
+        f(node_start, None)
         path = list()
         current_node = node_arrival
-        while predecessor[current_node.id] is  None:
-            print("impossible d'aller au noeud" , current_node.id)
-            print("redirection au noeud" , current_node.previous_nodes[0].id)
+        while predecessor[current_node.id] is None:
+            print("impossible d'aller au noeud", current_node.id)
+            print("redirection au noeud", current_node.previous_nodes[0].id)
             current_node = current_node.previous_nodes[0]
-        while(current_node.id != node_start.id):
+        while current_node.id != node_start.id:
             path.append(current_node)
             current_node = predecessor[current_node.id]
 
         path.append(node_start)
         return path
 
-
-    def delete_section(self,id_dep,id_fin):
-        self.matrix[id_dep][id_fin]=inf
+    def delete_section(self, id_dep, id_fin):
+        self.matrix[id_dep][id_fin] = inf
         self.get_node_from_id(id_dep).remove_next(self.get_node_from_id(id_fin))
 
-
-    def repare_section(self,id_dep,id_fin):
+    def repare_section(self, id_dep, id_fin):
         self.matrix[id_dep][id_fin] = self.expected_matrix[id_dep][id_fin]
         self.get_node_from_id(id_dep).add_next_node(self.get_node_from_id(id_fin))
 
-
-    def change(self,node_start, node_dest):
+    def change(self, node_start, node_dest):
         return node_start.loop.uuid != node_dest.loop.uuid
 
     def get_time_max(self, previous_switch, current_switch):
@@ -231,18 +229,17 @@ class Graph:
         self.matrix[node1][node2] = self.expected_matrix[node1][node2]
 
     def get_switches_nodes(self):
-    	list_nodes = list()
-    	for node in self.nodes:
-    		if type(node.switch) is switch.Switch:
-    			list_nodes.append(node)
-    	return list_nodes
+        list_nodes = list()
+        for node in self.nodes:
+            if type(node.elt) is switch.Switch:
+                list_nodes.append(node)
+        return list_nodes
 
     def get_node_from_switch(self, switch):
-    	for node in self.nodes:
-    		if node.switch.uuid == switch.uuid:
-    			return node
-    	print(switch)
-    	return None
+        for node in self.nodes:
+            if node.elt.uuid == switch.uuid:
+                return node
+        return None
 
     def get_node_from_id(self, id):
         for node in self.nodes:

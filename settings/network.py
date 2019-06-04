@@ -13,6 +13,7 @@ from model import station as model_station
 from model import switch as model_switch
 from model import traveler
 from model import warehouse as model_warehouse
+from model import sensor as model_sensor
 from settings import simlog, config
 
 """
@@ -20,6 +21,7 @@ fichier pour l'import des réseaux sur les formats json correspondant
 """
 
 _size = {}  # {'min_x': 0, 'max_x': 0, 'min_y': 0, 'max_y': 0}
+
 
 def load(file_name=None, capsules_fulfill=True):
     """
@@ -38,7 +40,6 @@ def load(file_name=None, capsules_fulfill=True):
     with open(file_path, 'r') as file:
         network = json.load(file)
     for loop, info in network.items():
-        # the_loop = None
         if loop in model_loop.all_loops:
             the_loop = model_loop.get_by_name(loop)
             the_loop.x = info["center"][0]
@@ -54,7 +55,6 @@ def load(file_name=None, capsules_fulfill=True):
             if el_type == "station":
                 elms += [model_station.Station(name=element["name"], capacity=element["capacity"], loop=the_loop,
                                                angle=element["angle"], station_type=element["station_type"])]
-                # the_loop.stations += [elms[e]]
             elif "switch" in el_type:
                 other = element["other_loop"]
                 if other in model_loop.all_loops:
@@ -80,6 +80,8 @@ def load(file_name=None, capsules_fulfill=True):
                     elms[e].angle_other_loop = element["angle"]
             elif el_type == "warehouse":
                 elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"])]
+            elif el_type == "sensor":
+                elms += [model_sensor.Sensor(angle=element["angle"], loop=the_loop)]
             else:
                 simlog.error("The json file is not properly formatted. "
                              "\n FORMAT : "
@@ -199,7 +201,7 @@ def sections_loop(the_loop):
     for j in range(1, len(the_loop.objects)):
         the_object = the_loop.objects[(index + j) % len(the_loop.objects)][1]
         # print('\t', the_object.name)
-        if type(the_object) is model_station.Station or type(the_object) is model_warehouse.Warehouse:
+        if type(the_object) is model_station.Station or type(the_object) is model_warehouse.Warehouse or type(the_object) is model_sensor.Sensor:
             the_object.section_loop = section
         elif the_object is the_loop.switches[index_s]:
             index_s = (index_s + 1) % len(the_loop.switches)

@@ -1,0 +1,157 @@
+@startuml
+
+class model.capsule
+class model.controller
+class model.graph
+class model.identifier
+class model.loop
+class model.node
+class model.queue
+class model.routing
+class model.rule
+class model.station
+class model.switch
+class model.traveler
+class model.warehouse
+class runnable.main
+class runnable.stats_test
+class runnable.web_app
+class settings.config
+class settings.json_serializer
+class settings.network
+class settings.simlog
+class simulator.ascent_generator
+class simulator.converter
+class simulator.poisson
+class simulator.sim_loop
+class simulator.traveler_generator
+class stats.abstract_array
+class stats.stats_array
+class stats.stats_average_array
+class stats.stats_recorder
+
+model.capsule -> model.controller
+model.capsule -> model.identifier
+model.capsule -> model.station
+model.capsule -> model.switch
+model.capsule -> model.warehouse
+model.capsule -> settings.config
+model.capsule -> settings.simlog
+model.capsule -> simulator.converter
+model.capsule -> simulator.sim_loop
+model.controller -> model.capsule
+model.controller -> model.graph
+model.controller -> model.node
+model.controller -> model.rule
+model.controller -> model.station
+model.controller -> model.switch
+model.controller -> model.warehouse
+model.graph -> model.node
+model.graph -> model.switch
+model.graph -> settings.config
+model.loop -> model.identifier
+model.loop -> model.station
+model.loop -> model.switch
+model.loop -> settings.simlog
+model.node -> model.identifier
+model.node -> model.loop
+model.node -> model.switch
+model.routing -> model.loop
+model.routing -> model.switch
+model.routing -> settings.config
+model.station -> model.capsule
+model.station -> model.controller
+model.station -> model.identifier
+model.station -> model.queue
+model.station -> model.warehouse
+model.station -> settings.simlog
+model.station -> simulator.converter
+model.station -> simulator.sim_loop
+model.switch -> model.controller
+model.switch -> model.identifier
+model.switch -> model.node
+model.switch -> model.routing
+model.switch -> model.switch
+model.switch -> settings.config
+model.switch -> settings.simlog
+model.traveler -> model.identifier
+model.traveler -> simulator.sim_loop
+model.warehouse -> model.capsule
+model.warehouse -> model.controller
+model.warehouse -> model.identifier
+model.warehouse -> model.station
+model.warehouse -> model.switch
+model.warehouse -> model.queue
+model.warehouse -> settings.simlog
+runnable.main -> settings.network
+runnable.main -> settings.simlog
+runnable.main -> simulator.sim_loop
+runnable.stats_test -> model.capsule
+runnable.stats_test -> model.loop
+runnable.stats_test -> model.station
+runnable.stats_test -> stats.stats_array
+runnable.stats_test -> stats.stats_average_array
+runnable.web_app -> model.capsule
+runnable.web_app -> model.loop
+runnable.web_app -> model.station
+runnable.web_app -> model.switch
+runnable.web_app -> model.warehouse
+runnable.web_app -> settings.config
+runnable.web_app -> settings.network
+runnable.web_app -> settings.json_serializer
+runnable.web_app -> settings.json_simlog
+runnable.web_app -> simulator.sim_loop
+settings.json_serializer -> model.switch
+settings.json_serializer -> settings.config
+settings.json_serializer -> settings.network
+settings.json_serializer -> simulator.converter
+settings.json_serializer -> simulator.sim_loop
+settings.network -> model.capsule
+settings.network -> model.identifier
+settings.json_network -> model.loop
+settings.network -> model.station
+settings.network -> model.switch
+settings.network -> model.traveler
+settings.network -> model.warehouse
+settings.network -> settings.config
+settings.network -> settings.simlog
+settings.simlog -> model.loop
+settings.simlog -> model.station
+settings.simlog -> model.switch
+settings.simlog -> settings.config
+settings.simlog -> simulator.converter
+simulator.ascent_generator -> model.station
+simulator.ascent_generator -> settings.config
+simulator.ascent_generator -> simulator.converter
+simulator.ascent_generator -> simulator.sim_loop
+simulator.converter -> model.station
+simulator.converter -> settings.config
+simulator.converter -> settings.simlog
+simulator.converter -> simulator.sim_loop
+simulator.poisson -> settings.config
+simulator.sim_loop -> model.capsule
+simulator.sim_loop -> model.controller
+simulator.sim_loop -> model.identifier
+simulator.sim_loop -> model.loop
+simulator.sim_loop -> model.station
+simulator.sim_loop -> model.warehouse
+simulator.sim_loop -> settings.config
+simulator.sim_loop -> settings.simlog
+simulator.sim_loop -> simulator.ascent_generator
+simulator.sim_loop -> simulator.traveler_generator
+simulator.sim_loop -> stats.stats_recorder
+simulator.traveler_generator -> model.station
+simulator.traveler_generator -> model.traveler
+simulator.traveler_generator -> settings.config
+simulator.traveler_generator -> settings.simlog
+simulator.traveler_generator -> simulator.converter
+simulator.traveler_generator -> simulator.poisson
+simulator.traveler_generator -> simulator.sim_loop
+stats.stats_array -> simulator.sim_loop
+stats.stats_average_array -> stats.ar.sim_loop
+stats.stats_average_array -> stats.abstract_array
+stats.stats_recorder -> settings.simlog
+stats.stats_recorder -> stats_array
+stats.stats_recorder -> stats_average_array
+
+@enduml

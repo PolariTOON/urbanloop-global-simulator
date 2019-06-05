@@ -1,8 +1,6 @@
-import numpy as np
 from math import *
-import copy
 
-from model import node, sensor
+from model import node, station, warehouse
 from model import switch
 from model.node import Node
 from settings import config
@@ -41,8 +39,7 @@ class Graph:
 
     def init_next_nodes(self, warehouses, stations):
         for a_node in self.nodes:
-            if stations.count(a_node.elt) > 0 or warehouses.count(a_node.elt) > 0:
-                # Le noeud est une station ou un garage
+            if type(a_node.elt) is station.Station or type(a_node.elt) is warehouse.Warehouse:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.elt.next_element, a_node.loop)])
             elif a_node.elt.loop.uuid == a_node.loop.uuid:  # Le noeud est un switch sur la boucle actuelle
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.elt.next_element, a_node.elt.loop)])

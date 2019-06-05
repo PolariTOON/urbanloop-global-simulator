@@ -179,13 +179,26 @@ def serialize_switch_set_data(a_switch):
         'next_element_name': a_switch.next_element.name,
         'next_other_element_name': a_switch.next_element_other.name,
         'size': a_switch.size,
-        # 'table': str(a_switch.table)
     }
 
 
 def serialize_switch_var_data(a_switch):
+    switch_positions = get_switch_positions(a_switch)
     return {
-        'jsonType': 'switch'
+        'jsonType': "switch",
+        'uuid': str(a_switch.uuid),
+        'id': a_switch.id,
+        'nameIn': a_switch.my_loop.name + ' -> ' + a_switch.other_loop.name,
+        'nameOut': a_switch.other_loop.name + ' <- ' + a_switch.my_loop.name,
+        'xIn': switch_positions[0],
+        'yIn': switch_positions[1],
+        'xOut': switch_positions[2],
+        'yOut': switch_positions[3],
+        'my_loop_name': a_switch.my_loop.name,
+        'other_loop_name': a_switch.other_loop.name,
+        'next_element_name': a_switch.next_element.name,
+        'next_other_element_name': a_switch.next_element_other.name,
+        'size': a_switch.size,
     }
 
 
@@ -265,3 +278,13 @@ def get_switch_positions(a_switch):
     x_out = a_switch.other_loop.x + math.cos(radius_angle_loop_out) * loop_out_radius
     y_out = a_switch.other_loop.y + math.sin(radius_angle_loop_out) * loop_out_radius
     return x_in, y_in, x_out, y_out
+
+
+def serialize_sensor_data(a_sensor):
+    return {
+        'jsonType': 'sensor',
+        'uuid': str(a_sensor.uuid),
+        'id': a_sensor.id,
+        'name': a_sensor.name,
+        'capsule_id': a_sensor.capsule.id
+    }

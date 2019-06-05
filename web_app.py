@@ -4,7 +4,7 @@ from threading import Thread
 from flask import Flask, request
 from flask.json import jsonify, loads
 
-from model import loop, station, switch, warehouse, capsule
+from model import loop, station, switch, warehouse, capsule, sensor
 from settings import config, network, json_serializer, simlog
 from simulator import sim_loop
 
@@ -120,11 +120,13 @@ def generate_updated_data_json():
                              station.get_stations()]
     list_warehouse_var_data = [json_serializer.serialize_warehouse_var_data(a_warehouse) for a_warehouse in
                                warehouse.get_warehouses()]
-    list_switch_var_data = []
+    list_switch_var_data = [json_serializer.serialize_switch_var_data(a_switch) for a_switch in switch.get_switches()]
 
     list_capsule_data = [json_serializer.serialize_capsule(a_capsule) for a_capsule in capsule.get_capsules()]
 
-    return jsonify(list_time_data + list_station_var_data + list_warehouse_var_data + list_switch_var_data + list_capsule_data)
+    list_sensor_data = [json_serializer.serialize_sensor_data(a_sensor) for a_sensor in sensor.get_sensors()]
+
+    return jsonify(list_time_data + list_station_var_data + list_warehouse_var_data + list_switch_var_data + list_capsule_data + list_sensor_data)
 
 
 @app.route('/network-files.json', methods=['GET'])

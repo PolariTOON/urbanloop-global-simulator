@@ -59,8 +59,7 @@ class Loop:
                     self.stations += [element]
                 elif type(element) is warehouse.Warehouse:
                     self.objects += [["warehouse", element, element.angle]]
-                elif type(element) is sensor.Sensor:  # Capteur
-                    self.sensors += [element]
+
         # mise à jour des longueurs
         nb_elements = len(self.objects)
         for i in range(nb_elements):
@@ -97,6 +96,17 @@ class Loop:
             if self.objects[i][1] is an_object:
                 return i
         return None
+
+    def add_sensors(self, sensors):
+        """
+        Permet d'ajouter les sensors dans la boucle sans qu'ils interfèrent avec les noeuds du graphe
+        calcul aussi la position
+        :param sensors: tableau contenant le nécessaire pour cette mise à jour ([string, Sensor, float]) OBLIGATOIRE
+        :return: void (mise à jour des capteurs)
+        """
+        self.sensors = sensors
+        # TODO : la position des capteurs
+
 
 
 def get_by_name(search_name):

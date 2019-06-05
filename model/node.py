@@ -31,6 +31,7 @@ class Node:
         self.calculate_distance(node.elt)
 
     def add_previous_node(self, node):
+
         if self.previous_nodes[0] is None:
             self.previous_nodes[0] = node
         else:

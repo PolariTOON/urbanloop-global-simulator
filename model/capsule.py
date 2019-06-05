@@ -133,7 +133,13 @@ class Capsule:
         This function is called when the capsule arrives to the next_element which isn't
         updated yet as the current_element.
         """
-        """test = True
+        """
+        Cette partie en commentaire correspond à des tests effectué pour arreté une capsule si lorsqu'elle
+        arrive à un noeud elle peut continuer sa route. Typiquement si il n'y a pas une autre capsule qui arrive
+        (90% du trajet) ou qui vient juste d'en partir (10% du trajet).
+        Cette méthode s'est soldé par un échec.
+
+        test = True
         for i in get_capsules():
             print("nextid",i.next_element.id)
             print("selfid",self.next_element.id)

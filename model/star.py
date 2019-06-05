@@ -11,6 +11,11 @@ from simulator import sim_loop
 
 _stars = list()
 
+"""
+Cette classe correspond aux interruptions de voie.
+Elle n'est utilisé que pour l'affichage (inactif) d'étoiles sur le simulateur
+lors de coupures
+"""   
 
 class Star:
     def __init__(self, node1, node2):

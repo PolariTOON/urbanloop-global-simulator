@@ -80,9 +80,7 @@ def dijkstra_route(switch, table, to_cover):
                                 table_to_cover[next_switch.section_other_loop][2]:
                             table_to_cover[next_switch.section_other_loop] = [next_switch.id] + table_temp[
                                 next_switch.section_other_loop]
-                # else :
-                # le calcul n'a pas à se faire maintenant
-        # print(table_temp)
+
     return table_temp
 
 

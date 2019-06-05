@@ -948,6 +948,8 @@ export async function updateNetworkScene() {
                 case 'capsule':
                     updateCapsuleFromJSON(dataJSON);
                     break;
+                case 'sensor':
+                    // TODO : l'affichage des capteurs
             }
         }
     }

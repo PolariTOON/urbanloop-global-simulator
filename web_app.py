@@ -14,7 +14,6 @@ app = Flask(__name__, static_folder=web_directory, template_folder=web_directory
 app.logger.setLevel(logging.ERROR)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 sim_thread = None
-is_simulation_started = False
 
 
 @app.errorhandler(Exception)
@@ -31,10 +30,8 @@ def root():
 @app.route('/start', methods=['POST'])
 def start_simulation():
     global sim_thread
-    global is_simulation_started
-    if not is_simulation_started:
+    if sim_thread is None:
         network.init_capsules()
-        is_simulation_started = True
         sim_thread = Thread(target=sim_loop.start_simulation, args=[True])
         sim_thread.start()
     return ''
@@ -42,37 +39,37 @@ def start_simulation():
 
 @app.route('/stop', methods=['POST'])
 def stop_simulation():
-    global is_simulation_started
-    if is_simulation_started:
-        is_simulation_started = False
+    global sim_thread
+    if sim_thread is not None:
+        sim_thread = None
         sim_loop.stop_simulation()
     return ''
 
 
 @app.route('/pause', methods=['POST'])
 def pause_simulation():
-    if is_simulation_started and not sim_loop.is_paused():
+    if sim_thread is not None and not sim_loop.is_paused():
         sim_loop.pause_simulation()
     return ''
 
 
 @app.route('/resume', methods=['POST'])
 def resume_simulation():
-    if is_simulation_started and sim_loop.is_paused():
+    if sim_thread is not None and sim_loop.is_paused():
         sim_loop.run_simulation_after_pause()
     return ''
 
 
 @app.route('/accelerate', methods=['POST'])
 def accelerate_simulation():
-    if is_simulation_started:
+    if sim_thread is not None:
         sim_loop.accelerate_simulation()
     return ''
 
 
 @app.route('/decelerate', methods=['POST'])
 def decelerate_simulation():
-    if is_simulation_started:
+    if sim_thread is not None:
         sim_loop.decelerate_simulation()
     return ''
 
@@ -85,7 +82,7 @@ def generate_time_json():
 @app.route('/load.json/', methods=['GET'], defaults={'file_name': None})
 @app.route('/load.json/<string:file_name>', methods=['GET'])
 def load_network(file_name):
-    if not is_simulation_started:
+    if sim_thread is None:
         if file_name is not None:
             network.reload(file_name=file_name, capsules_fulfill=False)
         else:

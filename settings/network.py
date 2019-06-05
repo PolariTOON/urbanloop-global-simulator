@@ -98,7 +98,7 @@ def load(file_name=None, capsules_fulfill=True):
                              "0,359)>} "
                              "\n \t ]}}")
         the_loop.clockwise = info["clockwise"]
-        tri_bulle(elms, the_loop)
+        elms.sort(key=lambda elm: get_angle_in_loop(the_loop, elm))
         the_loop.add_order(elms)
         sections_loop(the_loop)
         global _size
@@ -234,32 +234,13 @@ def sections_loop(the_loop):
 #             return "%s_%d-%d" % (the_loop.name, switch1.id, switch2.id)
 
 
-def tri_bulle(tab_objects, the_loop):
-    to_permute = True
-    cursor = 0
-    angles = []
-    for elm in tab_objects:
-        # choix de l'angle
-        if type(elm) is model_switch.Switch:
-            if elm.my_loop is the_loop:
-                angles.append(elm.angle_my_loop)
-            else:
-                angles.append(elm.angle_other_loop)
-        else:
-            angles.append(elm.angle)
-    while to_permute:
-        to_permute = False
-        cursor += 1
-        for i in range(0, len(tab_objects) - cursor):
-            if angles[i] < angles[i + 1] and the_loop.clockwise:
-                to_permute = True
-                angles[i], angles[i + 1] = angles[i + 1], angles[i]
-                tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
-            if angles[i] > angles[i + 1] and not the_loop.clockwise:
-                to_permute = True
-                angles[i], angles[i + 1] = angles[i + 1], angles[i]
-                tab_objects[i], tab_objects[i + 1] = tab_objects[i + 1], tab_objects[i]
-    return tab_objects
+def get_angle_in_loop(the_loop, elm):
+    if type(elm) is not model_switch.Switch:
+        return elm.angle
+    elif elm.my_loop is the_loop:
+        return elm.angle_my_loop
+    else:
+        return elm.angle_other_loop
 
 
 def get_network_json(file_name, is_default=False):

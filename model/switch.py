@@ -52,7 +52,7 @@ class Switch:
         self.section_other_loop = None
         self.rules = []
         if rules is not None:
-            self.rules == rules
+            self.rules = rules
 
     def route_capsule_to_station(self, capsule):
         """

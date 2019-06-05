@@ -1,4 +1,4 @@
-from model import identifier, station, switch
+from model import identifier, station, switch, warehouse, sensor
 from settings import simlog
 
 all_loops = {}
@@ -44,6 +44,7 @@ class Loop:
         for i in range(len(order)):
             element = order[i]
             # mise à jour des suivants + object[i] = [nature, obj, angle]
+            # On prend le reste car c'est une boucle donc le suivant du dernier est le premier
             if type(element) is switch.Switch and element.other_loop == self:  # switch_in
                 element.next_element_other = order[(i + 1) % len(order)]
                 self.objects += [["switch_in", element, element.angle_other_loop]]
@@ -51,14 +52,15 @@ class Loop:
             else:
                 element.next_element = order[(i + 1) % len(order)]
                 if type(element) is switch.Switch:  # switch_out
-                    # element.previous_element = order[(i - 1) % len(order)]
                     self.objects += [["switch_out", element, element.angle_my_loop]]
                     self.switches += [element]
                 elif type(element) is station.Station:
                     self.objects += [["station", element, element.angle]]
                     self.stations += [element]
-                else:
+                elif type(element) is warehouse.Warehouse:
                     self.objects += [["warehouse", element, element.angle]]
+                elif type(element) is sensor.Sensor:  # Capteur
+                    self.sensors += [element]
         # mise à jour des longueurs
         nb_elements = len(self.objects)
         for i in range(nb_elements):
@@ -70,7 +72,6 @@ class Loop:
                 angle_next = next_object[2] - an_object[2]
             if angle_next < 0:
                 angle_next += 360
-            # print(an_object[1].name, next_object[1].name, angle_next)
             self.lengths[i] = round(float(angle_next / 360) * self.size,
                                     2)  # arc = D*pi*angle/360  et D = circonference/pi
             if self.size is None:
@@ -102,11 +103,12 @@ def get_by_name(search_name):
     """
     cette fonction indépendante d'une boucle permet de récupérer un objet station en ne connaissant que son nom
         :param  search_name : le nom de la boucle cherchée (String) OBLIGATOIRE
-        :return: 0UT : la Loop (si elle existe) ayant le nom voulu (Loop)
+        :return: la Loop (si elle existe) ayant le nom voulu (Loop)
     """
     for name, loop in all_loops.items():
         if name == search_name:
             return loop
+    print("La boucle recherchée n'existe pas")
     return None
 
 

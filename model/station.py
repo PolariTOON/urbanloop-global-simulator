@@ -147,17 +147,6 @@ def fill_and_full_stations():
                 controller.get_controller().refill(6,station,nb_to_send)
                 station.capsule_arriving = True
                  # j'en envoie une depuis un entrepot
-            """
-            if nearer_warehouse is not None :
-                nearer_warehouse.send_capsule(station)
-                sim_loop.recorder.add_sent_capsules_drain(1, nearer_warehouse)
-        # vérifier que la station n'est pas sujette à être la destination de plein de capsules
-            proba = converter.station_probability(station.get_type(), now_second, True)
-            if proba < 0.3 and nb_to_send>1 and nearer_warehouse is not None: # je ne prends pas trop de risque à en renvoyer d'autres
-                for i in range(min(nb_to_send-1, 1)):
-                    nearer_warehouse.send_capsule(station)
-                    sim_loop.recorder.add_sent_capsules_drain(1, nearer_warehouse)
-            """
         if station.estimated_capsules_number() >= min(station.capacity - 1, floor(3 * station.capacity /4)) and station.capsule_queue.qsize() > 1:
             # quasi pleine --> station à vider
             simlog.debug("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (
@@ -194,6 +183,8 @@ def get_almost_empty_station(departure_station=None):
     return random.choice(_stations)
 
 '''
+Les fonctions suivantes ne sont plus utilisées:
+
 def get_almost_full_station(destination_station=None):
     """
     :param destination_station: The destination_station

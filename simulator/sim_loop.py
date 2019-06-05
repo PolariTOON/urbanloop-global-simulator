@@ -75,6 +75,12 @@ class SimLoop:
         _env.process(self.loop())  # Register the loop process in the simulation environment
 
     def collision(self):
+        """
+        Collision est un essai de détection de collision futur lorsqu'une capsule s'apprete à entrer sur une boucle en passant par un switch.
+        Si sur cette boucle une capsule sort du switch ou va y entrer test vaut alors true.
+        Différents essais on alors été fait  (modification vitesse arrêt capsule, modification de l'horloge interne de la capsule)
+        Sans succès
+        """
         from model import capsule
         from model import switch
         for i in capsule.get_capsules():
@@ -88,9 +94,6 @@ class SimLoop:
                             if j.get_segment_trip_percentage() <= 10 and i.current_element == j.next_element:
                                 test = True
                     if test:
-                        i.segment_real_tick -= 1
-
-                    else:
                         i.segment_real_tick -= 1
 
     def tick(self):
@@ -125,6 +128,10 @@ class SimLoop:
                         os.mkdir("out")
                     except:
                         pass
+                    """
+                    On obtient dans staats le temps moyen de trajet des capsules et dans staatsvoy le temps moyen
+                    d'attentes des voyageurs
+                    """
                     latest_stats_file = open("out/staats.txt", "a+")
                     buffer = str(controller.get_controller().temps_moy()) + ","
                     latest_stats_file.write(buffer)

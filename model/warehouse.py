@@ -1,4 +1,4 @@
-from model import identifier, controller
+from model import identifier
 from model import queue
 from model import switch
 from model import station
@@ -8,11 +8,12 @@ from settings import simlog
 
 _warehouses = list()
 
+
 class Warehouse:
     def __init__(self, loop, angle, capacity=float('inf'), next_element=None):
         global _warehouses
         _warehouses.append(self)
-        self.capsules=capsule.get_capsules()
+        self.capsules = capsule.get_capsules()
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_warehouse_id()
         self.angle = angle
@@ -43,8 +44,7 @@ class Warehouse:
                 if i.get_segment_trip_percentage() <= 10 and i.current_element == self:
                     test = False
             if test:
-                simlog.info("an empty capsule left warehouse %d to %s with priority %d" % (self.id, station_destination.name,
-                                                                                           priority))
+                simlog.info("an empty capsule left warehouse %d to %s with priority %d" % (self.id, station_destination.name, priority))
                 capsule_to_send.start_trip()
             else:
                 self.capsule_queue.put(capsule_to_send)
@@ -55,6 +55,7 @@ class Warehouse:
     def end_capsule_trip(self, capsule):
         controller.get_controller().stop_timer(capsule)
 
+
 def which_warehouse_before(station_destination):
     """
     trouver le warehouse dont la capsule doit partir pour arriver à la station au plus vite
@@ -64,7 +65,6 @@ def which_warehouse_before(station_destination):
     go_from = None
     cost_go_from = float('inf')
     for cand_warehouse in _warehouses:
-        #if cand_warehouse.capsule_queue.qsize() > 0:
         if cand_warehouse.loop is station_destination.loop:
             return cand_warehouse
         cost = switch.cost_between(cand_warehouse, station_destination)
@@ -83,7 +83,7 @@ def which_warehouse_after(station_source):
     go_to = None
     cost_go_to = float('inf')
     for cand_warehouse in _warehouses:
-        #if cand_warehouse.capsule_queue.qsize() < cand_warehouse.capacity:
+        # if cand_warehouse.capsule_queue.qsize() < cand_warehouse.capacity:
         if cand_warehouse.loop is station_source.loop:
             return cand_warehouse
         cost = switch.cost_between(station_source, cand_warehouse)

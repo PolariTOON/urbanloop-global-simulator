@@ -38,14 +38,17 @@ class Controller:
         """
         previous_switch = capsule.current_element  # last node browsed
         current_switch = capsule.next_element  # switch which route the pod
-        previous_node = self.graph.get_node_from_switch(previous_switch)
-        current_node = self.graph.get_node_from_switch(current_switch)
+        previous_node = self.graph.get_node_from_elt(previous_switch)
+        current_node = self.graph.get_node_from_elt(current_switch)
         if self.graph.update_weight(previous_switch, current_switch, self.timers[capsule.id]):
             print("CONGESTION")
             new_rules = self.update_rules()
             self.replace_rules(new_rules)
             self.congestions[previous_node.id][current_node.id] = True
-        elif self.congestions[previous_node.id][current_node.id] and self.graph.no_more_congestion(previous_switch, current_switch, self.timers[capsule.id]):
+        elif self.congestions[previous_node.id][current_node.id] and self.graph.no_more_congestion(previous_switch,
+                                                                                                   current_switch,
+                                                                                                   self.timers[
+                                                                                                       capsule.id]):
             self.congestions[previous_node.id][current_node.id] = False
 
         self.timers[capsule.id] = 0
@@ -67,19 +70,20 @@ class Controller:
         self.timers[capsule.id] = -1
 
     def init_rules(self):
-        def create_rules(station):
-            end_node = self.graph.get_node_from_switch(station) # ??
-            unvisited_nodes = self.graph.get_switches_nodes().copy() # copie de tous les switchs
+        def create_rules(elt):
+            end_node = self.graph.get_node_from_elt(elt)  # noeud correspondant à l'élément station
+            unvisited_nodes = self.graph.get_switches_nodes().copy()  # copie de tous les switchs
+            while len(unvisited_nodes) > 0:  # Tant qu'on a des switchs non visités
+                for node_switch in unvisited_nodes:
+                    chemin = self.graph.calcul(node_switch, end_node)  # Calcul du plus court chemin entre le switch et end_node
+                    for i in range(1, len(chemin)):
+                        if unvisited_nodes.count(chemin[i]) > 0: # Si on a pas encore visité un noeud du chemin on lui associe une règle
+                            change_loop = chemin[i].loop.id != chemin[i - 1].loop.id # On regarde si on a changé de boucle
+                            regle = Rule(chemin[i].elt.id, chemin[i].loop.id, elt, None, None, change_loop)
+                            self.rules.append(regle)
+                            unvisited_nodes.remove(chemin[i])
 
-            while len(unvisited_nodes) > 0: # Tant qu'on a des noeud non visités
-                for node in unvisited_nodes:
-                    node_list = self.graph.calcul(node, end_node) # Calcul du plus court chemin entre node et end_node
-                    for i in range(1, len(node_list)):
-                        if unvisited_nodes.count(node_list[i]) > 0:
-                            change = node_list[i].loop.id != node_list[i - 1].loop.id
-                            self.rules.append(
-                                Rule(node_list[i].elt.id, node_list[i].loop.id, station, None, None, change))
-                            unvisited_nodes.remove(node_list[i])
+        # On créé des règle entre les switch et les garages/stations
 
         for warehouse in self.warehouses:
             create_rules(warehouse)
@@ -91,10 +95,10 @@ class Controller:
         new_rules = []
 
         def create_rules(station):
-            end_node = self.graph.get_node_from_switch(station)
+            end_node = self.graph.get_node_from_elt(station)
             unvisited_nodes = self.graph.get_switches_nodes().copy()
 
-            while (len(unvisited_nodes) > 0):
+            while len(unvisited_nodes) > 0:
                 for node in unvisited_nodes:
                     node_list = self.graph.calcul(node, end_node)
                     for i in range(1, len(node_list)):
@@ -139,7 +143,7 @@ class Controller:
         """
         Décharge une station qui en effectue la demande
         :param destination: Station qui effectue la dema
-                end_node = self.graph.get_node_from_switch(station)
+                end_node = self.graph.get_node_from_elt(station)
                 unvisited_nodes = self.graph.get_switches_nodes().copy()
 
                 while(len(unvisited_nodes)>0):
@@ -160,16 +164,16 @@ class Controller:
             for capsule_t in capsule.get_empty_capsules():
                 if len(capsule_t.travelers) == 0 and capsule_t.priority <= 6:
                     test = True
-                    trajet = self.graph.calcul(self.graph.get_node_from_switch(capsule_t.next_element),
-                                               self.graph.get_node_from_switch(destination))
+                    trajet = self.graph.calcul(self.graph.get_node_from_elt(capsule_t.next_element),
+                                               self.graph.get_node_from_elt(destination))
                     for i in range(len(trajet) - 1):
                         new_rules = list()
                         r = Rule(trajet[i].elt.id, trajet[i + 1].loop.id, priority=6, empty=True,
                                  change=self.graph.change(trajet[i], trajet[i + 1]))
                         new_rules.append(r)
                         self.send_list_rules(new_rules)
-                if test == True:
-                    break;
+                if test:
+                    break
             if test:
                 test_warehouse = warehouse.which_warehouse_before(destination)
                 if test_warehouse.capsule_queue.qsize() > 0:

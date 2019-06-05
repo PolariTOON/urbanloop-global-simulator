@@ -1,6 +1,6 @@
 from model import identifier
 
-all_sensors = {}
+_sensors = list()
 
 
 class Sensor:
@@ -15,4 +15,4 @@ class Sensor:
 
 
 def get_sensors():
-    return all_sensors
+    return _sensors

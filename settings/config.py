@@ -20,8 +20,8 @@ capsule = None
 routing = None
 sim = None
 
-path = '{0}/../resources/config.ini'.format(sys.path[0])
-default_path = '{0}/../resources/default_config.ini'.format(sys.path[0])
+path = 'resources/config.ini'
+default_path = 'resources/default_config.ini'
 
 
 def load(file_name):

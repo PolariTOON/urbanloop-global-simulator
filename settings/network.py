@@ -31,11 +31,11 @@ def load(file_name=None, capsules_fulfill=True):
         :return: (void) l'ensemble des objets sont créés et configurés.
     """
 
-    file_path = ('{0}/../resources/networks/default/' + get_default_file_name() + '.json').format(sys.path[0])
+    file_path = 'resources/networks/default/%s.json' % get_default_file_name()
     if file_name is not None:
         if '.json' not in file_name:
             file_name += '.json'
-        file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
+        file_path = 'resources/networks/%s' % file_name
 
     with open(file_path, 'r') as file:
         network = json.load(file)
@@ -264,15 +264,15 @@ def tri_bulle(tab_objects, the_loop):
 def get_network_json(file_name, is_default=False):
     if '.json' not in file_name:
         file_name += '.json'
-    path = '{0}/../resources/networks/'.format(sys.path[0])
+    path = 'resources/networks/'
     if is_default:
-        path = '{0}/../resources/networks/default/'.format(sys.path[0])
+        path = 'resources/networks/default/'
     with open(path + file_name) as network_file:
         return json.load(network_file)
 
 
 def get_default_file_name():
-    default_network_file_regex_path = '{0}/../resources/networks/default/*.json'.format(sys.path[0])
+    default_network_file_regex_path = 'resources/networks/default/*.json'
     default_network_file_paths = glob.glob(default_network_file_regex_path)
     if not default_network_file_paths:
         return
@@ -282,7 +282,7 @@ def get_default_file_name():
 
 
 def get_network_file_names():
-    network_file_regex_paths = '{0}/../resources/networks/*.json'.format(sys.path[0])
+    network_file_regex_paths = 'resources/networks/*.json'
     network_file_paths = glob.glob(network_file_regex_paths)
     return [path.split(os.sep)[-1].split('.')[0] for path in network_file_paths if
             os.sep in path and '.' in path.split(os.sep)[-1]]
@@ -291,7 +291,7 @@ def get_network_file_names():
 def add_network_file(file_name, network_json):
     if '.json' not in file_name:
         file_name += '.json'
-    file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
+    file_path = 'resources/networks/%s' % file_name
 
     if not os.path.exists(file_path):
         with open(file_path, 'w') as new_network_json_file:
@@ -302,7 +302,7 @@ def add_network_file(file_name, network_json):
 def remove_network_file(file_name):
     if '.json' not in file_name:
         file_name += '.json'
-    file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
+    file_path = 'resources/networks/%s' % file_name
     if os.path.exists(file_path):
         os.remove(file_path)
 
@@ -310,8 +310,8 @@ def remove_network_file(file_name):
 def change_default_file(file_name):
     if '.json' not in file_name:
         file_name += '.json'
-    default_file_path = ('{0}/../resources/networks/default/' + get_default_file_name() + '.json').format(sys.path[0])
-    file_path = ('{0}/../resources/networks/' + file_name).format(sys.path[0])
+    default_file_path = 'resources/networks/default/%s.json' % get_default_file_name()
+    file_path = 'resources/networks/%s' % file_name
     new_default_file_path = default_file_path.replace('/default/', '/')
     new_file_path = file_path.replace(file_name, '/default/' + file_name)
     os.rename(default_file_path, new_default_file_path)

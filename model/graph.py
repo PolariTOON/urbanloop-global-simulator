@@ -21,6 +21,7 @@ class Graph:
         self.init_matrices()
 
     def init_nodes(self, warehouses, stations, switches):
+        """ On créé les noeuds à partir des stations, switchs, warehouse du réseau """
         for a_station in stations:
             a = Node(a_station, a_station.loop)
             self.nodes.append(a)
@@ -49,7 +50,10 @@ class Graph:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.elt.next_element_other, a_node.elt.other_loop)])
 
     def init_matrices(self):
-        # speed : unités à vérifier -> en s ?
+        #speed : unités à vérifier
+        """
+        On créé le graphe qui représente le réseau
+        """
         speed = float(config.capsule['max_speed'])
         for node in self.nodes:
             self.matrix[node.id][node.next_nodes[0].id] = node.distance_to_next_node[0] / speed
@@ -102,6 +106,7 @@ class Graph:
     def calcul(self, node_start, node_arrival):
         """
         calcul du chemin optimal entre un noeud (switch, warehouse, station) et une destination
+        Il s'agit d'un Dijkstra.
         :param node_arrival: destination OBLIGATOIRE
         :param  node_start : depart OBLIGATOIRE
         :return: path : le chemin optimal : liste ordonnée (sens croissant) des noeuds traversés pour aller du départ à

@@ -195,8 +195,15 @@ class Controller:
         self.replace_rules(new_rules)
         print("COUPURE D'UNE VOIE")
 
-    def temps_moy_stat(self, id, temps):
-        test = True
+    """
+    Les 4 fonctions suivantes sont des fonctions permettant de retourner des statistiques sur le temps
+    moyen d'attentes des voyageurs (temps_moy_voy_stat/temps_moy_voy()
+    et sur le temps moyen de trajet des capsules (temps_moy_stat/temps_moy)
+    Dans la pratique on créé des tableaux intermédiares mis à jour lors de l'arrivée/départ des capsules ou des voyageurs
+    Puis on calcule la moyenne.
+    """
+    def temps_moy_stat(self,id,temps):
+        test=True
         for i in self.tab_depart:
             if i[0] == id:
                 test = False

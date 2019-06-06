@@ -155,3 +155,14 @@ def random_ascent_descent_duration():
     """
     random_seconds = random.randrange(_ascent_descent_duration - 2, _ascent_descent_duration + 2, 1)
     return random_seconds * sim_loop.get_tick_per_second()
+
+
+def serialize_clock():
+    return {
+        'jsonType': 'time',
+        'day': now_to_day(),
+        'time': seconds_to_string(now_to_seconds()),
+        'speed': sim_speed_to_string(),
+        'accelerateJerky': (0, 1)[sim_loop.get_visualized_tick_duration() == 0],
+        'decelerateJerky': (0, 1)[sim_loop.get_initial_sim_tick() * 4 <= sim_loop.get_sim_tick()]
+    }

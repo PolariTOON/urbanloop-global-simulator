@@ -282,6 +282,44 @@ class Capsule:
         number = len(self.travelers)
         return ((str(number) + ' traveler', str(number) + ' travelers')[number > 1], 'Empty')[number == 0]
 
+    def get_position(self):
+        """
+        :return: (x, y)
+        """
+        if self.current_element is self.next_element:
+            # In this case, current_element and next_element can only be switches
+            t = self.get_segment_traveled_distance() / self.current_element.size
+            x_in, y_in, x_out, y_out = self.current_element.get_positions()
+            return x_in * (1 - t) + x_out * t, y_in * (1 - t) + y_out * t
+        else:
+            # In this case, current_element and next_element can be station or switch
+            angle = self.current_element.get_angle(self.loop)
+            trip_angle = self.get_segment_traveled_angle()
+            if self.loop.clockwise:
+                radius_angle = math.radians(angle) - trip_angle
+            else:
+                radius_angle = math.radians(angle) + trip_angle
+            loop_radius = self.loop.getRadius()
+            return self.loop.x + math.cos(radius_angle) * loop_radius, self.loop.y + math.sin(radius_angle) * loop_radius
+
+    def serialize(self):
+        x, y = self.get_position()
+        return {
+            'jsonType': 'capsule',
+            'uuid': str(self.uuid),
+            'id': self.id,
+            'x': x,
+            'y': y,
+            'travelerNumber': len(self.travelers),
+            'destination': self.destination.name if self.destination is not None else "None",
+            'moving': self.moving,
+            'outerCircle': self.loop.name,
+            'current_element': self.current_element.name,
+            'next_element': self.next_element.name,
+            'currentElementUuid': str(self.current_element.uuid),
+            'stationIndex': self.get_station_queue_index()
+        }
+
 
 def get_incoming_capsule(destination):
     return [capsule for capsule in _capsules if capsule.destination is destination]

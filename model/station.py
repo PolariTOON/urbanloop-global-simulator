@@ -1,3 +1,4 @@
+import math
 import random
 from enum import Enum
 from math import floor
@@ -118,6 +119,28 @@ class Station:
     def end_capsule_trip(self, capsule):
         controller.get_controller().stop_timer(capsule)
         self.capsule_arriving = False
+
+    def get_angle(self, loop):
+        return self.angle
+
+    def serialize(self):
+        radius_angle = math.radians(self.angle)
+        loop_radius = self.loop.get_radius()
+        return {
+            'jsonType': 'station',
+            'uuid': str(self.uuid),
+            'id': self.id,
+            'x': self.loop.x + loop_radius * math.cos(radius_angle),
+            'y': self.loop.y + loop_radius * math.sin(radius_angle),
+            'name': self.name,
+            'capacity': self.capacity,
+            'outerCircle': self.loop.name,
+            'type': self.get_string_type(),
+            'next_element': self.next_element.name,
+            'nb_travelers': self.traveler_queue.qsize(),
+            'nb_capsules': self.capsule_queue.qsize(),
+            'capsules': self.capsule_queue.serialize()
+        }
 
 
 def get_stations():

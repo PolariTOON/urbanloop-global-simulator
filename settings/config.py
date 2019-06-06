@@ -95,6 +95,33 @@ def reset_to_default(force=False):
         modified = False
 
 
+def serialize_config():
+    return {
+        'travelers_per_day': int(traveler['travelers_per_day']),
+        'trip_limit': int(traveler['trip_limit']),
+        'traveler_limit': int(traveler['traveler_limit']),
+        'ascent_descent_duration': int(traveler['ascent_descent_duration']),
+        'morning_peak_hour': int(traveler['morning_peak_hour']),
+        'evening_peak_hour': int(traveler['evening_peak_hour']),
+        'network_file': topology['network_file'],
+        'activity_and_residential_percent': int(prob['activity_and_residential_percent']),
+        'city_percent': int(prob['city_percent']),
+        'activity_and_residential_fluctuation': int(prob['activity_and_residential_fluctuation']),
+        'max_speed': float(capsule['max_speed']),
+        'number_of_capsules': int(capsule['number_of_capsules']),
+        'station_refill': capsule['station_refill'],
+        'fulfill_period': int(capsule['fulfill_period']),
+        'switched_cost': int(routing['switched_cost']),
+        'my_timer': int(routing['my_timer']),
+        'timer_other': int(routing['timer_other']),
+        'real_time': sim['real_time'],
+        'endless': sim['endless'],
+        'duration': int(sim['duration']),
+        'start_hour': int(sim['start_hour']),
+        'logs': sim['logs']
+    }
+
+
 if loaded is False:
     reset_to_default(force=True)
     load_default()

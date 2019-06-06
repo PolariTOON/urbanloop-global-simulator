@@ -1,3 +1,5 @@
+import math
+
 from model import identifier, station, switch, warehouse, sensor
 from settings import simlog, network
 
@@ -154,6 +156,20 @@ class Loop:
             if self.size is None:
                 self.size = sum(self.sensors_lengths)
 
+    def get_radius(self):
+        return self.size / (2 * math.pi)
+
+    def serialize(self):
+        return {
+            'uuid': str(self.uuid),
+            'id': self.id,
+            'name': self.name,
+            'x': self.x,
+            'y': self.y,
+            'radius': math.floor(self.size / (2 * math.pi)),
+            'size': self.size,
+            'clockwise': self.clockwise
+        }
 
 
 def get_by_name(search_name):

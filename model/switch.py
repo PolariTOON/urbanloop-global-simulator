@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 from model import identifier, controller, node
@@ -97,6 +99,46 @@ class Switch:
 
     def remove_rule(self, rule):
         self.rules.remove(rule)
+
+    def get_positions(self):
+        """
+        :return: (x_in, y_in, x_out, y_out)
+        """
+        radius_angle_loop_in = math.radians(self.angle_my_loop)
+        radius_angle_loop_out = math.radians(self.angle_other_loop)
+        loop_in_radius = math.floor(self.my_loop.size / (2 * math.pi))
+        loop_out_radius = math.floor(self.other_loop.size / (2 * math.pi))
+        x_in = self.my_loop.x + math.cos(radius_angle_loop_in) * loop_in_radius
+        y_in = self.my_loop.y + math.sin(radius_angle_loop_in) * loop_in_radius
+        x_out = self.other_loop.x + math.cos(radius_angle_loop_out) * loop_out_radius
+        y_out = self.other_loop.y + math.sin(radius_angle_loop_out) * loop_out_radius
+        return x_in, y_in, x_out, y_out
+
+    def get_angle(self, loop):
+        if self.my_loop == loop:
+            return self.angle_my_loop
+
+        if self.other_loop == loop:
+            return self.angle_other_loop
+
+    def serialize(self):
+        switch_positions = self.get_positions()
+        return {
+            'jsonType': "switch",
+            'uuid': str(self.uuid),
+            'id': self.id,
+            'nameIn': self.my_loop.name + ' -> ' + self.other_loop.name,
+            'nameOut': self.other_loop.name + ' <- ' + self.my_loop.name,
+            'xIn': switch_positions[0],
+            'yIn': switch_positions[1],
+            'xOut': switch_positions[2],
+            'yOut': switch_positions[3],
+            'my_loop_name': self.my_loop.name,
+            'other_loop_name': self.other_loop.name,
+            'next_element_name': self.next_element.name,
+            'next_other_element_name': self.next_element_other.name,
+            'size': self.size,
+        }
 
 
 def init():

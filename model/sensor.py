@@ -13,6 +13,15 @@ class Sensor:
         self.name = 'sensor n°%d' % self.id
         self.uuid = identifier.generate_unique()
 
+    def serialize(self):
+        return {
+            'jsonType': 'sensor',
+            'uuid': str(self.uuid),
+            'id': self.id,
+            'name': self.name,
+            'capsule_id': self.capsule.id
+        }
+
 
 def get_sensors():
     return _sensors

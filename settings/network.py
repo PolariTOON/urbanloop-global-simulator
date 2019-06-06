@@ -296,3 +296,15 @@ def change_default_file(file_name):
     new_file_path = file_path.replace(file_name, '/default/' + file_name)
     os.rename(default_file_path, new_default_file_path)
     os.rename(file_path, new_file_path)
+
+
+def serialize_network_size():
+    return {
+        'maxSize': get_size()
+    }
+
+
+def serialize_network_file_name(network_file_name):
+    return {
+        'fileName': network_file_name
+    }

@@ -1,3 +1,5 @@
+import math
+
 from model import identifier
 from model import queue
 from model import switch
@@ -54,6 +56,26 @@ class Warehouse:
 
     def end_capsule_trip(self, capsule):
         controller.get_controller().stop_timer(capsule)
+
+    def get_angle(self, loop):
+        return self.angle
+
+    def serialize(self):
+        radius_angle = math.radians(self.angle)
+        loop_radius = math.floor(self.loop.size / (2 * math.pi))
+        return {
+            'jsonType': 'warehouse',
+            'uuid': str(self.uuid),
+            'id': self.id,
+            'x': self.loop.x + loop_radius * math.cos(radius_angle),
+            'y': self.loop.y + loop_radius * math.sin(radius_angle),
+            'name': self.name,
+            'capacity': self.capacity,
+            'outerCircle': self.loop.name,
+            'next_element': self.next_element.name,
+            'nb_capsules': self.capsule_queue.qsize(),
+            'capsules': self.capsule_queue.serialize()
+        }
 
 
 def which_warehouse_before(station_destination):

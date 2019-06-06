@@ -55,3 +55,11 @@ class Queue:
         if item in self.items:
             return self.items.index(item)
         return -1
+
+    def serialize(self):
+        capsules = {}
+        # TODO fixer
+        # capsules_list = self.list()
+        # for i in range(0, len(capsules_list)):
+        #    capsules[i] = capsules_list[i].id
+        return capsules

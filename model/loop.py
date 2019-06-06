@@ -1,5 +1,5 @@
 from model import identifier, station, switch, warehouse, sensor
-from settings import simlog
+from settings import simlog, network
 
 all_loops = {}
 default_size = 100
@@ -30,6 +30,9 @@ class Loop:
         self.objects = []
         self.lengths = []
         self.sensors = []
+        self.sensors_lengths = []  # distance au prochain capteur
+        self.all_objects = []  # objects et sensors
+        self.all_objects_lengths = []
 
     def add_order(self, order):
         """
@@ -69,8 +72,7 @@ class Loop:
                 angle_next = an_object[2] - next_object[2]
             else:  # sens trigonométrique des angles
                 angle_next = next_object[2] - an_object[2]
-            if angle_next < 0:
-                angle_next += 360
+            angle_next = angle_next % 360
             self.lengths[i] = round(float(angle_next / 360) * self.size,
                                     2)  # arc = D*pi*angle/360  et D = circonference/pi
             if self.size is None:
@@ -102,10 +104,55 @@ class Loop:
         Permet d'ajouter les sensors dans la boucle sans qu'ils interfèrent avec les noeuds du graphe
         calcul aussi la position
         :param sensors: tableau contenant le nécessaire pour cette mise à jour ([string, Sensor, float]) OBLIGATOIRE
-        :return: void (mise à jour des capteurs)
+        :return: void (mise à jour des capteurs et de sensor_lengths)
         """
         self.sensors = sensors
-        # TODO : la position des capteurs
+        self.sensors_lengths = [0 for s in sensors]
+        nb_sensor = len(self.sensors)
+        for i in range(nb_sensor):
+            a_sensor = self.sensors[i]
+            next_sensor = self.sensors[(i + 1) % nb_sensor]
+            if self.clockwise:
+                next_angle = a_sensor.angle - next_sensor.angle
+            else:
+                next_angle = next_sensor.angle - a_sensor.angle
+            next_angle = next_angle % 360
+            self.sensors_lengths[i] = round(float(next_angle / 360) * self.size, 2)
+            if self.size is None:
+                self.size = sum(self.sensors_lengths)
+
+    def get_angle_in_loop(self, elm):
+        if type(elm) is not switch.Switch:
+            return elm.angle
+        elif elm.my_loop is self:
+            return elm.angle_my_loop
+        else:
+            return elm.angle_other_loop
+
+    def init_all_objects(self):
+        """
+        Initialise les tableaux annexes all_objects et all_objects_lengths qui contiennent
+        respectivement tous les objets dans la boucle (garage, station, switch, capteur)
+        et les distances d'un objet au suivant
+        :return: (void) Les éléments all_objects et all_objects_lengths sont remplis
+        """
+        self.all_objects = self.sensors + self.objects
+        self.all_objects.sort(key=lambda obj: self.get_angle_in_loop(obj))
+        self.all_objects_lengths = [0 for o in self.all_objects]
+        nb_objects = len(self.objects)
+        for i in range(nb_objects):
+            a_object = self.all_objects[i]
+            next_object = self.all_objects[(i+1)%nb_objects]
+            a_angle = self.get_angle_in_loop(a_object)
+            next_obj_angle = self.get_angle_in_loop(next_object)
+            if self.clockwise:
+                next_angle = a_angle - next_angle
+            else:
+                next_angle = next_obj_angle - a_angle
+            next_angle = next_angle % 360
+            self.sensors_lengths[i] = round(float(next_angle/360)*self.size, 2)
+            if self.size is None:
+                self.size = sum(self.sensors_lengths)
 
 
 

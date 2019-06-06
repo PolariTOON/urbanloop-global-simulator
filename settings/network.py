@@ -2,7 +2,6 @@ import glob
 import json
 import os
 import random
-import sys
 
 import numpy as np
 
@@ -82,7 +81,7 @@ def load(file_name=None, capsules_fulfill=True):
             elif el_type == "warehouse":
                 elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"])]
             elif el_type == "sensor":
-                sensors += [model_sensor.Sensor(angle=element["angle"], loop=the_loop)]
+                sensors.append(model_sensor.Sensor(angle=element["angle"], loop=the_loop))
             else:
                 simlog.error("The json file is not properly formatted. "
                              "\n FORMAT : "
@@ -97,11 +96,16 @@ def load(file_name=None, capsules_fulfill=True):
                              "int)>, 'angle':<placing(int[0,359)>}, "
                              "\n \t \t \t {'type':'switch_in','other_loop':<loop_name(String)>, 'angle':<placing(int["
                              "0,359)>} "
+                             "\n \t \t \t {'type':'warehouse', 'capacity':<number_slot(int[1-inf],default=50)>,'angle':<placing(int[0,359])>}"
+                             "\n \t \t \t {'type':'sensor','angle':<placing(int[0,359])>}"
                              "\n \t ]}}")
         the_loop.clockwise = info["clockwise"]
-        elms.sort(key=lambda elm: get_angle_in_loop(the_loop, elm))
+        elms.sort(key=lambda elm: the_loop.get_angle_in_loop(elm))
+        sensors.sort(key=lambda sensor: the_loop.get_angle_in_loop(sensor))
         the_loop.add_order(elms)
         the_loop.add_sensors(sensors)
+        the_loop.init_all_objects()
+        # TODO : faire les sections au sens où on l'entend
         sections_loop(the_loop)
         global _size
         radius = (the_loop.size / (2 * np.pi)) + 10
@@ -235,15 +239,6 @@ def sections_loop(the_loop):
 #         elif not is_a_out and the_loop.switches[index].my_loop is the_loop :
 #             switch2 = the_loop.switches[index]
 #             return "%s_%d-%d" % (the_loop.name, switch1.id, switch2.id)
-
-
-def get_angle_in_loop(the_loop, elm):
-    if type(elm) is not model_switch.Switch:
-        return elm.angle
-    elif elm.my_loop is the_loop:
-        return elm.angle_my_loop
-    else:
-        return elm.angle_other_loop
 
 
 def get_network_json(file_name, is_default=False):

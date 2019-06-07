@@ -299,7 +299,7 @@ class Capsule:
                 radius_angle = math.radians(angle) - trip_angle
             else:
                 radius_angle = math.radians(angle) + trip_angle
-            loop_radius = self.loop.getRadius()
+            loop_radius = self.loop.get_radius()
             return self.loop.x + math.cos(radius_angle) * loop_radius, self.loop.y + math.sin(radius_angle) * loop_radius
 
     def serialize(self):

@@ -1,12 +1,12 @@
 import logging
 from threading import Thread
 
-from flask import Flask, request
-from flask.json import jsonify, loads
+from flask import Flask, request, jsonify
+from flask.json import loads
 
 from model import loop, routing, station, switch, warehouse, capsule, sensor
 from settings import config, network, simlog
-from simulator import converter, sim_loop
+from simulator import sim_loop, converter
 
 web_directory = 'resources/web'
 app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
@@ -30,7 +30,6 @@ def root():
 
 @app.route('/clock/', methods=['GET'])
 def get_clock():
-    global jsonify
     return jsonify(converter.serialize_clock())
 
 
@@ -104,6 +103,9 @@ def get_warehouses():
 def get_switches():
     return jsonify([a_switch.serialize() for a_switch in switch.get_switches()])
 
+@app.route('/sensors/', methods=['GET'])
+def get_sensors():
+    return jsonify([a_sensor.serialize() for a_sensor in sensor.get_sensors()])
 
 @app.route('/data/', methods=['GET'])
 def get_data():
@@ -119,7 +121,9 @@ def get_data():
 @app.route('/networks/', methods=['GET'])
 def get_networks():
     default_name = 'default: ' + network.get_default_file_name()
-    network_file_names = [network.serialize_network_file_name(default_name)] + [network.serialize_network_file_name(network_file_name) for network_file_name in network.get_network_file_names()]
+    network_file_names = [network.serialize_network_file_name(default_name)] + [
+        network.serialize_network_file_name(network_file_name) for network_file_name in
+        network.get_network_file_names()]
     return jsonify(network_file_names)
 
 

@@ -1,4 +1,4 @@
-import {Capsule, Loop, Station, Switch, Warehouse, appState, getNetworkDivSize} from "./objects.js";
+import {Capsule, Loop, Sensor, Station, Switch, Warehouse, appState, getNetworkDivSize} from "./objects.js";
 
 let viewTab = document.getElementById("view-tab");
 
@@ -97,6 +97,12 @@ function updateViewCapsule() {
         "<div id='view-object' class='container'></div>";
 }
 
+function updateViewSensor() {
+    let actualSensor = appState.selectedObject;
+    viewTab.innerHTML = "<strong>Vue du capteur n°" + actualSensor.json["id"] + "</strong>" +
+        "<div id='view-object' class='container'></div>";
+}
+
 export async function updateViewPanel() {
     if (appState.selectedObject instanceof Loop)
         updateViewLoop();
@@ -108,4 +114,6 @@ export async function updateViewPanel() {
         updateViewWarehouse();
     else if (appState.selectedObject instanceof Capsule)
         updateViewCapsule();
+    else if (appState.selectedObject instanceof Sensor)
+        updateViewSensor();
 }

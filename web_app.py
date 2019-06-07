@@ -120,10 +120,7 @@ def get_data():
 
 @app.route('/networks/', methods=['GET'])
 def get_networks():
-    default_name = 'default: ' + network.get_default_file_name()
-    network_file_names = [network.serialize_network_file_name(default_name)] + [
-        network.serialize_network_file_name(network_file_name) for network_file_name in
-        network.get_network_file_names()]
+    network_file_names = [network.serialize_network_file_name(network_file_name) for network_file_name in network.get_network_file_names()]
     return jsonify(network_file_names)
 
 

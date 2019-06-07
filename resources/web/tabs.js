@@ -259,7 +259,7 @@ networkDlButton.onclick = async () => {
     const networkJSON = await (await fetch('/networks/' + selectedName + '/')).json();
     let downloadLink = window.document.createElement('a');
     downloadLink.href = window.URL.createObjectURL(new Blob([JSON.stringify(networkJSON, null, 2)], {type: "application/json"}));
-    downloadLink.download = selectedName.replace('default : ', '') + '.json';
+    downloadLink.download = selectedName + '.json';
 
     document.body.appendChild(downloadLink);
     downloadLink.click();

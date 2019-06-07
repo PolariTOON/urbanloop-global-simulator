@@ -15,10 +15,15 @@ arguments = argument_parser.parse_args()
 
 if arguments.port is -1:
     from time import time
-    from settings import network
-    from settings import simlog
-    from simulator import sim_loop
+    from model import routing, switch
+    from settings import config, network, simlog
+    from simulator import converter, sim_loop
     START_TIME = time()
+    config.restore_config()
+    routing.init_routing()
+    switch.init_switch()
+    converter.init_converter()
+    simlog.load()
     network.load()
     simlog.debug("Simulation starts")
     sim_loop.start_simulation()

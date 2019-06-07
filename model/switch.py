@@ -9,9 +9,19 @@ from model import controller
 from settings import config
 from settings import simlog
 
-timer_other = int(config.routing['timer_other'])
-my_timer = int(config.routing['my_timer'])
-switched_cost = int(config.routing['switched_cost'])
+timer_other = None
+my_timer = None
+switched_cost = None
+
+
+def init_switch():
+    global timer_other
+    global my_timer
+    global switched_cost
+    timer_other = int(config.routing['timer_other'])
+    my_timer = int(config.routing['my_timer'])
+    switched_cost = int(config.routing['switched_cost'])
+
 
 _switches = []
 alive_timers = []

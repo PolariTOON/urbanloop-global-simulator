@@ -894,29 +894,35 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 }
 
-export async function initNetworkScene(networkName, isDefaultNetwork) {
+export async function initNetworkScene(networkName) {
     appState.objects = [];
     startButton.classList.remove('not-shown');
 
-    const networkJSON = await (await fetch(isDefaultNetwork ? '/load.json' : '/load.json/' + networkName)).json();
+    await fetch('/config/restore/', {
+        method: "POST"
+    });
+
+    const networkJSON = await (await fetch('/networks/' + networkName + '/load/', {
+        method: "POST"
+    })).json();
     networkSize = networkJSON['maxSize'];
 
-    const listLoopJSON = await (await fetch('/loops.json')).json();
+    const listLoopJSON = await (await fetch('/loops/')).json();
     for (const loopJSON of listLoopJSON) {
         new Loop(loopJSON);
     }
 
-    const listStationSetDataJSON = await (await fetch('/stationsSetData.json')).json();
+    const listStationSetDataJSON = await (await fetch('/stations/')).json();
     for (const stationSetDataJSON of listStationSetDataJSON) {
         new Station(stationSetDataJSON);
     }
 
-    const listWarehouseSetDataJSON = await (await fetch('/warehousesSetData.json')).json();
+    const listWarehouseSetDataJSON = await (await fetch('/warehouses/')).json();
     for (const warehouseSetDataJSON of listWarehouseSetDataJSON) {
         new Warehouse(warehouseSetDataJSON);
     }
 
-    const listSwitchSetDataJSON = await (await fetch('/switchesSetData.json')).json();
+    const listSwitchSetDataJSON = await (await fetch('/switches/')).json();
     for (const switchSetDataJSON of listSwitchSetDataJSON) {
         new Switch(switchSetDataJSON);
     }
@@ -928,7 +934,7 @@ export async function initNetworkScene(networkName, isDefaultNetwork) {
 }
 
 export async function updateNetworkScene() {
-    const listDataJSON = await (await fetchTimeout(1000, '/updatedData.json')).json();
+    const listDataJSON = await (await fetchTimeout(1000, '/data/')).json();
 
     if (!appState.clearing) {
         for (const dataJSON of listDataJSON) {

@@ -4,7 +4,7 @@ from threading import Thread
 from flask import Flask, request
 from flask.json import jsonify, loads
 
-from model import loop, station, switch, warehouse, capsule, sensor
+from model import loop, routing, station, switch, warehouse, capsule, sensor
 from settings import config, network, simlog
 from simulator import converter, sim_loop
 
@@ -28,14 +28,14 @@ def root():
     return app.send_static_file('index.html')
 
 
-@app.route('/time.json', methods=['GET'])
-def generate_time_json():
+@app.route('/clock/', methods=['GET'])
+def get_clock():
     global jsonify
-    return jsonify(converter.serialize_time())
+    return jsonify(converter.serialize_clock())
 
 
-@app.route('/start', methods=['POST'])
-def start_simulation():
+@app.route('/clock/start/', methods=['POST'])
+def start_clock():
     global sim_thread
     if sim_thread is None:
         network.init_capsules()
@@ -44,8 +44,8 @@ def start_simulation():
     return ''
 
 
-@app.route('/stop', methods=['POST'])
-def stop_simulation():
+@app.route('/clock/stop/', methods=['POST'])
+def stop_clock():
     global sim_thread
     if sim_thread is not None:
         sim_thread = None
@@ -53,132 +53,131 @@ def stop_simulation():
     return ''
 
 
-@app.route('/pause', methods=['POST'])
-def pause_simulation():
+@app.route('/clock/pause/', methods=['POST'])
+def pause_clock():
     global sim_thread
     if sim_thread is not None and not sim_loop.is_paused():
         sim_loop.pause_simulation()
     return ''
 
 
-@app.route('/resume', methods=['POST'])
-def resume_simulation():
+@app.route('/clock/resume/', methods=['POST'])
+def resume_clock():
     global sim_thread
     if sim_thread is not None and sim_loop.is_paused():
         sim_loop.run_simulation_after_pause()
     return ''
 
 
-@app.route('/accelerate', methods=['POST'])
-def accelerate_simulation():
+@app.route('/clock/accelerate/', methods=['POST'])
+def accelerate_clock():
     global sim_thread
     if sim_thread is not None:
         sim_loop.accelerate_simulation()
     return ''
 
 
-@app.route('/decelerate', methods=['POST'])
-def decelerate_simulation():
+@app.route('/clock/decelerate/', methods=['POST'])
+def decelerate_clock():
     global sim_thread
     if sim_thread is not None:
         sim_loop.decelerate_simulation()
     return ''
 
 
-@app.route('/loops.json', methods=['GET'])
-def generate_loops_json():
+@app.route('/loops/', methods=['GET'])
+def get_loops():
     return jsonify([a_loop.serialize() for a_loop in loop.get_loops()])
 
 
-@app.route('/stationsSetData.json', methods=['GET'])
-def generate_stations_set_data_json():
+@app.route('/stations/', methods=['GET'])
+def get_stations():
     return jsonify([a_station.serialize() for a_station in station.get_stations()])
 
 
-@app.route('/warehousesSetData.json', methods=['GET'])
-def generate_warehouses_set_data_json():
+@app.route('/warehouses/', methods=['GET'])
+def get_warehouses():
     return jsonify([a_warehouse.serialize() for a_warehouse in warehouse.get_warehouses()])
 
 
-@app.route('/switchesSetData.json', methods=['GET'])
-def generate_switches_set_data_json():
+@app.route('/switches/', methods=['GET'])
+def get_switches():
     return jsonify([a_switch.serialize() for a_switch in switch.get_switches()])
 
 
-@app.route('/updatedData.json', methods=['GET'])
-def generate_updated_data_json():
+@app.route('/data/', methods=['GET'])
+def get_data():
     list_clock_data = [converter.serialize_clock()]
     list_station_var_data = [a_station.serialize() for a_station in station.get_stations()]
     list_warehouse_var_data = [a_warehouse.serialize() for a_warehouse in warehouse.get_warehouses()]
     list_switch_var_data = [a_switch.serialize() for a_switch in switch.get_switches()]
-
     list_capsule_data = [a_capsule.serialize() for a_capsule in capsule.get_capsules()]
-
     list_sensor_data = [a_sensor.serialize() for a_sensor in sensor.get_sensors()]
-
     return jsonify(list_clock_data + list_station_var_data + list_warehouse_var_data + list_switch_var_data + list_capsule_data + list_sensor_data)
 
 
-@app.route('/network-files.json', methods=['GET'])
-def network_files():
+@app.route('/networks/', methods=['GET'])
+def get_networks():
     default_name = 'default: ' + network.get_default_file_name()
     network_file_names = [network.serialize_network_file_name(default_name)] + [network.serialize_network_file_name(network_file_name) for network_file_name in network.get_network_file_names()]
     return jsonify(network_file_names)
 
 
-# TODO: change default getter
-@app.route('/dl-network-file.json/<string:file_name>/<int:is_default>', methods=['POST'])
-def dl_network_file(file_name, is_default):
-    return jsonify(network.get_network_json(file_name, (True, False)[is_default is None or is_default == 0]))
+@app.route('/networks/<string:file_name>/', methods=['GET'])
+def get_network(file_name):
+    return jsonify(network.get_network_json(file_name))
 
 
-# TODO: change default loader
-@app.route('/load.json/', methods=['GET'], defaults={'file_name': None})
-@app.route('/load.json/<string:file_name>', methods=['GET'])
+@app.route('/networks/<string:file_name>/load/', methods=['POST'])
 def load_network(file_name):
     global sim_thread
     if sim_thread is None:
-        if file_name is not None:
-            network.reload(file_name=file_name, capsules_fulfill=False)
-        else:
-            network.reload(capsules_fulfill=False)
+        network.load(file_name=file_name, capsules_fulfill=False)
     return jsonify(network.serialize_network_size())
 
 
-@app.route('/add-network-file/<string:file_name>', methods=['POST'])
-def add_network_file(file_name):
+@app.route('/networks/<string:file_name>/add/', methods=['POST'])
+def add_network(file_name):
     network.add_network_file(file_name, loads(request.form['data']))
     return ''
 
 
-@app.route('/remove-network-file/<string:file_name>', methods=['POST'])
-def remove_network_file(file_name):
+@app.route('/networks/<string:file_name>/remove/', methods=['POST'])
+def remove_network(file_name):
     network.remove_network_file(file_name)
     return ''
 
 
-@app.route('/change-default-network-file/<string:file_name>', methods=['POST'])
-def change_default_network_file(file_name):
-    network.change_default_file(file_name)
-    return ''
-
-
-@app.route('/change-config/<int:permanent>', methods=['POST'])
-def change_config(permanent):
-    config.modify(loads(request.form['data']), (True, False)[permanent is None or permanent == 0])
-    config.load_editable()
-    simlog.load()
-    return ''
-
-
-@app.route('/reset-config', methods=['POST'])
-def reset_config():
-    config.reset_to_default()
-    config.load_default()
-    simlog.load()
-    return ''
-
-
-@app.route('/config.json/<int:permanent>', methods=['GET'])
-def load_config(permanent):
+@app.route('/config/', methods=['GET'])
+def get_config():
     return jsonify(config.serialize_config())
+
+
+@app.route('/config/reset/', methods=['POST'])
+def reset_config():
+    config.reset_config()
+    routing.init_routing()
+    switch.init_switch()
+    converter.init_converter()
+    simlog.load()
+    return ''
+
+
+@app.route('/config/save/', methods=['POST'])
+def save_config():
+    config.save_config(loads(request.form['data']))
+    routing.init_routing()
+    switch.init_switch()
+    converter.init_converter()
+    simlog.load()
+    return ''
+
+
+@app.route('/config/restore/', methods=['POST'])
+def restore_config():
+    config.restore_config()
+    routing.init_routing()
+    switch.init_switch()
+    converter.init_converter()
+    simlog.load()
+    return ''

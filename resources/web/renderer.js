@@ -5,6 +5,10 @@ import {updateViewPanel} from "./viewPanel.js";
 
 let updateLoop;
 
+export function getDefaultFilename() {
+    return 'nancy_scaled';
+}
+
 function clearScene() {
     appState.clearing = true;
     stopUpdateLoop();
@@ -14,11 +18,11 @@ function clearScene() {
     stage.destroyChildren();
 }
 
-export async function applyNetworkScene(networkName = String(), isDefaultNetwork = true) {
+export async function applyNetworkScene(networkName = getDefaultFilename()) {
     clearScene();
     stage.add(networkLayer);
     stage.add(infoLayer);
-    await initNetworkScene(networkName, isDefaultNetwork);
+    await initNetworkScene(networkName);
     appState.clearing = false;
     startUpdateLoop();
 }

@@ -2,9 +2,18 @@ import model.loop
 from model import switch as model_switch
 from settings import config
 
-timer_other = int(config.routing['timer_other'])
-my_timer = int(config.routing['my_timer'])
-switched_cost = int(config.routing['switched_cost'])
+timer_other = None
+my_timer = None
+switched_cost = None
+
+
+def init_routing():
+    global timer_other
+    global my_timer
+    global switched_cost
+    timer_other = int(config.routing['timer_other'])
+    my_timer = int(config.routing['my_timer'])
+    switched_cost = int(config.routing['switched_cost'])
 
 
 def dijkstra_route(switch, table, to_cover):

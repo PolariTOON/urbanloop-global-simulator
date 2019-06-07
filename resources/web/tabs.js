@@ -1,12 +1,11 @@
 import {Capsule, Loop, Station, Switch, Warehouse, appState, fetchTimeout} from "./objects.js";
-import {applyNetworkScene} from "./renderer.js";
+import {applyNetworkScene, getDefaultFilename} from "./renderer.js";
 
 // Some elements are defined in the above file objects.js
 let dataTab = document.getElementById("data-tab");
 let configTab = document.getElementById("config-tab");
 let interactTab = document.getElementById("interact-tab");
 let saveConfigButton = document.getElementById('config-save-button');
-let permanentConfigButton = document.getElementById('config-permanent-button');
 let resetConfigButton = document.getElementById('config-reset-button');
 let networkAddButton = document.getElementById('network-add-btn');
 let networkDlButton = document.getElementById('network-dl-btn');
@@ -20,7 +19,6 @@ let refillCheckBox = document.getElementById('conf-capsule-2');
 let fulfillPeriod = document.getElementById('conf-capsule-3');
 let endlessCheckBox = document.getElementById('conf-simulation-1');
 let duration = document.getElementById('conf-simulation-2');
-let permanentConfigChange = false;
 
 export function updateDataPanel() {
     let data = "";
@@ -81,7 +79,7 @@ export function updateDataPanel() {
 }
 
 export async function updateConfigPanel() {
-    const configJSON = await (await fetch('/config.json/0')).json();
+    const configJSON = await (await fetch('/config/')).json();
     document.getElementById('conf-travelers-0').value = configJSON['travelers_per_day'];
     document.getElementById('conf-travelers-1').value = configJSON['trip_limit'];
     document.getElementById('conf-travelers-2').value = configJSON['traveler_limit'];
@@ -118,7 +116,7 @@ async function updateNetworkSelection() {
     while (networkSelection.firstChild) {
         networkSelection.removeChild(networkSelection.firstChild);
     }
-    const listNetworkFileNameJSON = await (await fetch('/network-files.json')).json();
+    const listNetworkFileNameJSON = await (await fetch('/networks/')).json();
     for (const networkFileNameJSON of listNetworkFileNameJSON) {
         let option = document.createElement('option');
         option.innerHTML = networkFileNameJSON['fileName'];
@@ -149,13 +147,7 @@ networkSelection.onchange = () => {
     networkErrorText.classList.add('text-muted');
 
     let selectedName = networkSelection[networkSelection.selectedIndex].value;
-    let isDefault = false;
-    if (selectedName.includes('default: ')) {
-        isDefault = true;
-        selectedName = selectedName.replace('default: ', '');
-    }
-
-    applyNetworkScene(selectedName, isDefault)
+    applyNetworkScene(selectedName)
 };
 
 networkFileInput.onchange = () => {
@@ -202,7 +194,7 @@ networkFileInput.onchange = () => {
             return;
         }
 
-        await fetchTimeout(1000, '/add-network-file/' + name, {
+        await fetchTimeout(1000, '/' + name + '/add/', {
             method: 'POST',
             body: JSON.stringify(parsedJSON)
         });
@@ -234,7 +226,7 @@ networkAddButton.onmouseleave = () => {
 networkRemoveButton.onclick = async () => {
     let selectedName = networkSelection[networkSelection.selectedIndex].value;
 
-    if (selectedName.includes('default: ')) {
+    if (selectedName === getDefaultFilename()) {
         networkErrorText.innerHTML = "Cannot remove default file";
         networkErrorText.classList.remove('text-muted');
         networkErrorText.classList.add('form-text-error');
@@ -244,7 +236,7 @@ networkRemoveButton.onclick = async () => {
     resetNetworkErrorText();
     changeNetworkButtonState(true);
 
-    await fetchTimeout(1000, '/remove-network-file/' + selectedName, {
+    await fetchTimeout(1000, '/' + selectedName + '/remove/', {
         method: "POST"
     });
     document.getElementById('conf-topology-0').dispatchEvent(new CustomEvent('change'));
@@ -264,15 +256,7 @@ networkRemoveButton.onmouseleave = () => {
 
 networkDlButton.onclick = async () => {
     let selectedName = networkSelection[networkSelection.selectedIndex].value;
-    let isDefault = false;
-    if (selectedName.includes('default: ')) {
-        isDefault = true;
-        selectedName = selectedName.replace('default: ', '');
-    }
-
-    const networkJSON = await (await fetch('/dl-network-file.json/' + selectedName + '/' + (isDefault ? '1' : '0'), {
-        method: "POST"
-    })).json();
+    const networkJSON = await (await fetch('/networks/' + selectedName + '/')).json();
     let downloadLink = window.document.createElement('a');
     downloadLink.href = window.URL.createObjectURL(new Blob([JSON.stringify(networkJSON, null, 2)], {type: "application/json"}));
     downloadLink.download = selectedName.replace('default : ', '') + '.json';
@@ -287,36 +271,6 @@ networkDlButton.onmouseenter = () => {
 };
 
 networkDlButton.onmouseleave = () => {
-    networkText.innerHTML = String();
-};
-
-networkFavButton.onclick = async () => {
-    let selectedName = networkSelection[networkSelection.selectedIndex].value;
-
-    if (selectedName.includes('default: ')) {
-        networkErrorText.innerHTML = "Selected network file is already the default one";
-        networkErrorText.classList.remove('text-muted');
-        networkErrorText.classList.add('form-text-error');
-        return;
-    }
-
-    resetNetworkErrorText();
-    changeNetworkButtonState(true);
-
-    await fetchTimeout(1000, '/change-default-network-file/' + selectedName, {
-        method: "POST"
-    });
-    networkFavButton.title = "Selected network is now the default one !";
-    setTimeout(() => {
-        networkFavButton.removeAttribute("title");
-    }, 3000);
-};
-
-networkFavButton.onmouseenter = () => {
-    networkText.innerHTML = "Make selected network file the default one"
-};
-
-networkFavButton.onmouseleave = () => {
     networkText.innerHTML = String();
 };
 
@@ -369,16 +323,14 @@ saveConfigButton.onclick = async () => {
     }
 
     saveConfigButton.disabled = true;
-    permanentConfigButton.disabled = true;
     resetConfigButton.disabled = true;
 
 
-    await fetch('/change-config/' + (permanentConfigChange ? '1' : '0'), {
+    await fetch('/config/save/', {
         method: "POST",
         body: JSON.stringify(configJson)
     });
     saveConfigButton.disabled = false;
-    permanentConfigButton.disabled = false;
     resetConfigButton.disabled = false;
     updateConfigPanel();
     saveConfigButton.title = "Config has been saved !";
@@ -387,37 +339,13 @@ saveConfigButton.onclick = async () => {
     }, 2000);
 };
 
-permanentConfigButton.onclick = () => {
-    if (permanentConfigChange) {
-        permanentConfigChange = false;
-        permanentConfigButton.innerHTML = "<i class='far fa-square'></i> Temporary";
-        permanentConfigButton.classList.remove("btn-danger");
-        permanentConfigButton.classList.add("btn-info");
-        permanentConfigButton.removeAttribute("title");
-    } else {
-        permanentConfigChange = true;
-        permanentConfigButton.innerHTML = "<i class='fas fa-check-square'></i> Permanent";
-        permanentConfigButton.classList.remove("btn-info");
-        permanentConfigButton.classList.add("btn-danger");
-        permanentConfigButton.title = "Save will overwrite default config with above data";
-    }
-};
-
-permanentConfigButton.onmouseleave = () => {
-    if (permanentConfigChange) {
-        permanentConfigButton.removeAttribute("title");
-    }
-};
-
 resetConfigButton.onclick = async () => {
     saveConfigButton.disabled = true;
-    permanentConfigButton.disabled = true;
     resetConfigButton.disabled = true;
-    await fetch('/reset-config', {
+    await fetch('/config/reset/', {
         method: "POST"
     });
     saveConfigButton.disabled = false;
-    permanentConfigButton.disabled = false;
     resetConfigButton.disabled = false;
     updateConfigPanel();
     resetConfigButton.title = "Config has been reset !"

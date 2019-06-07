@@ -10,7 +10,6 @@ let pauseButton = document.getElementById('pause-button');
 let backwardButton = document.getElementById('backward-button');
 let forwardButton = document.getElementById('forward-button');
 let saveConfigButton = document.getElementById('config-save-button');
-let permanentConfigButton = document.getElementById('config-permanent-button');
 let resetConfigButton = document.getElementById('config-reset-button');
 let networkSelection = document.getElementById('conf-topology-0');
 pauseButton.disabled = true;
@@ -107,13 +106,12 @@ startButton.onclick = async () => {
     backwardButton.disabled = false;
     forwardButton.disabled = false;
     saveConfigButton.disabled = true;
-    permanentConfigButton.disabled = true;
     resetConfigButton.disabled = true;
     networkSelection.disabled = true;
     changeNetworkButtonState(true);
     startButton.classList.add('not-shown');
     stopButton.classList.remove('not-shown');
-    await fetch('/start', {
+    await fetch('/clock/start/', {
         method: "POST"
     });
     running = true;
@@ -125,13 +123,12 @@ stopButton.onclick = async () => {
     backwardButton.disabled = true;
     forwardButton.disabled = true;
     saveConfigButton.disabled = false;
-    permanentConfigButton.disabled = false;
     resetConfigButton.disabled = false;
     networkSelection.disabled = false;
     changeNetworkButtonState(false);
     stopButton.classList.add('not-shown');
     running = false;
-    await fetch('/stop', {
+    await fetch('/clock/stop/', {
         method: "POST"
     });
     document.getElementById('timer-span').innerHTML = "Day -<br><br>--:--:--";
@@ -140,13 +137,13 @@ stopButton.onclick = async () => {
 
 pauseButton.onclick = () => {
     if (paused) {
-        fetch('/resume', {
+        fetch('/clock/resume/', {
             method: "POST"
         });
         pauseButton.innerHTML = "Pause";
         paused = false;
     } else {
-        fetch('/pause', {
+        fetch('/clock/pause/', {
             method: "POST"
         });
         pauseButton.innerHTML = "Resume";
@@ -156,14 +153,14 @@ pauseButton.onclick = () => {
 
 backwardButton.onclick = () => {
     if (!running) return;
-    fetch('/decelerate', {
+    fetch('/clock/decelerate/', {
         method: "POST"
     });
 };
 
 forwardButton.onclick = () => {
     if (!running) return;
-    fetch('/accelerate', {
+    fetch('/clock/accelerate/', {
         method: "POST"
     });
 };

@@ -70,7 +70,3 @@ def update_level_from_config():
         _set_error_level()
     else:
         _set_debug_level()
-
-
-if _loaded is False:
-    load()

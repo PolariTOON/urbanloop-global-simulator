@@ -29,8 +29,23 @@ def load(file_name=None, capsules_fulfill=True):
         :param capsules_fulfill: Should or not do capsules fulfill
         :return: (void) l'ensemble des objets sont créés et configurés.
     """
-
-    file_path = 'resources/networks/default/%s.json' % get_default_file_name()
+    global _size
+    _size = {}
+    model_loop.all_loops = {}
+    model_switch._switches = []
+    model_switch.alive_timers = []
+    model_warehouse._warehouses = list()
+    model_station._stations = list()
+    model_capsule._capsules = list()
+    model_sensor._sensors = list()
+    traveler.total_generated = 0
+    identifier._loop_id = -1
+    identifier._warehouse_id = -1
+    identifier._station_id = -1
+    identifier._switch_id = -1
+    identifier._capsule_id = -1
+    identifier._traveler_id = -1
+    file_path = 'resources/networks/%s.json' % get_default_file_name()
     if file_name is not None:
         if '.json' not in file_name:
             file_name += '.json'
@@ -107,7 +122,6 @@ def load(file_name=None, capsules_fulfill=True):
         the_loop.init_all_objects()
         # TODO : faire les sections au sens où on l'entend
         sections_loop(the_loop)
-        global _size
         radius = (the_loop.size / (2 * np.pi)) + 10
         if _size == {}:
             _size['min_x'] = the_loop.x - radius
@@ -129,26 +143,6 @@ def load(file_name=None, capsules_fulfill=True):
         init_capsules()
     file.close()
     return
-
-
-def reload(file_name=None, capsules_fulfill=True):
-    global _size
-    _size = {}
-    model_loop.all_loops = {}
-    model_switch._switches = []
-    model_switch.alive_timers = []
-    model_warehouse._warehouses = list()
-    model_station._stations = list()
-    model_capsule._capsules = list()
-    model_sensor._sensors = list()
-    traveler.total_generated = 0
-    identifier._loop_id = -1
-    identifier._warehouse_id = -1
-    identifier._station_id = -1
-    identifier._switch_id = -1
-    identifier._capsule_id = -1
-    identifier._traveler_id = -1
-    load(file_name=file_name, capsules_fulfill=capsules_fulfill)
 
 
 def init_capsules():
@@ -241,38 +235,24 @@ def sections_loop(the_loop):
 #             return "%s_%d-%d" % (the_loop.name, switch1.id, switch2.id)
 
 
-def get_network_json(file_name, is_default=False):
-    if '.json' not in file_name:
-        file_name += '.json'
-    path = 'resources/networks/'
-    if is_default:
-        path = 'resources/networks/default/'
-    with open(path + file_name) as network_file:
+def get_network_json(file_name):
+    path = 'resources/networks/%s.json' % file_name
+    with open(path) as network_file:
         return json.load(network_file)
 
 
 def get_default_file_name():
-    default_network_file_regex_path = 'resources/networks/default/*.json'
-    default_network_file_paths = glob.glob(default_network_file_regex_path)
-    if not default_network_file_paths:
-        return
-    default_network_file_path = default_network_file_paths[0]
-    if os.sep in default_network_file_path and '.' in default_network_file_path.split(os.sep)[-1]:
-        return default_network_file_path.split(os.sep)[-1].split('.')[0]
+    return 'nancy_scaled'
 
 
 def get_network_file_names():
     network_file_regex_paths = 'resources/networks/*.json'
     network_file_paths = glob.glob(network_file_regex_paths)
-    return [path.split(os.sep)[-1].split('.')[0] for path in network_file_paths if
-            os.sep in path and '.' in path.split(os.sep)[-1]]
+    return [path.split(os.sep)[-1].split('.')[0] for path in network_file_paths if os.sep in path and '.' in path.split(os.sep)[-1]]
 
 
 def add_network_file(file_name, network_json):
-    if '.json' not in file_name:
-        file_name += '.json'
-    file_path = 'resources/networks/%s' % file_name
-
+    file_path = 'resources/networks/%s.json' % file_name
     if not os.path.exists(file_path):
         with open(file_path, 'w') as new_network_json_file:
             json.dump(network_json, new_network_json_file, indent=4)
@@ -280,22 +260,11 @@ def add_network_file(file_name, network_json):
 
 
 def remove_network_file(file_name):
-    if '.json' not in file_name:
-        file_name += '.json'
-    file_path = 'resources/networks/%s' % file_name
+    if file_name == get_default_file_name():
+        return
+    file_path = 'resources/networks/%s.json' % file_name
     if os.path.exists(file_path):
         os.remove(file_path)
-
-
-def change_default_file(file_name):
-    if '.json' not in file_name:
-        file_name += '.json'
-    default_file_path = 'resources/networks/default/%s.json' % get_default_file_name()
-    file_path = 'resources/networks/%s' % file_name
-    new_default_file_path = default_file_path.replace('/default/', '/')
-    new_file_path = file_path.replace(file_name, '/default/' + file_name)
-    os.rename(default_file_path, new_default_file_path)
-    os.rename(file_path, new_file_path)
 
 
 def serialize_network_size():

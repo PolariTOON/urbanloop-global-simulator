@@ -1,4 +1,4 @@
-import {Capsule, Loop, Station, Switch, Warehouse, appState, fetchTimeout} from "./objects.js";
+import {Capsule, Loop, Station, Switch, Warehouse, Sensor, appState, fetchTimeout} from "./objects.js";
 import {applyNetworkScene} from "./renderer.js";
 
 // Some elements are defined in the above file objects.js
@@ -62,9 +62,6 @@ export function updateDataPanel() {
         data += "<p>Capacity: " + appState.selectedObject.json["capacity"] + "</p>";
         data += "<p>Next element: " + appState.selectedObject.json["next_element"] + "</p>";
         data += "<p>Capsules: " + appState.selectedObject.json["nb_capsules"];
-        /*for (k in appState.selectedObject.json["capsules"]) {
-            data += "<br>&nbsp;<br>&nbsp;Capsule #" + appState.selectedObject.json["capsules"][k];
-        }*/
         data += "</p>";
     } else if (appState.selectedObject instanceof Capsule) {
         data += "<p>Capsule n°" + appState.selectedObject.json["id"] + "</p>";
@@ -74,7 +71,10 @@ export function updateDataPanel() {
         data += "<p>Current Loop: " + appState.selectedObject.json["outerCircle"] + "</p>";
         data += "<p>Last or current element: " + appState.selectedObject.json["current_element"] + "</p>";
         data += "<p>Next element: " + appState.selectedObject.json["next_element"] + "</p>";
-    } else {
+    } else if (appState.selectedObject instanceof Sensor) {
+        data += "<p>Sensor n°" + appState.selectedObject.json["id"] + "</p>"
+    }
+    else {
         data += "<p>Nothing selected.</p>";
     }
     dataTab.innerHTML = data;

@@ -122,7 +122,6 @@ def load(file_name=None, capsules_fulfill=True):
                 _size['min_y'] = the_loop.y - radius
             elif the_loop.y + radius > _size['max_y']:
                 _size['max_y'] = the_loop.y + radius
-
     model_switch.init()
     if capsules_fulfill:
         init_capsules()

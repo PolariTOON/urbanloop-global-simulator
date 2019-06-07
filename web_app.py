@@ -115,11 +115,8 @@ def generate_updated_data_json():
     list_station_var_data = [a_station.serialize() for a_station in station.get_stations()]
     list_warehouse_var_data = [a_warehouse.serialize() for a_warehouse in warehouse.get_warehouses()]
     list_switch_var_data = [a_switch.serialize() for a_switch in switch.get_switches()]
-
     list_capsule_data = [a_capsule.serialize() for a_capsule in capsule.get_capsules()]
-
     list_sensor_data = [a_sensor.serialize() for a_sensor in sensor.get_sensors()]
-
     return jsonify(
         list_clock_data + list_station_var_data + list_warehouse_var_data + list_switch_var_data + list_capsule_data + list_sensor_data)
 

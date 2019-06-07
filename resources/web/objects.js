@@ -896,13 +896,14 @@ function initBehaviors(object, innerShape, outerShape, info = undefined) {
     });
 }
 
-class Sensor {
-    constructor(sensorJSON, sensorRadius = 9, sensorWidth = 3) {
+export class Sensor {
+    constructor(sensorJSON, sensorRadius = 12, sensorWidth = 4) {
         this.json = sensorJSON;
         this.uuid = sensorJSON['uuid'];
         this.id = sensorJSON['id'];
-
-        const x = sensorJSON['x'];
+        this.sensorRadius = sensorRadius;
+        this.x = sensorJSON['x'];
+        const x = this.x;
         this.y = sensorJSON['y'];
         const y = getNetworkDivSize().height - this.y;
         const semiWidth = Math.floor(sensorWidth / 2);
@@ -1019,27 +1020,22 @@ export async function initNetworkScene(networkName, isDefaultNetwork) {
     for (const loopJSON of listLoopJSON) {
         new Loop(loopJSON);
     }
-
     const listStationSetDataJSON = await (await fetch('/stationsSetData.json')).json();
     for (const stationSetDataJSON of listStationSetDataJSON) {
         new Station(stationSetDataJSON);
     }
-
     const listWarehouseSetDataJSON = await (await fetch('/warehousesSetData.json')).json();
     for (const warehouseSetDataJSON of listWarehouseSetDataJSON) {
         new Warehouse(warehouseSetDataJSON);
     }
-
     const listSwitchSetDataJSON = await (await fetch('/switchesSetData.json')).json();
     for (const switchSetDataJSON of listSwitchSetDataJSON) {
         new Switch(switchSetDataJSON);
     }
-
     const listSensorSetDataJSON = await (await fetch('/sensorSetData.json')).json();
     for (const sensorSetDataJson of listSensorSetDataJSON){
         new Sensor(sensorSetDataJson);
     }
-
     calibrateNetworkScene();
 
     networkLayer.batchDraw();

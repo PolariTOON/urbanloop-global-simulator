@@ -1,12 +1,12 @@
 import logging
 from threading import Thread
 
-from flask import Flask, request
-from flask.json import jsonify, loads
+from flask import Flask, request, jsonify
+from flask.json import loads
 
 from model import loop, station, switch, warehouse, capsule, sensor
 from settings import config, network, simlog
-from simulator import converter, sim_loop
+from simulator import sim_loop, converter
 
 web_directory = 'resources/web'
 app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
@@ -30,8 +30,7 @@ def root():
 
 @app.route('/time.json', methods=['GET'])
 def generate_time_json():
-    global jsonify
-    return jsonify(converter.serialize_time())
+    return jsonify(converter.serialize_clock())
 
 
 @app.route('/start', methods=['POST'])
@@ -103,6 +102,11 @@ def generate_warehouses_set_data_json():
 @app.route('/switchesSetData.json', methods=['GET'])
 def generate_switches_set_data_json():
     return jsonify([a_switch.serialize() for a_switch in switch.get_switches()])
+
+
+@app.route('/sensorSetData.json', methods=['GET'])
+def generate_sensors_set_data_json():
+    return jsonify([a_sensor.serialize() for a_sensor in sensor.get_sensors()])
 
 
 @app.route('/updatedData.json', methods=['GET'])

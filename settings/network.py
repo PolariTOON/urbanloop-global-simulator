@@ -35,7 +35,6 @@ def load(file_name=None, capsules_fulfill=True):
         if '.json' not in file_name:
             file_name += '.json'
         file_path = 'resources/networks/%s' % file_name
-
     with open(file_path, 'r') as file:
         network = json.load(file)
     for loop, info in network.items():

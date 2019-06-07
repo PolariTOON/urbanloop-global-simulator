@@ -105,6 +105,7 @@ class Loop:
         """
         Permet d'ajouter les sensors dans la boucle sans qu'ils interfèrent avec les noeuds du graphe
         calcul aussi la position
+        Initialise les next_sensor
         :param sensors: tableau contenant le nécessaire pour cette mise à jour ([string, Sensor, float]) OBLIGATOIRE
         :return: void (mise à jour des capteurs et de sensor_lengths)
         """
@@ -114,6 +115,7 @@ class Loop:
         for i in range(nb_sensor):
             a_sensor = self.sensors[i]
             next_sensor = self.sensors[(i + 1) % nb_sensor]
+            a_sensor.next_sensor = next_sensor
             if self.clockwise:
                 next_angle = a_sensor.angle - next_sensor.angle
             else:
@@ -136,23 +138,27 @@ class Loop:
         Initialise les tableaux annexes all_objects et all_objects_lengths qui contiennent
         respectivement tous les objets dans la boucle (garage, station, switch, capteur)
         et les distances d'un objet au suivant
+        Un objet est de la forme : ["type", objet, angle]
         :return: (void) Les éléments all_objects et all_objects_lengths sont remplis
         """
-        self.all_objects = self.sensors + self.objects
-        self.all_objects.sort(key=lambda obj: self.get_angle_in_loop(obj))
+        for o in self.sensors:
+            self.all_objects += ['sensor', o, float(o.angle)]
+        for o in self.objects:
+            self.all_objects.append(o)
+        self.all_objects.sort(key=lambda obj: obj[2])
         self.all_objects_lengths = [0 for o in self.all_objects]
-        nb_objects = len(self.objects)
+        nb_objects = len(self.all_objects)
         for i in range(nb_objects):
             a_object = self.all_objects[i]
-            next_object = self.all_objects[(i+1)%nb_objects]
-            a_angle = self.get_angle_in_loop(a_object)
-            next_obj_angle = self.get_angle_in_loop(next_object)
+            next_object = self.all_objects[(i + 1) % nb_objects]
+            a_angle = a_object[2]
+            next_obj_angle = next_object[2]
             if self.clockwise:
-                next_angle = a_angle - next_angle
+                next_angle = a_angle - next_obj_angle
             else:
                 next_angle = next_obj_angle - a_angle
             next_angle = next_angle % 360
-            self.sensors_lengths[i] = round(float(next_angle/360)*self.size, 2)
+            self.all_objects_lengths[i] = round(float(next_angle / 360) * self.size, 2)
             if self.size is None:
                 self.size = sum(self.sensors_lengths)
 
@@ -170,7 +176,6 @@ class Loop:
             'size': self.size,
             'clockwise': self.clockwise
         }
-
 
 def get_by_name(search_name):
     """

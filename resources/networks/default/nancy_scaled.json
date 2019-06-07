@@ -32,13 +32,13 @@
     "circonference": 5800,
     "clockwise" : true,
     "content": [{"type":"switch_out","other_loop":"Nancy", "angle":345.5 },
-                {"type":"switch_in","other_loop":"Nancy", "angle":332 },
-                {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":260 },
+                {"type":"switch_in","other_loop":"Nancy", "angle":332.0 },
+                {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":260.0 },
                 {"type":"station","name":"Auchan", "angle":167.8, "station_type": 1, "capacity": 3},
                 {"type":"station","name":"Sapiniere", "angle":130.6, "station_type": 2, "capacity": 3},
-                {"type":"warehouse", "capacity": 100, "angle":100},
-                {"type":"station", "name":"Fac. de Lettres", "capacity": 3, "station_type": 1,"angle":320},
-                {"type":"switch_out","other_loop":"Villers-les-Nancy", "angle":300 }
+                {"type":"warehouse", "capacity": 100, "angle":100.0},
+                {"type":"station", "name":"Fac. de Lettres", "capacity": 3, "station_type": 1,"angle":320.0},
+                {"type":"switch_out","other_loop":"Villers-les-Nancy", "angle":300.0 }
     ]
   }
 }

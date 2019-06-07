@@ -120,13 +120,16 @@ def generate_updated_data_json():
 
     list_sensor_data = [a_sensor.serialize() for a_sensor in sensor.get_sensors()]
 
-    return jsonify(list_clock_data + list_station_var_data + list_warehouse_var_data + list_switch_var_data + list_capsule_data + list_sensor_data)
+    return jsonify(
+        list_clock_data + list_station_var_data + list_warehouse_var_data + list_switch_var_data + list_capsule_data + list_sensor_data)
 
 
 @app.route('/network-files.json', methods=['GET'])
 def network_files():
     default_name = 'default: ' + network.get_default_file_name()
-    network_file_names = [network.serialize_network_file_name(default_name)] + [network.serialize_network_file_name(network_file_name) for network_file_name in network.get_network_file_names()]
+    network_file_names = [network.serialize_network_file_name(default_name)] + [
+        network.serialize_network_file_name(network_file_name) for network_file_name in
+        network.get_network_file_names()]
     return jsonify(network_file_names)
 
 

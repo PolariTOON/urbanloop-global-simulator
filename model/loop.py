@@ -142,7 +142,7 @@ class Loop:
         :return: (void) Les éléments all_objects et all_objects_lengths sont remplis
         """
         for o in self.sensors:
-            self.all_objects += ['sensor', o, float(o.angle)]
+            self.all_objects += [['sensor', o, float(o.angle)]]
         for o in self.objects:
             self.all_objects.append(o)
         self.all_objects.sort(key=lambda obj: obj[2])

@@ -103,9 +103,11 @@ def get_warehouses():
 def get_switches():
     return jsonify([a_switch.serialize() for a_switch in switch.get_switches()])
 
+
 @app.route('/sensors/', methods=['GET'])
 def get_sensors():
     return jsonify([a_sensor.serialize() for a_sensor in sensor.get_sensors()])
+
 
 @app.route('/data/', methods=['GET'])
 def get_data():
@@ -115,12 +117,14 @@ def get_data():
     list_switch_var_data = [a_switch.serialize() for a_switch in switch.get_switches()]
     list_capsule_data = [a_capsule.serialize() for a_capsule in capsule.get_capsules()]
     list_sensor_data = [a_sensor.serialize() for a_sensor in sensor.get_sensors()]
-    return jsonify(list_clock_data + list_station_var_data + list_warehouse_var_data + list_switch_var_data + list_capsule_data + list_sensor_data)
+    return jsonify(
+        list_clock_data + list_station_var_data + list_warehouse_var_data + list_switch_var_data + list_capsule_data + list_sensor_data)
 
 
 @app.route('/networks/', methods=['GET'])
 def get_networks():
-    network_file_names = [network.serialize_network_file_name(network_file_name) for network_file_name in network.get_network_file_names()]
+    network_file_names = [network.serialize_network_file_name(network_file_name) for network_file_name in
+                          network.get_network_file_names()]
     return jsonify(network_file_names)
 
 

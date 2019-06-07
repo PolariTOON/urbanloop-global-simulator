@@ -45,6 +45,7 @@ def load(file_name=None, capsules_fulfill=True):
     identifier._switch_id = -1
     identifier._capsule_id = -1
     identifier._traveler_id = -1
+    identifier._sensor_id = -1
     file_path = 'resources/networks/%s.json' % get_default_file_name()
     if file_name is not None:
         if '.json' not in file_name:

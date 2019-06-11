@@ -1,0 +1,71 @@
+@startuml
+
+class Main
+class Console
+class WebApp
+package controler {
+	class Simulation
+	class Converter
+	class Poisson
+	class Routing
+}
+package model {
+	package graph {
+		class Network
+		package network {
+			class NetworkArc
+			class NetworkNode
+			class Connection
+			class Bridge
+			class Route
+			package route {
+				class RouteArc
+				class RouteNode
+				class Sensor
+				class Section
+				class Station
+				class Warehouse
+			}
+		}
+	}
+	package set {
+		class Switch
+		class Loop
+	}
+	package token {
+		class Capsule
+		class Traveler
+	}
+}
+
+Main "0"--"1" Console
+Main "0"--"1" WebApp
+Console "0"--"1" Simulation
+WebApp "0"--"1..*" Simulation
+Simulation "0"--"1" Converter
+Simulation "0"--"1" Poisson
+Simulation "0"--"1" Routing
+Routing "0"--"1" Network
+Network "0"*--"0..*" NetworkArc
+Network "0"*--"0..*" NetworkNode
+NetworkArc <|-- Connection
+NetworkNode <|-- Bridge
+NetworkNode <|-- Route
+NetworkNode "2"--"0" Connection
+Route "0"*--"0..*" RouteArc
+Route "0"*--"0..*" RouteNode
+RouteArc <|-- Sensor
+RouteNode "2"--"0" Sensor
+RouteNode <|-- Section
+RouteNode <|-- Station
+RouteNode <|-- Warehouse
+Connection "2"-right-"1" Switch
+Route "1..*"-right-"1" Loop
+Capsule "*"-right-"0" Bridge
+Capsule "*"-right-"0" Section
+Capsule "*"-right-"0" Station
+Capsule "*"-right-"0" Warehouse
+Traveler "*"-right-"0" Station
+Traveler "*"-up-"0" Capsule
+
+@enduml

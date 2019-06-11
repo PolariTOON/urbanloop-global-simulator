@@ -45,12 +45,8 @@ class Controller:
             new_rules = self.update_rules()
             self.replace_rules(new_rules)
             self.congestions[previous_node.id][current_node.id] = True
-        elif self.congestions[previous_node.id][current_node.id] and self.graph.no_more_congestion(previous_switch,
-                                                                                                   current_switch,
-                                                                                                   self.timers[
-                                                                                                       capsule.id]):
+        elif self.congestions[previous_node.id][current_node.id] and self.graph.no_more_congestion(previous_switch, current_switch, self.timers[capsule.id]):
             self.congestions[previous_node.id][current_node.id] = False
-
         self.timers[capsule.id] = 0
 
     def update(self):

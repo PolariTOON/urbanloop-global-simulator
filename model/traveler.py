@@ -21,13 +21,10 @@ class Traveler:
         self.waiting_since = sim_loop.get_current_tick()
         self.trip_start_tick = None
         self.departure_station.traveler_queue.put(self)
-        # TODO self.travel_time = 0
 
     def stats(self):
         from model import controller
-        controller.get_controller().temps_moy_voy_stat(self.id,sim_loop.get_simulated_time())
-
-
+        controller.get_controller().temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())
 
     def get_waiting_seconds(self):
         """

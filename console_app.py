@@ -1,6 +1,7 @@
 """
 Cette classe permet de gérer le code lié à un lancement d'une simulation sans interface graphique
 """
+
 from time import time
 from model import routing, switch
 from settings import config, network, simlog

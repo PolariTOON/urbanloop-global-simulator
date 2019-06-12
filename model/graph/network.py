@@ -5,5 +5,10 @@ les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (
 
 
 class Network:
+
+    nodes = None
+    arcs = None
+
     def __init__(self):
-        self.id = 0
+        self.nodes = []
+        self.arc = []

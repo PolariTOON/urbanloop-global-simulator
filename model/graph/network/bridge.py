@@ -15,6 +15,6 @@ class Bridge(NetworkNode):
         return self._capsules
 
     def serialize():
-        return super.serialize().update({
+        return super().serialize().update({
             'jsonType': 'bridge'
         })

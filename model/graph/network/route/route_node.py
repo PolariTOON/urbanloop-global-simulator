@@ -15,7 +15,7 @@ class RouteNode(Node):
         return self._capsules
 
     def serialize(self):
-        return super.serialize().update({
+        return super().serialize().update({
             'jsonType': 'route_node',
             'capsules': [capsule.serialize() for capsule in self.capsules]
         })

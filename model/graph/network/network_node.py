@@ -10,6 +10,6 @@ class NetworkNode(Node):
         pass
 
     def serialize():
-        return super.serialize().update({
+        return super().serialize().update({
             'jsonType': 'network_node'
         })

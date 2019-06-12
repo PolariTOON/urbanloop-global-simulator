@@ -10,6 +10,6 @@ class Warehouse(RouteNode):
         pass
 
     def serialize():
-        return super.serialize().update({
+        return super().serialize().update({
             'jsonType': 'station'
         })

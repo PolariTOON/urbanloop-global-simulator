@@ -24,6 +24,6 @@ class Route(NetworkNode):
         return self._arcs
 
     def serialize(self):
-        return super.serialize().update({
+        return super().serialize().update({
             'jsonType': 'route'
         })

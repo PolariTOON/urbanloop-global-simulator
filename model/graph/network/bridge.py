@@ -3,11 +3,18 @@
 Représentation de la portion de voie entre deux boucles (la voie qui est entre deux switchs de boucles différentes)
 """
 
-from network_node import NetworkNode
+from .network_node import NetworkNode
 
 
 class Bridge(NetworkNode):
-
     def __init__(self):
-        self.capsules = []
-        pass
+        self._capsules = []
+
+    @property
+    def capsules(self):
+        return self._capsules
+
+    def serialize():
+        return super.serialize().update({
+            'jsonType': 'bridge'
+        })

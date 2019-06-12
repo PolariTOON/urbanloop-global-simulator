@@ -5,10 +5,23 @@ les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (
 
 
 class Network:
-
-    nodes = None
-    arcs = None
-
     def __init__(self):
-        self.nodes = []
-        self.arc = []
+        self._nodes = []
+        self._arcs = []
+
+    @property
+    def capsules(self):
+        return [capsule for node in self.nodes for capsule in node.capsules]
+
+    @property
+    def nodes(self):
+        return self._nodes
+
+    @property
+    def arcs(self):
+        return self._arcs
+
+    def serialize(self):
+        return {
+            'jsonType': 'network'
+        }

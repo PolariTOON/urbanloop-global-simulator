@@ -12,6 +12,8 @@ package controler {
 package model {
 	package graph {
 		class Network
+		class Arc
+		class Node
 		package network {
 			class NetworkArc
 			class NetworkNode
@@ -48,6 +50,10 @@ Simulation "0"--"1" Routing
 Routing "0"--"1" Network
 Network "0"*--"0..*" NetworkArc
 Network "0"*--"0..*" NetworkNode
+Arc <|-- NetworkArc
+Arc <|-- RouteArc
+Node <|-- NetworkNode
+Node <|-- RouteNode
 NetworkArc <|-- Connection
 NetworkNode <|-- Bridge
 NetworkNode <|-- Route
@@ -55,10 +61,10 @@ NetworkNode "2"--"0" Connection
 Route "0"*--"0..*" RouteArc
 Route "0"*--"0..*" RouteNode
 RouteArc <|-- Sensor
-RouteNode "2"--"0" Sensor
 RouteNode <|-- Section
 RouteNode <|-- Station
 RouteNode <|-- Warehouse
+RouteNode "2"--"0" Sensor
 Connection "2"-right-"1" Switch
 Route "1..*"-right-"1" Loop
 Capsule "*"-right-"0" Bridge

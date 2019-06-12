@@ -1,44 +1,18 @@
 """
-Cette classe contient des fonctions utilitaires sur le temps de la simulation
+Ce fichier contient des fonctions utilitaires sur le temps de la simulation
 """
 
-import random
 from math import floor
 
-from simulator import sim_loop
 
-
-class Converter:
-    # TODO : les arguments proviennent de config
-    def __init__(self, city_percent=None, activity_and_residential_percent=None,
-                 activity_and_residential_fluctuation=None, ascent_descent_duration=None, morning_peak_hour=None,
-                 evening_peak_hour=None):
-        self.city_percent = city_percent
-        self.activity_and_residential_percent = activity_and_residential_percent
-        self.activity_and_residential_fluctuation = activity_and_residential_fluctuation
-        self.ascent_descent_duration = ascent_descent_duration
-        self.morning_peak_hour = morning_peak_hour
-        self.evening_peak_hour = evening_peak_hour
-
-        if self.activity_and_residential_fluctuation < 0 or self.activity_and_residential_fluctuation >= self.activity_and_residential_percent:
-            self.activity_and_residential_fluctuation = floor(self.activity_and_residential_percent / 2)
-
-    def random_ascent_descent_duration(self):
-        """
-        :return: A value between [|time-2, time+2|]. time is the defined duration (in the config file)
-        for ascent and descent events.
-        """
-        random_seconds = random.randrange(self.ascent_descent_duration - 2, self.ascent_descent_duration + 2, 1)
-        return random_seconds * sim_loop.get_tick_per_second()
-
-
-def sim_speed_to_string():
+def sim_speed_to_string(sim_tick, view_tick, initial_tick):
     """
-    :return: This function can only be used in visualized mode.
+    This function can only be used in visualized mode.
+    :param initial_tick: The _sim_tick value at the start of simulation
+    :param view_tick: The visualized tick duration
+    :param sim_tick: the simulation's tick
+    :return: Return the speed of the simulation from string format.
     """
-    sim_tick = sim_loop.get_sim_tick()
-    view_tick = sim_loop.get_visualized_tick_duration()
-    initial_tick = sim_loop.get_initial_sim_tick()
     if sim_tick == view_tick:
         return "RealTime"
     if view_tick == 0:
@@ -74,27 +48,28 @@ def seconds_to_decimal_hour(seconds):
     return round(seconds / 3600, 2)
 
 
-def now_to_day():
+def now_to_day(start_hour, simulated_time):
     """
-    :return: The current day. This function takes into account the
-    sim_tick variations.
+    :param simulated_time: Total simulated time in seconds.
+    :param start_hour: The simulation's start hour.
+    :return: The current day. This function takes into account the sim_tick variations.
     """
     # Start at Day 1
-    start_hour = sim_loop.get_start_hour()
     if start_hour is None:
         # This case means that the simulation hasn't been started yet.
         return 1
-    return 1 + int((start_hour * 3600 + sim_loop.get_simulated_time()) / 86400)
+    return 1 + int((start_hour * 3600 + simulated_time) / 86400)
 
 
-def now_to_seconds():
+def now_to_seconds(start_hour, simulated_time):
     """
-    :return: The current time in second. This function takes into account the
-    sim_tick variations.
+    :param simulated_time: Total simulated time in seconds.
+    :param start_hour: The simulation's start hour.
+    :return: The current time in second. This function takes into account the sim_tick variations.
     """
-    if sim_loop.get_start_hour() is None:
+    if start_hour is None:
         return -1
-    return sim_loop.get_start_hour() * 3600 + sim_loop.get_simulated_time()
+    return start_hour * 3600 + simulated_time
 
 
 def seconds_to_floor_hour(seconds):
@@ -106,12 +81,20 @@ def seconds_to_floor_hour(seconds):
     return floor((seconds % 86400) / 3600)
 
 
-def serialize_clock():
+def serialize_clock(view_tick, initial_tick, sim_tick, start_hour, simulated_time):
+    """
+    :param simulated_time: Total simulated time in seconds.
+    :param start_hour: The simulation's start hour.
+    :param view_tick: The visualized tick duration
+    :param initial_tick: The _sim_tick value at the start of simulation
+    :param sim_tick: The simulation's tick
+    :return: A JSON array with the information about time of the simulation.
+    """
     return {
         'jsonType': 'time',
-        'day': now_to_day(),
-        'time': seconds_to_string(now_to_seconds()),
-        'speed': sim_speed_to_string(),
-        'accelerateJerky': (0, 1)[sim_loop.get_visualized_tick_duration() == 0],
-        'decelerateJerky': (0, 1)[sim_loop.get_initial_sim_tick() * 4 <= sim_loop.get_sim_tick()]
+        'day': now_to_day(start_hour, simulated_time),
+        'time': seconds_to_string(now_to_seconds(start_hour, simulated_time)),
+        'speed': sim_speed_to_string(sim_tick, view_tick, initial_tick),
+        'accelerateJerky': (0, 1)[view_tick == 0],
+        'decelerateJerky': (0, 1)[initial_tick * 4 <= sim_tick]
     }

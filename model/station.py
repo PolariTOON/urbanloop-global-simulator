@@ -6,12 +6,6 @@ from math import floor
 from model import capsule, controller
 from model import identifier
 from model import queue
-from model import warehouse
-from settings import simlog
-from simulator import converter
-
-from simulator import converter
-from simulator import sim_loop
 from settings import simlog
 
 _stations = list()

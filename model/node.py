@@ -1,7 +1,4 @@
-import numpy as np
-
-from model import switch, identifier
-from model import loop
+from model import switch
 from model import identifier
 
 _nodes = list()

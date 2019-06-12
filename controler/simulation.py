@@ -127,7 +127,7 @@ class Simulation:
                     self.controller.update()  # TODO : Mettre à jour le controler (timers ...)
 
                 if self.station_refill and not self._current_tick == 0 and self._modulo_on_seconds(1):
-                    station.fill_and_full_stations()
+                    self.controler.fill_and_full_stations()
 
                 self.collision()
 
@@ -137,8 +137,7 @@ class Simulation:
                     sleep_time = self._visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
             elif self.is_killed():
-                recorder.stop_listen(get_simulated_time())
-                recorder.extract()
+                self.controler.extract(self.get_simulated_time())
                 reset_simulation_parameters()
                 if self.is_endless:
                     _quit_endless_simulation()
@@ -222,3 +221,26 @@ class Simulation:
             'start_hour': int(self.sim['start_hour']),
             'logs': self.sim['logs']
         }
+
+    def get_simulated_time(self, tick=None):
+        """
+        :return: The total simulated time, in seconds. This function takes
+        into account the sim_tick variation.
+        """
+        if tick is None or tick > self._current_tick:
+            tick = self._current_tick
+
+        if not self._sim_tick_variations:
+            # Empty case
+            return tick * self._sim_tick
+
+        result = 0
+        for start_tick, tick_duration, sim_tick in self._sim_tick_variations:
+            if tick <= start_tick + tick_duration:
+                return result + (tick - start_tick) * sim_tick
+            result += tick_duration * sim_tick
+
+        last_end_tick = self._sim_tick_variations[-1][0] + self._sim_tick_variations[-1][1]
+        result += (tick - last_end_tick) * self._sim_tick
+
+        return result

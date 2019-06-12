@@ -84,3 +84,7 @@ class Routing:
             return 0
         else:
             return moy / j
+
+    def extract(self, simulated_time):
+        self.recorder.stop_listen(simulated_time)
+        self.recorder.extract()

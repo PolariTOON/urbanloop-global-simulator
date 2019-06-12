@@ -14,8 +14,6 @@ from controler.probability import Probability
 from controler.routing import Routing
 from shutil import copyfile
 
-from stats import stats_recorder
-
 
 class SimState(Enum):
     RUNNING = 0
@@ -46,7 +44,6 @@ class Simulation:
         self._sim_tick_variations = list()
         self._start_hour = None
         self._endless_quit_event = None
-        self.recorder = stats_recorder.StatsRecorder(0)
         self.is_real_time = False
         self.is_endless = False
         self.station_refill = True
@@ -87,6 +84,16 @@ class Simulation:
             return True
         return self._current_tick % (seconds / self._sim_tick) == 0
 
+    def tick(self):
+        """
+        This function triggers the tick_event
+        The tick_event updateData the current_tick.
+        It should be used to frequency process
+        """
+        self._current_tick += 1
+        yield self.tick_event.succeed()
+        self.tick_event = self._env.event()
+
     def loop(self):
         """
         This function is the main process station of the simulation.
@@ -106,51 +113,30 @@ class Simulation:
                         os.mkdir("out")
                     except:
                         pass
-                    """
-                    On obtient dans staats le temps moyen de trajet des capsules et dans staatsvoy le temps moyen
-                    d'attentes des voyageurs
-                    """
-                    latest_stats_file = open("out/staats.txt", "a+")
-                    buffer = str(self.controler.temps_moy()) + ","  # TODO : stats temps moyen
-                    latest_stats_file.write(buffer)
-                    latest_stats_file.close()
-                    latest_stats_file = open("out/staatsvoy.txt", "a+")
-                    buffer = str(self.controler.temps_moy_voy()) + ","  # TODO : stats temps moyen
-                    latest_stats_file.write(buffer)
-                    latest_stats_file.close()
+                    self.controler.travel_stats()
 
-                # Information about the network : TODO
+
+                # Information about the network : TODO : Gestion des infos du circuit à faire depuis le controler (routing)
                 if self._modulo_on_seconds(30):
-                    loops = []
-                    capsules = {}
-                    for a_loop_name, a_loop in loop.all_loops.items():
-                        loops.append(a_loop)
-                        capsules[a_loop_name] = 0
-                    for a_capsule in capsule.get_capsules():
-                        capsules[a_capsule.loop.name] += 1
-                    for a_loop in loops:
-                        recorder.add_capsule_average_loop(capsules[a_loop.name], a_loop)
-                    for a_station in station.get_stations():
-                        recorder.add_stopped_capsules_station(a_station.get_waiting_capsules_number(), a_station)
-                        recorder.add_waiting_travelers(a_station.get_waiting_travelers_number(), a_station)
+                    self.controler.maj_info()
 
-                _env.process(self.tick())
-                _env.process(self.ascent_generator.generate())
-                if _modulo_on_seconds(1):
-                    _env.process(self.traveler_generator.generate())
-                    self.controller.update()
+                self._env.process(self.tick())
+                self._env.process(self.ascent_generator.generate())  # TODO : générer la montée des voyageurs à chaque tick
+                if self._modulo_on_seconds(1):
+                    self._env.process(self.traveler_generator.generate())  # TODO : générer les voyageurs à chaque tick
+                    self.controller.update()  # TODO : Mettre à jour le controler (timers ...)
 
-                if self.station_refill and not _current_tick == 0 and _modulo_on_seconds(1):
+                if self.station_refill and not self._current_tick == 0 and self._modulo_on_seconds(1):
                     station.fill_and_full_stations()
 
                 self.collision()
 
-                yield _env.timeout(1)
+                yield self._env.timeout(1)
 
                 if loop_sleep_boolean:
-                    sleep_time = _visualized_tick_duration - (time.perf_counter() - tick_start_time)
+                    sleep_time = self._visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
-            elif is_killed():
+            elif self.is_killed():
                 recorder.stop_listen(get_simulated_time())
                 recorder.extract()
                 reset_simulation_parameters()
@@ -165,6 +151,12 @@ class Simulation:
         :return: True if the simulation is currently started
         """
         return self._sim_state == SimState.RUNNING
+
+    def is_killed(self):
+        """
+        :return: True if the simulation is currently paused
+        """
+        return self._sim_state == SimState.KILLED
 
     def reset_config(self):
         """

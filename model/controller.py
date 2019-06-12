@@ -236,7 +236,7 @@ class Controller:
             j += 1
             moy += i
         if j == 0:
-            return (0)
+            return 0
         else:
             return moy / j
 

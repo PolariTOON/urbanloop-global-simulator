@@ -6,14 +6,10 @@ from model.graph.network.route.route_node import RouteNode
 
 class Section(RouteNode):
     def __init__(self, len):
-        super().__init__()
         self.len = len  # taille de la section
 
     def serialize(self):
-        return {
+        return super().serialize().update({
             'jsonType': 'section',
-            'width': self.len
-        }
-
-    def get_len(self):
-        return self.len
+            'len': self.len
+        })

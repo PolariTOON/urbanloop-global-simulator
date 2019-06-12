@@ -9,6 +9,7 @@ class Network:
     nodes = None
     arcs = None
 
-    def __init__(self):
+
+    def __init__(self, json_network):
         self.nodes = []
         self.arc = []

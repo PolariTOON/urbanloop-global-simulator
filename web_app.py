@@ -1,3 +1,7 @@
+"""
+Cette classe permet de gérer le code lié à un lancement d'une simulation avec interface graphique
+"""
+
 import logging
 from threading import Thread
 
@@ -8,11 +12,15 @@ from model import loop, routing, station, switch, warehouse, capsule, sensor
 from settings import config, network, simlog
 from simulator import sim_loop, converter
 
-web_directory = 'resources/web'
-app = Flask(__name__, static_folder=web_directory, template_folder=web_directory)
+app = Flask(__name__, static_url_path="", static_folder='view/static', template_folder='view/templates')
 app.logger.setLevel(logging.ERROR)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 sim_thread = None
+
+
+def run_app(port):
+    print("App runnning on port %d (http://127.0.0.1:%d)" % (port, port))
+    app.run(port=port)
 
 
 @app.errorhandler(Exception)

@@ -14,22 +14,8 @@ arguments = argument_parser.parse_args()
 
 
 if arguments.port is -1:
-    from time import time
-    from model import routing, switch
-    from settings import config, network, simlog
-    from simulator import converter, sim_loop
-    START_TIME = time()
-    config.restore_config()
-    routing.init_routing()
-    switch.init_switch()
-    converter.init_converter()
-    simlog.load()
-    network.load()
-    simlog.debug("Simulation starts")
-    sim_loop.start_simulation()
-    simlog.debug("Execution time : %.3f seconds" % (time() - START_TIME))
-    simlog.debug("Simulation time : %.1f seconds" % (sim_loop.get_simulated_time()))
+    from console_app import run_app
+    run_app()
 else:
-    from web_app import app
-    print("http://127.0.0.1:%d" % arguments.port)
-    app.run(port=arguments.port)
+    from web_app import run_app
+    run_app(arguments.port)

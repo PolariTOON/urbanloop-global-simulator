@@ -1,0 +1,71 @@
+{
+  "loops": [
+    {
+      "name": "Nancy",
+      "clockwise": false,
+      "elements": [
+        {"type":"station","name":"Gare", "x": 500, "y": 710, "capacity": 4, "capsule_count": 0, "station_type": 3},
+        {"type":"station","name":"Stanislas", "x": 580, "y": 630, "capacity": 4, "capsule_count": 0, "station_type": 3},
+        {"type":"station","name":"Campus_ARTEM", "x": 527, "y": 555, "capacity": 4, "capsule_count": 0, "station_type": 1},
+        {"type": "switch_out", "x": 486, "y": 551, "id_bridge": 1},
+        {"type": "switch_out", "x": 430, "y": 590, "id_bridge": 0},
+        {"type": "switch_in", "x": 434, "y": 676, "id_bridge": 3}
+      ],
+      "paths": ["line", "line", "line", "line", "line", "line"]
+    },
+    {
+      "name": "Villers-les-Nancy",
+      "clockwise": false,
+      "elements": [
+        {"type":"station","name":"Gare", "x": 500, "y": 710, "capacity": 4, "capsule_count": 0, "station_type": 3},
+        {"type":"station","name":"Stanislas", "x": 580, "y": 630, "capacity": 4, "capsule_count": 0, "station_type": 3},
+        {"type":"station","name":"Campus_ARTEM", "x": 527, "y": 555, "capacity": 4, "capsule_count": 0, "station_type": 1},
+        {"type": "switch_out", "x": 486, "y": 551, "id_bridge": 1},
+        {"type": "switch_out", "x": 430, "y": 590, "id_bridge": 0},
+        {"type": "switch_in", "x": 434, "y": 676, "id_bridge": 3}
+      ],
+      "paths": ["line", "line", "line", "line", "line", "line"]
+    },
+    {
+      "name": "Villers-les-Nancy",
+      "clockwise": false,
+      "elements": [
+        {"type": "switch_in", "x": 396, "y": 455, "id_bridge": 3},
+        {"type":"station","name":"Velodrome", "x": 411, "y": 400, "capacity": 5, "capsule_count": 0, "station_type": 3},
+        {"type":"station","name":"Telecom Nancy", "x": 371, "y": 315, "capacity": 4, "capsule_count": 0, "station_type": 1},
+        {"type":"station","name":"Eglise", "x": 222, "y": 555, "capacity": 3, "capsule_count": 0, "station_type": 2},
+        {"type": "warehouse", "x": 189, "y": 400, "id_bridge": 1},
+        {"type": "switch_out", "x": 215, "y": 471, "id_bridge": 0}
+      ],
+      "paths": ["line", "line", "line", "line", "line", "line"]
+    }
+  ],
+  "bridges": [],
+  "capsules": []
+},
+{
+  "Villers-les-Nancy": {
+    "center": [300,400],
+    "circonference": 700,
+    "clockwise" : false,
+    "content": [{"type":"switch_in","other_loop":"Nancy", "angle":30 },
+                {"type":"station","name":"Velodrome", "angle":0, "station_type": 3, "capacity": 5},
+                {"type":"station","name":"TELECOM Nancy", "angle":310, "station_type": 1, "capacity": 4},
+                {"type":"station","name":"Eglise", "angle":225, "station_type": 2, "capacity": 3},
+                {"type":"warehouse", "capacity": 50, "angle":180},
+                {"type":"switch_out","other_loop":"Laxou", "length": 147.064, "angle":140}
+    ]
+  },
+  "Laxou": {
+    "center": [150,650],
+    "circonference": 900,
+    "clockwise" : false,
+    "content": [{"type":"switch_out","other_loop":"Nancy", "length": 187.941, "angle":40 },
+                {"type":"switch_in","other_loop":"Nancy", "angle":300 },
+                {"type":"switch_in","other_loop":"Villers-les-Nancy", "angle":240 },
+                {"type":"station","name":"Auchan", "angle":180, "station_type": 1, "capacity": 3},
+                {"type":"station","name":"Sapiniere", "angle":110, "station_type": 2, "capacity": 3},
+                {"type":"warehouse", "capacity": 100, "angle":80}
+    ]
+  }
+}

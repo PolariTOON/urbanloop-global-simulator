@@ -53,6 +53,8 @@ def load(file_name=None, capsules_fulfill=True):
         file_path = 'resources/networks/%s' % file_name
     with open(file_path, 'r') as file:
         network = json.load(file)
+
+    #  Début du chargement : c'est fait loop par loop
     for loop, info in network.items():
         if loop in model_loop.all_loops:
             the_loop = model_loop.get_by_name(loop)

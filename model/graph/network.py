@@ -5,7 +5,7 @@ les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (
 
 
 class Network:
-    def __init__(self, json):
+    def __init__(self, json_network):
         self._nodes = []
         self._arcs = []
 
@@ -25,3 +25,6 @@ class Network:
         return {
             'jsonType': 'network'
         }
+
+    def init_graph_from_json(self, json_network):
+        for loop_name, info in json_network.items():

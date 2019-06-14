@@ -19,12 +19,13 @@ package model {
 			class SwitchIn
 			class SwitchOut
 			class Route
-			package steps {
+			package tracks {
+				class Track
 				class Step
 				class Sensor
-				class Section
 				class Station
 				class Warehouse
+				class Section
 			}
 		}
 		package lines {
@@ -50,7 +51,7 @@ Simulation "0"--"1" Routing
 Routing "0"--"1" Network
 Node <|-- Network
 Node <|-- Road
-Node <|-- Step
+Node <|-- Track
 Node "0"--"0..*" Capsule
 Network "0"*--"0..*" Road
 Network "0"*--"0..*" Line
@@ -59,10 +60,12 @@ Road <|-- Route
 Switch <|-- SwitchIn
 Switch <|-- SwitchOut
 SwitchIn "0"--"3" Route
+SwitchIn "1"--"1" SwitchOut
 SwitchOut "0"--"3" Route
 Route "0"--"2" Switch
-Route "0"*--"0..*" Step
-Step <|-- Section
+Route "0"*--"0..*" Track
+Track <|-- Step
+Track <|-- Section
 Step <|-- Sensor
 Step <|-- Station
 Step <|-- Warehouse

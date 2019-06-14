@@ -3,14 +3,14 @@ C'est la représentation des arcs du sous-graphe du réseau
 Cela permet 'avoir un capteur entre chaque section, tout comme dans un réseau réel idéal
 """
 
-from .route_arc import RouteArc
+from .step import Step
 
 
-class Sensor(RouteArc):
-    def __init__(self, id_detected=-1):
-        self.id_detected = id_detected
+class Sensor(Step):
+    def __init__(self):
+        super().__init__(self)
 
     def serialize(self):
         return super().serialize().update({
-            'jsonType': 'sensor'
+            'type': 'sensor'
         })

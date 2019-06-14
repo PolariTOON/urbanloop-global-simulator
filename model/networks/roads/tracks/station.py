@@ -3,7 +3,7 @@ Type de noeud du sous-graphe correspondant à une station d'arrêt
 """
 
 from enum import Enum
-from .route_node import RouteNode
+from .step import Step
 
 
 class Type(Enum):
@@ -12,11 +12,11 @@ class Type(Enum):
     CITY = 3
 
 
-class Station(RouteNode):
+class Station(Step):
     def __init__(self):
-        pass
+        super().__init__(self)
 
     def serialize():
         return super().serialize().update({
-            'jsonType': 'station'
+            'type': 'station'
         })

@@ -8,5 +8,5 @@ class Node:
 
     def serialize(self):
         return {
-            'jsonType': 'node'
+            'capsules': [capsule.serialize() for capsule in self.capsules]
         }

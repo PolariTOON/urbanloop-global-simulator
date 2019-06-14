@@ -10,31 +10,31 @@ package controler {
 	class Routing
 }
 package model {
-	package graph {
+	class Node
+	package networks {
 		class Network
-		class Arc
-		class Node
-		package network {
-			class NetworkArc
-			class NetworkNode
-			class Connection
-			class Bridge
+		package roads {
+			class Road
+			class Switch
+			class SwitchIn
+			class SwitchOut
 			class Route
-			package route {
-				class RouteArc
-				class RouteNode
+			package steps {
+				class Step
 				class Sensor
 				class Section
 				class Station
 				class Warehouse
 			}
 		}
+		package lines {
+			class Line
+			class Bridge
+			class Loop
+		}
 	}
-	package set {
-		class Switch
-		class Loop
-	}
-	package token {
+	package tokens {
+		class Token
 		class Capsule
 		class Traveler
 	}
@@ -48,30 +48,31 @@ Simulation "0"--"1" Converter
 Simulation "0"--"1" Poisson
 Simulation "0"--"1" Routing
 Routing "0"--"1" Network
-Network "0"*--"0..*" NetworkArc
-Network "0"*--"0..*" NetworkNode
-Arc <|-- NetworkArc
-Arc <|-- RouteArc
-Node <|-- NetworkNode
-Node <|-- RouteNode
-NetworkArc <|-- Connection
-NetworkNode <|-- Bridge
-NetworkNode <|-- Route
-NetworkNode "2"--"0" Connection
-Route "0"*--"0..*" RouteArc
-Route "0"*--"0..*" RouteNode
-RouteArc <|-- Sensor
-RouteNode <|-- Section
-RouteNode <|-- Station
-RouteNode <|-- Warehouse
-RouteNode "2"--"0" Sensor
-Connection "2"-right-"1" Switch
-Route "1..*"-right-"1" Loop
-Capsule "*"-right-"0" Bridge
-Capsule "*"-right-"0" Section
-Capsule "*"-right-"0" Station
-Capsule "*"-right-"0" Warehouse
-Traveler "*"-right-"0" Station
-Traveler "*"-up-"0" Capsule
+Node <|-- Network
+Node <|-- Road
+Node <|-- Step
+Node "0"--"0..*" Capsule
+Network "0"*--"0..*" Road
+Network "0"*--"0..*" Line
+Road <|-- Switch
+Road <|-- Route
+Switch <|-- SwitchIn
+Switch <|-- SwitchOut
+SwitchIn "0"--"3" Route
+SwitchOut "0"--"3" Route
+Route "0"--"2" Switch
+Route "0"*--"0..*" Step
+Step <|-- Section
+Step <|-- Sensor
+Step <|-- Station
+Step <|-- Warehouse
+Station "0"--"0..*" Traveler
+Line <|-- Bridge
+Line <|-- Loop
+Bridge "0"--"1" Route
+Loop "0"--"1..*" Route
+Token <|-- Capsule
+Token <|-- Traveler
+Capsule "0"--"0..*" Traveler
 
 @enduml

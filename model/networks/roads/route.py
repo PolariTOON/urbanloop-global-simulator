@@ -7,10 +7,11 @@ from .road import Road
 
 
 class Route(Road):
-    def __init__(self):
-        super().__init__(self)
+    def __init__(self, tracks):
+        super().__init__()
         self._sections = []
         self._steps = []
+        self.build(tracks)
 
     @property
     def capsules(self):
@@ -28,3 +29,8 @@ class Route(Road):
         return super().serialize().update({
             'type': 'route'
         })
+
+    def build(self, tracks):
+        #  TODO : contruction de la route à partir des tracks la composant
+        for track in tracks:
+            pass

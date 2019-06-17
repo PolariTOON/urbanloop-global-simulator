@@ -6,6 +6,7 @@ import fileinput
 import os
 import sys
 import time
+import json
 from enum import Enum
 
 import simpy
@@ -22,8 +23,10 @@ class SimState(Enum):
 
 
 class Simulation:
-    def __init__(self, loaded=None, modified=None, config=None, is_visualized=False):
-        self.controler = Routing()
+    def __init__(self, loaded=None, modified=None, config=None, is_visualized=False, json_network_path="resources/new_mini_network.json"):
+        with open(json_network_path) as json_data:
+            json_network = json.load(json_data)
+        self.controler = Routing(json_network)
         self.loaded = loaded
         self.config = config
         self.modified = modified

@@ -1,13 +1,13 @@
 """
 C'est ici qu'est le controler du paradigme SDN (calcul des routes ...)
 """
-from model.graph.network import Network
+from model.networks.network import Network
 from stats import stats_recorder
 
 
 class Routing:
-    def __init__(self):
-        self.network = Network()
+    def __init__(self, json_network):
+        self.network = Network(json_network)
         self.recorder = stats_recorder.StatsRecorder(0)
         self.timers = [-1] * len(self.network.get_capsules())
         self.tab_depart = []

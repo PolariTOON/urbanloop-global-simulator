@@ -2,5 +2,5 @@ class Line:
     def __init__(self):
         pass
 
-    def serialize():
+    def serialize(self):
         return {}

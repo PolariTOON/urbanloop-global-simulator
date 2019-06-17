@@ -2,16 +2,19 @@
 Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
-import json
-
+from model.networks.lines.bridge import Bridge
+from model.networks.roads.switch import Switch
+from model.networks.roads.switch_in import SwitchIn
 from ..node2 import Node
 
 
 class Network(Node):
-    def __init__(self, json_network_path):
+    def __init__(self, json_network):
+        super().__init__()
         self._bridges = []
         self._loops = []
         self._roads = []
+        self.init_graph_from_json(json_network)
 
     @property
     def capsules(self):
@@ -31,31 +34,38 @@ class Network(Node):
             'loops': [loop.serialize() for loop in self.loops],
         })
 
-    def init_graph_from_json(self, json_network_path):
-        with open(json_network_path) as json_data:
-            json_network = json.load(json_data)
-        loops = json_network["loops"]
-        bridges = json_network["bridges"]
-        capsules = json_network["capsules"]
-        for bridge in bridges:
-            path = bridge["type"]
-            # TODO : charger les bridges
-            new_bridge = Bridge()
-            self._bridges.append(new_bridge)
-
+    def init_graph_from_json(self, json_network):
+        #  Etape 1 : Récupérer les infos du json sous forme pratique
+        bridges = [{} for b in json_network["bridges"]]
+        loops = [{} for l in json_network["loops"]]
         for loop in loops:
-            loop_name = loop["name"]
-            clockwise = loop["clockwise"]
-            elements = loop["elements"]
-            paths = loop["paths"]
-            # TODO : charger les boucles
-            new_loop = Loop()
-            self._loops.append(new_loop)
+            loop["switches"] = []
+            loop["routes"] = []
+            steps = []
+            for noeud in loop["elements"]:
+                if noeud is Switch:
+                    id_bridge = noeud["id_bridge"]
+                    if noeud is SwitchIn:
+                        if bridges[id_bridge]["in"] is None:
+                            bridges[id_bridge]["in"] = [loop, len(loop["switches"])]
+                        else:
+                            print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
+                    else:
+                        if bridges[id_bridge]["out"] is None:
+                            bridges[id_bridge]["out"] = [loop, len(loop["switches"])]
+                        else:
+                            print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
+                    loop["switches"].append(noeud)
+                    loop["routes"].append(steps)
+                    steps = []
+                else:
+                    steps.append(noeud)
+            if len(steps) != 0:
+                loop["routes"].append(steps)
 
-        for capsule in capsules:
-            # TODO : charger les capsules
-            new_capsule = Capsule()
-            for loop in self._loops:
-                if new_capsule.loop_id == loop.id:
-                    loop._capsules.append(new_capsule)
-            pass
+        #  Etape 2 : Instanciation des routes
+        all_routes = []
+        for loop in loops:
+            for route in range(len(loop["routes"])):
+                #  TODO : finir d'implémenter l'algo
+

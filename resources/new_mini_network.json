@@ -2,20 +2,18 @@
   "loops": [
     {
       "name": "Nancy",
-      "clockwise": false,
       "elements": [
+        {"type": "switch_in", "x": 434, "y": 676, "id_bridge": 0},
         {"type":"station","name":"Gare", "x": 500, "y": 710, "capacity": 4, "capsule_count": 0, "station_type": 3},
         {"type":"station","name":"Stanislas", "x": 580, "y": 630, "capacity": 4, "capsule_count": 0, "station_type": 3},
         {"type":"station","name":"Campus_ARTEM", "x": 527, "y": 555, "capacity": 4, "capsule_count": 0, "station_type": 1},
         {"type": "switch_out", "x": 486, "y": 551, "id_bridge": 1},
-        {"type": "switch_out", "x": 430, "y": 590, "id_bridge": 2},
-        {"type": "switch_in", "x": 434, "y": 676, "id_bridge": 0}
+        {"type": "switch_out", "x": 430, "y": 590, "id_bridge": 2}
       ],
       "paths": [{"type": "line"}, {"type": "line"}, {"type": "line"}, {"type": "line"}, {"type": "line"}, {"type": "line"}]
     },
     {
       "name": "Villers-les-Nancy",
-      "clockwise": false,
       "elements": [
         {"type": "switch_in", "x": 396, "y": 456, "id_bridge": 1},
         {"type":"station","name":"Velodrome", "x": 411, "y": 400, "capacity": 5, "capsule_count": 0, "station_type": 3},
@@ -28,14 +26,13 @@
     },
     {
       "name": "Laxou",
-      "clockwise": false,
       "elements": [
-        {"type": "switch_out", "x": 260, "y": 742, "id_bridge": 0},
         {"type": "switch_in", "x": 222, "y": 526, "id_bridge": 2},
         {"type": "switch_in", "x": 78, "y": 526, "id_bridge": 3},
         {"type":"station","name":"Auchan", "x": 7, "y": 650, "capacity": 3, "capsule_count": 0, "station_type": 1},
         {"type":"station","name":"Sapiniere", "x": 101, "y": 785, "capacity": 3, "capsule_count": 0, "station_type": 2},
-        {"type": "warehouse", "name": "Marie-Jeanne", "x": 175, "y": 791, "capacity": 100, "capsule_count": 100}
+        {"type": "warehouse", "name": "Marie-Jeanne", "x": 175, "y": 791, "capacity": 100, "capsule_count": 100},
+        {"type": "switch_out", "x": 260, "y": 742, "id_bridge": 0}
       ],
       "paths": [{"type": "line"}, {"type": "line"}, {"type": "line"}, {"type": "line"}, {"type": "line"}, {"type": "line"}]
     }

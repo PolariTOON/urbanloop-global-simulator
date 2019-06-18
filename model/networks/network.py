@@ -6,7 +6,6 @@ from model.networks.lines.bridge import Bridge
 from model.networks.lines.loop import Loop
 from model.networks.roads.route import Route
 from model.networks.roads.switch import Switch
-from model.networks.roads.switch_in import SwitchIn
 from ..node2 import Node
 
 
@@ -21,7 +20,7 @@ class Network(Node):
 
     @property
     def capsules(self):
-        return [capsule for road in self._routes for capsule in road.capsules]
+        return [capsule for capsule in self._routes] + [capsule for capsule in self._bridges]
 
     @property
     def bridges(self):
@@ -33,19 +32,22 @@ class Network(Node):
 
     def serialize(self):
         return super().serialize().update({
-            'bridges': [bridge.serialize() for bridge in self.bridges],
-            'loops': [loop.serialize() for loop in self.loops],
+            'bridges': [bridge.serialize() for bridge in self._bridges],
+            'loops': [loop.serialize() for loop in self._loops],
         })
 
     def init_graph_from_json(self, json_network):
         #  Etape 1 : Récupérer les infos du json sous forme pratique
-        bridges = [{"in": [], "out": [], "route": None} for b in json_network["bridges"]]
-        loops = [{"switches": [], "routes": []} for l in json_network["loops"]]
+        bridges = json_network["bridges"]
+        loops = json_network["loops"]
         for b in range(json_network["loops"]):
             loops[b]["switches"] = []
             loops[b]["routes"] = []
             steps = []
-            for n in json_network["loops"][b]["elements"]:
+            paths = []
+            for node in range(len(json_network["loops"][b]["elements"])):
+                n = loops[b]["elements"][node]
+                p = loops[b]["paths"][node]
                 if "switch" in n["type"]:
                     id_bridge = n["id_bridge"]
                     if n["type"] == "switch_in":
@@ -59,12 +61,13 @@ class Network(Node):
                         else:
                             print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
                     loops[b]["switches"].append(n)
-                    loops[b]["routes"].append(steps)
+                    loops[b]["routes"].append({"steps": steps, "paths": paths})
                     steps = []
                 else:
                     steps.append(n)
+                paths.append(p)
             if len(steps) != 0:
-                loops[b]["routes"].append(steps)
+                loops[b]["routes"].append({"steps": steps, "paths": paths})
 
         #  Etape 2 : Instanciation des routes
         all_routes = []
@@ -73,11 +76,11 @@ class Network(Node):
                 new_route = Route(len(all_routes), loops[b]["routes"][route])
                 all_routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
-                loops[b]["routes"][route - 1] = new_route
+                loops[b]["routes"][route - 1]["steps"] = new_route
             loops[b]["routes"].pop()
         l = len(all_routes)  # nombre de routes du réseau internes aux boucles
         for p in range(len(bridges)):
-            new_route = Route(l + p, [])
+            new_route = Route(l + p, [], bridges[p])
             all_routes.append(new_route)
             bridges[p]["route"] = new_route  # On ajoute sa route au bridge
 
@@ -99,10 +102,10 @@ class Network(Node):
             bridges[p]["in"] = loops[b]["switches"][s]
             b, s = bridges[p]["out"]
             bridges[p]["out"] = loops[b]["switches"][s]
-            bridges[p] = Bridge(bridges[p]["in"], bridges[p]["out"], bridges[p]["route"], json_network[bridges][p])
+            bridges[p] = Bridge(bridges[p]["in"], bridges[p]["out"], bridges[p]["route"], bridges[p])
         for b in range(len(loops)):
-            loops[b] = Loop(loops[b]["routes"], loops[b]["switches"], json_network["loops"][b]["name"],
-                            json_network["loops"][b]["paths"])
+            loops[b] = Loop(loops[b]["routes"], loops[b]["switches"], loops[b]["name"],
+                            loops[b]["paths"])
 
         # Etape 5 : On donne le résultat de l'algorithme en attribut du réseau
         self._loops = loops

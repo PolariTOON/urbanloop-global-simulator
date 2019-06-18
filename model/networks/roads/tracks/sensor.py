@@ -7,8 +7,10 @@ from .step import Step
 
 
 class Sensor(Step):
-    def __init__(self):
+    def __init__(self, x, y):
         super().__init__(self)
+        self.x = x
+        self.y = y
 
     def serialize(self):
         return super().serialize().update({

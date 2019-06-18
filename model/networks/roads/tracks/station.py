@@ -13,10 +13,16 @@ class Type(Enum):
 
 
 class Station(Step):
-    def __init__(self):
+    def __init__(self, name, capacity, capsule_count, station_type, x, y):
         super().__init__(self)
+        self.name = name
+        self.capacity = capacity
+        self.capsule_count = capsule_count
+        self.station_type = station_type
+        self.x = x
+        self.y = y
 
-    def serialize():
+    def serialize(self):
         return super().serialize().update({
             'type': 'station'
         })

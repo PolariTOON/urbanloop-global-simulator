@@ -10,11 +10,11 @@ from .tracks.shed import Shed
 
 
 class Route(Way):
-    def __init__(self, id, paths=None, steps=None):
+    def __init__(self, id, steps=None, sections=None):
         super().__init__()
         self.id = id
-        self._sections = paths or []
         self._steps = steps or []  # liste contenant des sheds, stations et capteurs au format json
+        self._sections = sections or []
         self._init_route()  # steps_paths = [{"steps": [shed, capteur, station, ...], "paths": [{"type": machin}]}]
         self._previous_switch = None
         self._next_switch = None

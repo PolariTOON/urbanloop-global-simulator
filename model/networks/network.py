@@ -44,7 +44,7 @@ class Network(Node):
             self._loops[b]["switches"] = []
             self._loops[b]["routes"] = []
             steps = []
-            paths = []
+            sections = []
             for node in range(len(self._loops[b]["elements"])):
                 n = self._loops[b]["elements"][node]
                 p = self._loops[b]["paths"][node]
@@ -61,13 +61,14 @@ class Network(Node):
                         else:
                             print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
                     self._loops[b]["switches"].append(n)
-                    self._loops[b]["routes"].append({"steps": steps, "paths": paths})
+                    self._loops[b]["routes"].append({"steps": steps, "sections": sections})
                     steps = []
+                    sections = []
                 else:
                     steps.append(n)
-                paths.append(p)
+                sections.append(p)
             if len(steps) != 0:
-                self._loops[b]["routes"].append({"steps": steps, "paths": paths})
+                self._loops[b]["routes"].append({"steps": steps, "sections": sections})
 
         #  Etape 2 : Instanciation des routes
         for b in range(len(self._loops)):
@@ -79,7 +80,9 @@ class Network(Node):
             self._loops[b]["routes"].pop()
         l = len(self._routes)  # nombre de routes du réseau internes aux boucles
         for p in range(len(self._bridges)):
-            new_route = Route(l + p, {"steps": [], "paths": [self._bridges[p]["path"]]})
+            steps = []
+            sections = [self._bridges[p]["path"]]
+            new_route = Route(l + p, {"steps": steps, "sections": sections})
             self._routes.append(new_route)
             self._bridges[p]["route"] = new_route  # On ajoute sa route au bridge
 

@@ -90,13 +90,13 @@ class Network(Node):
         for b in range(len(loops)):
             for s in range(len(loops[b]["switches"])):
                 id_switch = len(all_switches)
-                route1 = all_routes[(id_switch - 1) % len(loops[b]["switches"])]
-                route2 = all_routes[id_switch]
-                route3 = all_routes[l + loops[b]["switches"][s]["id_bridge"]]
+                route_in = all_routes[(id_switch - 1) % len(loops[b]["switches"])]
+                route_out = all_routes[id_switch]
+                route_bridge = all_routes[l + loops[b]["switches"][s]["id_bridge"]]
                 if loops[b]["switches"][s]["type"] == "switch_in":
-                    new_switch = SwitchIn(id_switch, route1, route2, route3)
+                    new_switch = SwitchIn(id_switch, route_in, route_out, route_bridge)
                 else:
-                    new_switch = SwitchOut(id_switch, route1, route2, route3)
+                    new_switch = SwitchOut(id_switch, route_in, route_out, route_bridge)
                 all_switches.append(new_switch)
                 loops[b]["switchs"][s] = new_switch
 

@@ -7,18 +7,18 @@ from .road import Road
 
 class Switch(Road):
 
-    def __init__(self, id, route1, route2):
+    def __init__(self, id, route_in, route_out):
         super().__init__()
         self.id = id
-        self.route1 = route1
-        self.route2 = route2
+        self.route_in = route_in
+        self.route_out = route_out
 
     @property
     def capsules(self):
-        return self.route1.capsules + self.route2.capsules
+        return self.route_in.capsules + self.route_out.capsules
 
     def serialize(self):
         return super().serialize().update({
             'type': 'switch',
-            'capsule': self.capsules
+            'capsules': self.capsules
         })

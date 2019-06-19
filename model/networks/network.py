@@ -5,7 +5,8 @@ les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (
 from model.networks.lines.bridge import Bridge
 from model.networks.lines.loop import Loop
 from model.networks.roads.route import Route
-from model.networks.roads.switch import Switch
+from model.networks.roads.switch_in import SwitchIn
+from model.networks.roads.switch_out import SwitchOut
 from ..node2 import Node
 
 
@@ -80,7 +81,7 @@ class Network(Node):
             loops[b]["routes"].pop()
         l = len(all_routes)  # nombre de routes du réseau internes aux boucles
         for p in range(len(bridges)):
-            new_route = Route(l + p, [], bridges[p])
+            new_route = Route(l + p, [{"steps": [], "paths": bridges[p]}])
             all_routes.append(new_route)
             bridges[p]["route"] = new_route  # On ajoute sa route au bridge
 
@@ -92,7 +93,10 @@ class Network(Node):
                 route1 = all_routes[(id_switch - 1) % len(loops[b]["switches"])]
                 route2 = all_routes[id_switch]
                 route3 = all_routes[l + loops[b]["switches"][s]["id_bridge"]]
-                new_switch = Switch(id_switch, route1, route2, route3)
+                if loops[b]["switches"][s]["type"] == "switch_in":
+                    new_switch = SwitchIn(id_switch, route1, route2, route3)
+                else:
+                    new_switch = SwitchOut(id_switch, route1, route2, route3)
                 all_switches.append(new_switch)
                 loops[b]["switchs"][s] = new_switch
 

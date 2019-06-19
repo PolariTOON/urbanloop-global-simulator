@@ -9,12 +9,12 @@ from .way import Way
 
 
 class Route(Way):
-    def __init__(self, id, steps):
+    def __init__(self, id, steps_paths):
         super().__init__()
         self.id = id
         self._sections = []
         self._steps = []  # liste contenant des warehouses, stations et capteurs au format json
-        self.build(steps)
+        self.init_route(steps_paths)  # steps_paths = [{"steps": [warehouse, capteur, station, ...], "paths": [{"type": machin}]}]
 
     @property
     def capsules(self):
@@ -35,7 +35,7 @@ class Route(Way):
             'capsule': ''  # TODO
         })
 
-    def build(self, steps):
+    def init_route(self, steps):
         #  TODO : contruction de la route à partir des tracks la composant
 
         for step in range(len(steps)):

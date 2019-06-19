@@ -6,8 +6,18 @@ from .way import Way
 
 
 class Switch(Way):
-    def __init__(self):
+    def __init__(self, id, route1, route2):
         super().__init__()
+        self.id = id
+        self.route1 = route1
+        self.route2 = route2
+
+    @property
+    def capsules(self):
+        return self.route1.capsules + self.route2.capsules
 
     def serialize(self):
-        return super().serialize().update({})
+        return super().serialize().update({
+            'type': 'switch',
+            'capsule': self.capsules
+        })

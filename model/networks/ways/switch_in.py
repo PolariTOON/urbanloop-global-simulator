@@ -9,9 +9,10 @@ class SwitchIn(Switch):
     def __init__(self):
         super().__init__()
         self._switch_out = None
-        self._capsules_in_loop = []
-        self._capsules_in_bridge = []
-        self._capsules_out_loop = []
+        self._capsules_loop_in = []
+        self._capsules_bridge_in = []
+        self._capsules_loop_out = []
+        self._bridge_in =
 
     @property
     def capsules(self):

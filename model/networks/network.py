@@ -2,22 +2,23 @@
 Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
-from model.networks.lines.bridge import Bridge
-from model.networks.lines.loop import Loop
-from model.networks.roads.route import Route
-from model.networks.roads.switch_in import SwitchIn
-from model.networks.roads.switch_out import SwitchOut
+
 from ..node2 import Node
+from .lines.bridge import Bridge
+from .lines.loop import Loop
+from .ways.route import Route
+from .ways.switch_in import SwitchIn
+from .ways.switch_out import SwitchOut
 
 
 class Network(Node):
-    def __init__(self, json_network):
+    def __init__(self, bridges=None, loops=None, switches=None, routes=None, capsules=None):
         super().__init__()
-        self._bridges = []
-        self._loops = []
-        self._switches = []
-        self._routes = []
-        self.init_graph_from_json(json_network)
+        self._bridges = bridges or []
+        self._loops = loops or []
+        self._switches = switches or []
+        self._routes = routes or []
+        self._init_graph_from_json()
 
     @property
     def capsules(self):
@@ -37,82 +38,72 @@ class Network(Node):
             'loops': [loop.serialize() for loop in self._loops],
         })
 
-    def init_graph_from_json(self, json_network):
+    def _init_graph_from_json(self):
         #  Etape 1 : Récupérer les infos du json sous forme pratique
-        bridges = json_network["bridges"]
-        loops = json_network["loops"]
-        for b in range(json_network["loops"]):
-            loops[b]["switches"] = []
-            loops[b]["routes"] = []
+        for b in range(self._loops):
+            self._loops[b]["switches"] = []
+            self._loops[b]["routes"] = []
             steps = []
             paths = []
-            for node in range(len(json_network["loops"][b]["elements"])):
-                n = loops[b]["elements"][node]
-                p = loops[b]["paths"][node]
+            for node in range(len(self._loops[b]["elements"])):
+                n = self._loops[b]["elements"][node]
+                p = self._loops[b]["paths"][node]
                 if "switch" in n["type"]:
                     id_bridge = n["id_bridge"]
                     if n["type"] == "switch_in":
-                        if not bridges[id_bridge]["in"]:
-                            bridges[id_bridge]["in"] = [loops[b], len(loops[b]["switches"])]  # [id_boucle, id_switch_in]
+                        if not self._bridges[id_bridge]["in"]:
+                            self._bridges[id_bridge]["in"] = [self._loops[b], len(self._loops[b]["switches"])]  # [id_boucle, id_switch_in]
                         else:
                             print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
                     else:
-                        if not bridges[id_bridge]["out"]:
-                            bridges[id_bridge]["out"] = [loops[b], len(loops[b]["switches"])]  # [id_boucle, id_switch_out]
+                        if not self._bridges[id_bridge]["out"]:
+                            self._bridges[id_bridge]["out"] = [self._loops[b], len(self._loops[b]["switches"])]  # [id_boucle, id_switch_out]
                         else:
                             print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
-                    loops[b]["switches"].append(n)
-                    loops[b]["routes"].append({"steps": steps, "paths": paths})
+                    self._loops[b]["switches"].append(n)
+                    self._loops[b]["routes"].append({"steps": steps, "paths": paths})
                     steps = []
                 else:
                     steps.append(n)
                 paths.append(p)
             if len(steps) != 0:
-                loops[b]["routes"].append({"steps": steps, "paths": paths})
+                self._loops[b]["routes"].append({"steps": steps, "paths": paths})
 
         #  Etape 2 : Instanciation des routes
-        all_routes = []
-        for b in range(len(loops)):
-            for route in range(1, len(loops[b]["routes"])):
-                new_route = Route(len(all_routes), loops[b]["routes"][route])
-                all_routes.append(new_route)
+        for b in range(len(self._loops)):
+            for route in range(1, len(self._loops[b]["routes"])):
+                new_route = Route(len(self._routes), self._loops[b]["routes"][route])
+                self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
-                loops[b]["routes"][route - 1]["steps"] = new_route
-            loops[b]["routes"].pop()
-        l = len(all_routes)  # nombre de routes du réseau internes aux boucles
-        for p in range(len(bridges)):
-            new_route = Route(l + p, [{"steps": [], "paths": bridges[p]}])
-            all_routes.append(new_route)
-            bridges[p]["route"] = new_route  # On ajoute sa route au bridge
+                self._loops[b]["routes"][route - 1]["steps"] = new_route
+            self._loops[b]["routes"].pop()
+        l = len(self._routes)  # nombre de routes du réseau internes aux boucles
+        for p in range(len(self._bridges)):
+            new_route = Route(l + p, {"steps": [], "paths": [self._bridges[p]["path"]]})
+            self._routes.append(new_route)
+            self._bridges[p]["route"] = new_route  # On ajoute sa route au bridge
 
         #  Etape 3 : Instanciation des aiguillages et liaison avec les routes
-        all_switches = []
-        for b in range(len(loops)):
-            for s in range(len(loops[b]["switches"])):
-                id_switch = len(all_switches)
-                route_in = all_routes[(id_switch - 1) % len(loops[b]["switches"])]
-                route_out = all_routes[id_switch]
-                route_bridge = all_routes[l + loops[b]["switches"][s]["id_bridge"]]
-                if loops[b]["switches"][s]["type"] == "switch_in":
+        for b in range(len(self._loops)):
+            for s in range(len(self._loops[b]["switches"])):
+                id_switch = len(self._switches)
+                route_in = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]
+                route_out = self._routes[id_switch]
+                route_bridge = self._routes[l + self._loops[b]["switches"][s]["id_bridge"]]
+                if self._loops[b]["switches"][s]["type"] == "switch_in":
                     new_switch = SwitchIn(id_switch, route_in, route_out, route_bridge)
                 else:
                     new_switch = SwitchOut(id_switch, route_in, route_out, route_bridge)
-                all_switches.append(new_switch)
-                loops[b]["switchs"][s] = new_switch
+                self._switches.append(new_switch)
+                self._loops[b]["switchs"][s] = new_switch
 
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
-        for p in range(len(bridges)):
-            b, s = bridges[p]["in"]
-            bridges[p]["in"] = loops[b]["switches"][s]
-            b, s = bridges[p]["out"]
-            bridges[p]["out"] = loops[b]["switches"][s]
-            bridges[p] = Bridge(bridges[p]["in"], bridges[p]["out"], bridges[p]["route"], bridges[p])
-        for b in range(len(loops)):
-            loops[b] = Loop(loops[b]["routes"], loops[b]["switches"], loops[b]["name"],
-                            loops[b]["paths"])
-
-        # Etape 5 : On donne le résultat de l'algorithme en attribut du réseau
-        self._loops = loops
-        self._bridges = bridges
-        self._switches = all_switches
-        self._routes = all_routes
+        for p in range(len(self._bridges)):
+            b, s = self._bridges[p]["in"]
+            self._bridges[p]["in"] = self._loops[b]["switches"][s]
+            b, s = self._bridges[p]["out"]
+            self._bridges[p]["out"] = self._loops[b]["switches"][s]
+            self._bridges[p] = Bridge(self._bridges[p]["in"], self._bridges[p]["out"], self._bridges[p]["route"], self._bridges[p])
+        for b in range(len(self._loops)):
+            self._loops[b] = Loop(self._loops[b]["routes"], self._loops[b]["switches"], self._loops[b]["name"],
+                            self._loops[b]["paths"])

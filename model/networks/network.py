@@ -2,7 +2,7 @@
 Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
-
+from model.networks.tokens.pod import Pod
 from ..node2 import Node
 from .lines.bridge import Bridge
 from .lines.loop import Loop
@@ -12,7 +12,7 @@ from .ways.switch_out import SwitchOut
 
 
 class Network(Node):
-    def __init__(self, bridges=None, loops=None, switches=None, routes=None, capsules=None):
+    def __init__(self, bridges=None, loops=None, switches=None, routes=None):
         super().__init__()
         self._bridges = bridges or []
         self._loops = loops or []
@@ -21,8 +21,8 @@ class Network(Node):
         self._init_graph_from_json()
 
     @property
-    def capsules(self):
-        return [capsule for capsule in self._routes] + [capsule for capsule in self._bridges]
+    def pods(self):
+        return [pod for pod in self._routes] + [pod for pod in self._bridges]
 
     @property
     def bridges(self):
@@ -52,12 +52,14 @@ class Network(Node):
                     id_bridge = n["id_bridge"]
                     if n["type"] == "switch_in":
                         if not self._bridges[id_bridge]["in"]:
-                            self._bridges[id_bridge]["in"] = [self._loops[b], len(self._loops[b]["switches"])]  # [id_boucle, id_switch_in]
+                            self._bridges[id_bridge]["in"] = [self._loops[b], len(
+                                self._loops[b]["switches"])]  # [id_boucle, id_switch_in]
                         else:
                             print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
                     else:
                         if not self._bridges[id_bridge]["out"]:
-                            self._bridges[id_bridge]["out"] = [self._loops[b], len(self._loops[b]["switches"])]  # [id_boucle, id_switch_out]
+                            self._bridges[id_bridge]["out"] = [self._loops[b], len(
+                                self._loops[b]["switches"])]  # [id_boucle, id_switch_out]
                         else:
                             print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
                     self._loops[b]["switches"].append(n)
@@ -65,7 +67,13 @@ class Network(Node):
                     steps = []
                     sections = []
                 else:
-                    steps.append(n)
+                    if n["type"] == "station" or n["type"] == "shed":
+                        # Ajout des capsules sans voyageurs
+                        pods_sc = []
+                        for c in range(n["pods"]["count"]):
+                            pods_sc.append(Pod(None, None)) # TODO
+                        n["pods_list"] = pods_sc
+                    steps.append(n)  # important : on ajoute l'étape
                 sections.append(p)
             if len(steps) != 0:
                 self._loops[b]["routes"].append({"steps": steps, "sections": sections})
@@ -106,7 +114,28 @@ class Network(Node):
             self._bridges[p]["in"] = self._loops[b]["switches"][s]
             b, s = self._bridges[p]["out"]
             self._bridges[p]["out"] = self._loops[b]["switches"][s]
-            self._bridges[p] = Bridge(self._bridges[p]["in"], self._bridges[p]["out"], self._bridges[p]["route"], self._bridges[p])
+            self._bridges[p] = Bridge(**self._bridges[p])
         for b in range(len(self._loops)):
-            self._loops[b] = Loop(self._loops[b]["routes"], self._loops[b]["switches"], self._loops[b]["name"],
-                            self._loops[b]["paths"])
+            self._loops[b] = Loop(**self._loops[b])
+
+        """
+        TODO : A FAIRE DANS LOOP ET BRIDGE
+        # Etape 5 : Ajout des capsules en mouvement
+        for c in range(len(self.pods)):
+            if self.pods[c]["position"]["loop_bridge"]:  # La capsule est sur une boucle
+                b = self.pods[c]["position"]["id"]
+                d = 0
+                ok = False
+                # On trouve la section à laquelle appartient la voiture pour l'ajouter
+                for r in self.loops[b].routes:
+                    for s in r.sections:
+                        d += s.len
+                        if d > self.pods[c]["position"]["distance"]:
+                            source = get_node(id_loop, id_element
+                            s.add_pod(self._id_pod_max, )
+                            self._id_pod_max += 1
+                            ok = True
+                            break
+                    if ok:
+                        break
+        """

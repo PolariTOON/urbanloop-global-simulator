@@ -20,8 +20,8 @@ class Route(Way):
         self._next_switch = None
 
     @property
-    def capsules(self):
-        return [capsule for section in self.sections for capsule in section.capsules] + [capsule for step in self.steps for capsule in step.capsules]
+    def pods(self):
+        return [pod for section in self.sections for pod in section.pods] + [pod for step in self.steps for pod in step.pods]
 
     @property
     def sections(self):
@@ -34,7 +34,7 @@ class Route(Way):
     def serialize(self):
         return super().serialize().update({
             'type': 'route',
-            'capsule': ''  # TODO
+            'pod': ''  # TODO
         })
 
     def _init_route(self):
@@ -43,10 +43,10 @@ class Route(Way):
         for k in range(len(self._steps)):
             step = self._steps[k]
             if step["type"] == "station":
-                new_station = Station(step["name"], step["capacity"], step["capsule_count"], step["station_type"], step["x"], step["y"])
+                new_station = Station(step["name"], step["capacity"], step["pod_count"], step["station_type"], step["x"], step["y"])
                 self._steps[k] = new_station
             elif step["type"] == "shed":
-                new_shed = Shed(step["name"], step["capacity"], step["capsule_count"], step["x"], step["y"])
+                new_shed = Shed(step["name"], step["capacity"], step["pod_count"], step["x"], step["y"])
                 self._steps[k] = new_shed
             elif step["type"] == "sensor":
                 new_sensor = Sensor(step["x"], step["y"])

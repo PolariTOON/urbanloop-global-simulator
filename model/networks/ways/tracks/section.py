@@ -1,7 +1,7 @@
 """
 Possibilité de noeud du sous-graphe désignant une section de route
 """
-
+from ...tokens.pod import Pod
 from .track import Track
 
 
@@ -24,3 +24,6 @@ class Section(Track):
             'len': self.len,
             'path': self.path
         })
+
+    def add_pod(self, id, source, destination, travelers):
+        self.pods.append(Pod(id, source, destination, travelers))

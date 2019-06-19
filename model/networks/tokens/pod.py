@@ -1,9 +1,11 @@
 from .token import Token
+import uuid
 
 
-class Capsule(Token):
-    def __init__(self, travelers=None):
-        super().__init__()
+class Pod(Token):
+    def __init__(self, source, destination, travelers):
+        super().__init__(source, destination)
+        self.id = uuid.uuid4().hex  # génération d'un identifiant unique
         self._travelers = travelers if travelers is not None else []
 
     @property

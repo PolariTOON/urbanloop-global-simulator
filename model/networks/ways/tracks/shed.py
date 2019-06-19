@@ -6,11 +6,11 @@ from .step import Step
 
 
 class Shed(Step):
-    def __init__(self, name, capacity, capsule_count, x, y):
+    def __init__(self, name, capacity, pod_count, x, y):
         super().__init__()
         self.name = name
         self.capacity = capacity
-        self.capsule_count = capsule_count
+        self.pod_count = pod_count
         self.x = x
         self.y = y
 

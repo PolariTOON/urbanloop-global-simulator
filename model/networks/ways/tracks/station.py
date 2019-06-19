@@ -13,11 +13,11 @@ class Type(Enum):
 
 
 class Station(Step):
-    def __init__(self, name, capacity, capsule_count, station_type, x, y):
+    def __init__(self, name, capacity, pod_count, station_type, x, y):
         super().__init__()
         self.name = name
         self.capacity = capacity
-        self.capsule_count = capsule_count
+        self.pod_count = pod_count
         self.station_type = station_type
         self.x = x
         self.y = y

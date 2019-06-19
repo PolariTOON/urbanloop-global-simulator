@@ -3,10 +3,10 @@ class Node:
         pass
 
     @property
-    def capsules(self):
+    def pods(self):
         raise NotImplementedError
 
     def serialize(self):
         return {
-            'capsules': [capsule.serialize() for capsule in self.capsules]
+            'pods': [pod.serialize() for pod in self.pods]
         }

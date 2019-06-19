@@ -5,9 +5,9 @@ Type de noeud du sous-graphe du réseau qui représente un garage où sont stock
 from .step import Step
 
 
-class Warehouse(Step):
+class Shed(Step):
     def __init__(self, name, capacity, capsule_count, x, y):
-        super().__init__(self)
+        super().__init__()
         self.name = name
         self.capacity = capacity
         self.capsule_count = capsule_count

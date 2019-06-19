@@ -3,7 +3,7 @@ from .token import Token
 
 class Capsule(Token):
     def __init__(self, travelers=None):
-        super().__init__(self)
+        super().__init__()
         self._travelers = travelers if travelers is not None else []
 
     @property

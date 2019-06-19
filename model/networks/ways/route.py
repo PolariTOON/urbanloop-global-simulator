@@ -5,13 +5,13 @@ Une route est à la fois un noeud du graphe subdivisé et un graphe divisé en s
 
 from .way import Way
 from .tracks.sensor import Sensor
-from .tracks.station import Station
 from .tracks.shed import Shed
+from .tracks.station import Station
 
 
 class Route(Way):
-    def __init__(self, id, steps=None, sections=None):
-        super().__init__()
+    def __init__(self, id, steps=None, sections=None, **kwargs):
+        super().__init__(**kwargs)
         self.id = id
         self._steps = steps or []  # liste contenant des sheds, stations et capteurs au format json
         self._sections = sections or []
@@ -42,14 +42,11 @@ class Route(Way):
 
         for k in range(len(self._steps)):
             step = self._steps[k]
-            if step["type"] == "station":
-                new_station = Station(step["name"], step["capacity"], step["capsule_count"], step["station_type"], step["x"], step["y"])
-                self._steps[k] = new_station
+            if step["type"] == "sensor":
+                self._steps[k] = Sensor(**step)
             elif step["type"] == "shed":
-                new_shed = Shed(step["name"], step["capacity"], step["capsule_count"], step["x"], step["y"])
-                self._steps[k] = new_shed
-            elif step["type"] == "sensor":
-                new_sensor = Sensor(step["x"], step["y"])
-                self._steps[k] = new_sensor
+                self._steps[k] = Shed(**step)
+            elif step["type"] == "station":
+                self._steps[k] = Station(**step)
             else:
                 print("ERROR TYPE OF STEP")

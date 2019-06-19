@@ -6,15 +6,21 @@ from .track import Track
 
 
 class Step(Track):
-    def __init__(self, angle):
-        super().__init__(angle)
-        self._angle = angle
+    def __init__(self, x=None, y=None, **kwargs):
+        super().__init__(**kwargs)
+        self._x = x or 0
+        self._y = y or 0
 
     @property
-    def angle(self):
-        return self._angle
+    def x(self):
+        return self._x
+
+    @property
+    def y(self):
+        return self._y
 
     def serialize(self):
         return super().serialize().update({
-            'angle': self.angle
+            "x": self.x,
+            "y": self.y
         })

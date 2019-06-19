@@ -12,8 +12,8 @@ from .ways.switch_out import SwitchOut
 
 
 class Network(Node):
-    def __init__(self, bridges=None, loops=None, switches=None, routes=None, capsules=None):
-        super().__init__()
+    def __init__(self, bridges=None, loops=None, switches=None, routes=None, capsules=None, **kwargs):
+        super().__init__(**kwargs)
         self._bridges = bridges or []
         self._loops = loops or []
         self._switches = switches or []
@@ -73,7 +73,7 @@ class Network(Node):
         #  Etape 2 : Instanciation des routes
         for b in range(len(self._loops)):
             for route in range(1, len(self._loops[b]["routes"])):
-                new_route = Route(len(self._routes), self._loops[b]["routes"][route])
+                new_route = Route(len(self._routes), **self._loops[b]["routes"][route])
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
                 self._loops[b]["routes"][route - 1]["steps"] = new_route
@@ -82,7 +82,7 @@ class Network(Node):
         for p in range(len(self._bridges)):
             steps = []
             sections = [self._bridges[p]["path"]]
-            new_route = Route(l + p, {"steps": steps, "sections": sections})
+            new_route = Route(l + p, **{"steps": steps, "sections": sections})
             self._routes.append(new_route)
             self._bridges[p]["route"] = new_route  # On ajoute sa route au bridge
 

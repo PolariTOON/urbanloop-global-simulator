@@ -6,8 +6,8 @@ from ....node2 import Node
 
 
 class Track(Node):
-    def __init__(self, angle):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self._previous_track = None
         self._next_track = None
         self._capsules = [] # TODO déplacer vers les sections et les différentes étapes

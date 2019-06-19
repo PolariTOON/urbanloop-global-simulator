@@ -6,8 +6,8 @@ from ...node2 import Node
 
 
 class Way(Node):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def serialize(self):
         return super().serialize().update({})

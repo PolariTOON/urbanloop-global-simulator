@@ -7,8 +7,8 @@ from .way import Way
 
 class Switch(Way):
 
-    def __init__(self, id, route_in, route_out):
-        super().__init__()
+    def __init__(self, id, route_in, route_out, **kwargs):
+        super().__init__(**kwargs)
         self.id = id
         self.route_in = route_in
         self.route_out = route_out

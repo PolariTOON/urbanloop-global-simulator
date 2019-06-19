@@ -6,8 +6,8 @@ from .track import Track
 
 
 class Section(Track):
-    def __init__(self, len):
-        super().__init__()
+    def __init__(self, len, **kwargs):
+        super().__init__(**kwargs)
         self._len = len  # taille de la section
         self._path = None
 

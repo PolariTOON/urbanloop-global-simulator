@@ -20,8 +20,8 @@ class Route(Way):
         self._next_switch = None
 
     @property
-    def capsules(self):
-        return [capsule for section in self.sections for capsule in section.capsules] + [capsule for step in self.steps for capsule in step.capsules]
+    def pods(self):
+        return [pod for section in self.sections for pod in section.pods] + [pod for step in self.steps for pod in step.pods]
 
     @property
     def sections(self):
@@ -34,7 +34,7 @@ class Route(Way):
     def serialize(self):
         return super().serialize().update({
             'type': 'route',
-            'capsule': ''  # TODO
+            'pod': ''  # TODO
         })
 
     def _init_route(self):

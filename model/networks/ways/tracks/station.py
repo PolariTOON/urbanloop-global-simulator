@@ -3,7 +3,7 @@ Type de noeud du sous-graphe correspondant à une station d"arrêt
 """
 
 from enum import Enum
-from ...tokens.capsule import Capsule
+from ...tokens.pod import Capsule
 from .step import Step
 
 
@@ -14,21 +14,21 @@ class Type(Enum):
 
 
 class Station(Step):
-    def __init__(self, capsules=None, station_type=None, **kwargs):
+    def __init__(self, pods=None, station_type=None, **kwargs):
         super().__init__(**kwargs)
-        capsules = capsules or {
+        pods = pods or {
             "count": 0,
             "max": 0
         }
-        self._capsules = [Capsule() for k in range(capsules["count"])]
-        self._capacity = capsules["max"] or 0
+        self._pods = [Capsule() for k in range(pods["count"])]
+        self._capacity = pods["max"] or 0
         self._station_type = station_type
 
     def serialize(self):
         return super().serialize().update({
             "type": "station",
-            "capsules": {
-                "count": len(self._capsules),
+            "pods": {
+                "count": len(self._pods),
                 "max": self._capacity
             },
             "station_type": self._station_type

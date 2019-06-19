@@ -33,7 +33,7 @@ class Simulation:
         self.traveler = config['TRAVELER']
         self.topology = config['TOPOLOGY']
         self.prob = config['PROB']
-        self.capsule = config['CAPSULE']
+        self.pod = config['POD']
         self.routing = config['ROUTING']
         self.sim = config['SIM']
         self.path = 'resources/config.ini'
@@ -50,7 +50,7 @@ class Simulation:
         self.is_real_time = False
         self.is_endless = False
         self.station_refill = True
-        self.fulfill_period = int(self.capsule['fulfill_period'])
+        self.fulfill_period = int(self.pod['fulfill_period'])
         self.is_visualized = is_visualized
         self.tab_depart = []
         self.tab_temps = []
@@ -60,7 +60,7 @@ class Simulation:
             self.is_real_time = True
         if self.sim['endless'] in ['true', 'True']:
             self.is_endless = True
-        if self.capsule['station_refill'] in ['false', 'False']:
+        if self.pod['station_refill'] in ['false', 'False']:
             self.station_refill = False
         self._load_env()
         self.tick_event = self._env.event()
@@ -176,7 +176,7 @@ class Simulation:
         self.traveler = self.config['TRAVELER']
         self.topology = self.config['TOPOLOGY']
         self.prob = self.config['PROB']
-        self.capsule = self.config['CAPSULE']
+        self.pod = self.config['POD']
         self.routing = self.config['ROUTING']
         self.sim = self.config['SIM']
         self.loaded = True
@@ -211,10 +211,10 @@ class Simulation:
             'activity_and_residential_percent': int(self.prob['activity_and_residential_percent']),
             'city_percent': int(self.prob['city_percent']),
             'activity_and_residential_fluctuation': int(self.prob['activity_and_residential_fluctuation']),
-            'max_speed': float(self.capsule['max_speed']),
-            'number_of_capsules': int(self.capsule['number_of_capsules']),
-            'station_refill': self.capsule['station_refill'],
-            'fulfill_period': int(self.capsule['fulfill_period']),
+            'max_speed': float(self.pod['max_speed']),
+            'number_of_pods': int(self.pod['number_of_pods']),
+            'station_refill': self.pod['station_refill'],
+            'fulfill_period': int(self.pod['fulfill_period']),
             'switched_cost': int(self.routing['switched_cost']),
             'my_timer': int(self.routing['my_timer']),
             'timer_other': int(self.routing['timer_other']),

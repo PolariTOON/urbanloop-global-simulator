@@ -14,11 +14,11 @@ class Switch(Way):
         self.route_out = route_out
 
     @property
-    def capsules(self):
-        return self.route_in.capsules + self.route_out.capsules
+    def pods(self):
+        return self.route_in.pods + self.route_out.pods
 
     def serialize(self):
         return super().serialize().update({
             'type': 'switch',
-            'capsules': self.capsules
+            'pods': self.pods
         })

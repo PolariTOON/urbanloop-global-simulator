@@ -1,26 +1,26 @@
 """
-Type de noeud du sous-graphe du réseau qui représente un garage où sont stocker des capsules
+Type de noeud du sous-graphe du réseau qui représente un garage où sont stocker des pods
 """
 
-from ...tokens.capsule import Capsule
+from ...tokens.pod import Capsule
 from .step import Step
 
 
 class Shed(Step):
-    def __init__(self, capsules=None, **kwargs):
+    def __init__(self, pods=None, **kwargs):
         super().__init__(**kwargs)
-        capsules = capsules or {
+        pods = pods or {
             "count": 0,
             "max": 0
         }
-        self._capsules = [Capsule() for k in range(capsules["count"])]
-        self._capacity = capsules["max"] or 0
+        self._pods = [Capsule() for k in range(pods["count"])]
+        self._capacity = pods["max"] or 0
 
     def serialize(self):
         return super().serialize().update({
             "type": "shed",
-            "capsules": {
-                "count": len(self._capsules),
+            "pods": {
+                "count": len(self._pods),
                 "max": self._capacity
             }
         })

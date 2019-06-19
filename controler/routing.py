@@ -31,16 +31,16 @@ class Routing:
 
     def maj_info(self):
         loops = []
-        capsules = []
+        pods = []
         for a_loop_name, a_loop in self.network.get_loops():
             loops.append(a_loop)
-            capsules[a_loop_name] = 0
-        for a_capsule in self.network.get_capsules():
-            capsules[a_capsule.loop.name] += 1
+            pods[a_loop_name] = 0
+        for a_pod in self.network.get_pods():
+            pods[a_pod.loop.name] += 1
         for a_loop in loops:
-            recorder.add_capsule_average_loop(capsules[a_loop.name], a_loop)
+            recorder.add_pod_average_loop(pods[a_loop.name], a_loop)
         for a_station in station.get_stations():
-            recorder.add_stopped_capsules_station(a_station.get_waiting_capsules_number(), a_station)
+            recorder.add_stopped_pods_station(a_station.get_waiting_pods_number(), a_station)
             recorder.add_waiting_travelers(a_station.get_waiting_travelers_number(), a_station)
 
     def temps_moy_stat(self, id, temps):

@@ -4,11 +4,11 @@ Une route est à la fois un noeud du graphe subdivisé et un graphe divisé en s
 """
 from model.networks.roads.tracks.sensor import Sensor
 from model.networks.roads.tracks.station import Station
-from model.networks.roads.tracks.warehouse import Warehouse
-from .road import Road
+from model.networks.roads.tracks.warehouse import Shed
+from .way import Way
 
 
-class Route(Road):
+class Route(Way):
     def __init__(self, id, steps_paths):
         super().__init__()
         self.id = id
@@ -43,7 +43,7 @@ class Route(Road):
                 new_station = Station(step["name"], step["capacity"], step["capsule_count"], step["station_type"], step["x"], step["y"])
                 self._steps.append(new_station)
             elif step["type"] == "warehouse":
-                new_warehouse = Warehouse(step["name"], step["capacity"], step["capsule_count"], step["x"], step["y"])
+                new_warehouse = Shed(step["name"], step["capacity"], step["capsule_count"], step["x"], step["y"])
                 self._steps.append(new_warehouse)
             elif step["type"] == "sensor":
                 new_sensor = Sensor(step["x"], step["y"])

@@ -14,7 +14,7 @@ class Type(Enum):
 
 class Station(Step):
     def __init__(self, name, capacity, capsule_count, station_type, x, y):
-        super().__init__(self)
+        super().__init__()
         self.name = name
         self.capacity = capacity
         self.capsule_count = capsule_count

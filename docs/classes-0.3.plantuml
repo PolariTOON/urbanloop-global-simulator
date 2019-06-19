@@ -6,7 +6,7 @@ class WebApp
 package controler {
 	class Simulation
 	class Converter
-	class Poisson
+	class Probability
 	class Routing
 }
 package model {
@@ -14,7 +14,7 @@ package model {
 	package networks {
 		class Network
 		package roads {
-			class Road
+			class Way
 			class Switch
 			class SwitchIn
 			class SwitchOut
@@ -24,7 +24,7 @@ package model {
 				class Step
 				class Sensor
 				class Station
-				class Warehouse
+				class Shed
 				class Section
 			}
 		}
@@ -46,17 +46,17 @@ Main "0"--"1" WebApp
 ConsoleApp "0"--"1" Simulation
 WebApp "0"--"1..*" Simulation
 Simulation "0"--"1" Converter
-Simulation "0"--"1" Poisson
+Simulation "0"--"1" Probability
 Simulation "0"--"1" Routing
 Routing "0"--"1" Network
 Node <|-- Network
-Node <|-- Road
+Node <|-- Way
 Node <|-- Track
 Node "0"--"0..*" Capsule
-Network "0"*--"0..*" Road
+Network "0"*--"0..*" Way
 Network "0"*--"0..*" Line
-Road <|-- Switch
-Road <|-- Route
+Way <|-- Switch
+Way <|-- Route
 Switch <|-- SwitchIn
 Switch <|-- SwitchOut
 SwitchIn "0"--"3" Route
@@ -68,11 +68,13 @@ Track <|-- Step
 Track <|-- Section
 Step <|-- Sensor
 Step <|-- Station
-Step <|-- Warehouse
+Step <|-- Shed
 Station "0"--"0..*" Traveler
 Line <|-- Bridge
 Line <|-- Loop
 Bridge "0"--"1" Route
+Bridge "0"--"2" Switch
+Loop "0"--"2..*" Switch
 Loop "0"--"1..*" Route
 Token <|-- Capsule
 Token <|-- Traveler

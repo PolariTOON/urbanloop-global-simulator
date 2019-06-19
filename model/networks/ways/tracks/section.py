@@ -7,7 +7,7 @@ from .track import Track
 
 class Section(Track):
     def __init__(self, len):
-        super().__init__(self)
+        super().__init__()
         self._len = len  # taille de la section
         self._path = None
 

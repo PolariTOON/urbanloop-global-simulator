@@ -7,7 +7,7 @@ from .track import Track
 
 class Step(Track):
     def __init__(self, angle):
-        super().__init__(self, angle)
+        super().__init__(angle)
         self._angle = angle
 
     @property

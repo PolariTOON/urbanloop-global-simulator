@@ -8,7 +8,7 @@ from .step import Step
 
 class Sensor(Step):
     def __init__(self, x, y):
-        super().__init__(self)
+        super().__init__()
         self.x = x
         self.y = y
 

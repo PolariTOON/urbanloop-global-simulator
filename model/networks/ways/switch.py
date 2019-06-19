@@ -2,10 +2,10 @@
 réuni des connexions pour former les switchs du réseau
 """
 
-from .road import Road
+from .way import Way
 
 
-class Switch(Road):
+class Switch(Way):
 
     def __init__(self, id, route_in, route_out):
         super().__init__()

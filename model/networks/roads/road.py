@@ -11,5 +11,5 @@ class Road(Node):
         self._previous_road = None
         self._next_road = None
 
-    def serialize():
+    def serialize(self):
         return super().serialize().update({})

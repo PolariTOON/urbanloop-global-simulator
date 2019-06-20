@@ -3,7 +3,7 @@ Type de noeud du sous-graphe correspondant à une station d"arrêt
 """
 
 from enum import Enum
-from ...tokens.pod import Capsule
+from ...tokens.pod import Pod
 from .step import Step
 
 
@@ -14,13 +14,13 @@ class Type(Enum):
 
 
 class Station(Step):
-    def __init__(self, pods=None, station_type=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, previous_track, next_track, pods=None, station_type=None, **kwargs):
+        super().__init__(previous_track, next_track, **kwargs)
         pods = pods or {
             "count": 0,
             "max": 0
         }
-        self._pods = [Capsule() for k in range(pods["count"])]
+        self._pods = [Pod() for k in range(pods["count"])]
         self._capacity = pods["max"] or 0
         self._station_type = station_type
 

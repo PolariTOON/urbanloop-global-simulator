@@ -6,10 +6,10 @@ from .track import Track
 
 
 class Section(Track):
-    def __init__(self, len, **kwargs):
-        super().__init__(**kwargs)
-        self._len = len  # taille de la section
-        self._path = None
+    def __init__(self, previous_track, next_track, path, **kwargs):
+        super().__init__(previous_track, next_track, **kwargs)
+        self._len = None  # taille de la section
+        self._path = path
 
     @property
     def len(self):

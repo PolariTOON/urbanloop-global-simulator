@@ -5,8 +5,8 @@ from .switch import Switch
 
 
 class SwitchIn(Switch):
-    def __init__(self, id, route_in, route_out, route_bridge, **kwargs):
-        super().__init__(id, route_in, route_out, **kwargs)
+    def __init__(self, id, pods, route_in, route_out, route_bridge, **kwargs):
+        super().__init__(id, pods, route_in, route_out, **kwargs)
         self._switch_out = None
         self._pod_loop_in = []
         self._pod_bridge_in = []
@@ -15,7 +15,7 @@ class SwitchIn(Switch):
 
     @property
     def pods(self):
-        return self._pod_loop_in + self._pod_bridge_in + self._pod_loop_out
+        return self._pods
 
     def serialize(self):
         return super().serialize().update({

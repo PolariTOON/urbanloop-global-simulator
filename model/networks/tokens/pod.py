@@ -3,7 +3,7 @@ import uuid
 
 
 class Pod(Token):
-    def __init__(self, source, destination, travelers):
+    def __init__(self, source, destination, travelers=None):
         super().__init__(source, destination)
         self.id = uuid.uuid4().hex  # génération d'un identifiant unique
         self._travelers = travelers if travelers is not None else []

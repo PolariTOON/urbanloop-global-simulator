@@ -3,6 +3,7 @@ Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
 from model.networks.tokens.pod import Pod
+from model.networks.tokens.traveler import Traveler
 from ..node2 import Node
 from .lines.bridge import Bridge
 from .lines.loop import Loop
@@ -71,7 +72,7 @@ class Network(Node):
                         # Ajout des capsules sans voyageurs
                         pods_sc = []
                         for c in range(n["pods"]["count"]):
-                            pods_sc.append(Pod(None, None)) # TODO
+                            pods_sc.append(Pod(None, None))
                         n["pods_list"] = pods_sc
                     steps.append(n)  # important : on ajoute l'étape
                 sections.append(p)
@@ -94,19 +95,30 @@ class Network(Node):
             self._routes.append(new_route)
             self._bridges[p]["route"] = new_route  # On ajoute sa route au bridge
 
-        #  Etape 3 : Instanciation des aiguillages et liaison avec les routes
+        #  Etape 3 : Instanciation des aiguillages, ajout de leurs capsules et liaison avec les routes
         for b in range(len(self._loops)):
             for s in range(len(self._loops[b]["switches"])):
+                #  Capsules
+                pods = []
+                for pod in self._loops[b]["switches"][s]:
+                    source = self._get_elt_of_loop(self._loops[b]["switches"][s]["pods"][pod]["source"])
+                    destination = self._get_elt_of_loop(self._loops[b]["switches"][s]["pods"][pod]["destination"])
+                    travelers = []
+                    for trav in range(pod["travelers"]["count"]):
+                        travelers.append(Traveler(source, destination))
+                    new_pod = Pod(source, destination, travelers)
+                    pods.append(new_pod)
+                #  Routes et Id
                 id_switch = len(self._switches)
                 route_in = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]
                 route_out = self._routes[id_switch]
                 route_bridge = self._routes[l + self._loops[b]["switches"][s]["id_bridge"]]
                 if self._loops[b]["switches"][s]["type"] == "switch_in":
-                    new_switch = SwitchIn(id_switch, route_in, route_out, route_bridge)
+                    new_switch = SwitchIn(id_switch, pods, route_in, route_out, route_bridge)
                 else:
-                    new_switch = SwitchOut(id_switch, route_in, route_out, route_bridge)
+                    new_switch = SwitchOut(id_switch, pods, route_in, route_out, route_bridge)
                 self._switches.append(new_switch)
-                self._loops[b]["switchs"][s] = new_switch
+                self._loops[b]["switches"][s] = new_switch
 
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
         for p in range(len(self._bridges)):
@@ -139,3 +151,26 @@ class Network(Node):
                     if ok:
                         break
         """
+
+    def _get_elt_of_loop(self, source_dest):
+        """
+        :param source_dest: dictionnaire obtenu à partir du fichier json
+        de la forme {"loop": id_loop, "element": id_element}
+        :return: l'objet instancié correspondant au numéro d'élément présent dans la boucle spécifiée
+        """
+        #  Initialisation des variables
+        b = source_dest["loop"]
+        e = source_dest["element"]
+        if e < 0:
+            raise ValueError("Element's index must be positive")
+        elt = 0
+        #  Recherche du noeud
+        for r in range(len(self._loops[b]["routes"])):
+            if elt == e:  # L'element est un switch
+                return self._loops[b]["switches"][r]
+            elt += 1
+            for s in range(len(self._loops[b]["routes"][r].steps)):
+                if elt == e: # L'element est une etape
+                    return self._loops[b]["routes"][r].steps[s]
+                elt += 1
+        raise ValueError("Element's index out of the range of elements in the loop")

@@ -7,15 +7,16 @@ from .way import Way
 
 class Switch(Way):
 
-    def __init__(self, id, route_in, route_out, **kwargs):
+    def __init__(self, id, pods, route_in, route_out, **kwargs):
         super().__init__(**kwargs)
         self.id = id
         self.route_in = route_in
         self.route_out = route_out
+        self._pods = pods
 
     @property
     def pods(self):
-        return self.route_in.pods + self.route_out.pods
+        return self._pods
 
     def serialize(self):
         return super().serialize().update({

@@ -100,14 +100,16 @@ class Network(Node):
             for s in range(len(self._loops[b]["switches"])):
                 #  Capsules
                 pods = []
-                for pod in self._loops[b]["switches"][s]:
-                    source = self._get_elt_of_loop(self._loops[b]["switches"][s]["pods"][pod]["source"])
-                    destination = self._get_elt_of_loop(self._loops[b]["switches"][s]["pods"][pod]["destination"])
-                    travelers = []
-                    for trav in range(pod["travelers"]["count"]):
-                        travelers.append(Traveler(source, destination))
-                    new_pod = Pod(source, destination, travelers)
-                    pods.append(new_pod)
+                for branch_key in self._loops[b]["switches"][s]["pods"]:
+                    branch_value = self._loops[b]["switches"][s]["pods"][branch_key]
+                    for pod in range(len(branch_value)):
+                        source = self._get_elt_of_loop(self._loops[b]["switches"][s]["pods"][pod]["source"])
+                        destination = self._get_elt_of_loop(self._loops[b]["switches"][s]["pods"][pod]["destination"])
+                        travelers = []
+                        for _ in range(self._loops[b]["switches"][s]["pods"][pod]["travelers"]["count"]):
+                            travelers.append(Traveler(source, destination))
+                        new_pod = Pod(source, destination, travelers)
+                        pods.append(new_pod)
                 #  Routes et Id
                 id_switch = len(self._switches)
                 route_in = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]
@@ -129,28 +131,6 @@ class Network(Node):
             self._bridges[p] = Bridge(**self._bridges[p])
         for b in range(len(self._loops)):
             self._loops[b] = Loop(**self._loops[b])
-
-        """
-        TODO : A FAIRE DANS LOOP ET BRIDGE
-        # Etape 5 : Ajout des capsules en mouvement
-        for c in range(len(self.pods)):
-            if self.pods[c]["position"]["loop_bridge"]:  # La capsule est sur une boucle
-                b = self.pods[c]["position"]["id"]
-                d = 0
-                ok = False
-                # On trouve la section à laquelle appartient la voiture pour l'ajouter
-                for r in self.loops[b].routes:
-                    for s in r.sections:
-                        d += s.len
-                        if d > self.pods[c]["position"]["distance"]:
-                            source = get_node(id_loop, id_element
-                            s.add_pod(self._id_pod_max, )
-                            self._id_pod_max += 1
-                            ok = True
-                            break
-                    if ok:
-                        break
-        """
 
     def _get_elt_of_loop(self, source_dest):
         """

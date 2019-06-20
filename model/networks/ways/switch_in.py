@@ -8,9 +8,9 @@ class SwitchIn(Switch):
     def __init__(self, id, pods, route_in, route_out, route_bridge, **kwargs):
         super().__init__(id, pods, route_in, route_out, **kwargs)
         self._switch_out = None
-        self._pod_loop_in = []
-        self._pod_bridge_in = []
-        self._pod_loop_out = []
+        self._pods_loop_in = []
+        self._pods_bridge_in = []
+        self._pods_loop_out = []
         self._bridge_in = route_bridge
 
     @property

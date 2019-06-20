@@ -7,8 +7,8 @@ from .step import Step
 
 
 class Sensor(Step):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, previous_track, next_track, **kwargs):
+        super().__init__(previous_track, next_track, **kwargs)
 
     def serialize(self):
         return super().serialize().update({

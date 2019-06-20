@@ -84,16 +84,18 @@ class Network(Node):
         #  Etape 2 : Instanciation des routes
         for b in range(len(self._loops)):
             for route in range(1, len(self._loops[b]["routes"])):
-                new_route = Route(len(self._routes), **self._loops[b]["routes"][route])
+                new_route = Route(len(self._routes),
+                                  **self._loops[b]["routes"][route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
                 self._loops[b]["routes"][route - 1]["steps"] = new_route
+                self._loops[b]["routes"][route - 1]["sections"] = self._loops[b]["routes"][route]["sections"]
             self._loops[b]["routes"].pop()
         l = len(self._routes)  # nombre de routes du réseau internes aux boucles
         for p in range(len(self._bridges)):
             steps = []
             sections = [self._bridges[p]["path"]]
-            new_route = Route(l + p, **{"steps": steps, "sections": sections})
+            new_route = Route(l + p, **{"steps": steps, "sections": sections})  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._routes.append(new_route)
             self._bridges[p]["routes"] = [new_route]  # On ajoute sa route au bridge
 
@@ -108,16 +110,17 @@ class Network(Node):
                         pod = self._loops[b]["switches"][s]["pods"][pod_index]
                         pod["source"] = self._get_elt_of_loop(**pod["source"])
                         pod["destination"] = self._get_elt_of_loop(**pod["destination"])
-                        pod_branch[pod_index] = Pod(**pod)  # TODO: instancer les pods directement dans les switches ?
+                        pod_branch[pod_index] = Pod(**pod)  # TODO: instancier les pods directement dans les switches ?
                 #  Routes et Id
                 id_switch = len(self._switches)
                 route_in = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]
                 route_out = self._routes[id_switch]
                 route_bridge = self._routes[l + self._loops[b]["switches"][s]["id_bridge"]]
                 if self._loops[b]["switches"][s]["type"] == "switch_in":
-                    new_switch = SwitchIn(id_switch, pods, route_in, route_out, route_bridge)
+                    new_switch = SwitchIn(id_switch, self._loops[b]["switches"][s]["pods"], route_in, route_out, route_bridge)
+                    # new_switch = SwitchIn(id_switch, **self._loops[b]["switches"][s]) : TODO : doit devenir comme ça
                 else:
-                    new_switch = SwitchOut(id_switch, pods, route_in, route_out, route_bridge)
+                    new_switch = SwitchOut(id_switch, self._loops[b]["switches"][s]["pods"], route_in, route_out, route_bridge)
                 self._switches.append(new_switch)
                 self._loops[b]["switches"][s] = new_switch
 
@@ -143,7 +146,7 @@ class Network(Node):
     def _init_pod_of_line(self, line, pod):
         position = pod["position"]
         if position < 0:
-            raise ValueError("Element's position out of the range")
+            raise ValueError("Element's position out of range")
         for route in line["routes"]:
             for section in route.sections:
                 length = section.length
@@ -152,7 +155,7 @@ class Network(Node):
                     section.insert_pod(**pod)
                     return
                 position -= length
-        raise ValueError("Element's position out of the range")
+        raise ValueError("Element's position out of range")
 
     def _get_elt_of_loop(self, loop=None, element=None):
         """
@@ -162,12 +165,12 @@ class Network(Node):
         """
         #  Initialisation des variables
         if loop < 0 or loop > len(self._loops):
-            raise ValueError("Loop's index out of the range")
+            raise ValueError("Loop's index out of range")
         loop = self._loops[loop]
         routes = loop["routes"]
         switches = loop["switches"]
         if element < 0:
-            raise ValueError("Element's index out of the range")
+            raise ValueError("Element's index out of range")
         elt = 0
         #  Recherche du noeud
         for r in range(len(routes)):
@@ -179,4 +182,4 @@ class Network(Node):
                 if elt == element:  # L'element est une etape
                     return steps[s]
                 elt += 1
-        raise ValueError("Element's index out of the range")
+        raise ValueError("Element's index out of range")

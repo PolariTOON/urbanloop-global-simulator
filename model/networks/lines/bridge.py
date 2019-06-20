@@ -7,12 +7,10 @@ from .line import Line
 
 
 class Bridge(Line):
-    def __init__(self, id_switch_in, id_switch_out, route, path):
+    def __init__(self, routes=None, switches=None, **kwargs):
         super().__init__()
-        self._route = route
-        self.path = path
-        self.id_switch_out = id_switch_out
-        self.id_switch_in = id_switch_in
+        self._routes = routes or []
+        self._switches = switches or []
 
     def serialize(self):
         return super().serialize().update({

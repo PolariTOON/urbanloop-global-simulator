@@ -8,6 +8,7 @@ from .track import Track
 class Section(Track):
     def __init__(self, len, **kwargs):
         super().__init__(**kwargs)
+        self._pods = []
         self._len = len  # taille de la section
         self._path = None
 
@@ -25,5 +26,10 @@ class Section(Track):
             'path': self.path
         })
 
-    def add_pod(self, id, source, destination, travelers):
-        self.pods.append(Pod(id, source, destination, travelers))
+    def insert_pod(self, **pod):
+        pods = self._pods
+        for k in range(len(pods)):
+            if pods[k].position > pod["position"]:
+                pods.insert(k, Pod(**pod))
+                return
+        pods.append(Pod(**pod))

@@ -41,7 +41,7 @@ class Network(Node):
 
     def _init_graph_from_json(self):
         #  Etape 1 : Récupérer les infos du json sous forme pratique
-        for b in range(self._loops):
+        for b in range(len(self._loops)):
             self._loops[b]["switches"] = []
             self._loops[b]["routes"] = []
             steps = []
@@ -49,20 +49,22 @@ class Network(Node):
             for node in range(len(self._loops[b]["elements"])):
                 n = self._loops[b]["elements"][node]
                 p = self._loops[b]["paths"][node]
-                if "switch" in n["type"]:
+                if n["type"] in ["switch_in", "switch_out"]:
                     id_bridge = n["id_bridge"]
                     if n["type"] == "switch_in":
-                        if not self._bridges[id_bridge]["in"]:
-                            self._bridges[id_bridge]["in"] = [self._loops[b], len(
-                                self._loops[b]["switches"])]  # [id_boucle, id_switch_in]
-                        else:
-                            print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
+                        if "in" in self._bridges[id_bridge]:
+                            raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN")
+                        self._bridges[id_bridge]["switch_in"] = {
+                            "loop": b,
+                            "element": node
+                        }
                     else:
-                        if not self._bridges[id_bridge]["out"]:
-                            self._bridges[id_bridge]["out"] = [self._loops[b], len(
-                                self._loops[b]["switches"])]  # [id_boucle, id_switch_out]
-                        else:
-                            print("[ERROR] MISTAKES IN THE NETWORK DESIGN")
+                        if "out" in self._bridges[id_bridge]:
+                            raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN")
+                        self._bridges[id_bridge]["switch_out"] = {
+                            "loop": b,
+                            "element": node
+                        }
                     self._loops[b]["switches"].append(n)
                     self._loops[b]["routes"].append({"steps": steps, "sections": sections})
                     steps = []
@@ -93,23 +95,20 @@ class Network(Node):
             sections = [self._bridges[p]["path"]]
             new_route = Route(l + p, **{"steps": steps, "sections": sections})
             self._routes.append(new_route)
-            self._bridges[p]["route"] = new_route  # On ajoute sa route au bridge
+            self._bridges[p]["routes"] = [new_route]  # On ajoute sa route au bridge
 
         #  Etape 3 : Instanciation des aiguillages, ajout de leurs capsules et liaison avec les routes
         for b in range(len(self._loops)):
             for s in range(len(self._loops[b]["switches"])):
                 #  Capsules
-                pods = []
-                for branch_key in self._loops[b]["switches"][s]["pods"]:
-                    branch_value = self._loops[b]["switches"][s]["pods"][branch_key]
-                    for pod in range(len(branch_value)):
-                        source = self._get_elt_of_loop(self._loops[b]["switches"][s]["pods"][pod]["source"])
-                        destination = self._get_elt_of_loop(self._loops[b]["switches"][s]["pods"][pod]["destination"])
-                        travelers = []
-                        for _ in range(self._loops[b]["switches"][s]["pods"][pod]["travelers"]["count"]):
-                            travelers.append(Traveler(source, destination))
-                        new_pod = Pod(source, destination, travelers)
-                        pods.append(new_pod)
+                pods = self._loops[b]["switches"][s]["pods"]
+                for pod_branch_key in pods:
+                    pod_branch = pods[pod_branch_key]
+                    for pod_index in range(len(pod_branch)):
+                        pod = self._loops[b]["switches"][s]["pods"][pod_index]
+                        pod["source"] = self._get_elt_of_loop(**pod["source"])
+                        pod["destination"] = self._get_elt_of_loop(**pod["destination"])
+                        pod_branch[pod_index] = Pod(**pod)  # TODO: instancer les pods directement dans les switches ?
                 #  Routes et Id
                 id_switch = len(self._switches)
                 route_in = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]
@@ -124,33 +123,60 @@ class Network(Node):
 
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
         for p in range(len(self._bridges)):
-            b, s = self._bridges[p]["in"]
-            self._bridges[p]["in"] = self._loops[b]["switches"][s]
-            b, s = self._bridges[p]["out"]
-            self._bridges[p]["out"] = self._loops[b]["switches"][s]
-            self._bridges[p] = Bridge(**self._bridges[p])
+            bridge = self._bridges[p]
+            switch_out = self._get_elt_of_loop(**bridge["switch_out"])
+            switch_in = self._get_elt_of_loop(**bridge["switch_in"])
+            bridge["switches"] = [switch_out, switch_in]
+            self._init_pods_of_line(bridge)
+            self._bridges[p] = Bridge(**bridge)
         for b in range(len(self._loops)):
-            self._loops[b] = Loop(**self._loops[b])
+            loop = self._loops[b]
+            self._init_pods_of_line(loop)
+            self._loops[b] = Loop(**loop)
 
-    def _get_elt_of_loop(self, source_dest):
+    def _init_pods_of_line(self, line):
+        for pod in line["pods"]:
+            pod["source"] = self._get_elt_of_loop(**pod["source"])
+            pod["destination"] = self._get_elt_of_loop(**pod["destination"])
+            self._init_pod_of_line(line, pod)
+
+    def _init_pod_of_line(self, line, pod):
+        position = pod["position"]
+        if position < 0:
+            raise ValueError("Element's position out of the range")
+        for route in line["routes"]:
+            for section in route.sections:
+                length = section.length
+                if position < length:
+                    pod["position"] = position
+                    section.insert_pod(**pod)
+                    return
+                position -= length
+        raise ValueError("Element's position out of the range")
+
+    def _get_elt_of_loop(self, loop=None, element=None):
         """
         :param source_dest: dictionnaire obtenu à partir du fichier json
         de la forme {"loop": id_loop, "element": id_element}
         :return: l'objet instancié correspondant au numéro d'élément présent dans la boucle spécifiée
         """
         #  Initialisation des variables
-        b = source_dest["loop"]
-        e = source_dest["element"]
-        if e < 0:
-            raise ValueError("Element's index must be positive")
+        if loop < 0 or loop > len(self._loops):
+            raise ValueError("Loop's index out of the range")
+        loop = self._loops[loop]
+        routes = loop["routes"]
+        switches = loop["switches"]
+        if element < 0:
+            raise ValueError("Element's index out of the range")
         elt = 0
         #  Recherche du noeud
-        for r in range(len(self._loops[b]["routes"])):
-            if elt == e:  # L'element est un switch
-                return self._loops[b]["switches"][r]
+        for r in range(len(routes)):
+            if elt == element:  # L'element est un switch
+                return switches[r]
             elt += 1
-            for s in range(len(self._loops[b]["routes"][r].steps)):
-                if elt == e: # L'element est une etape
-                    return self._loops[b]["routes"][r].steps[s]
+            steps = routes[r].steps
+            for s in range(len(steps)):
+                if elt == element:  # L'element est une etape
+                    return steps[s]
                 elt += 1
-        raise ValueError("Element's index out of the range of elements in the loop")
+        raise ValueError("Element's index out of the range")

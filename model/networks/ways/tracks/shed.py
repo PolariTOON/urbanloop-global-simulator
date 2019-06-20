@@ -2,7 +2,7 @@
 Type de noeud du sous-graphe du réseau qui représente un garage où sont stocker des pods
 """
 
-from ...tokens.pod import Capsule
+from ...tokens.pod import Pod
 from .step import Step
 
 
@@ -13,7 +13,7 @@ class Shed(Step):
             "count": 0,
             "max": 0
         }
-        self._pods = [Capsule() for k in range(pods["count"])]
+        self._pods = [Pod() for k in range(pods["count"])]
         self._capacity = pods["max"] or 0
 
     def serialize(self):

@@ -12,5 +12,6 @@ class Node:
 
     def serialize(self):
         return {
-            'pods': [pod.serialize() for pod in self.pods]
+            "name": self.name,
+            "pods": [pod.serialize() for pod in self.pods] # TODO: retirer ?
         }

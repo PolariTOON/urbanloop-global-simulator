@@ -6,13 +6,11 @@ from .line import Line
 
 
 class Loop(Line):
-    def __init__(self, routes=None, switches=None, name=None, paths=None, pods=None):
+    def __init__(self, routes=None, switches=None, **kwargs):
         super().__init__()
         self._routes = routes
         self._switches = switches
-        self._name = name
-        self._paths = paths
-        self.init_pods(pods)
+        # self.init_pods(pods)
 
     @property
     def routes(self):

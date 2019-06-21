@@ -10,7 +10,6 @@ class Loop(Line):
         super().__init__()
         self._routes = routes
         self._switches = switches
-        # self.init_pods(pods)
 
     @property
     def routes(self):
@@ -27,19 +26,3 @@ class Loop(Line):
             "paths": self._paths
         })
 
-    """
-    def init_pods(self, pods):
-        for pod in pods:
-            d = 0
-            ok = False
-            for route in self.routes:
-                for section in route.sections:
-                    d += section.len
-                    if d > pod["position"]:
-                        source =
-                        section.add_pod(pod, source, destination, travelers)
-                        ok = True
-                        break
-                if ok:
-                    break
-    """

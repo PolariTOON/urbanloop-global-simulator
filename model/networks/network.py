@@ -2,7 +2,6 @@
 Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
-from model.networks.tokens.pod import Pod
 from ..node2 import Node
 from .lines.bridge import Bridge
 from .lines.loop import Loop
@@ -75,12 +74,6 @@ class Network(Node):
                     steps = []
                     sections = []
                 else:
-                    if n["type"] == "station" or n["type"] == "shed":
-                        # Ajout des capsules sans voyageurs
-                        pods_sc = []
-                        for c in range(n["pods"]["count"]):
-                            pods_sc.append(Pod(None, None))
-                        n["pods_list"] = pods_sc
                     steps.append(n)  # important : on ajoute l'étape
                 sections.append(p)
             if len(steps) != 0:

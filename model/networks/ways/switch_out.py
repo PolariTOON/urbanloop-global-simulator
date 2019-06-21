@@ -18,10 +18,6 @@ class SwitchOut(Switch):
             self._beside.sections[-1].next.switch_in = self
 
     @property
-    def pods(self):
-        return   # TODO
-
-    @property
     def switch_in(self):
         return self._switch_in
 
@@ -31,6 +27,5 @@ class SwitchOut(Switch):
 
     def serialize(self):
         return super().serialize().update({
-            'type': 'out',
-            'pods': self.pods
+            'type': 'switch_out'
         })

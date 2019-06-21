@@ -6,31 +6,20 @@ from ....node2 import Node
 
 
 class Track(Node):
-    def __init__(self, previous_track, next_track, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._previous_track = previous_track
-        self._next_track = next_track
-        self._pods = []
 
     @property
     def pods(self):
-        return self._pods
+        raise NotImplementedError()
 
     @property
-    def previous_track(self):
-        return self._previous_track
-
-    @previous_track.setter
-    def previous_track(self, value):
-        self._previous_track = value
+    def previous(self):
+        raise NotImplementedError()
 
     @property
-    def next_track(self):
-        return self._next_track
-
-    @next_track.setter
-    def next_track(self, value):
-        self._next_track = value
+    def next(self):
+        raise NotImplementedError()
 
     def serialize(self):
         return super().serialize().update({})

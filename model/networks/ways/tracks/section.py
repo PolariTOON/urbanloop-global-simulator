@@ -1,28 +1,66 @@
 """
 Possibilité de noeud du sous-graphe désignant une section de route
 """
+
+from math import hypot, nan
 from ...tokens.pod import Pod
 from .track import Track
 
 
 class Section(Track):
-    def __init__(self, previous_track, next_track, path, **kwargs):
-        super().__init__(previous_track, next_track, **kwargs)
-        self._len = None  # taille de la section
-        self._path = path
+    def __init__(self, speed=None, path=None, **kwargs):
+        super().__init__(**kwargs)
+        speed = speed or 0
+        path = path or {
+            "type": "line"
+        }
+        path["type"] = path["type"] or "line"
+        self._speed = speed
+        self._path_type = path["type"]
+        self._length = nan
+        self._previous = None
+        self._next = None
 
     @property
-    def len(self):
-        return self._len
+    def speed(self):
+        return self._speed
 
     @property
-    def path(self):
-        return self._path
+    def length(self):
+        return self._length
+
+    @property
+    def previous(self):
+        return self._previous
+
+    @previous.setter
+    def previous(self, value):
+        self._previous = value
+        other = self._next
+        if value is None or other is None:
+            self._length = nan
+        else
+            self._length = hypot(other.x - value.x, other.y - value.y) # TODO: gérer les autres types de chemins
+
+    @property
+    def next(self):
+        return self._next
+
+    @next.setter
+    def next(self, value):
+        self._next = value
+        other = self._previous
+        if value is None or other is None:
+            self._length = nan
+        else
+            self._length = hypot(other.x - value.x, other.y - value.y) # TODO: gérer les autres types de chemins
 
     def serialize(self):
         return super().serialize().update({
-            'len': self.len,
-            'path': self.path
+            "speed": self._speed,
+            "path": {
+                "type": self._path_type
+            }
         })
 
     def insert_pod(self, **pod):

@@ -15,47 +15,51 @@ class Route(Way):
         self.id = id
         self._steps = steps or []  # [shed, capteur, station, ...]
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)
-        self._previous_switch = None
-        self._next_switch = None
+        self._previous = None
+        self._next = None
 
         #  Etape 42 : On instancie les pistes mais pas les liaisons de la premiere et de la dernière section
-        for s in range(len(self._steps)):
-            self._sections[s] = Section(None, None, self._sections[s])
-            if self._steps[s]["type"] == "station":
-                self._steps[s] = Station(self._sections[s], None)
-            elif self._steps[s]["type"] == "shed":
-                self._steps[s] = Shed(self._sections[s], None)
-            elif self._steps[s]["type"] == "sensor":
-                self._steps[s] = Sensor(self._sections[s], None)
+        for section_index in range(len(self._sections)):
+            section = self._sections[section_index]
+            section = Section(**section)
+            self._sections[section_index] = section
+        for step_index in range(len(self._steps)):
+            step = self._steps[step_index]
+            step["previous"] = self._sections[step_index]
+            step["next"] = self._sections[step_index + 1]
+            if step["type"] == "sensor":
+                step = Sensor(**step)
+            elif step["type"] == "shed":
+                step = Shed(**step)
+            elif step["type"] == "station":
+                step = Station(**step)
             else:
-                raise TypeError("type ", self._steps[s]["type"], "is not a valid type for a step")
-            self._sections[s].next_track = self._steps[s]
-        self._sections.append(Section(self._steps[len(self._steps) - 1], None, self._sections[len(self._sections) - 1]))
+                raise TypeError("invalid element type")
+            self._steps[step_index] = step
 
     @property
     def pods(self):
-        return [pod for section in self.sections for pod in section.pods] + [pod for step in self.steps for pod in
-                                                                             step.pods]
+        return [pod for section in self.sections for pod in section.pods] + [pod for step in self.steps for pod in step.pods]
 
     @property
     def sections(self):
         return self._sections
 
     @property
-    def previous_switch(self):
-        return self._previous_switch
+    def previous(self):
+        return self._previous
 
-    @previous_switch.setter
-    def previous_switch(self, value):
-        self._previous_switch = value
+    @previous.setter
+    def previous(self, value):
+        self._previous = value
 
     @property
-    def next_switch(self):
-        return self._next_switch
+    def next(self):
+        return self._next
 
-    @next_switch.setter
-    def next_switch(self, value):
-        self._next_switch = value
+    @next.setter
+    def next(self, value):
+        self._next = value
 
     @property
     def steps(self):
@@ -66,4 +70,3 @@ class Route(Way):
             'type': 'route',
             'pod': self.pods
         })
-

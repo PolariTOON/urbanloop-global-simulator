@@ -8,7 +8,7 @@ class Node:
 
     @property
     def pods(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def serialize(self):
         return {

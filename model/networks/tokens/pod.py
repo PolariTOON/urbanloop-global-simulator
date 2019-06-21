@@ -13,8 +13,10 @@ class Pod(Token):
             "count": 0,
             "max": 0
         }
+        travelers["count"] = travelers["count"] or 0
+        travelers["max"] = travelers["max"] or 0
         self._travelers = [Traveler(source, destination) for k in range(travelers["count"])]
-        self._capacity = travelers["max"] or 0
+        self._capacity = travelers["max"]
 
     @property
     def travelers(self):

@@ -14,14 +14,17 @@ class Type(Enum):
 
 
 class Station(Step):
-    def __init__(self, previous_track, next_track, pods=None, station_type=None, **kwargs):
-        super().__init__(previous_track, next_track, **kwargs)
+    def __init__(self, pods=None, station_type=None, **kwargs):
+        super().__init__(**kwargs)
         pods = pods or {
             "count": 0,
             "max": 0
         }
+        pods["count"] = pods["count"] or 0
+        pods["max"] = pods["max"] or 0
+        station_type = station_type or Type.CITY
         self._pods = [Pod() for k in range(pods["count"])]
-        self._capacity = pods["max"] or 0
+        self._capacity = pods["max"]
         self._station_type = station_type
 
     def serialize(self):

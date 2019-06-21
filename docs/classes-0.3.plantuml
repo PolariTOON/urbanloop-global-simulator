@@ -13,7 +13,7 @@ package model {
 	class Node
 	package networks {
 		class Network
-		package roads {
+		package ways {
 			class Way
 			class Switch
 			class SwitchIn

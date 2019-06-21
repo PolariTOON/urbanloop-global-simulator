@@ -48,7 +48,7 @@ class Network(Node):
             sections = []
             for node in range(len(self._loops[b]["elements"])):
                 n = self._loops[b]["elements"][node]
-                p = self._loops[b]["paths"][node]
+                p = self._loops[b]["sections"][node]
                 if n["type"] in ["switch_in", "switch_out"]:
                     id_bridge = n["id_bridge"]
                     if n["type"] == "switch_in":
@@ -94,7 +94,7 @@ class Network(Node):
         l = len(self._routes)  # nombre de routes du réseau internes aux boucles
         for p in range(len(self._bridges)):
             steps = []
-            sections = [self._bridges[p]["path"]]
+            sections = [self._bridges[p]["section"]]
             new_route = Route(l + p, **{"steps": steps, "sections": sections})  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._routes.append(new_route)
             self._bridges[p]["routes"] = [new_route]  # On ajoute sa route au bridge

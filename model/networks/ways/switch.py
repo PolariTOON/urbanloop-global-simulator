@@ -7,7 +7,7 @@ from .way import Way
 
 class Switch(Way):
 
-    def __init__(self, id, loop_in=None, loop_out=None, route_bridge=None, pods=None, **kwargs):
+    def __init__(self, id, loop_in=None, loop_out=None, route_bridge=None, pods=None, id_bridge=None, **kwargs):
         super().__init__(**kwargs)
         self.id = id
         self._previous = loop_in
@@ -16,6 +16,7 @@ class Switch(Way):
         self._pods_previous = []
         self._pods_next = []
         self._pods_beside = []
+        self._id_bridge = id_bridge
 
         # Ajout des capsules
         for key in pods:
@@ -62,10 +63,15 @@ class Switch(Way):
 
     def serialize(self):
         return super().serialize().update({
-            'type': 'switch',
-            'pods': self.pods
+            "type": "switch",
+            "pods": {
+                "loop_in": [pod.serialize() for pod in self._pods_previous],
+                "loop_out": [pod.serialize() for pod in self._pods_next],
+                "bridge": [pod.serialize() for pod in self._pods_beside]
+            },
+            "id_bridge": self._id_bridge
         })
 
     @property
     def pods(self):
-        return  # TODO
+        return self._pods_previous + self._pods_next + self._pods_beside

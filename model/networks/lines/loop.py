@@ -7,7 +7,7 @@ from .line import Line
 
 class Loop(Line):
     def __init__(self, routes=None, switches=None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self._routes = routes
         self._switches = switches
 
@@ -20,8 +20,19 @@ class Loop(Line):
         return [p for p in self.routes.pods]
 
     def serialize(self):
+        elements = []
+        sections = []
+        pods = []
+        for e in range(len(self._switches)):
+            elements.append(self._switches[e].serialize())
+            for step in range(len(self._routes[e].steps)):
+                elements.append(self._routes[e].steps[step].serialize())
+                sections.append(self._routes[e].sections[step].serialize())
+                for pod in range(self._routes[e].sections[step].pods):
+                    pods.append(self._routes[e].sections[step].pods[pod].serialize())
         return super().serialize().update({
-            "type": "loop",
             "name": self._name,
-            "paths": self._paths
+            "elements": elements,
+            "sections": sections,
+            "pods": pods
         })

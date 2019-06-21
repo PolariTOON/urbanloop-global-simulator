@@ -3,7 +3,6 @@ Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
 from model.networks.tokens.pod import Pod
-from model.networks.tokens.traveler import Traveler
 from ..node2 import Node
 from .lines.bridge import Bridge
 from .lines.loop import Loop
@@ -40,14 +39,20 @@ class Network(Node):
         })
 
     def _init_graph_from_json(self):
+        """
+        Création du model à partir du dictionnaire obtenu à partir du fichier json
+        :return: (void) Le réseau est construit
+        """
         #  Etape 1 : Récupérer les infos du json sous forme pratique
         for b in range(len(self._loops)):
             self._loops[b]["switches"] = []
             self._loops[b]["routes"] = []
             steps = []
             sections = []
-            for node in range(len(self._loops[b]["elements"])):
-                n = self._loops[b]["elements"][node]
+            elements = self._loops[b]["elements"]
+            routes = self._loops[b]["routes"]
+            for node in range(len(elements)):
+                n = elements[node]
                 p = self._loops[b]["paths"][node]
                 if n["type"] in ["switch_in", "switch_out"]:
                     id_bridge = n["id_bridge"]
@@ -79,23 +84,25 @@ class Network(Node):
                     steps.append(n)  # important : on ajoute l'étape
                 sections.append(p)
             if len(steps) != 0:
-                self._loops[b]["routes"].append({"steps": steps, "sections": sections})
+                routes.append({"steps": steps, "sections": sections})
 
         #  Etape 2 : Instanciation des routes
         for b in range(len(self._loops)):
-            for route in range(1, len(self._loops[b]["routes"])):
-                new_route = Route(len(self._routes),
-                                  **self._loops[b]["routes"][route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
+            routes = self._loops[b]["routes"]
+            for route in range(1, len(routes)):
+                new_route = Route(len(self._routes), **routes[
+                    route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
-                self._loops[b]["routes"][route - 1]["steps"] = new_route
-                self._loops[b]["routes"][route - 1]["sections"] = self._loops[b]["routes"][route]["sections"]
-            self._loops[b]["routes"].pop()
+                routes[route - 1]["steps"] = new_route
+                routes[route - 1]["sections"] = routes[route]["sections"]
+            routes.pop()
         l = len(self._routes)  # nombre de routes du réseau internes aux boucles
         for p in range(len(self._bridges)):
             steps = []
             sections = [self._bridges[p]["path"]]
-            new_route = Route(l + p, **{"steps": steps, "sections": sections})  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
+            new_route = Route(l + p, **{"steps": steps,
+                                        "sections": sections})  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._routes.append(new_route)
             self._bridges[p]["routes"] = [new_route]  # On ajoute sa route au bridge
 
@@ -103,7 +110,8 @@ class Network(Node):
         for b in range(len(self._loops)):
             for s in range(len(self._loops[b]["switches"])):
                 #  Capsules
-                pods = self._loops[b]["switches"][s]["pods"]
+                switch = self._loops[b]["switches"][s]
+                pods = switch["pods"]
                 for pod_branch_key in pods:
                     pod_branch = pods[pod_branch_key]
                     for pod_index in range(len(pod_branch)):
@@ -113,14 +121,13 @@ class Network(Node):
                         pod_branch[pod_index] = Pod(**pod)  # TODO: instancier les pods directement dans les switches ?
                 #  Routes et Id
                 id_switch = len(self._switches)
-                route_in = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]
-                route_out = self._routes[id_switch]
-                route_bridge = self._routes[l + self._loops[b]["switches"][s]["id_bridge"]]
-                if self._loops[b]["switches"][s]["type"] == "switch_in":
-                    new_switch = SwitchIn(id_switch, self._loops[b]["switches"][s]["pods"], route_in, route_out, route_bridge)
-                    # new_switch = SwitchIn(id_switch, **self._loops[b]["switches"][s]) : TODO : doit devenir comme ça
+                switch["loop_in"] = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]  # loop_in
+                switch["loop_out"] = self._routes[id_switch]  # loop_out
+                switch["route_bridge"] = self._routes[l + switch["id_bridge"]]  # route_bridge
+                if switch["type"] == "switch_in":
+                    new_switch = SwitchIn(id_switch, **switch)
                 else:
-                    new_switch = SwitchOut(id_switch, self._loops[b]["switches"][s]["pods"], route_in, route_out, route_bridge)
+                    new_switch = SwitchOut(id_switch, **switch)
                 self._switches.append(new_switch)
                 self._loops[b]["switches"][s] = new_switch
 
@@ -141,21 +148,7 @@ class Network(Node):
         for pod in line["pods"]:
             pod["source"] = self._get_elt_of_loop(**pod["source"])
             pod["destination"] = self._get_elt_of_loop(**pod["destination"])
-            self._init_pod_of_line(line, pod)
-
-    def _init_pod_of_line(self, line, pod):
-        position = pod["position"]
-        if position < 0:
-            raise ValueError("Element's position out of range")
-        for route in line["routes"]:
-            for section in route.sections:
-                length = section.length
-                if position < length:
-                    pod["position"] = position
-                    section.insert_pod(**pod)
-                    return
-                position -= length
-        raise ValueError("Element's position out of range")
+            _init_pod_of_line(line, pod)
 
     def _get_elt_of_loop(self, loop=None, element=None):
         """
@@ -183,3 +176,18 @@ class Network(Node):
                     return steps[s]
                 elt += 1
         raise ValueError("Element's index out of range")
+
+
+def _init_pod_of_line(line, pod):
+    position = pod["position"]
+    if position < 0:
+        raise ValueError("Element's position out of range")
+    for route in line["routes"]:
+        for section in route.sections:
+            length = section.length
+            if position < length:
+                pod["position"] = position
+                section.insert_pod(**pod)
+                return
+            position -= length
+    raise ValueError("Element's position out of range")

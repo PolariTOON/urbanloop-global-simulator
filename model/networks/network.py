@@ -57,14 +57,14 @@ class Network(Node):
                 if n["type"] in ["switch_in", "switch_out"]:
                     id_bridge = n["id_bridge"]
                     if n["type"] == "switch_in":
-                        if "in" in self._bridges[id_bridge]:
+                        if "switch_in" in self._bridges[id_bridge]:
                             raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN")
                         self._bridges[id_bridge]["switch_in"] = {
                             "loop": b,
                             "element": node
                         }
                     else:
-                        if "out" in self._bridges[id_bridge]:
+                        if "switch_out" in self._bridges[id_bridge]:
                             raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN")
                         self._bridges[id_bridge]["switch_out"] = {
                             "loop": b,
@@ -76,11 +76,10 @@ class Network(Node):
                     sections = []
                 else:
                     if n["type"] == "station" or n["type"] == "shed":
-                        # Ajout des capsules sans voyageurs
-                        pods_sc = []
-                        for c in range(n["pods"]["count"]):
-                            pods_sc.append(Pod(None, None))
-                        n["pods_list"] = pods_sc
+                        n["element_of_loop"] = {
+                            "loop": b,
+                            "element": node
+                        }
                     steps.append(n)  # important : on ajoute l'étape
                 sections.append(p)
             if len(steps) != 0:
@@ -90,8 +89,7 @@ class Network(Node):
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
-                new_route = Route(len(self._routes), **routes[
-                    route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
+                new_route = Route(len(self._routes), **routes[route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
                 routes[route - 1]["steps"] = new_route

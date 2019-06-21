@@ -25,4 +25,3 @@ class Loop(Line):
             "name": self._name,
             "paths": self._paths
         })
-

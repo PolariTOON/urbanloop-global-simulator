@@ -31,6 +31,6 @@ class Step(Track):
 
     def serialize(self):
         return super().serialize().update({
-            "x": self.x,
-            "y": self.y
+            "x": self._x,
+            "y": self._y
         })

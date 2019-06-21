@@ -1,5 +1,7 @@
 class Token:
-    def __init__(self, source, destination):
+    def __init__(self, source=None, destination=None):
+        source = source or None
+        destination = destination or None
         self._source = source
         self._destination = destination
 
@@ -13,6 +15,6 @@ class Token:
 
     def serialize(self):
         return {
-            'source': self.source,
-            'destination': self.destination
+            "source": self.source.to_element_of_loop(),
+            "destination": self.destination.to_element_of_loop()
         }

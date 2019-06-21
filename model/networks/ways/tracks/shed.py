@@ -7,7 +7,7 @@ from .step import Step
 
 
 class Shed(Step):
-    def __init__(self, pods=None, **kwargs):
+    def __init__(self, pods=None, element_of_loop=None, **kwargs):
         super().__init__(**kwargs)
         pods = pods or {
             "count": 0,
@@ -15,8 +15,15 @@ class Shed(Step):
         }
         pods["count"] = pods["count"] or 0
         pods["max"] = pods["max"] or 0
+        element_of_loop = element_of_loop or {
+            "loop": 0,
+            "element": 0
+        }
+        element_of_loop["loop"] = element_of_loop["loop"] or 0
+        element_of_loop["element"] = element_of_loop["element"] or 0
         self._pods = [Pod() for k in range(pods["count"])]
         self._capacity = pods["max"]
+        self._element_of_loop = element_of_loop
 
     def serialize(self):
         return super().serialize().update({
@@ -26,3 +33,6 @@ class Shed(Step):
                 "max": self._capacity
             }
         })
+
+    def to_element_of_loop(self):
+        return self._element_of_loop

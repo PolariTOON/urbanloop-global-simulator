@@ -39,8 +39,8 @@ class Section(Track):
         other = self._next
         if value is None or other is None:
             self._length = nan
-        else
-            self._length = hypot(other.x - value.x, other.y - value.y) # TODO: gérer les autres types de chemins
+        else:
+            self._length = hypot(other.x - value.x, other.y - value.y)  # TODO: gérer les autres types de chemins
 
     @property
     def next(self):
@@ -52,8 +52,8 @@ class Section(Track):
         other = self._previous
         if value is None or other is None:
             self._length = nan
-        else
-            self._length = hypot(other.x - value.x, other.y - value.y) # TODO: gérer les autres types de chemins
+        else:
+            self._length = hypot(other.x - value.x, other.y - value.y)  # TODO: gérer les autres types de chemins
 
     def serialize(self):
         return super().serialize().update({

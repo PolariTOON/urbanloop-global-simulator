@@ -5,12 +5,9 @@ from .switch import Switch
 
 
 class SwitchOut(Switch):
-    def __init__(self, id, pods=None, **kwargs):
+    def __init__(self, id, **kwargs):
         super().__init__(id, **kwargs)
         self._switch_in = None
-        self._pods_loop_in = pods["loop_in"] or []
-        self._pods_loop_out = pods["loop_out"] or []
-        self._pods_bridge_out = pods["bridge"] or []
 
         # Liaison de la route et des sections du pont
         self._beside.previous = self

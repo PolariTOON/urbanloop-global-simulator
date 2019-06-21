@@ -118,7 +118,6 @@ class Network(Node):
                         pod = self._loops[b]["switches"][s]["pods"][pod_index]
                         pod["source"] = self._get_elt_of_loop(**pod["source"])
                         pod["destination"] = self._get_elt_of_loop(**pod["destination"])
-                        pod_branch[pod_index] = Pod(**pod)  # TODO: instancier les pods directement dans les switches ?
                 #  Routes et Id
                 id_switch = len(self._switches)
                 switch["loop_in"] = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]  # loop_in
@@ -152,8 +151,7 @@ class Network(Node):
 
     def _get_elt_of_loop(self, loop=None, element=None):
         """
-        :param source_dest: dictionnaire obtenu à partir du fichier json
-        de la forme {"loop": id_loop, "element": id_element}
+        :param loop, element: numéro de la boucle et de l'élément s'y trouvant
         :return: l'objet instancié correspondant au numéro d'élément présent dans la boucle spécifiée
         """
         #  Initialisation des variables

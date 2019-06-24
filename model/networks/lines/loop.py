@@ -23,17 +23,26 @@ class Loop(Line):
         elements = []
         sections = []
         pods = []
-        for e in range(len(self._switches)):
-            elements.append(self._switches[e].serialize())
-            for step in range(len(self._routes[e].steps)):
-                elements.append(self._routes[e].steps[step].serialize())
-                sections.append(self._routes[e].sections[step].serialize())
-                for pod in range(self._routes[e].sections[step].pods):
-                    pods.append(self._routes[e].sections[step].pods[pod].serialize())
-            # On oublie pas la dernière section
-            sections.append(self._routes[e].sections[len(self._routes[e]-1)])
-            for pod in range(self._routes[e].sections[len(self._routes[e]-1)].pods):
-                pods.append(self._routes[e].sections[len(self._routes[e]-1)].pods[pod].serialize())
+        switches = self._switches
+        routes = self._routes
+        for way_index in range(len(switches)):
+            switch = switches[way_index]
+            route = routes[way_index]
+            elements.append(switch.serialize())
+            for step_index in range(len(route.steps)):
+                step = route.steps[step_index]
+                section = route.sections[step_index]
+                elements.append(step.serialize())
+                sections.append(section.serialize())
+                for pod_index in range(section.pods):
+                    pod = section.pods[pod_index]
+                    pods.append(pod.serialize())
+            # On n'oublie pas la dernière section
+            section = route.sections[-1]
+            sections.append(section)
+            for pod_index in range(section.pods):
+                pod = section.pods[pod_index]
+                pods.append(pod.serialize())
         return super().serialize().update({
             "name": self._name,
             "elements": elements,

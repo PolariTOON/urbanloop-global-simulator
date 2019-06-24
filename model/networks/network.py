@@ -38,6 +38,14 @@ class Network(Node):
     def loops(self):
         return self._loops
 
+    @property
+    def switches(self):
+        return self._switches
+
+    @property
+    def routes(self):
+        return self._routes
+
     def serialize(self):
         dict = super().serialize()
         dict.update({

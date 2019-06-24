@@ -6,7 +6,7 @@ import logging
 from threading import Thread
 
 from flask import Flask, request, jsonify
-from flask.json import loads
+from flask.json import load, loads
 
 from model import loop, routing, station, switch, warehouse, capsule, sensor
 from settings import config, network, simlog
@@ -17,9 +17,16 @@ app.logger.setLevel(logging.ERROR)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 sim_thread = None
 
+# TODO: déplacer vers la simulation
+from model.networks.network import Network
+_networks = []
+
 
 def run_app(port):
+    global _networks
     print("App runnning on port %d (http://127.0.0.1:%d)" % (port, port))
+    with open("resources/new_mini_network.json") as network:
+        _networks.append(Network(0, **load(network)))
     app.run(port=port)
 
 
@@ -194,3 +201,45 @@ def restore_config():
     converter.init_converter()
     simlog.load()
     return ''
+
+
+@app.route("/networks/<int:network_index>/", methods=["GET"])
+def _get_network(network_index):
+    global _networks
+    return jsonify(_networks[network_index].serialize())
+
+
+@app.route("/networks/<int:network_index>/bridges/<int:bridge_index>/", methods=["GET"])
+def _get_bridge(network_index, bridge_index):
+    global _networks
+    return jsonify(_networks[network_index].bridges[bridge_index].serialize())
+
+
+@app.route("/networks/<int:network_index>/loops/<int:loop_index>/", methods=["GET"])
+def _get_loop(network_index, loop_index):
+    global _networks
+    return jsonify(_networks[network_index].loops[loop_index].serialize())
+
+
+@app.route("/networks/<int:network_index>/switches/<int:switch_index>/", methods=["GET"])
+def _get_switch(network_index, switch_index):
+    global _networks
+    return jsonify(_networks[network_index].switches[switch_index].serialize())
+
+
+@app.route("/networks/<int:network_index>/routes/<int:route_index>/", methods=["GET"])
+def _get_route(network_index, route_index):
+    global _networks
+    return jsonify(_networks[network_index].routes[route_index].serialize())
+
+
+@app.route("/networks/<int:network_index>/routes/<int:route_index>/steps/<int:step_index>/", methods=["GET"])
+def _get_step(network_index, route_index, step_index):
+    global _networks
+    return jsonify(_networks[network_index].routes[route_index].steps[step_index].serialize())
+
+
+@app.route("/networks/<int:network_index>/routes/<int:route_index>/sections/<int:section_index>/", methods=["GET"])
+def _get_section(network_index, route_index, section_index):
+    global _networks
+    return jsonify(_networks[network_index].routes[route_index].sections[section_index].serialize())

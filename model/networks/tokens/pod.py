@@ -20,7 +20,7 @@ class Pod(Token):
         self._capacity = travelers["max"]
 
     @property
-    def poosition(self):
+    def position(self):
         return self._position
 
     @property

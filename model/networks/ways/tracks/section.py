@@ -8,6 +8,7 @@ from .track import Track
 
 
 class Section(Track):
+
     def __init__(self, speed=None, path=None, **kwargs):
         super().__init__(**kwargs)
         speed = speed or 0
@@ -20,6 +21,7 @@ class Section(Track):
         self._length = nan
         self._previous = None
         self._next = None
+        self._pods = []
 
     @property
     def speed(self):
@@ -32,6 +34,10 @@ class Section(Track):
     @property
     def previous(self):
         return self._previous
+
+    @property
+    def pods(self):
+        return self._pods
 
     @previous.setter
     def previous(self, value):

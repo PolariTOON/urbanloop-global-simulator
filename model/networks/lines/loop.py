@@ -30,6 +30,10 @@ class Loop(Line):
                 sections.append(self._routes[e].sections[step].serialize())
                 for pod in range(self._routes[e].sections[step].pods):
                     pods.append(self._routes[e].sections[step].pods[pod].serialize())
+            # On oublie pas la dernière section
+            sections.append(self._routes[e].sections[len(self._routes[e]-1)])
+            for pod in range(self._routes[e].sections[len(self._routes[e]-1)].pods):
+                pods.append(self._routes[e].sections[len(self._routes[e]-1)].pods[pod].serialize())
         return super().serialize().update({
             "name": self._name,
             "elements": elements,

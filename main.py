@@ -1,5 +1,8 @@
 from argparse import ArgumentParser, ArgumentTypeError
 
+from model.networks.network import Network
+import json
+
 
 def port(value):
     integer = int(value)
@@ -16,6 +19,10 @@ arguments = argument_parser.parse_args()
 if arguments.port is -1:
     from console_app import run_app
     run_app()
+elif arguments.port is 1:
+    with open("resources/new_mini_network.json") as json_data:
+        json_network = json.load(json_data)
+    Network(**json_network)
 else:
     from web_app import run_app
     run_app(arguments.port)

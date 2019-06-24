@@ -18,6 +18,7 @@
         {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": []

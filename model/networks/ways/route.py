@@ -32,6 +32,7 @@ class Route(Way):
             elif step["type"] == "shed":
                 step = Shed(**step)
             elif step["type"] == "station":
+                print(step)
                 step = Station(**step)
             else:
                 raise TypeError("invalid element type")

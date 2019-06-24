@@ -43,6 +43,7 @@ class Network(Node):
         :return: (void) Le réseau est construit
         """
         #  Etape 1 : Récupérer les infos du json sous forme pratique
+        print("Etape 1 : ...")
         for b in range(len(self._loops)):
             self._loops[b]["switches"] = []
             self._loops[b]["routes"] = []
@@ -83,11 +84,13 @@ class Network(Node):
                 sections.append(p)
             if len(steps) != 0:
                 routes.append({"steps": steps, "sections": sections})
-
+        print("Etape 1 : [OK]")
+        print("Etape 2 : ...")
         #  Etape 2 : Instanciation des routes
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
+                print("creation route : id=", len(self._routes))
                 new_route = Route(len(self._routes), **routes[route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
@@ -101,7 +104,8 @@ class Network(Node):
             new_route = Route(l + p, **{"steps": steps, "sections": sections})  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._routes.append(new_route)
             self._bridges[p]["routes"] = [new_route]  # On ajoute sa route au bridge
-
+        print("Etape 2 : [OK]")
+        print("Etape 3 : ...")
         #  Etape 3 : Instanciation des aiguillages, ajout de leurs capsules et liaison avec les routes
         for b in range(len(self._loops)):
             for s in range(len(self._loops[b]["switches"])):
@@ -125,7 +129,7 @@ class Network(Node):
                     new_switch = SwitchOut(id_switch, **switch)
                 self._switches.append(new_switch)
                 self._loops[b]["switches"][s] = new_switch
-
+        print("Etape 3 : [OK]")
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
         for p in range(len(self._bridges)):
             bridge = self._bridges[p]

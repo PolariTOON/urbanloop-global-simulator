@@ -180,7 +180,6 @@ def get_size():
     :return: largeur ou longueur nécessaire pour afficher tout le réseau (contenu dans un carré)
     """
     global _size
-    # print(_size)
     length = _size['max_x'] - _size['min_x']
     width = _size['max_y'] - _size['min_y']
     return max(length, width)
@@ -194,7 +193,6 @@ def sections_loop(the_loop):
     switch1 = the_loop.switches[0]
     index_s = 1
     section = "%s_%d-%d" % (the_loop.name, switch1.id, the_loop.switches[index_s].id)
-    #print(section, "\n \t", switch1.name)
     if switch1.my_loop is the_loop:  # switch_out
         switch1.section_my_loop = section
     else:
@@ -203,13 +201,11 @@ def sections_loop(the_loop):
     for j in range(1, len(the_loop.objects)):
         # on parcourt les elts de la boucle à partir du switch
         the_object = the_loop.objects[(index + j) % len(the_loop.objects)][1]
-        #print('\t', the_object.name)
         if type(the_object) is model_station.Station or type(the_object) is model_warehouse.Warehouse:
             the_object.section_loop = section
         elif the_object is the_loop.switches[index_s]:
             index_s = (index_s + 1) % len(the_loop.switches)
             section = "%s_%d-%d" % (the_loop.name, the_object.id, the_loop.switches[index_s].id)
-            #print('\n \n ', section, '\n \t', the_object.name)
             if the_object.my_loop is the_loop:
                 # switch out
                 the_object.section_my_loop = section

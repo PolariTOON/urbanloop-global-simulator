@@ -69,7 +69,6 @@ def dijkstra_route(switch, table, to_cover):
                     # il n'y a pas d'anomalies pour rester sur la boucle
                     if next_switch.section_my_loop not in table_temp or distance < \
                             table_temp[next_switch.section_my_loop][1]:
-                        # print(distance)
                         table_temp[next_switch.section_my_loop] = [step[2], distance, step[4] + [next_switch.id,
                                                                                                  next_switch.section_my_loop]]
                         if next_switch.section_my_loop not in table_to_cover or distance < \
@@ -82,7 +81,6 @@ def dijkstra_route(switch, table, to_cover):
                     distance += next_switch.size + switched_cost
                     if next_switch.section_other_loop not in table_temp or distance < \
                             table_temp[next_switch.section_other_loop][1]:
-                        # print(distance)
                         table_temp[next_switch.section_other_loop] = [step[2], distance, step[4] + [next_switch.id,
                                                                                                     next_switch.section_other_loop]]
                         if next_switch.section_other_loop not in table_to_cover or distance < \

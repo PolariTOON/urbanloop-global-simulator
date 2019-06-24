@@ -17,7 +17,7 @@ class Loop(Line):
 
     @property
     def pods(self):
-        return [p for p in self.routes.pods]
+        return [p for p in self._routes.pods]
 
     def serialize(self):
         elements = []

@@ -74,6 +74,6 @@ class Section(Track):
         pods = self._pods
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
-                pods.insert(k, Pod(**pod))
+                self._pods.insert(k, Pod(**pod))
                 return
-        pods.append(Pod(**pod))
+        self._pods.append(Pod(**pod))

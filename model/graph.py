@@ -157,8 +157,6 @@ class Graph:
         path = list()
         current_node = node_arrival
         while predecessor[current_node.id] is None:
-            # print("impossible d'aller au noeud", current_node.id)
-            # print("redirection au noeud", current_node.previous_nodes[0].id)
             current_node = current_node.previous_nodes[0]
         while current_node.id != node_start.id:
             path.append(current_node)

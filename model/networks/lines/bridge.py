@@ -20,3 +20,12 @@ class Bridge(Line):
             "pods": [pod.serialize() for pod in section.pods]
         })
         return dict
+
+    @property
+    def pods(self):
+        pods = []
+        for route in self._routes:
+            for section in route.sections:
+                for pod in section.pods:
+                    pods.append(pod)
+        return pods

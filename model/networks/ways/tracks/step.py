@@ -38,3 +38,7 @@ class Step(Track):
             "y": self._y
         })
         return dict
+
+    @property
+    def pods(self):
+        raise NotImplementedError

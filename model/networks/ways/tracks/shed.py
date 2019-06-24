@@ -38,3 +38,7 @@ class Shed(Step):
 
     def to_element_of_loop(self):
         return self._element_of_loop
+
+    @property
+    def pods(self):
+        return self._pods

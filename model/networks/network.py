@@ -21,7 +21,14 @@ class Network(Node):
 
     @property
     def pods(self):
-        return [pod for pod in self._routes] + [pod for pod in self._bridges]
+        pods = []
+        for route in self._routes:
+            for pod in route.pods:
+                pods.append(pod)
+        for bridge in self._bridges:
+            for pod in bridge.pods:
+                pods.append(pod)
+        return pods
 
     @property
     def bridges(self):
@@ -91,7 +98,6 @@ class Network(Node):
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
-                print("creation route : id=", len(self._routes))
                 new_route = Route(len(self._routes), **routes[route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
@@ -130,6 +136,7 @@ class Network(Node):
                 self._switches.append(new_switch)
                 self._loops[b]["switches"][s] = new_switch
         print("Etape 3 : [OK]")
+        print("Etape 4 : ...")
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
         for p in range(len(self._bridges)):
             bridge = self._bridges[p]
@@ -142,6 +149,7 @@ class Network(Node):
             loop = self._loops[b]
             self._init_pods_of_line(loop)
             self._loops[b] = Loop(b, **loop)
+        print("Etape 4 : [OK]")
 
     def _init_pods_of_line(self, line):
         for pod in line["pods"]:

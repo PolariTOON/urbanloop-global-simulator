@@ -1,4 +1,4 @@
-import {Capsule, Loop, Sensor, Station, Switch, Warehouse, appState, getNetworkDivSize} from "./objects.js";
+import {Capsule, Loop, Sensor, Station, Switch, Warehouse, appState} from "./objects.js";
 
 let viewTab = document.getElementById("view-tab");
 

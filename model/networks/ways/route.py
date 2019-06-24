@@ -62,6 +62,10 @@ class Route(Way):
         return self._steps
 
     @property
+    def stations(self):
+        return [step for step in self._steps if isinstance(step, Station)]
+
+    @property
     def pods(self):
         return [pod for section in self.sections for pod in section.pods] + [pod for step in self.steps for pod in step.pods]
 

@@ -32,7 +32,9 @@ class Step(Track):
         return self._next
 
     def serialize(self):
-        return super().serialize().update({
+        dict = super().serialize()
+        dict.update({
             "x": self._x,
             "y": self._y
         })
+        return dict

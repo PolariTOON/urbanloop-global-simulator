@@ -6,7 +6,6 @@ from .way import Way
 
 
 class Switch(Way):
-
     def __init__(self, id, x=None, y=None, loop_in=None, loop_out=None, route_bridge=None, pods=None, id_bridge=None, **kwargs):
         super().__init__(id, **kwargs)
         self._x = x or 0
@@ -59,15 +58,19 @@ class Switch(Way):
         return self._previous
 
     def serialize(self):
-        return super().serialize().update({
+        dict = super().serialize()
+        dict.update({
             "type": "switch",
             "pods": {
                 "loop_in": [pod.serialize() for pod in self._pods_previous],
                 "loop_out": [pod.serialize() for pod in self._pods_next],
                 "bridge": [pod.serialize() for pod in self._pods_beside]
             },
+            "x": self._x,
+            "y": self._y,
             "id_bridge": self._id_bridge
         })
+        return dict
 
     @property
     def pods(self):

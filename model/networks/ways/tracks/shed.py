@@ -26,13 +26,15 @@ class Shed(Step):
         self._element_of_loop = element_of_loop
 
     def serialize(self):
-        return super().serialize().update({
+        dict = super().serialize()
+        dict.update({
             "type": "shed",
             "pods": {
                 "count": len(self._pods),
                 "max": self._capacity
             }
         })
+        return dict
 
     def to_element_of_loop(self):
         return self._element_of_loop

@@ -34,18 +34,19 @@ class Loop(Line):
                 section = route.sections[step_index]
                 elements.append(step.serialize())
                 sections.append(section.serialize())
-                for pod_index in range(section.pods):
+                for pod_index in range(len(section.pods)):
                     pod = section.pods[pod_index]
                     pods.append(pod.serialize())
             # On n'oublie pas la dernière section
             section = route.sections[-1]
-            sections.append(section)
-            for pod_index in range(section.pods):
+            sections.append(section.serialize())
+            for pod_index in range(len(section.pods)):
                 pod = section.pods[pod_index]
                 pods.append(pod.serialize())
-        return super().serialize().update({
-            "name": self._name,
+        dict = super().serialize()
+        dict.update({
             "elements": elements,
             "sections": sections,
             "pods": pods
         })
+        return dict

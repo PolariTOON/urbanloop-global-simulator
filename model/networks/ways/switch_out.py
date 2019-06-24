@@ -26,6 +26,8 @@ class SwitchOut(Switch):
         self._switch_in = value
 
     def serialize(self):
-        return super().serialize().update({
-            'type': 'switch_out'
+        dict = super().serialize()
+        dict.update({
+            "type": "switch_out"
         })
+        return dict

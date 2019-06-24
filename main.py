@@ -22,7 +22,9 @@ if arguments.port is -1:
 elif arguments.port is 1:
     with open("resources/new_mini_network.json") as json_data:
         json_network = json.load(json_data)
-    Network(0, **json_network)
+    json_network = Network(0, **json_network).serialize()
+    # with open("resources/new_mini_network_copy.json", mode="w", newline="\n") as json_data:
+    #     json.dump(json_network, json_data, allow_nan=False, indent="\t")
 else:
     from web_app import run_app
     run_app(arguments.port)

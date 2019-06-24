@@ -6,4 +6,6 @@ class Traveler(Token):
         super().__init__(**kwargs)
 
     def serialize(self):
-        return super().serialize().update({})
+        dict = super().serialize()
+        dict.update({})
+        return dict

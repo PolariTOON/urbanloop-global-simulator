@@ -61,12 +61,14 @@ class Section(Track):
         return self._pods
 
     def serialize(self):
-        return super().serialize().update({
+        dict = super().serialize()
+        dict.update({
             "speed": self._speed,
             "path": {
                 "type": self._path_type
             }
         })
+        return dict
 
     def insert_pod(self, **pod):
         pods = self._pods

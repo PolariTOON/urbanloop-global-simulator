@@ -4,10 +4,14 @@ class Line:
         self._name = name or ""
 
     @property
+    def id(self):
+        return self._id
+
+    @property
     def name(self):
         return self._name
 
     def serialize(self):
         return {
-            "name": self.name
+            "name": self._name
         }

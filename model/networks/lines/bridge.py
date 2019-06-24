@@ -13,6 +13,10 @@ class Bridge(Line):
         self._switches = switches or []
 
     def serialize(self):
-        return super().serialize().update({
-            "type": "bridge"
+        section = self._routes[0].sections[0]
+        dict = super().serialize()
+        dict.update({
+            "section": section.serialize(),
+            "pods": [pod.serialize() for pod in section.pods]
         })
+        return dict

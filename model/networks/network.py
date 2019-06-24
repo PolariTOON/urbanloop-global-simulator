@@ -32,10 +32,12 @@ class Network(Node):
         return self._loops
 
     def serialize(self):
-        return super().serialize().update({
-            'bridges': [bridge.serialize() for bridge in self._bridges],
-            'loops': [loop.serialize() for loop in self._loops],
+        dict = super().serialize()
+        dict.update({
+            "bridges": [bridge.serialize() for bridge in self._bridges],
+            "loops": [loop.serialize() for loop in self._loops],
         })
+        return dict
 
     def _init_graph_from_json(self):
         """

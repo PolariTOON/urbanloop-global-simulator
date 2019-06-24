@@ -31,10 +31,12 @@ class Pod(Token):
         return self._travelers
 
     def serialize(self):
-        return super().serialize().update({
+        dict = super().serialize()
+        dict.update({
             "position": self._position,
             "travelers": {
                 "count": len(self._travelers),
                 "max": self._capacity
             }
         })
+        return dict

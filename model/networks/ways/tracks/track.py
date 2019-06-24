@@ -22,4 +22,6 @@ class Track(Node):
         raise NotImplementedError()
 
     def serialize(self):
-        return super().serialize().update({})
+        dict = super().serialize()
+        dict.update({})
+        return dict

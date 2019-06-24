@@ -11,6 +11,8 @@ class Sensor(Step):
         super().__init__(id, **kwargs)
 
     def serialize(self):
-        return super().serialize().update({
+        dict = super().serialize()
+        dict.update({
             "type": "sensor"
         })
+        return dict

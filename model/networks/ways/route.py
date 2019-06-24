@@ -2,8 +2,9 @@
 2eme possibilité de noeud
 Une route est à la fois un noeud du graphe subdivisé et un graphe divisé en sections, stations, garages séparés par des capteurs
 """
-from model.networks.ways.tracks.section import Section
+
 from .way import Way
+from .tracks.section import Section
 from .tracks.sensor import Sensor
 from .tracks.shed import Shed
 from .tracks.station import Station
@@ -11,8 +12,7 @@ from .tracks.station import Station
 
 class Route(Way):
     def __init__(self, id, steps=None, sections=None, **kwargs):
-        super().__init__(**kwargs)
-        self.id = id
+        super().__init__(id, **kwargs)
         self._steps = steps or []  # [shed, capteur, station, ...]
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)
         self._previous = None
@@ -21,26 +21,21 @@ class Route(Way):
         #  Etape 42 : On instancie les pistes mais pas les liaisons de la premiere et de la dernière section
         for section_index in range(len(self._sections)):
             section = self._sections[section_index]
-            section = Section(**section)
+            section = Section(section_index, **section)
             self._sections[section_index] = section
         for step_index in range(len(self._steps)):
             step = self._steps[step_index]
             step["previous"] = self._sections[step_index]
             step["next"] = self._sections[step_index + 1]
             if step["type"] == "sensor":
-                step = Sensor(**step)
+                step = Sensor(step_index, **step)
             elif step["type"] == "shed":
-                step = Shed(**step)
+                step = Shed(step_index, **step)
             elif step["type"] == "station":
-                print(step)
-                step = Station(**step)
+                step = Station(step_index, **step)
             else:
                 raise TypeError("invalid element type")
             self._steps[step_index] = step
-
-    @property
-    def pods(self):
-        return [pod for section in self.sections for pod in section.pods] + [pod for step in self.steps for pod in step.pods]
 
     @property
     def sections(self):
@@ -65,6 +60,10 @@ class Route(Way):
     @property
     def steps(self):
         return self._steps
+
+    @property
+    def pods(self):
+        return [pod for section in self.sections for pod in section.pods] + [pod for step in self.steps for pod in step.pods]
 
     def serialize(self):
         return super().serialize().update({

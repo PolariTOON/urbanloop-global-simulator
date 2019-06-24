@@ -7,8 +7,8 @@ from .step import Step
 
 
 class Shed(Step):
-    def __init__(self, pods=None, element_of_loop=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, id, pods=None, element_of_loop=None, **kwargs):
+        super().__init__(id, **kwargs)
         pods = pods or {
             "count": 0,
             "max": 0

@@ -14,8 +14,8 @@ class Type(Enum):
 
 
 class Station(Step):
-    def __init__(self, pods=None, element_of_loop=None, station_type=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, id, pods=None, element_of_loop=None, station_type=None, **kwargs):
+        super().__init__(id, **kwargs)
         pods = pods or {
             "count": 0,
             "max": 0

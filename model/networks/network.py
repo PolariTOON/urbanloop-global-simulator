@@ -11,8 +11,8 @@ from .ways.switch_out import SwitchOut
 
 
 class Network(Node):
-    def __init__(self, bridges=None, loops=None, switches=None, routes=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, id, bridges=None, loops=None, switches=None, routes=None, **kwargs):
+        super().__init__(id, **kwargs)
         self._bridges = bridges or []
         self._loops = loops or []
         self._switches = switches or []
@@ -82,8 +82,7 @@ class Network(Node):
                         }
                     steps.append(n)  # important : on ajoute l'étape
                 sections.append(p)
-            if len(steps) != 0:
-                routes.append({"steps": steps, "sections": sections})
+            routes.append({"steps": steps, "sections": sections})
         print("Etape 1 : [OK]")
         print("Etape 2 : ...")
         #  Etape 2 : Instanciation des routes
@@ -94,8 +93,7 @@ class Network(Node):
                 new_route = Route(len(self._routes), **routes[route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
-                routes[route - 1]["steps"] = new_route
-                routes[route - 1]["sections"] = routes[route]["sections"]
+                routes[route - 1] = new_route
             routes.pop()
         l = len(self._routes)  # nombre de routes du réseau internes aux boucles
         for p in range(len(self._bridges)):
@@ -137,11 +135,11 @@ class Network(Node):
             switch_in = self._get_elt_of_loop(**bridge["switch_in"])
             bridge["switches"] = [switch_out, switch_in]
             self._init_pods_of_line(bridge)
-            self._bridges[p] = Bridge(**bridge)
+            self._bridges[p] = Bridge(p, **bridge)
         for b in range(len(self._loops)):
             loop = self._loops[b]
             self._init_pods_of_line(loop)
-            self._loops[b] = Loop(**loop)
+            self._loops[b] = Loop(b, **loop)
 
     def _init_pods_of_line(self, line):
         for pod in line["pods"]:

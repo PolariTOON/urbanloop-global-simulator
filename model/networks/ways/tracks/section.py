@@ -8,9 +8,8 @@ from .track import Track
 
 
 class Section(Track):
-
-    def __init__(self, speed=None, path=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, id, speed=None, path=None, **kwargs):
+        super().__init__(id, **kwargs)
         speed = speed or 0
         path = path or {
             "type": "line"
@@ -35,10 +34,6 @@ class Section(Track):
     def previous(self):
         return self._previous
 
-    @property
-    def pods(self):
-        return self._pods
-
     @previous.setter
     def previous(self, value):
         self._previous = value
@@ -60,6 +55,10 @@ class Section(Track):
             self._length = nan
         else:
             self._length = hypot(other.x - value.x, other.y - value.y)  # TODO: gérer les autres types de chemins
+
+    @property
+    def pods(self):
+        return self._pods
 
     def serialize(self):
         return super().serialize().update({

@@ -6,8 +6,8 @@ from ....node2 import Node
 
 
 class Track(Node):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, id, **kwargs):
+        super().__init__(id, **kwargs)
 
     @property
     def pods(self):

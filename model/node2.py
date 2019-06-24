@@ -1,6 +1,11 @@
 class Node:
-    def __init__(self, name=None):
+    def __init__(self, id, name=None, **kawrgs):
+        self._id = id
         self._name = name or ""
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def name(self):
@@ -12,5 +17,5 @@ class Node:
 
     def serialize(self):
         return {
-            "name": self.name
+            "name": self._name
         }

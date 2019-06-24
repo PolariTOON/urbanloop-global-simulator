@@ -7,8 +7,8 @@ from .line import Line
 
 
 class Bridge(Line):
-    def __init__(self, routes=None, switches=None, **kwargs):
-        super().__init__()
+    def __init__(self, id, routes=None, switches=None, **kwargs):
+        super().__init__(id, **kwargs)
         self._routes = routes or []
         self._switches = switches or []
 

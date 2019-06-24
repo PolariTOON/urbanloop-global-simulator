@@ -1,5 +1,5 @@
 class Token:
-    def __init__(self, source=None, destination=None):
+    def __init__(self, source=None, destination=None, **kwargs):
         source = source or None
         destination = destination or None
         self._source = source

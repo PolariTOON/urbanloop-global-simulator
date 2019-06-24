@@ -6,8 +6,8 @@ from .line import Line
 
 
 class Loop(Line):
-    def __init__(self, routes=None, switches=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, id, routes=None, switches=None, **kwargs):
+        super().__init__(id, **kwargs)
         self._routes = routes
         self._switches = switches
 

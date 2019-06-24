@@ -7,7 +7,7 @@ from stats import stats_recorder
 
 class Routing:
     def __init__(self, json_network):
-        self.network = Network(**json_network)
+        self.network = Network(0, **json_network)
         self.recorder = stats_recorder.StatsRecorder(0)
         self.timers = [-1] * len(self.network.get_capsules())
         self.tab_depart = []

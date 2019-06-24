@@ -6,12 +6,14 @@ from .track import Track
 
 
 class Step(Track):
-    def __init__(self, x=None, y=None, previous=None, next=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, id, x=None, y=None, previous=None, next=None, **kwargs):
+        super().__init__(id, **kwargs)
         self._x = x or 0
         self._y = y or 0
         self._previous = previous or None
         self._next = next or None
+        self._previous.next = self
+        self._next.previous = self
 
     @property
     def x(self):

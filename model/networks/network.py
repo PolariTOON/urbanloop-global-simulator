@@ -2,6 +2,7 @@
 Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
+from model.networks.ways.tracks.station import Station
 from ..node2 import Node
 from .lines.bridge import Bridge
 from .lines.loop import Loop
@@ -37,6 +38,15 @@ class Network(Node):
     @property
     def loops(self):
         return self._loops
+
+    @property
+    def stations(self):
+        stations = []
+        for route in self._routes:
+            for step in route.steps:
+                if step is Station:
+                    stations.append(step)
+        return stations
 
     def serialize(self):
         dict = super().serialize()

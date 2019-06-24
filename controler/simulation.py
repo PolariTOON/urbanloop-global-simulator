@@ -23,22 +23,16 @@ class SimState(Enum):
 
 
 class Simulation:
-    def __init__(self, loaded=None, modified=None, config=None, is_visualized=False, json_network_path="resources/new_mini_network.json"):
+    def __init__(self, loaded=None, modified=None, config=None, is_visualized=False,
+                 json_network_path="resources/new_mini_network.json"):
         with open(json_network_path) as json_data:
             json_network = json.load(json_data)
         self.controler = Routing(json_network)
         self.loaded = loaded
         self.config = config
         self.modified = modified
-        self.traveler = config['TRAVELER']
-        self.topology = config['TOPOLOGY']
-        self.prob = config['PROB']
-        self.pod = config['POD']
-        self.routing = config['ROUTING']
-        self.sim = config['SIM']
         self.path = 'resources/config.ini'
-        self.default_path = 'resources/default_config.ini'
-        self.probability = Probability(self.traveler, self.prob)
+        self.probability = Probability(self.config['TRAVELER'], self.config['PROB'])
         self._env = None
         self._sim_state = None
         self._sim_tick = 0.05  # Duration of a tick
@@ -50,17 +44,17 @@ class Simulation:
         self.is_real_time = False
         self.is_endless = False
         self.station_refill = True
-        self.fulfill_period = int(self.pod['fulfill_period'])
+        self.fulfill_period = int(self.config['POD']['fulfill_period'])
         self.is_visualized = is_visualized
         self.tab_depart = []
         self.tab_temps = []
         self.traveler_generator = None  # traveler_generator.TravelerGenerator() # TODO : generation de voyageur
         self.ascent_generator = None  # ascent_generator.AscentGenerator() # TODO : monter des voyageurs
-        if self.sim['real_time'] in ['true', 'True']:
+        if self.config['SIM']['real_time'] in ['true', 'True']:
             self.is_real_time = True
-        if self.sim['endless'] in ['true', 'True']:
+        if self.config['SIM']['endless'] in ['true', 'True']:
             self.is_endless = True
-        if self.pod['station_refill'] in ['false', 'False']:
+        if self.config['POD']['station_refill'] in ['false', 'False']:
             self.station_refill = False
         self._load_env()
         self.tick_event = self._env.event()
@@ -116,15 +110,15 @@ class Simulation:
                         os.mkdir("out")
                     except:
                         pass
-                    self.controler.travel_stats()
-
+                    self.controler.travel_stats()  # TODO : génération des statistiques
 
                 # Information about the network : TODO : Gestion des infos du circuit à faire depuis le controler (routing)
                 if self._modulo_on_seconds(30):
                     self.controler.maj_info()
 
                 self._env.process(self.tick())
-                self._env.process(self.ascent_generator.generate())  # TODO : générer la montée des voyageurs à chaque tick
+                self._env.process(
+                    self.ascent_generator.generate())  # TODO : générer la montée des voyageurs à chaque tick
                 if self._modulo_on_seconds(1):
                     self._env.process(self.traveler_generator.generate())  # TODO : générer les voyageurs à chaque tick
                     self.controller.update()  # TODO : Mettre à jour le controler (timers ...)
@@ -164,7 +158,7 @@ class Simulation:
         """
         Replace all the values in the config.ini file with default values
         """
-        copyfile(self.default_path, self.path)
+        copyfile('resources/default_config.ini', self.path)
         self.restore_config()
 
     def restore_config(self):
@@ -173,12 +167,6 @@ class Simulation:
         """
         self.config = configparser.ConfigParser()
         self.config.read(self.path)
-        self.traveler = self.config['TRAVELER']
-        self.topology = self.config['TOPOLOGY']
-        self.prob = self.config['PROB']
-        self.pod = self.config['POD']
-        self.routing = self.config['ROUTING']
-        self.sim = self.config['SIM']
         self.loaded = True
 
     def save_config(self, config_json):
@@ -201,28 +189,28 @@ class Simulation:
         if self.loaded is False:
             return None
         return {
-            'travelers_per_day': int(self.traveler['travelers_per_day']),
-            'trip_limit': int(self.traveler['trip_limit']),
-            'traveler_limit': int(self.traveler['traveler_limit']),
-            'ascent_descent_duration': int(self.traveler['ascent_descent_duration']),
-            'morning_peak_hour': int(self.traveler['morning_peak_hour']),
-            'evening_peak_hour': int(self.traveler['evening_peak_hour']),
-            'network_file': self.topology['network_file'],
-            'activity_and_residential_percent': int(self.prob['activity_and_residential_percent']),
-            'city_percent': int(self.prob['city_percent']),
-            'activity_and_residential_fluctuation': int(self.prob['activity_and_residential_fluctuation']),
-            'max_speed': float(self.pod['max_speed']),
-            'number_of_pods': int(self.pod['number_of_pods']),
-            'station_refill': self.pod['station_refill'],
-            'fulfill_period': int(self.pod['fulfill_period']),
-            'switched_cost': int(self.routing['switched_cost']),
-            'my_timer': int(self.routing['my_timer']),
-            'timer_other': int(self.routing['timer_other']),
-            'real_time': self.sim['real_time'],
-            'endless': self.sim['endless'],
-            'duration': int(self.sim['duration']),
-            'start_hour': int(self.sim['start_hour']),
-            'logs': self.sim['logs']
+            'travelers_per_day': int(self.config['TRAVELER']['travelers_per_day']),
+            'trip_limit': int(self.config['TRAVELER']['trip_limit']),
+            'traveler_limit': int(self.config['TRAVELER']['traveler_limit']),
+            'ascent_descent_duration': int(self.config['TRAVELER']['ascent_descent_duration']),
+            'morning_peak_hour': int(self.config['TRAVELER']['morning_peak_hour']),
+            'evening_peak_hour': int(self.config['TRAVELER']['evening_peak_hour']),
+            'network_file': self.config['TOPOLOGY']['network_file'],
+            'activity_and_residential_percent': int(self.config['PROB']['activity_and_residential_percent']),
+            'city_percent': int(self.config['PROB']['city_percent']),
+            'activity_and_residential_fluctuation': int(self.config['PROB']['activity_and_residential_fluctuation']),
+            'max_speed': float(self.config['POD']['max_speed']),
+            'number_of_pods': int(self.config['POD']['number_of_pods']),
+            'station_refill': self.config['POD']['station_refill'],
+            'fulfill_period': int(self.config['POD']['fulfill_period']),
+            'switched_cost': int(self.config['ROUTING']['switched_cost']),
+            'my_timer': int(self.config['ROUTING']['my_timer']),
+            'timer_other': int(self.config['ROUTING']['timer_other']),
+            'real_time': self.config['SIM']['real_time'],
+            'endless': self.config['SIM']['endless'],
+            'duration': int(self.config['SIM']['duration']),
+            'start_hour': int(self.config['SIM']['start_hour']),
+            'logs': self.config['SIM']['logs']
         }
 
     def get_simulated_time(self, tick=None):

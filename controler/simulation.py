@@ -15,6 +15,8 @@ from controler.probability import Probability
 from controler.routing import Routing
 from shutil import copyfile
 
+from settings import simlog
+
 
 class SimState(Enum):
     RUNNING = 0
@@ -25,14 +27,17 @@ class SimState(Enum):
 class Simulation:
     def __init__(self, loaded=None, modified=None, config=None, is_visualized=False,
                  json_network_path="resources/new_mini_network.json"):
+        # Etape 1 : chargement du modèle
         with open(json_network_path) as json_data:
             json_network = json.load(json_data)
-        self.controler = Routing(json_network)
+        self._controler = Routing(json_network)
         self.loaded = loaded
+        # Etape 2 : chargement de la configuration de la simulation et du modèle probabiliste
         self.config = config
         self.modified = modified
         self.path = 'resources/config.ini'
         self.probability = Probability(self.config['TRAVELER'], self.config['PROB'])
+        # Etape 3 : Initialisation de simPy
         self._env = None
         self._sim_state = None
         self._sim_tick = 0.05  # Duration of a tick
@@ -59,7 +64,8 @@ class Simulation:
         self._load_env()
         self.tick_event = self._env.event()
         self._endless_quit_event = self._env.event()
-        self._env.process(self.loop())
+        # Etape 5 : Lancement de la simulation
+        self._env.process(self._run_simulation())
 
     def _load_env(self):
         """
@@ -91,7 +97,7 @@ class Simulation:
         yield self.tick_event.succeed()
         self.tick_event = self._env.event()
 
-    def loop(self):
+    def _run_simulation(self):
         """
         This function is the main process station of the simulation.
         You can create several independents process while the
@@ -110,21 +116,20 @@ class Simulation:
                         os.mkdir("out")
                     except:
                         pass
-                    self.controler.travel_stats()  # TODO : génération des statistiques
+                    #  self.controler.travel_stats()  # TODO : génération des statistiques
 
                 # Information about the network : TODO : Gestion des infos du circuit à faire depuis le controler (routing)
                 if self._modulo_on_seconds(30):
-                    self.controler.maj_info()
+                    self._controler.maj_info()
 
                 self._env.process(self.tick())
-                self._env.process(
-                    self.ascent_generator.generate())  # TODO : générer la montée des voyageurs à chaque tick
+                self._env.process(self.ascent_generator.generate())  # TODO : générer la montée des voyageurs à chaque tick
                 if self._modulo_on_seconds(1):
                     self._env.process(self.traveler_generator.generate())  # TODO : générer les voyageurs à chaque tick
-                    self.controller.update()  # TODO : Mettre à jour le controler (timers ...)
+                    self._controler.update()  # TODO : Mettre à jour le controler (timers ...)
 
                 if self.station_refill and not self._current_tick == 0 and self._modulo_on_seconds(1):
-                    self.controler.fill_and_full_stations()
+                    self._controler.fill_and_full_stations()
 
                 self.collision()
 
@@ -134,12 +139,12 @@ class Simulation:
                     sleep_time = self._visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
             elif self.is_killed():
-                self.controler.extract(self.get_simulated_time())
-                reset_simulation_parameters()
+                self._controler.extract(self.get_simulated_time())
+                self.reset_simulation_parameters("resources/new_mini_network.json")
                 if self.is_endless:
-                    _quit_endless_simulation()
+                    self._quit_endless_simulation()
                 else:
-                    yield _env.process(_env.exit())
+                    yield self._env.process(self._env.exit())
                 return
 
     def is_running(self):
@@ -235,3 +240,32 @@ class Simulation:
         result += (tick - last_end_tick) * self._sim_tick
 
         return result
+
+    def reset_simulation_parameters(self, json_network_path):
+        """
+        Reset the current simulation parameters. The SimState needs to be KILLED
+        """
+        if self._sim_state != SimState.KILLED:
+            return
+
+        simlog.warn("Resetting the simulation parameters")
+        with open(json_network_path) as json_data:
+            json_network = json.load(json_data)
+        self._controler = Routing(json_network)
+        self._current_tick = 0
+        self._sim_tick = 0.05
+        self._visualized_tick_duration = 0.05
+        self._start_hour = None
+        self._sim_tick_variations = list()
+
+    def _quit_endless_simulation(self):
+        """
+        Stop an endless simulation by triggering the _endless_quit_event.
+        This function should only be used in SimLoop.loop(), and asserts
+        that the simulation is endless
+        """
+
+        def _trigger():
+            yield self._endless_quit_event.succeed()
+
+        self._env.process(_trigger())

@@ -40,6 +40,10 @@ class Network(Node):
         return self._loops
 
     @property
+    def shed(self):
+        return [shed for route in self._routes for shed in route.sheds]
+
+    @property
     def switches(self):
         return self._switches
 

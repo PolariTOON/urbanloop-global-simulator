@@ -4,7 +4,6 @@ from model.graph import Graph
 from model.rule import *
 from model import station
 from model import warehouse
-from model import node
 
 _controller = None
 
@@ -198,7 +197,7 @@ class Controller:
     Dans la pratique on créé des tableaux intermédiares mis à jour lors de l'arrivée/départ des capsules ou des voyageurs
     Puis on calcule la moyenne.
     """
-    def temps_moy_stat(self,id,temps):
+    def temps_moy_stat(self, id,temps):
         test=True
         for i in self.tab_depart:
             if i[0] == id:

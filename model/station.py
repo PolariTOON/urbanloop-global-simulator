@@ -86,7 +86,7 @@ class Station:
                         test = False
                 if test:
                     simlog.debug("Station %s (%s/%d capsules) drained to %s" % (
-                    self.name, qsize, self.capacity, destination.name))
+                        self.name, qsize, self.capacity, destination.name))
                     a_capsule.start_trip()
                 else:
                     self.capsule_queue.put(a_capsule)
@@ -151,23 +151,25 @@ def fill_and_full_stations():
     sera donc autant prioritaire qu'une capsule pleine. Si il reste au moins une capsule alors la demande est
     effectué avec une priorité faible
     """
-    #simlog.debug("Stations drainage and completion process launched.")
+    # simlog.debug("Stations drainage and completion process launched.")
     for station in get_stations():
         if station.estimated_capsules_number() <= max(1, floor(station.capacity / 4)):
             # quasi vide --> station à compléter
-            simlog.debug("Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
+            simlog.debug(
+                "Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
             nb_to_send = station.capacity - station.estimated_capsules_number() - 1
             if station.estimated_capsules_number() == 0 and not station.capsule_arriving:
                 controller.get_controller().refill(10, station, nb_to_send)
                 station.capsule_arriving = True
             elif not station.capsule_arriving:
-                controller.get_controller().refill(6,station,nb_to_send)
+                controller.get_controller().refill(6, station, nb_to_send)
                 station.capsule_arriving = True
-                 # j'en envoie une depuis un entrepot
-        if station.estimated_capsules_number() >= min(station.capacity - 1, floor(3 * station.capacity /4)) and station.capsule_queue.qsize() > 1:
+                # j'en envoie une depuis un entrepot
+        if station.estimated_capsules_number() >= min(station.capacity - 1, floor(
+                3 * station.capacity / 4)) and station.capsule_queue.qsize() > 1:
             # quasi pleine --> station à vider
             simlog.debug("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (
-            station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
+                station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
             nb_to_send = 1
             if station.capsule_queue.qsize() > station.traveler_queue.qsize():
                 nb_to_send = max(station.capsule_queue.qsize() - station.traveler_queue.qsize() - 1, 1)
@@ -199,6 +201,7 @@ def get_almost_empty_station(departure_station=None):
                 return station
     return random.choice(_stations)
 
+
 '''
 Les fonctions suivantes ne sont plus utilisées:
 
@@ -226,8 +229,6 @@ def drain_all():
         if station.estimated_capsules_number() <= 1:
             station.complete()
 '''
-
-
 
 """
 def fill_and_full_stations():

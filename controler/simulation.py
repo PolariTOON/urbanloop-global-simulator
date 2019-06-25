@@ -3,7 +3,6 @@ Classe qui est liée à une simulation
 """
 import configparser
 import fileinput
-import os
 import sys
 import time
 import json
@@ -25,53 +24,62 @@ class SimState(Enum):
 
 
 class Simulation:
-    def __init__(self, loaded=None, modified=None, config=None, is_visualized=False,
+    def __init__(self, id, is_visualized=False,
                  json_network_path="resources/new_mini_network.json"):
+        self.id = id
         # Etape 1 : chargement du modèle
+        print("Chargement du modèle : ...")
         with open(json_network_path) as json_data:
             json_network = json.load(json_data)
-        self._controler = Routing(json_network)
-        self.loaded = loaded
+        self._controler = Routing(self.id, json_network)
+        print("Chargement du modèle : [OK]")
         # Etape 2 : chargement de la configuration de la simulation et du modèle probabiliste
-        self.config = config
-        self.modified = modified
-        self.path = 'resources/config.ini'
-        self.probability = Probability(self.config['TRAVELER'], self.config['PROB'])
+        print("Chargement de la configuration : ...")
+        self._config = configparser.ConfigParser()
+        self._config.read('resources/config.ini')
+        print("Chargement de la configuration : [OK]\nChargement du modèle probabiliste : ...")
+        self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
+        print("Chargement du modèle probabiliste : [OK]\nInitialisation de simPy : ...")
         # Etape 3 : Initialisation de simPy
         self._env = None
-        self._sim_state = None
+        self._sim_state = SimState.RUNNING
         self._sim_tick = 0.05  # Duration of a tick
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
         self._sim_tick_variations = list()
         self._start_hour = None
         self._endless_quit_event = None
-        self.is_real_time = False
-        self.is_endless = False
-        self.station_refill = True
-        self.fulfill_period = int(self.config['POD']['fulfill_period'])
-        self.is_visualized = is_visualized
-        self.tab_depart = []
-        self.tab_temps = []
-        self.traveler_generator = None  # traveler_generator.TravelerGenerator() # TODO : generation de voyageur
-        self.ascent_generator = None  # ascent_generator.AscentGenerator() # TODO : monter des voyageurs
-        if self.config['SIM']['real_time'] in ['true', 'True']:
-            self.is_real_time = True
-        if self.config['SIM']['endless'] in ['true', 'True']:
-            self.is_endless = True
-        if self.config['POD']['station_refill'] in ['false', 'False']:
-            self.station_refill = False
+        self._is_real_time = False
+        self._is_endless = False
+        self._station_refill = True  # Todo : à déplacer dans station
+        self._fulfill_period = int(self._config['CAPSULE']['fulfill_period'])
+        self._is_visualized = is_visualized
+        self._tab_depart = []
+        self._tab_temps = []
+        self._traveler_generator = None  # traveler_generator.TravelerGenerator() # TODO : generation de voyageur
+        self._ascent_generator = None  # ascent_generator.AscentGenerator() # TODO : monter des voyageurs
+        if self._config['SIM']['real_time'] in ['true', 'True']:
+            self._is_real_time = True
+        if self._config['SIM']['endless'] in ['true', 'True']:
+            self._is_endless = True
+        if self._config['CAPSULE']['station_refill'] in ['false', 'False']:
+            self._station_refill = False  # TODO : doit disparaître
         self._load_env()
-        self.tick_event = self._env.event()
+        self._tick_event = self._env.event()
         self._endless_quit_event = self._env.event()
         # Etape 5 : Lancement de la simulation
+        print("Initialisation de simPy : [OK]\nLancement de la simulation : ...")
         self._env.process(self._run_simulation())
+        if self._is_endless:
+            self._env.run(self._endless_quit_event)
+            return
+        self._env.run(until=int(self._config['SIM']['duration']))
 
     def _load_env(self):
         """
         Load the simulation environment with configuration, real_time or not
         """
-        if self.is_real_time:
+        if self._is_real_time:
             self._env = simpy.rt.RealtimeEnvironment(factor=self._sim_tick)
         else:
             self._env = simpy.Environment()
@@ -94,8 +102,8 @@ class Simulation:
         It should be used to frequency process
         """
         self._current_tick += 1
-        yield self.tick_event.succeed()
-        self.tick_event = self._env.event()
+        yield self._tick_event.succeed()
+        self._tick_event = self._env.event()
 
     def _run_simulation(self):
         """
@@ -103,76 +111,57 @@ class Simulation:
         You can create several independents process while the
         SimState is RUNNING.
         """
+        print("Simulation is running.")
         tick_start_time = 0
         while True:
-            if self.is_running():
-                loop_sleep_boolean = self.is_visualized and not self.is_real_time and self._visualized_tick_duration != 0
+            if self._sim_state == SimState.RUNNING:
+                print("run")
+                loop_sleep_boolean = self._is_visualized and not self._is_real_time and self._visualized_tick_duration != 0
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()  # temps de la boucle
-
-                # Stats are recorded every 30 simulated seconds
-                if self._modulo_on_seconds(30):
-                    try:
-                        os.mkdir("out")
-                    except:
-                        pass
-                    #  self.controler.travel_stats()  # TODO : génération des statistiques
-
-                # Information about the network : TODO : Gestion des infos du circuit à faire depuis le controler (routing)
-                if self._modulo_on_seconds(30):
-                    self._controler.maj_info()
-
+                # Etape 1 : génération de statistiques
+                self._controler.travel_stats()  # TODO : génération des statistiques
+                # Etape 3 : Passage au tick suivant
                 self._env.process(self.tick())
-                self._env.process(self.ascent_generator.generate())  # TODO : générer la montée des voyageurs à chaque tick
+                # Etape 4 : Monter des voyageurs en attente dans les capsules
+                self._env.process(self._ascent_generator.generate())  # TODO : générer la montée des voyageurs à chaque tick
+                # Etape 5 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
                 if self._modulo_on_seconds(1):
-                    self._env.process(self.traveler_generator.generate())  # TODO : générer les voyageurs à chaque tick
+                    self._env.process(self._traveler_generator.generate())  # TODO : générer les voyageurs à chaque tick
                     self._controler.update()  # TODO : Mettre à jour le controler (timers ...)
-
-                if self.station_refill and not self._current_tick == 0 and self._modulo_on_seconds(1):
+                # Etape 7 : Complétion des stations
+                if self._station_refill and not self._current_tick == 0 and self._modulo_on_seconds(1):
                     self._controler.fill_and_full_stations()
-
+                # Etape 8 : gestion des collisions
                 self.collision()
-
                 yield self._env.timeout(1)
-
+                # Etape 9 : Gestion de la fin de la simulation
                 if loop_sleep_boolean:
                     sleep_time = self._visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
-            elif self.is_killed():
+            elif self._sim_state == SimState.KILLED:
+                print("killed")
                 self._controler.extract(self.get_simulated_time())
                 self.reset_simulation_parameters("resources/new_mini_network.json")
-                if self.is_endless:
+                if self._is_endless:
                     self._quit_endless_simulation()
                 else:
                     yield self._env.process(self._env.exit())
                 return
 
-    def is_running(self):
-        """
-        :return: True if the simulation is currently started
-        """
-        return self._sim_state == SimState.RUNNING
-
-    def is_killed(self):
-        """
-        :return: True if the simulation is currently paused
-        """
-        return self._sim_state == SimState.KILLED
-
     def reset_config(self):
         """
         Replace all the values in the config.ini file with default values
         """
-        copyfile('resources/default_config.ini', self.path)
+        copyfile('resources/default_config.ini', 'resources/config.ini')
         self.restore_config()
 
     def restore_config(self):
         """
         This function loads the resources/config.ini config file.
         """
-        self.config = configparser.ConfigParser()
-        self.config.read(self.path)
-        self.loaded = True
+        self._config = configparser.ConfigParser()
+        self._config.read('resources/config.ini')
 
     def save_config(self, config_json):
         """
@@ -181,7 +170,7 @@ class Simulation:
         :param config_json: A json with exact same value of attributes
         will be overwritten.
         """
-        for line in fileinput.input(self.path, inplace=True):
+        for line in fileinput.input('resources/config.ini', inplace=True):
             output = line
             for attribute, value in config_json.items():
                 if attribute in line and '#' not in line:
@@ -191,30 +180,28 @@ class Simulation:
         self.restore_config()
 
     def serialize_config(self):
-        if self.loaded is False:
-            return None
         return {
-            'travelers_per_day': int(self.config['TRAVELER']['travelers_per_day']),
-            'trip_limit': int(self.config['TRAVELER']['trip_limit']),
-            'traveler_limit': int(self.config['TRAVELER']['traveler_limit']),
-            'ascent_descent_duration': int(self.config['TRAVELER']['ascent_descent_duration']),
-            'morning_peak_hour': int(self.config['TRAVELER']['morning_peak_hour']),
-            'evening_peak_hour': int(self.config['TRAVELER']['evening_peak_hour']),
-            'activity_and_residential_percent': int(self.config['PROB']['activity_and_residential_percent']),
-            'city_percent': int(self.config['PROB']['city_percent']),
-            'activity_and_residential_fluctuation': int(self.config['PROB']['activity_and_residential_fluctuation']),
-            'max_speed': float(self.config['POD']['max_speed']),
-            'number_of_pods': int(self.config['POD']['number_of_pods']),
-            'station_refill': self.config['POD']['station_refill'],
-            'fulfill_period': int(self.config['POD']['fulfill_period']),
-            'switched_cost': int(self.config['ROUTING']['switched_cost']),
-            'my_timer': int(self.config['ROUTING']['my_timer']),
-            'timer_other': int(self.config['ROUTING']['timer_other']),
-            'real_time': self.config['SIM']['real_time'],
-            'endless': self.config['SIM']['endless'],
-            'duration': int(self.config['SIM']['duration']),
-            'start_hour': int(self.config['SIM']['start_hour']),
-            'logs': self.config['SIM']['logs']
+            'travelers_per_day': int(self._config['TRAVELER']['travelers_per_day']),
+            'trip_limit': int(self._config['TRAVELER']['trip_limit']),
+            'traveler_limit': int(self._config['TRAVELER']['traveler_limit']),
+            'ascent_descent_duration': int(self._config['TRAVELER']['ascent_descent_duration']),
+            'morning_peak_hour': int(self._config['TRAVELER']['morning_peak_hour']),
+            'evening_peak_hour': int(self._config['TRAVELER']['evening_peak_hour']),
+            'activity_and_residential_percent': int(self._config['PROB']['activity_and_residential_percent']),
+            'city_percent': int(self._config['PROB']['city_percent']),
+            'activity_and_residential_fluctuation': int(self._config['PROB']['activity_and_residential_fluctuation']),
+            'max_speed': float(self._config['CAPSULE']['max_speed']),
+            'number_of_pods': int(self._config['CAPSULE']['number_of_pods']),
+            'station_refill': self._config['CAPSULE']['station_refill'],
+            'fulfill_period': int(self._config['CAPSULE']['fulfill_period']),
+            'switched_cost': int(self._config['ROUTING']['switched_cost']),
+            'my_timer': int(self._config['ROUTING']['my_timer']),
+            'timer_other': int(self._config['ROUTING']['timer_other']),
+            'real_time': self._config['SIM']['real_time'],
+            'endless': self._config['SIM']['endless'],
+            'duration': int(self._config['SIM']['duration']),
+            'start_hour': int(self._config['SIM']['start_hour']),
+            'logs': self._config['SIM']['logs']
         }
 
     def get_simulated_time(self, tick=None):
@@ -250,7 +237,7 @@ class Simulation:
         simlog.warn("Resetting the simulation parameters")
         with open(json_network_path) as json_data:
             json_network = json.load(json_data)
-        self._controler = Routing(json_network)
+        self._controler = Routing(self.id, json_network)
         self._current_tick = 0
         self._sim_tick = 0.05
         self._visualized_tick_duration = 0.05
@@ -268,3 +255,102 @@ class Simulation:
             yield self._endless_quit_event.succeed()
 
         self._env.process(_trigger())
+
+    def _change_sim_tick(self, value=None):
+        """
+        Change the current sim_tick value. Bigger is the sim_tick value,
+        more jerky the simulation will be. Use this to speed up (really)
+        the simulation. This function adds in the variations list, the tuple :
+        (start_tick, tick_duration, sim_tick) in _sim_tick_variations
+        /!\ This function is disabled in case of real time simulation
+        :param value: The desired new sim_tick value
+        """
+        if value is None:
+            value = self._sim_tick
+
+        if type(self._env) is simpy.rt.RealtimeEnvironment:
+            simlog.warn("You can't change the sim_tick in a real-time environment")
+            return
+
+        if value <= 0:
+            simlog.warn("The sim_tick needs to be greater than zero")
+            return
+
+        if self._sim_tick_variations:
+            # Not empty case
+            start_tick = self._sim_tick_variations[-1][0] + self._sim_tick_variations[-1][1]
+            tick_duration = self._current_tick - start_tick
+            self._sim_tick_variations.append((start_tick, tick_duration, self._sim_tick))
+        else:
+            # Empty case
+            self._sim_tick_variations.append((0, self._current_tick, self._sim_tick))
+
+        self._sim_tick = value
+        simlog.warn("Changing _sim_tick. One tick equals now %f seconds" % self._sim_tick)
+
+    def get_initial_sim_tick(self):
+        """
+        :return: The _sim_tick value at the start of simulation
+        """
+        if self._sim_tick_variations:
+            return self._sim_tick_variations[0][2]
+        return self._sim_tick
+
+    def accelerate_simulation(self):
+        initial_sim_tick = self.get_initial_sim_tick()
+
+        if self._visualized_tick_duration > 0:
+            self._visualized_tick_duration /= 2
+            if self._visualized_tick_duration < initial_sim_tick * 2 ** -8:
+                self._visualized_tick_duration = 0
+            return
+
+        if self._sim_tick < initial_sim_tick * 2 ** 7:
+            self._change_sim_tick(self._sim_tick * 2)
+
+    def decelerate_simulation(self):
+        initial_sim_tick = self.get_initial_sim_tick()
+
+        if self._sim_tick > initial_sim_tick:
+            self._change_sim_tick(self._sim_tick / 2)
+            return
+
+        if self._visualized_tick_duration < initial_sim_tick:
+            self._visualized_tick_duration *= 2
+            if self._visualized_tick_duration == 0:
+                _visualized_tick_duration = initial_sim_tick * pow(2, -8)
+
+    def change_state(self, sim_state=SimState.RUNNING):
+        """
+        :param sim_state: The desired simulation state
+        """
+        simlog.debug("Changing SimState to %s" % sim_state.name)
+        self._sim_state = sim_state
+
+    def stop_simulation(self):
+        """
+        Stop the simulation definitely. After call this method, The SimLoop.loop()
+        function will manage the case endless or not, and reset all simulation parameters
+        """
+        simlog.warn("Simulation KILLED")
+        self.change_state(SimState.KILLED)
+
+    def pause_simulation(self):
+        """
+        Pause the simulation. Call run_simulation_after_pause to restart the simulation
+        """
+        simlog.warn("Simulation PAUSED")
+        self.change_state(SimState.PAUSED)
+
+    def run_simulation_after_pause(self):
+        """
+        Re-run the simulation after a PAUSED state.
+        """
+        simlog.warn("Simulation re-RUNNING")
+        self.change_state(SimState.RUNNING)
+
+    def get_tick_per_second(self):
+        """
+        :return: The simulation ticks per second
+        """
+        return 1 / self._sim_tick

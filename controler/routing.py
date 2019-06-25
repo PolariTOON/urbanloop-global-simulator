@@ -6,10 +6,11 @@ from stats.stats_recorder import StatsRecorder
 
 
 class Routing:
-    def __init__(self, json_network):
-        self.network = Network(0, **json_network)
-        self.recorder = StatsRecorder(0)
-        self.timers = [-1] * len(self.network.pods())
+    def __init__(self, id, json_network):
+        self.id = id
+        self.network = Network(self.id, **json_network)
+        self.recorder = StatsRecorder(0)  # TODO : à déplacer ici
+        self.timers = [-1] * len(self.network.pods)
         self.tab_depart = []
         self.tab_temps = []
         self.tab_depart_voy = []
@@ -28,20 +29,6 @@ class Routing:
         buffer = str(self.temps_moy_voy()) + ","
         latest_stats_file.write(buffer)
         latest_stats_file.close()
-
-    def maj_info(self):
-        loops = []
-        pods = []
-        for a_loop_name, a_loop in self.network.loops():
-            loops.append(a_loop)
-            pods[a_loop_name] = 0
-        for a_pod in self.network.pods():
-            pods[a_pod.loop.name] += 1
-        for a_loop in loops:
-            self.recorder.add_capsule_average_loop(pods[a_loop.name], a_loop)
-        for a_station in self.network.stations():
-            self.recorder.add_stopped_capsules_station(a_station.get_waiting_pods_number(), a_station)
-            self.recorder.add_waiting_travelers(a_station.get_waiting_travelers_number(), a_station)
 
     def temps_moy_stat(self, id, temps):
         test = True
@@ -88,3 +75,6 @@ class Routing:
     def extract(self, simulated_time):
         self.recorder.stop_listen(simulated_time)
         self.recorder.extract()
+
+    def update(self):
+        pass

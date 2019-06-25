@@ -42,7 +42,6 @@ class SimLoop:
         global _start_hour
         global _endless_quit_event
         global recorder
-        global _controller
         _sim_tick = float(config.sim['tick'])
         _visualized_tick_duration = _sim_tick
         _start_hour = int(config.sim['start_hour'])
@@ -338,8 +337,8 @@ def reset_simulation_parameters():
     """
     Reset the current simulation parameters. The SimState needs to be KILLED
     """
-    global _env, _current_tick, _sim_state, _sim_tick, _visualized_tick_duration
-    global _start_hour, _sim_tick_variations, _endless_quit_event
+    global _current_tick, _sim_state, _sim_tick, _visualized_tick_duration
+    global _start_hour, _sim_tick_variations
 
     if not is_killed():
         return

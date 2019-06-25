@@ -6,8 +6,9 @@ import logging
 from threading import Thread
 
 from flask import Flask, request, jsonify
-from flask.json import load, loads
+from flask.json import loads
 
+from controler.simulation import Simulation
 from model import loop, routing, station, switch, warehouse, capsule, sensor
 from settings import config, network, simlog
 from simulator import sim_loop, converter
@@ -17,16 +18,13 @@ app.logger.setLevel(logging.ERROR)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 sim_thread = None
 
-# TODO: déplacer vers la simulation
-from model.networks.network import Network
-_networks = []
+_simulations = []
 
 
 def run_app(port):
-    global _networks
-    print("App runnning on port %d (http://127.0.0.1:%d)" % (port, port))
-    with open("resources/new_mini_network.json") as network:
-        _networks.append(Network(0, **load(network)))
+    global _simulations
+    print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
+    _simulations.append(Simulation(0))
     app.run(port=port)
 
 

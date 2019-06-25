@@ -24,7 +24,6 @@ def init_switch():
 
 
 _switches = []
-alive_timers = []
 
 
 class Switch:
@@ -40,9 +39,7 @@ class Switch:
         :return: 0UT : un objet aiguillage (Switch)
         """
         global _switches
-        global alive_timers
         _switches.append(self)
-        alive_timers += [float('inf'), float('inf')]
 
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_switch_id()

@@ -4,11 +4,10 @@ from model import identifier, station, switch, warehouse, sensor
 from settings import simlog, network
 
 all_loops = {}
-default_size = 100
 
 
 class Loop:
-    def __init__(self, name, size=default_size, coordinates=None):
+    def __init__(self, name, size=100, coordinates=None):
         """
         initialisation d'une station
         :param name : Nom de la boucle /!\ fait office d'identifiant (String) OBLIGATOIRE

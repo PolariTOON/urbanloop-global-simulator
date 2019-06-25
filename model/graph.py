@@ -59,15 +59,6 @@ class Graph:
                 self.matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1] / speed
                 self.expected_matrix[node.id][node.next_nodes[1].id] = node.distance_to_next_node[1] / speed
 
-    def add_edge(self, node1, node2, weight):
-        self.matrix[node1][node2] = weight
-
-    def delete_edge(self, node1, node2):
-        self.matrix[node1][node2] = inf
-
-    def get_edge_existence(self, node1, node2):
-        return self.matrix[node1][node2] < inf
-
     def get_edge_weight(self, node1, node2):
         return self.matrix[node1][node2]
 
@@ -165,14 +156,6 @@ class Graph:
         path.append(node_start)
         return path
 
-    def delete_section(self, id_dep, id_fin):
-        self.matrix[id_dep][id_fin] = inf
-        self.get_node_from_id(id_dep).remove_next(self.get_node_from_id(id_fin))
-
-    def repare_section(self, id_dep, id_fin):
-        self.matrix[id_dep][id_fin] = self.expected_matrix[id_dep][id_fin]
-        self.get_node_from_id(id_dep).add_next_node(self.get_node_from_id(id_fin))
-
     def change(self, node_start, node_dest):
         return node_start.loop.uuid != node_dest.loop.uuid
 
@@ -210,23 +193,6 @@ class Graph:
 
         self.matrix[node1][node2] = inf
 
-    def enable_way(self, previous_switch, current_switch):
-        """
-        Rétablit un troncon entre deux noeuds. Concretement cela place la valeur de départ comme poids de l'arc
-        dans le graphe
-        :param previous_switch: switch, warehouse ou station d'où commence le troncon
-        :param current_switch: switch, warehouse ou station où arrive le troncon
-        """
-
-        node1 = node.get_node_id(previous_switch, previous_switch.loop)
-
-        if previous_switch.uuid == current_switch.uuid:
-            node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
-        else:
-            node2 = node.get_node_id(current_switch, current_switch.loop)
-
-        self.matrix[node1][node2] = self.expected_matrix[node1][node2]
-
     def get_switches_nodes(self):
         list_nodes = list()
         for node in self.nodes:
@@ -242,15 +208,5 @@ class Graph:
         """
         for node in self.nodes:
             if node.elt.uuid == elt.uuid:
-                return node
-        return None
-
-    def get_node_from_id(self, id):
-        """
-        :param id: l'identificateur du noeud voulu
-        :return: Renvoie le noeud du graphe d'id en paramètre
-        """
-        for node in self.nodes:
-            if node.id == id:
                 return node
         return None

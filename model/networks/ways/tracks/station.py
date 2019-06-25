@@ -55,3 +55,11 @@ class Station(Step):
     @property
     def pods(self):
         return self._pods
+
+    @property
+    def travelers(self):
+        return self._travelers
+
+    @property
+    def type(self):
+        return self._station_type

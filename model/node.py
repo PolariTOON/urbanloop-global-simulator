@@ -34,22 +34,6 @@ class Node:
         else:
             self.previous_nodes[1] = node
 
-    def remove_next(self, node):
-        if self.next_nodes[0].id == node.id:
-            node.remove_previous(self)
-            self.next_nodes[0] = self.next_nodes[1]
-            self.next_nodes[1] = None
-        elif self.next_nodes[1].id == node.id:
-            node.remove_previous(self)
-            self.next_nodes[1] = None
-
-    def remove_previous(self, node):
-        if self.previous_nodes[0].id == node.id:
-            self.previous_nodes[0] = self.previous_nodes[1]
-            self.previous_nodes[1] = None
-        else:
-            self.previous_nodes[1] = None
-
     def calculate_distance(self, elt_cible):
         """
         Calcule la longueur du troncon entre lui même et le switch/warehouse/station entré en paramètre

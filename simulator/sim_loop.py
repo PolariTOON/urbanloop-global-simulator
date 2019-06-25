@@ -341,7 +341,7 @@ def reset_simulation_parameters():
     global _env, _current_tick, _sim_state, _sim_tick, _visualized_tick_duration
     global _start_hour, _sim_tick_variations, _endless_quit_event
 
-    if _sim_state != SimState.KILLED:
+    if not is_killed():
         return
 
     simlog.warn("Resetting the simulation parameters")

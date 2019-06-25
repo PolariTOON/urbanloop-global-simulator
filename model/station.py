@@ -178,17 +178,6 @@ def fill_and_full_stations():
             # station.drain(warehouse.which_warehouse_before(station(station)))
 
 
-def get_station_by_name(name):
-    """
-    :param name: Name of the desired station
-    :return: The desired station
-    """
-    global _stations
-    for station in _stations:
-        if station.name == name:
-            return station
-
-
 def get_almost_empty_station(departure_station=None):
     """
     :param departure_station: The departure_station

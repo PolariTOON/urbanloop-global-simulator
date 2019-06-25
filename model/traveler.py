@@ -1,8 +1,6 @@
 from model import identifier
 from simulator import sim_loop
 
-total_generated = 0
-
 
 class Traveler:
     def __init__(self, departure_station, destination_station):
@@ -12,8 +10,6 @@ class Traveler:
         :param destination_station_name: nom de la station d'arrivée souhaitée par le voyageur (String)
         :param waiting_since: The time since the Traveler is waiting at departure_station (in seconds)
         """
-        global total_generated
-        total_generated += 1
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_traveler_id()
         self.departure_station = departure_station

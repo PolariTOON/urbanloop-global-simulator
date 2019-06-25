@@ -184,12 +184,6 @@ class Controller:
             if test_warehouse.capsule_queue.qsize() > 0:
                 test_warehouse.drain(destination, prio)
 
-    def disable_way(self, id1, id2):
-        self.graph.delete_section(id1, id2)
-        new_rules = self.update_rules()
-        self.replace_rules(new_rules)
-        print("COUPURE D'UNE VOIE")
-
     """
     Les 4 fonctions suivantes sont des fonctions permettant de retourner des statistiques sur le temps
     moyen d'attentes des voyageurs (temps_moy_voy_stat/temps_moy_voy()

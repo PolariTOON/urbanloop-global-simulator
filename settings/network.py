@@ -33,12 +33,10 @@ def load(file_name=None, capsules_fulfill=True):
     _size = {}
     model_loop.all_loops = {}
     model_switch._switches = []
-    model_switch.alive_timers = []
     model_warehouse._warehouses = list()
     model_station._stations = list()
     model_capsule._capsules = list()
     model_sensor._sensors = list()
-    traveler.total_generated = 0
     identifier._loop_id = -1
     identifier._warehouse_id = -1
     identifier._station_id = -1

@@ -6,15 +6,13 @@ from model import switch
 from settings import config
 from simulator import converter
 
-_loaded = False
-
 
 def load():
-    global _loaded
     logging.basicConfig(format='[%(levelname)s]%(message)s', level=logging.DEBUG)
-    update_level_from_config()
-    _loaded = True
-
+    if config.sim['logs'] in ['False', 'false']:
+        logging.getLogger().setLevel(logging.ERROR)
+    else:
+        logging.getLogger().setLevel(logging.DEBUG)
 
 def _format(message, *elements):
     time_string = converter.seconds_to_string(converter.now_to_seconds())
@@ -55,18 +53,3 @@ def warn(message, *stations_switches_loops_or_strings):
 
 def error(message, *stations_switches_loops_or_strings):
     logging.error(_format(message, *stations_switches_loops_or_strings))
-
-
-def _set_error_level():
-    logging.getLogger().setLevel(logging.ERROR)
-
-
-def _set_debug_level():
-    logging.getLogger().setLevel(logging.DEBUG)
-
-
-def update_level_from_config():
-    if config.sim['logs'] in ['False', 'false']:
-        _set_error_level()
-    else:
-        _set_debug_level()

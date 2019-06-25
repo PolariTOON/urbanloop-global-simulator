@@ -14,7 +14,6 @@ https://docs.python.org/dev/library/configparser.html
 loaded = False
 modified = False
 traveler = None
-topology = None
 prob = None
 capsule = None
 routing = None
@@ -56,7 +55,6 @@ def restore_config():
     """
     global loaded
     global traveler
-    global topology
     global prob
     global capsule
     global routing
@@ -64,7 +62,6 @@ def restore_config():
     config = configparser.ConfigParser()
     config.read(path)
     traveler = config['TRAVELER']
-    topology = config['TOPOLOGY']
     prob = config['PROB']
     capsule = config['CAPSULE']
     routing = config['ROUTING']
@@ -82,7 +79,6 @@ def serialize_config():
         'ascent_descent_duration': int(traveler['ascent_descent_duration']),
         'morning_peak_hour': int(traveler['morning_peak_hour']),
         'evening_peak_hour': int(traveler['evening_peak_hour']),
-        'network_file': topology['network_file'],
         'activity_and_residential_percent': int(prob['activity_and_residential_percent']),
         'city_percent': int(prob['city_percent']),
         'activity_and_residential_fluctuation': int(prob['activity_and_residential_fluctuation']),

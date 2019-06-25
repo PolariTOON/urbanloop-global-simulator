@@ -200,7 +200,6 @@ class Simulation:
             'ascent_descent_duration': int(self.config['TRAVELER']['ascent_descent_duration']),
             'morning_peak_hour': int(self.config['TRAVELER']['morning_peak_hour']),
             'evening_peak_hour': int(self.config['TRAVELER']['evening_peak_hour']),
-            'network_file': self.config['TOPOLOGY']['network_file'],
             'activity_and_residential_percent': int(self.config['PROB']['activity_and_residential_percent']),
             'city_percent': int(self.config['PROB']['city_percent']),
             'activity_and_residential_fluctuation': int(self.config['PROB']['activity_and_residential_fluctuation']),

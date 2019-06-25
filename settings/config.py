@@ -37,8 +37,6 @@ def save_config(config_json):
     This function overwrites a new config under a json format and saves it
     into resources/config.ini
     :param config_json: A json with exact same value of attributes
-    :param permanent: If permanent is true, both default_config and config
-    will be overwritten.
     """
     for line in fileinput.input(path, inplace=True):
         output = line

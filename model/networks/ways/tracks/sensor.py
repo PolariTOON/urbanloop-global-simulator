@@ -16,3 +16,7 @@ class Sensor(Step):
             "type": "sensor"
         })
         return dict
+
+    @property
+    def pods(self):
+        return []

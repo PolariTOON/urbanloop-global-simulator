@@ -81,6 +81,20 @@ class Routing:
     def update(self):
         pass
 
+    def ascend_travelers(self, trip_limit, _env):
+        for station in self.network.stations:
+            if station.travelers and station.pods and self.can_generate():
+                if trip_limit != -1:
+                    trip_limit -= 1
+                if station.pods:
+                    return
+
+                traveler = station.travelers.pop()
+                pod = station.pods[-1]
+                pod.add_traveler(traveler)
+                # sim_loop.recorder.add_waiting_time_traveler(traveler.get_waiting_seconds(), traveler) TODO : STATS A GENERER
+                yield _env.process(ascent_event(station, pod, _env))
+
     def generate_travelers(self, traveler_limit, traveler_number, second, probability):
         for a_traveler in range(traveler_number):
             if not (traveler_limit > 0 or traveler_limit == -1):
@@ -94,3 +108,13 @@ class Routing:
             self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : A GERER
             simlog.info("Traveler generated", departure_station, destination_station)
 
+
+def ascent_event(a_station, capsule, _env):  # TODO à ajuster
+    ascent_timeout = _env.timeout(converter.random_ascent_descent_duration())
+    ascent_timeout.callbacks.append(lambda event: ascent_event_callback(a_station, capsule))
+    yield ascent_timeout
+
+
+def ascent_event_callback(a_station, capsule):  # TODO : à ajuster
+    a_station.capsule_queue.remove(capsule)
+    capsule.start_trip()

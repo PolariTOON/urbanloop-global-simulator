@@ -75,19 +75,12 @@ class Route(Way):
 
     @property
     def pods(self):
-        pods = []
-        for section in self._sections:
-            for pod in section.pods:
-                pods.append(pod)
-        for step in self._steps:
-            for pod in step.pods:
-                pods.append(pod)
-        return pods
+        return [pod for track in self._sections + self._steps for pod in track.pods]
 
     def serialize(self):
+        pods = [pod.serialize() for track in self._sections + self._steps for pod in track.pods]
         dict = super().serialize()
         dict.update({
-            "type": "route",
-            "pod": self.pods
+            "pod": pods
         })
         return dict

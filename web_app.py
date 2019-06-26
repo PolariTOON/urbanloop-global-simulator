@@ -19,12 +19,16 @@ logging.getLogger('werkzeug').setLevel(logging.ERROR)
 sim_thread = None
 
 _simulations = []
+_networks = []
 
 
 def run_app(port):
     global _simulations
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
-    _simulations.append(Simulation(0))
+    simulation = Simulation(0)
+    network = simulation._controler.network
+    _simulations.append(simulation)
+    _networks.append(network)
     app.run(port=port)
 
 

@@ -17,7 +17,7 @@ from controler.probability import Probability
 from controler.routing import Routing
 from shutil import copyfile
 
-from model.networks.ways.tracks.station import Type
+from model.networks.ways.tracks.station import station_types
 from model.traveler import Traveler
 from settings import simlog
 
@@ -325,7 +325,7 @@ class Simulation:
         if self._visualized_tick_duration < initial_sim_tick:
             self._visualized_tick_duration *= 2
             if self._visualized_tick_duration == 0:
-                _visualized_tick_duration = initial_sim_tick * pow(2, -8)
+                self._visualized_tick_duration = initial_sim_tick * pow(2, -8)
 
     def change_state(self, sim_state=SimState.RUNNING):
         """

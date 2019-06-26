@@ -14,18 +14,23 @@ class Bridge(Line):
 
     def serialize(self):
         section = self._routes[0].sections[0]
+        pods = []
+        for pod_index in range(len(section.pods)):
+            pod = section.pods[pod_index]
+            pod = pod.serialize()
+            pod.update({
+                "x": 0,  # TODO
+                "y": 0  # TODO
+            })
+            pods.append(pod)
+        section = section.serialize()
         dict = super().serialize()
         dict.update({
-            "section": section.serialize(),
-            "pods": [pod.serialize() for pod in section.pods]
+            "section": section,
+            "pods": pods
         })
         return dict
 
     @property
     def pods(self):
-        pods = []
-        for route in self._routes:
-            for section in route.sections:
-                for pod in section.pods:
-                    pods.append(pod)
-        return pods
+        return [pod for route in self._routes for pod in route.pods]

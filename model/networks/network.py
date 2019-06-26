@@ -4,7 +4,7 @@ les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (
 """
 import random
 
-from .ways.tracks.station import Type
+from .ways.tracks.station import station_types
 from ..node2 import Node
 from .lines.bridge import Bridge
 from .lines.loop import Loop
@@ -72,10 +72,12 @@ class Network(Node):
         return random.choice(stations)
 
     def serialize(self):
+        bridges = [bridge.serialize() for bridge in self._bridges]
+        loops = [loop.serialize() for loop in self._loops]
         dict = super().serialize()
         dict.update({
-            "bridges": [bridge.serialize() for bridge in self._bridges],
-            "loops": [loop.serialize() for loop in self._loops],
+            "bridges": bridges,
+            "loops": loops,
         })
         return dict
 
@@ -113,7 +115,10 @@ class Network(Node):
                             "element": node
                         }
                     self._loops[b]["switches"].append(n)
-                    self._loops[b]["routes"].append({"steps": steps, "sections": sections})
+                    self._loops[b]["routes"].append({
+                        "steps": steps,
+                        "sections": sections
+                    })
                     steps = []
                     sections = []
                 else:
@@ -124,15 +129,17 @@ class Network(Node):
                         }
                     steps.append(n)  # important : on ajoute l'étape
                 sections.append(p)
-            routes.append({"steps": steps, "sections": sections})
+            routes.append({
+                "steps": steps,
+                "sections": sections
+            })
         print("Etape 1 : [OK]")
         print("Etape 2 : ...")
         #  Etape 2 : Instanciation des routes
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
-                new_route = Route(len(self._routes), **routes[
-                    route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
+                new_route = Route(len(self._routes), **routes[route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
                 routes[route - 1] = new_route
@@ -141,8 +148,10 @@ class Network(Node):
         for p in range(len(self._bridges)):
             steps = []
             sections = [self._bridges[p]["section"]]
-            new_route = Route(l + p, **{"steps": steps,
-                                        "sections": sections})  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
+            new_route = Route(l + p, **{
+                "steps": steps,
+                "sections": sections
+            })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._routes.append(new_route)
             self._bridges[p]["routes"] = [new_route]  # On ajoute sa route au bridge
         print("Etape 2 : [OK]")
@@ -156,7 +165,7 @@ class Network(Node):
                 for pod_branch_key in pods:
                     pod_branch = pods[pod_branch_key]
                     for pod_index in range(len(pod_branch)):
-                        pod = self._loops[b]["switches"][s]["pods"][pod_index]
+                        pod = pod_branch[pod_index]
                         pod["source"] = self._get_elt_of_loop(**pod["source"])
                         pod["destination"] = self._get_elt_of_loop(**pod["destination"])
                 #  Routes et Id
@@ -225,19 +234,19 @@ class Network(Node):
         looking for a destination_station.
         """
         is_arrival = departure_station is not None
-        city_prob = probability.station_probability(Type.CITY, second, is_arrival=is_arrival)
-        residential_prob = probability.station_probability(Type.RESIDENTIAL, second, is_arrival=is_arrival) + city_prob
-        activity_prob = probability.station_probability(Type.ACTIVITY, second, is_arrival=is_arrival) + residential_prob
+        city_prob = probability.station_probability(station_types["city"], second, is_arrival=is_arrival)
+        residential_prob = probability.station_probability(station_types["residential"], second, is_arrival=is_arrival) + city_prob
+        activity_prob = probability.station_probability(station_types["activity"], second, is_arrival=is_arrival) + residential_prob
         prob = random.uniform(0, 1)
 
-        if 0 <= prob < city_prob:
-            return self.get_random_station_from_type(Type.CITY, departure_station=departure_station)
-        elif city_prob <= prob < residential_prob:
-            return self.get_random_station_from_type(Type.RESIDENTIAL, departure_station=departure_station)
-        elif residential_prob <= prob < activity_prob:
-            return self.get_random_station_from_type(Type.ACTIVITY, departure_station=departure_station)
+        if prob < city_prob:
+            return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
+        elif prob < residential_prob:
+            return self.get_random_station_from_type(station_types["residential"], departure_station=departure_station)
+        elif prob < activity_prob:
+            return self.get_random_station_from_type(station_types["activity"], departure_station=departure_station)
         else:
-            return self.get_random_station_from_type(Type.CITY, departure_station=departure_station)
+            return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
 
 
 def _init_pod_of_line(line, pod):

@@ -2,15 +2,14 @@
 Type de noeud du sous-graphe correspondant à une station d"arrêt
 """
 
-from enum import Enum
 from ...tokens.pod import Pod
 from .step import Step
 
-
-class Type(Enum):
-    ACTIVITY = 0
-    RESIDENTIAL = 1
-    CITY = 2
+station_types = {
+    "city": 0,
+    "residential": 1,
+    "activity": 2,
+}
 
 
 class Station(Step):
@@ -23,7 +22,7 @@ class Station(Step):
         pods["count"] = pods["count"] or 0
         pods["max"] = pods["max"] or 0
         travelers = travelers or 0
-        station_type = station_type or Type.CITY
+        station_type = station_type or station_types["city"]
         element_of_loop = element_of_loop or {
             "loop": 0,
             "element": 0

@@ -17,7 +17,7 @@ class Loop(Line):
 
     @property
     def pods(self):
-        return [p for p in self._routes.pods]
+        return [pod for route in self._routes for pod in route.pods]
 
     def serialize(self):
         elements = []
@@ -25,24 +25,44 @@ class Loop(Line):
         pods = []
         switches = self._switches
         routes = self._routes
+        length = 0
         for way_index in range(len(switches)):
             switch = switches[way_index]
+            switch = switch.serialize()
+            elements.append(switch)
             route = routes[way_index]
-            elements.append(switch.serialize())
             for step_index in range(len(route.steps)):
                 step = route.steps[step_index]
+                step = step.serialize()
+                elements.append(step)
                 section = route.sections[step_index]
-                elements.append(step.serialize())
-                sections.append(section.serialize())
                 for pod_index in range(len(section.pods)):
                     pod = section.pods[pod_index]
-                    pods.append(pod.serialize())
+                    position = pod.position + length
+                    pod = pod.serialize()
+                    pod.update({
+                        "position": position,
+                        "x": 0,  # TODO
+                        "y": 0  # TODO
+                    })
+                    pods.append(pod)
+                length += section.length
+                section = section.serialize()
+                sections.append(section)
             # On n'oublie pas la dernière section
             section = route.sections[-1]
-            sections.append(section.serialize())
             for pod_index in range(len(section.pods)):
                 pod = section.pods[pod_index]
-                pods.append(pod.serialize())
+                position = pod.position + length
+                pod = pod.serialize()
+                pod.update({
+                    "position": position,
+                    "x": 0,  # TODO
+                    "y": 0  # TODO
+                })
+                pods.append(pod)
+            section = section.serialize()
+            sections.append(section)
         dict = super().serialize()
         dict.update({
             "elements": elements,

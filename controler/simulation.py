@@ -3,17 +3,22 @@ Classe qui est liée à une simulation
 """
 import configparser
 import fileinput
+import random
 import sys
 import time
 import json
 from enum import Enum
 
 import simpy
+from math import floor
 
+from controler import probability
 from controler.probability import Probability
 from controler.routing import Routing
 from shutil import copyfile
 
+from model.networks.ways.tracks.station import Type
+from model.traveler import Traveler
 from settings import simlog
 
 
@@ -124,10 +129,12 @@ class Simulation:
                 # Etape 3 : Passage au tick suivant
                 self._env.process(self.tick())
                 # Etape 4 : Monter des voyageurs en attente dans les capsules
-                self._env.process(self._ascent_generator.generate())  # TODO : générer la montée des voyageurs à chaque tick
+                self._env.process(
+                    self._controler.ascend_travelers())  # TODO : générer la montée des voyageurs à chaque tick (anciennement generate de ascend_generator)
                 # Etape 5 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
                 if self._modulo_on_seconds(1):
-                    self._env.process(self._traveler_generator.generate())  # TODO : générer les voyageurs à chaque tick
+                    self._env.process(
+                        self.generate_travelers())  # TODO : générer les voyageurs à chaque tick (anciennement generate dans traveler_generator)
                     self._controler.update()  # TODO : Mettre à jour le controler (timers ...)
                 # Etape 7 : Complétion des stations
                 if self._station_refill and not self._current_tick == 0 and self._modulo_on_seconds(1):
@@ -354,3 +361,32 @@ class Simulation:
         :return: The simulation ticks per second
         """
         return 1 / self._sim_tick
+
+    def generate_travelers(self):
+        """
+        :return: The generator of one or several travelers each second
+        """
+        traveler_limit = int(self._config["TRAVELER"]["traveler_limit"])
+        seconds = self.now_to_seconds()
+        hour = seconds_to_floor_hour(seconds)
+        traveler_number = probability.generate_traveler_poisson(self._config["TRAVELER"]["travelers_per_day"], hour)
+        self._controler.generate_travelers(traveler_limit, traveler_number, seconds, self._probability)
+        yield self._env.timeout(floor(self.get_tick_per_second() / traveler_number))
+
+    def now_to_seconds(self):
+        """
+        :return: The current time in second. This function takes into account the
+        sim_tick variations.
+        """
+        if self._start_hour is None:
+            return -1
+        return self._start_hour * 3600 + self.get_simulated_time()
+
+
+def seconds_to_floor_hour(seconds):
+    """
+    This function transforms an amount of seconds to the corresponding hour
+    :param seconds: An amount of seconds
+    :return: The corresponding hour
+    """
+    return floor((seconds % 86400) / 3600)

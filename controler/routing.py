@@ -2,6 +2,8 @@
 C'est ici qu'est le controler du paradigme SDN (calcul des routes ...)
 """
 from model.networks.network import Network
+from model.networks.tokens.traveler import Traveler
+from settings import simlog
 from stats.stats_recorder import StatsRecorder
 
 
@@ -78,3 +80,17 @@ class Routing:
 
     def update(self):
         pass
+
+    def generate_travelers(self, traveler_limit, traveler_number, second, probability):
+        for a_traveler in range(traveler_number):
+            if not (traveler_limit > 0 or traveler_limit == -1):
+                return
+            if traveler_limit != -1:
+                traveler_limit -= 1
+
+            departure_station = self.network.select_random_station(second, probability)
+            destination_station = self.network.select_random_station(second, probability, departure_station=departure_station)
+            a = Traveler(departure_station, destination_station)  # TODO : A GERER
+            self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : A GERER
+            simlog.info("Traveler generated", departure_station, destination_station)
+

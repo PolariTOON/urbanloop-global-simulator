@@ -119,6 +119,13 @@ def station_probability(station_type, second, is_arrival=True):
     :param is_arrival: If the station is a departure or destination station
     :return: The probability to lead a traveler to the chosen station_type at the given time
     """
+    global _city_percent
+    global _activity_and_residential_percent
+    global _activity_and_residential_fluctuation
+    global _ascent_descent_duration
+    global _morning_peak_hour
+    global _evening_peak_hour
+
     if None in (_city_percent, _activity_and_residential_percent, _activity_and_residential_fluctuation):
         simlog.error("Converter hasn't been loaded")
         return 0

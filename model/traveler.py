@@ -6,9 +6,9 @@ class Traveler:
     def __init__(self, departure_station, destination_station):
         """
         Travelers are automatically added to the queue in the departure_station
-        :param departure_station_name: nom de la station de départ du voyageur (String)
-        :param destination_station_name: nom de la station d'arrivée souhaitée par le voyageur (String)
-        :param waiting_since: The time since the Traveler is waiting at departure_station (in seconds)
+        :param departure_station: nom de la station de départ du voyageur (String)
+        :param destination_station: nom de la station d'arrivée souhaitée par le voyageur (String)
+        waiting_since: The time since the Traveler is waiting at departure_station (in seconds)
         """
         self.uuid = identifier.generate_unique()
         self.id = identifier.generate_traveler_id()

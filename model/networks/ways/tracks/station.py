@@ -8,9 +8,9 @@ from .step import Step
 
 
 class Type(Enum):
-    ACTIVITY = 1
-    RESIDENTIAL = 2
-    CITY = 3
+    ACTIVITY = 0
+    RESIDENTIAL = 1
+    CITY = 2
 
 
 class Station(Step):

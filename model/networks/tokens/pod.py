@@ -1,4 +1,6 @@
 from uuid import uuid4
+
+from settings import simlog
 from .token import Token
 from .traveler import Traveler
 
@@ -40,3 +42,8 @@ class Pod(Token):
             }
         })
         return dict
+
+    def add_traveler(self, traveler):
+        self._travelers.append(traveler)
+        simlog.info("Traveler %s gets in capsule %d" % (traveler.id, self._id), traveler.source,
+                    self.destination)

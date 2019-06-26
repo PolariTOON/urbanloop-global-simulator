@@ -3,12 +3,10 @@ Classe qui est liée à une simulation
 """
 import configparser
 import fileinput
-import random
 import sys
 import time
 import json
 from enum import Enum
-
 import simpy
 from math import floor
 
@@ -16,9 +14,6 @@ from controler import probability
 from controler.probability import Probability
 from controler.routing import Routing
 from shutil import copyfile
-
-from model.networks.ways.tracks.station import Type
-from model.traveler import Traveler
 from settings import simlog
 
 
@@ -61,7 +56,6 @@ class Simulation:
         self._is_visualized = is_visualized
         self._tab_depart = []
         self._tab_temps = []
-        self._traveler_generator = None  # traveler_generator.TravelerGenerator() # TODO : generation de voyageur
         self._ascent_generator = None  # ascent_generator.AscentGenerator() # TODO : monter des voyageurs
         if self._config['SIM']['real_time'] in ['true', 'True']:
             self._is_real_time = True
@@ -125,7 +119,7 @@ class Simulation:
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()  # temps de la boucle
                 # Etape 1 : génération de statistiques
-                self._controler.travel_stats()  # TODO : génération des statistiques
+                # self._controler.travel_stats()  # TODO : génération des statistiques
                 # Etape 3 : Passage au tick suivant
                 self._env.process(self.tick())
                 # Etape 4 : Monter des voyageurs en attente dans les capsules
@@ -381,6 +375,9 @@ class Simulation:
         if self._start_hour is None:
             return -1
         return self._start_hour * 3600 + self.get_simulated_time()
+
+    def ascend_travelers(self):
+        self._controler.ascend_travelers(int(self._config["TRAVELER"]["trip_limit"]), self._env)
 
 
 def seconds_to_floor_hour(seconds):

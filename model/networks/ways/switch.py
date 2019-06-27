@@ -6,13 +6,13 @@ from .way import Way
 
 
 class Switch(Way):
-    def __init__(self, id, x=None, y=None, loop_in=None, loop_out=None, route_bridge=None, pods=None, id_bridge=None, **kwargs):
+    def __init__(self, id, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
         super().__init__(id, **kwargs)
         self._x = x or 0
         self._y = y or 0
-        self._previous = loop_in
-        self._next = loop_out
-        self._beside = route_bridge
+        self._previous = previous
+        self._next = next
+        self._beside = beside
         self._pods_previous = []
         self._pods_next = []
         self._pods_beside = []
@@ -62,9 +62,9 @@ class Switch(Way):
         dict.update({
             "type": "switch",
             "pods": {
-                "loop_in": [pod.serialize() for pod in self._pods_previous],
-                "loop_out": [pod.serialize() for pod in self._pods_next],
-                "bridge": [pod.serialize() for pod in self._pods_beside]
+                "previous": [pod.serialize() for pod in self._pods_previous],
+                "next": [pod.serialize() for pod in self._pods_next],
+                "beside": [pod.serialize() for pod in self._pods_beside]
             },
             "x": self._x,
             "y": self._y,

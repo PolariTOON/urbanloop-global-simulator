@@ -15,7 +15,7 @@ class Graph:
         self.expected_matrix = [[inf for j in range(self.size)] for i in range(self.size)]
 
         self.init_nodes(warehouses, stations, switches)
-        self.init_next_nodes(warehouses, stations)
+        self.init_next_nodes()
         self.init_matrices()
 
     def init_nodes(self, warehouses, stations, switches):
@@ -37,7 +37,7 @@ class Graph:
             self.nodes.append(node1)
             self.nodes.append(node2)
 
-    def init_next_nodes(self, warehouses, stations):
+    def init_next_nodes(self):
         for a_node in self.nodes:
             if type(a_node.elt) is station.Station or type(a_node.elt) is warehouse.Warehouse:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.elt.next_element, a_node.loop)])
@@ -47,7 +47,7 @@ class Graph:
                 a_node.add_next_node(self.nodes[node.get_node_id(a_node.elt.next_element_other, a_node.elt.other_loop)])
 
     def init_matrices(self):
-        #speed : unités à vérifier
+        # speed : unités à vérifier
         """
         On créé le graphe qui représente le réseau
         """
@@ -81,7 +81,7 @@ class Graph:
 
         return self.matrix[node1][node2] > 3 * self.expected_matrix[node1][node2]
 
-    def no_more_congestion(self, previous_switch, current_switch, sample_time):
+    def no_more_congestion(self, previous_switch, current_switch):
         node1 = node.get_node_id(previous_switch, previous_switch.loop)
 
         if previous_switch.uuid == current_switch.uuid:

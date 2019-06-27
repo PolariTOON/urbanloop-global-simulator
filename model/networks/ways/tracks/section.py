@@ -70,10 +70,10 @@ class Section(Track):
         })
         return dict
 
-    def insert_pod(self, **pod):
+    def insert_pod(self, pos_from_section, **pod):
         pods = self._pods
         for k in range(len(pods)):
-            if pods[k].position > pod["position"]:
+            if pods[k].position > pos_from_section:
                 self._pods.insert(k, Pod(**pod))
                 return
         self._pods.append(Pod(**pod))

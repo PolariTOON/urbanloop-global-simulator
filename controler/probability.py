@@ -51,7 +51,7 @@ class Probability:
         eph = self.evening_peak_hour
         gaussian_factor = 250 * (self.activity_and_residential_fluctuation / 100)
         result = 0
-        decimal_hour = converter.seconds_to_decimal_hour(second) # TODO : à revoir ?
+        decimal_hour = converter.seconds_to_decimal_hour(second)
         norm_mph = scipy.stats.norm.pdf(decimal_hour, mph, 1)
         norm_eph = scipy.stats.norm.pdf(decimal_hour, eph, 1)
         if station_type == station.station_types["city"]:

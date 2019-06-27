@@ -33,7 +33,7 @@ class Controller:
     def update_from_switch(self, capsule):
         """
          fonction qui est lancée à chaque fois qu'une capsule passe un switch
-         :param capsule : la capsule routée
+         :param capsule: la capsule routée
         """
         previous_switch = capsule.current_element  # last node browsed
         current_switch = capsule.next_element  # switch which route the pod

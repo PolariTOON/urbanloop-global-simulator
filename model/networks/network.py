@@ -68,7 +68,8 @@ class Network(Node):
         looking for a destination_station and this station can't be the
         same as the departure_station
         """
-        stations = [station for route in self._routes for station in route.stations if station.type == station_type and (departure_station is None or station != departure_station)]
+        stations = [station for route in self._routes for station in route.stations if
+                    station.type == station_type and (departure_station is None or station != departure_station)]
         return random.choice(stations)
 
     def serialize(self):
@@ -139,7 +140,8 @@ class Network(Node):
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
-                new_route = Route(len(self._routes), **routes[route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
+                new_route = Route(len(self._routes), **routes[
+                    route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
                 routes[route - 1] = new_route
@@ -158,6 +160,7 @@ class Network(Node):
         print("Etape 3 : ...")
         #  Etape 3 : Instanciation des aiguillages, ajout de leurs capsules et liaison avec les routes
         for b in range(len(self._loops)):
+            first_switch = len(self._switches)
             for s in range(len(self._loops[b]["switches"])):
                 #  Capsules
                 switch = self._loops[b]["switches"][s]
@@ -170,9 +173,9 @@ class Network(Node):
                         pod["destination"] = self._get_elt_of_loop(**pod["destination"])
                 #  Routes et Id
                 id_switch = len(self._switches)
-                switch["loop_in"] = self._routes[(id_switch - 1) % len(self._loops[b]["switches"])]  # loop_in
-                switch["loop_out"] = self._routes[id_switch]  # loop_out
-                switch["route_bridge"] = self._routes[l + switch["id_bridge"]]  # route_bridge
+                switch["previous"] = self._routes[(id_switch - first_switch - 1) % len(self._loops[b]["switches"]) + first_switch]  # loop_in
+                switch["next"] = self._routes[id_switch]  # loop_out
+                switch["beside"] = self._routes[l + switch["id_bridge"]]  # route_bridge
                 if switch["type"] == "switch_in":
                     new_switch = SwitchIn(id_switch, **switch)
                 else:
@@ -235,8 +238,10 @@ class Network(Node):
         """
         is_arrival = departure_station is not None
         city_prob = probability.station_probability(station_types["city"], second, is_arrival=is_arrival)
-        residential_prob = probability.station_probability(station_types["residential"], second, is_arrival=is_arrival) + city_prob
-        activity_prob = probability.station_probability(station_types["activity"], second, is_arrival=is_arrival) + residential_prob
+        residential_prob = probability.station_probability(station_types["residential"], second,
+                                                           is_arrival=is_arrival) + city_prob
+        activity_prob = probability.station_probability(station_types["activity"], second,
+                                                        is_arrival=is_arrival) + residential_prob
         prob = random.uniform(0, 1)
 
         if prob < city_prob:
@@ -257,8 +262,8 @@ def _init_pod_of_line(line, pod):
         for section in route.sections:
             length = section.length
             if position < length:
-                pod["position"] = position
-                section.insert_pod(**pod)
+                section.insert_pod(position, **pod)
                 return
             position -= length
     raise ValueError("Element's position out of range")
+

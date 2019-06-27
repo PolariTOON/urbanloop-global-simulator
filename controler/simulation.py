@@ -10,7 +10,7 @@ from enum import Enum
 import simpy
 from math import floor
 
-from controler import probability
+from controler import probability, converter
 from controler.probability import Probability
 from controler.routing import Routing
 from shutil import copyfile
@@ -24,8 +24,7 @@ class SimState(Enum):
 
 
 class Simulation:
-    def __init__(self, id, is_visualized=False,
-                 json_network_path="resources/new_mini_network.json"):
+    def __init__(self, id, is_visualized=False, json_network_path="resources/new_mini_network.json"):
         self.id = id
         # Etape 1 : chargement du modèle
         print("Chargement du modèle : ...")
@@ -361,7 +360,7 @@ class Simulation:
         """
         traveler_limit = int(self._config["TRAVELER"]["traveler_limit"])
         seconds = self.now_to_seconds()
-        hour = seconds_to_floor_hour(seconds)
+        hour = converter.seconds_to_floor_hour(seconds)
         traveler_number = probability.generate_traveler_poisson(self._config["TRAVELER"]["travelers_per_day"], hour)
         self._controler.generate_travelers(traveler_limit, traveler_number, seconds, self._probability)
         yield self._env.timeout(floor(self.get_tick_per_second() / traveler_number))
@@ -378,11 +377,3 @@ class Simulation:
     def ascend_travelers(self):
         self._controler.ascend_travelers(int(self._config["TRAVELER"]["trip_limit"]), self._env, self._config, self.get_tick_per_second())
 
-
-def seconds_to_floor_hour(seconds):
-    """
-    This function transforms an amount of seconds to the corresponding hour
-    :param seconds: An amount of seconds
-    :return: The corresponding hour
-    """
-    return floor((seconds % 86400) / 3600)

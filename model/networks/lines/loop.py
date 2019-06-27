@@ -16,6 +16,10 @@ class Loop(Line):
         return self._routes
 
     @property
+    def switches(self):
+        return self._switches
+
+    @property
     def pods(self):
         return [pod for route in self._routes for pod in route.pods]
 

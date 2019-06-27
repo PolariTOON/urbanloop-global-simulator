@@ -376,4 +376,3 @@ class Simulation:
 
     def ascend_travelers(self):
         self._controler.ascend_travelers(int(self._config["TRAVELER"]["trip_limit"]), self._env, self._config, self.get_tick_per_second())
-

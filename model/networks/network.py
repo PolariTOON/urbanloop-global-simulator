@@ -262,8 +262,8 @@ def _init_pod_of_line(line, pod):
         for section in route.sections:
             length = section.length
             if position < length:
-                section.insert_pod(position, **pod)
+                pod["position"] = position
+                section.insert_pod(**pod)
                 return
             position -= length
     raise ValueError("Element's position out of range")
-

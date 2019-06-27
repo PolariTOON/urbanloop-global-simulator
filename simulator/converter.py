@@ -175,6 +175,7 @@ def random_ascent_descent_duration():
     :return: A value between [|time-2, time+2|]. time is the defined duration (in the config file)
     for ascent and descent events.
     """
+    global _ascent_descent_duration
     random_seconds = random.randrange(_ascent_descent_duration - 2, _ascent_descent_duration + 2, 1)
     return random_seconds * sim_loop.get_tick_per_second()
 

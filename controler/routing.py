@@ -1,8 +1,9 @@
 """
 C'est ici qu'est le controler du paradigme SDN (calcul des routes ...)
 """
+import random
+
 from model.networks.network import Network
-from model.networks.tokens.traveler import Traveler
 from settings import simlog
 from stats.stats_recorder import StatsRecorder
 
@@ -81,9 +82,9 @@ class Routing:
     def update(self):
         pass
 
-    def ascend_travelers(self, trip_limit, _env):
+    def ascend_travelers(self, trip_limit, _env, config, frequency):
         for station in self.network.stations:
-            if station.travelers and station.pods and self.can_generate():
+            if station.travelers and station.pods and (trip_limit > 0 or trip_limit == -1):
                 if trip_limit != -1:
                     trip_limit -= 1
                 if station.pods:
@@ -93,7 +94,7 @@ class Routing:
                 pod = station.pods[-1]
                 pod.add_traveler(traveler)
                 # sim_loop.recorder.add_waiting_time_traveler(traveler.get_waiting_seconds(), traveler) TODO : STATS A GENERER
-                yield _env.process(ascent_event(station, pod, _env))
+                yield _env.process(ascent_event(station, pod, _env, config["TRAVELER"]["ascent_descent_duration"], frequency))
 
     def generate_travelers(self, traveler_limit, traveler_number, second, probability):
         for a_traveler in range(traveler_number):
@@ -102,19 +103,28 @@ class Routing:
             if traveler_limit != -1:
                 traveler_limit -= 1
 
-            departure_station = self.network.select_random_station(second, probability)
-            destination_station = self.network.select_random_station(second, probability, departure_station=departure_station)
-            a = Traveler(departure_station, destination_station)  # TODO : A GERER
-            self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : A GERER
-            simlog.info("Traveler generated", departure_station, destination_station)
+            source = self.network.select_random_station(second, probability)
+            destination = self.network.select_random_station(second, probability, departure_station=source)
+            source.add_traveler(destination)
+            # self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : STATS A GERER
+            simlog.info("Traveler generated", source, destination)
 
 
-def ascent_event(a_station, capsule, _env):  # TODO à ajuster
-    ascent_timeout = _env.timeout(converter.random_ascent_descent_duration())
-    ascent_timeout.callbacks.append(lambda event: ascent_event_callback(a_station, capsule))
+def ascent_event(station, pod, _env, ascent_descent_duration, frequency):  # TODO à ajuster
+    ascent_timeout = _env.timeout(random_ascent_descent_duration(ascent_descent_duration, frequency))
+    ascent_timeout.callbacks.append(lambda event: ascent_event_callback(station, pod))
     yield ascent_timeout
 
 
-def ascent_event_callback(a_station, capsule):  # TODO : à ajuster
-    a_station.capsule_queue.remove(capsule)
-    capsule.start_trip()
+def random_ascent_descent_duration(ascent_descent_duration, frequency):
+    """
+    :return: A value between [|time-2, time+2|]. time is the defined duration (in the config file)
+    for ascent and descent events.
+    """
+    random_seconds = random.randrange(ascent_descent_duration - 2, ascent_descent_duration + 2, 1)
+    return random_seconds * frequency
+
+
+def ascent_event_callback(station, pod):
+    station.pods.remove(pod)
+    pod.start_trip()  # TODO : à faire

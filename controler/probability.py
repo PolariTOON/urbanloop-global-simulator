@@ -7,7 +7,7 @@ import numpy as np
 import scipy.stats
 
 from controler import converter
-from model.networks.ways.tracks.station import Type
+from model.networks.ways.tracks import station
 from settings import simlog
 
 
@@ -54,9 +54,9 @@ class Probability:
         decimal_hour = converter.seconds_to_decimal_hour(second) # TODO : à revoir ?
         norm_mph = scipy.stats.norm.pdf(decimal_hour, mph, 1)
         norm_eph = scipy.stats.norm.pdf(decimal_hour, eph, 1)
-        if station_type == Type.CITY:
+        if station_type == station.station_types["city"]:
             result = self.city_percent
-        if station_type == Type.ACTIVITY:
+        if station_type == station.station_types["activity"]:
             if is_arrival:
                 if second < 43200:
                     result = self.activity_and_residential_percent + gaussian_factor * norm_mph
@@ -67,7 +67,7 @@ class Probability:
                     result = self.activity_and_residential_percent - gaussian_factor * norm_mph
                 else:
                     result = self.activity_and_residential_percent + gaussian_factor * norm_eph
-        if station_type == Type.RESIDENTIAL:
+        if station_type == station.station_types["residential"]:
             if is_arrival:
                 if second < 43200:
                     result = self.activity_and_residential_percent - gaussian_factor * norm_mph

@@ -1,7 +1,7 @@
 """
 Type de noeud du sous-graphe correspondant à une station d"arrêt
 """
-
+from ...tokens.traveler import Traveler
 from ...tokens.pod import Pod
 from .step import Step
 
@@ -62,3 +62,6 @@ class Station(Step):
     @property
     def type(self):
         return self._station_type
+
+    def add_traveler(self, destination):
+        self._travelers.add(Traveler(self, destination))

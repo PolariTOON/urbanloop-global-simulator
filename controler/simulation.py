@@ -124,17 +124,16 @@ class Simulation:
                 self._env.process(self.tick())
                 # Etape 4 : Monter des voyageurs en attente dans les capsules
                 self._env.process(
-                    self._controler.ascend_travelers())  # TODO : générer la montée des voyageurs à chaque tick (anciennement generate de ascend_generator)
+                    self._controler.ascend_travelers(self._config["TRAVELER"]["trip_limit"], self._env))
                 # Etape 5 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
                 if self._modulo_on_seconds(1):
-                    self._env.process(
-                        self.generate_travelers())  # TODO : générer les voyageurs à chaque tick (anciennement generate dans traveler_generator)
+                    self._env.process(self.generate_travelers())
                     self._controler.update()  # TODO : Mettre à jour le controler (timers ...)
                 # Etape 7 : Complétion des stations
-                if self._station_refill and not self._current_tick == 0 and self._modulo_on_seconds(1):
+                if self._station_refill and self._current_tick != 0 and self._modulo_on_seconds(1):
                     self._controler.fill_and_full_stations()
                 # Etape 8 : gestion des collisions
-                self.collision()
+                #  self.collision() TODO : GESTION DES COLLISIONS
                 yield self._env.timeout(1)
                 # Etape 9 : Gestion de la fin de la simulation
                 if loop_sleep_boolean:
@@ -377,7 +376,7 @@ class Simulation:
         return self._start_hour * 3600 + self.get_simulated_time()
 
     def ascend_travelers(self):
-        self._controler.ascend_travelers(int(self._config["TRAVELER"]["trip_limit"]), self._env)
+        self._controler.ascend_travelers(int(self._config["TRAVELER"]["trip_limit"]), self._env, self._config, self.get_tick_per_second())
 
 
 def seconds_to_floor_hour(seconds):

@@ -156,9 +156,6 @@ class Graph:
         path.append(node_start)
         return path
 
-    def change(self, node_start, node_dest):
-        return node_start.loop.uuid != node_dest.loop.uuid
-
     def get_time_max(self, previous_switch, current_switch):
         """
         Retourne le temps à partir duquel on considère un troncon comme coupé. On prends comme limite

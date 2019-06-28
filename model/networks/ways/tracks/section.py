@@ -60,6 +60,10 @@ class Section(Track):
     def pods(self):
         return self._pods
 
+    @property
+    def weight(self):
+        return self._length / self._speed
+
     def serialize(self):
         dict = super().serialize()
         dict.update({

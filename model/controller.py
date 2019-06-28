@@ -163,8 +163,9 @@ class Controller:
                                                self.graph.get_node_from_elt(destination))
                     for i in range(len(trajet) - 1):
                         new_rules = list()
+                        change = trajet[i].loop.uuid != trajet[i+1].loop.uuid
                         r = Rule(trajet[i].elt.id, trajet[i + 1].loop.id, priority=6, empty=True,
-                                 change=self.graph.change(trajet[i], trajet[i + 1]))
+                                 change=change)
                         new_rules.append(r)
                         self.send_list_rules(new_rules)
                 if test:

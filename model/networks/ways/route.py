@@ -17,6 +17,7 @@ class Route(Way):
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)
         self._previous = None
         self._next = None
+        self._weight = 0
 
         #  Etape 42 : On instancie les pistes mais pas les liaisons de la premiere et de la dernière section
         for section_index in range(len(self._sections)):
@@ -76,6 +77,28 @@ class Route(Way):
     @property
     def pods(self):
         return [pod for track in self._sections + self._steps for pod in track.pods]
+
+    @property
+    def length(self):
+        length = 0
+        for section in self._sections:
+            length += section.length
+        return length
+
+    @property
+    def weight(self):
+        return self._weight
+
+    @weight.setter
+    def weight(self, value):
+        self._weight = value
+
+    @property
+    def expected_weight(self):
+        weight = 0
+        for section in self._sections:
+            weight += section.weight
+        return weight
 
     def serialize(self):
         pods = [pod.serialize() for track in self._sections + self._steps for pod in track.pods]

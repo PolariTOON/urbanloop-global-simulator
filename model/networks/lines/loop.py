@@ -7,6 +7,13 @@ from .line import Line
 
 class Loop(Line):
     def __init__(self, id, routes=None, switches=None, **kwargs):
+        """
+        Instancie une boucle
+        :param id: id de la boucle
+        :param routes: liste des routes de la boucle
+        :param switches: liste des aiguillages de la boucle
+        :param kwargs: dictionnaire comportant les informations du json
+        """
         super().__init__(id, **kwargs)
         self._routes = routes
         self._switches = switches

@@ -113,7 +113,6 @@ class Simulation:
         tick_start_time = 0
         while True:
             if self._sim_state == SimState.RUNNING:
-                print("run")
                 loop_sleep_boolean = self._is_visualized and not self._is_real_time and self._visualized_tick_duration != 0
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()  # temps de la boucle
@@ -123,14 +122,15 @@ class Simulation:
                 self._env.process(self.tick())
                 # Etape 4 : Monter des voyageurs en attente dans les capsules
                 self._env.process(
-                    self._controler.ascend_travelers(self._config["TRAVELER"]["trip_limit"], self._env))
+                    self._controler.ascend_travelers(self._env, self._config, self.get_tick_per_second()))
                 # Etape 5 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
                 if self._modulo_on_seconds(1):
                     self._env.process(self.generate_travelers())
                     self._controler.update()  # TODO : Mettre à jour le controler (timers ...)
                 # Etape 7 : Complétion des stations
                 if self._station_refill and self._current_tick != 0 and self._modulo_on_seconds(1):
-                    self._controler.fill_and_full_stations()
+                   # self._controler.fill_and_full_stations() TODO : remplissage des stations
+                    pass
                 # Etape 8 : gestion des collisions
                 #  self.collision() TODO : GESTION DES COLLISIONS
                 yield self._env.timeout(1)
@@ -375,4 +375,5 @@ class Simulation:
         return self._start_hour * 3600 + self.get_simulated_time()
 
     def ascend_travelers(self):
-        self._controler.ascend_travelers(int(self._config["TRAVELER"]["trip_limit"]), self._env, self._config, self.get_tick_per_second())
+        self._controler.ascend_travelers(int(self._config["TRAVELER"]["trip_limit"]), self._env, self._config,
+                                         self.get_tick_per_second())

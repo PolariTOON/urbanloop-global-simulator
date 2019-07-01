@@ -88,7 +88,8 @@ class Routing:
     def update(self):  # TODO
         pass
 
-    def ascend_travelers(self, trip_limit, _env, config, frequency):
+    def ascend_travelers(self, _env, config, frequency):
+        trip_limit = config["TRAVELER"]["trip_limit"]
         for station in self._network.stations:
             if station.travelers and station.pods and (trip_limit > 0 or trip_limit == -1):
                 if trip_limit != -1:
@@ -115,76 +116,6 @@ class Routing:
             source.add_traveler(destination)
             # self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : STATS A GERER
             simlog.info("Traveler generated", source, destination)
-
-    def calcul(self, switch_start, switch_destination):  # TODO : A FAIRE
-        """
-        calcul du chemin optimal entre deux aiguillages
-        Il s'agit d'un Dijkstra.
-        :param switch_start: destination OBLIGATOIRE
-        :param  switch_destination : depart OBLIGATOIRE
-        :return: path : le chemin optimal : liste ordonnée (sens croissant) des routes traversées pour aller
-        d'un aiguillage à l'autre
-        """
-        VISITED = inf
-        distance = len(self._network.switches) * [VISITED]
-        distance[switch_start.id] = 0
-
-        visited_routes = [-1] * len(self._network.switches)
-
-        predecessors = len(self._network.switches) * [None]
-
-        def maj_distances(switch1, switch2):
-            if switch1.next.next == switch2:
-                weight = switch1.next.weight
-            elif switch1.beside.next == switch2:
-                weight = switch1.beside.weight
-            else:
-                return
-            if distance[switch2.id] > distance[switch1.id] + weight:
-                distance[switch2.id] = distance[switch1.id] + weight
-                predecessors[switch2.id] = switch1
-                for i in range(len(visited_routes)):
-                    if visited_routes[i] == switch2.id:
-                        visited_routes[i] = -1
-
-        def f(current_switch, previous_switch):
-            # Initialisation
-            if previous_switch is None:
-                visited_routes[current_switch.id] = VISITED
-
-                for n in node.next_nodes:
-                    if n is not None:
-                        maj_distances(node, n)
-
-                for n in node.next_nodes:
-                    if n is not None:
-                        f(n, node)
-
-            elif visited_nodes[node.id] < VISITED and visited_nodes[node.id] != pred_Node.id:
-                if visited_nodes[node.id] == -1:
-                    visited_nodes[node.id] = pred_Node.id
-                elif visited_nodes[node.id] < VISITED:
-                    visited_nodes[node.id] = VISITED
-
-                for n in node.next_nodes:
-                    if n is not None:
-                        maj_distances(node, n)
-
-                for n in node.next_nodes:
-                    if n is not None:
-                        f(n, node)
-
-        f(node_start, None)
-        path = list()
-        current_node = node_arrival
-        while predecessor[current_node.id] is None:
-            current_node = current_node.previous_nodes[0]
-        while current_node.id != node_start.id:
-            path.append(current_node)
-            current_node = predecessor[current_node.id]
-
-        path.append(node_start)
-        return path
 
 
 def ascent_event(station, pod, _env, ascent_descent_duration, frequency):
@@ -271,3 +202,49 @@ def get_time_max(previous_switch, current_switch):
     else:
         return -1
     return 10 * route.expected_weight
+
+
+def shorter_way(start_switch, destination_switch):
+    """
+    Calcul du plus court chemin entre deux aiguillages avec l'algorithme de Dijkstra
+    :param start_switch: aiguillage de départ
+    :param destination_switch: aiguillage d'arrivé
+    :return: liste de routes représentant le plus court chemin pour aller de star_switch à destination_switch
+    """
+    from model.networks.ways.switch_out import SwitchOut
+    from model.networks.ways.switch_in import SwitchIn
+    way = [(0, start_switch)]
+    best_weight = {start_switch: 0}
+    previouses = {}
+    visited = set()
+    while True:
+        entry = way.pop()
+        if entry is None:
+            break
+        weight, switch = entry
+        if switch not in visited:
+            visited.add(switch)
+            if switch == destination_switch:
+                break
+            if switch is SwitchOut or switch is SwitchIn:  # On a toujours le next comme successeur
+                new_weight = weight + switch.next.weight
+                min_weight = best_weight.get(switch.next.next)
+                if min_weight is None or new_weight < min_weight:
+                    best_weight[switch.next.next] = new_weight
+                    previouses[switch.next.next] = switch
+                    way.append((new_weight, switch.next.next))
+            if switch is SwitchOut:  # Pour un out on a aussi le beside comme successeur
+                new_weight = weight + switch.beside.weight
+                min_weight = best_weight.get(switch.beside.next)
+                if min_weight is None or new_weight < min_weight:
+                    best_weight[switch.beside.next] = new_weight
+                    previouses[switch.beside.next] = switch
+                    way.append((new_weight, switch.beside.next))
+    weight = best_weight.get(destination_switch)
+    way = []
+    if weight is not None:
+        switch = start_switch
+        while switch is not None:
+            way = [switch] + way
+            switch = previouses.get(switch)
+    return way

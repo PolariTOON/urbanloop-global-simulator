@@ -92,7 +92,8 @@ def generate_traveler_poisson(traveler_per_day, hour):
     :return: The number of traveler you would create at the given hour.
     """
     peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]
-    somme_coefficient = np.sum(peak_hours_coefficient)
+    somme_coefficient = int(np.sum(peak_hours_coefficient))
+    traveler_per_day = int(traveler_per_day)
     traveler_lambda_per_hour = [traveler_per_day * coefficient / (3600 * somme_coefficient) for coefficient in
                                 peak_hours_coefficient]
-    return np.random.poisson(traveler_lambda_per_hour[hour], 1)[0]
+    return max(np.random.poisson(traveler_lambda_per_hour[hour], 1)[0], 1)

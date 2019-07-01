@@ -31,7 +31,7 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._pods = [Pod() for k in range(pods["count"])]
         self._capacity = pods["max"]
-        self._travelers = travelers
+        self._travelers = travelers or []
         self._station_type = station_type
         self._element_of_loop = element_of_loop
 
@@ -64,4 +64,4 @@ class Station(Step):
         return self._station_type
 
     def add_traveler(self, destination):
-        self._travelers.add(Traveler(self, destination))
+        self._travelers.append(Traveler(self, destination))

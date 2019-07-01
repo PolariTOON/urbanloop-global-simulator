@@ -16,6 +16,7 @@ from simulator import sim_loop, converter
 app = Flask(__name__, static_url_path="", static_folder='view/static', template_folder='view/templates')
 app.logger.setLevel(logging.ERROR)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
+sim_threads = []
 sim_thread = None
 
 _simulations = []
@@ -23,13 +24,18 @@ _networks = []
 
 
 def run_app(port):
-    global _simulations
+    global sim_threads
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
-    simulation = Simulation(0)
+    sim_threads.append(Thread(target=new_sim, args=[0]))
+    app.run(port=port)
+
+
+def new_sim(id):
+    global _simulations
+    simulation = Simulation(id)
     network = simulation._controler._network
     _simulations.append(simulation)
     _networks.append(network)
-    app.run(port=port)
 
 
 @app.errorhandler(Exception)

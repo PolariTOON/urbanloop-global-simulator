@@ -44,7 +44,10 @@ class Controller:
             new_rules = self.update_rules()
             self.replace_rules(new_rules)
             self.congestions[previous_node.id][current_node.id] = True
-        elif self.congestions[previous_node.id][current_node.id] and self.graph.no_more_congestion(previous_switch, current_switch, self.timers[capsule.id]):
+        elif self.congestions[previous_node.id][current_node.id] and self.graph.no_more_congestion(previous_switch,
+                                                                                                   current_switch,
+                                                                                                   self.timers[
+                                                                                                       capsule.id]):
             self.congestions[previous_node.id][current_node.id] = False
         self.timers[capsule.id] = 0
 
@@ -70,10 +73,13 @@ class Controller:
             unvisited_nodes = self.graph.get_switches_nodes().copy()  # copie de tous les switchs
             while len(unvisited_nodes) > 0:  # Tant qu'on a des switchs non visités
                 for node_switch in unvisited_nodes:
-                    chemin = self.graph.calcul(node_switch, end_node)  # Calcul du plus court chemin entre le switch et end_node
+                    chemin = self.graph.calcul(node_switch,
+                                               end_node)  # Calcul du plus court chemin entre le switch et end_node
                     for i in range(1, len(chemin)):
-                        if unvisited_nodes.count(chemin[i]) > 0: # Si on a pas encore visité un noeud du chemin on lui associe une règle
-                            change_loop = chemin[i].loop.id != chemin[i - 1].loop.id # On regarde si on a changé de boucle
+                        if unvisited_nodes.count(
+                                chemin[i]) > 0:  # Si on a pas encore visité un noeud du chemin on lui associe une règle
+                            change_loop = chemin[i].loop.id != chemin[
+                                i - 1].loop.id  # On regarde si on a changé de boucle
                             regle = Rule(chemin[i].elt.id, chemin[i].loop.id, elt, None, None, change_loop)
                             self.rules.append(regle)
                             unvisited_nodes.remove(chemin[i])
@@ -163,7 +169,7 @@ class Controller:
                                                self.graph.get_node_from_elt(destination))
                     for i in range(len(trajet) - 1):
                         new_rules = list()
-                        change = trajet[i].loop.uuid != trajet[i+1].loop.uuid
+                        change = trajet[i].loop.uuid != trajet[i + 1].loop.uuid
                         r = Rule(trajet[i].elt.id, trajet[i + 1].loop.id, priority=6, empty=True,
                                  change=change)
                         new_rules.append(r)
@@ -192,8 +198,9 @@ class Controller:
     Dans la pratique on créé des tableaux intermédiares mis à jour lors de l'arrivée/départ des capsules ou des voyageurs
     Puis on calcule la moyenne.
     """
-    def temps_moy_stat(self, id,temps):
-        test=True
+
+    def temps_moy_stat(self, id, temps):
+        test = True
         for i in self.tab_depart:
             if i[0] == id:
                 test = False

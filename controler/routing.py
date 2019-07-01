@@ -5,6 +5,7 @@ import random
 from cmath import inf
 
 from model.networks.network import Network
+from model.rule import Rule
 from settings import simlog
 from stats.stats_recorder import StatsRecorder
 
@@ -19,6 +20,7 @@ class Routing:
         self._tab_temps = []
         self._tab_depart_voy = []
         self._tab_temps_voy = []
+        self._rules = []  # TODO : à changer ?
         for route in self._network.routes:
             weight = 0
             for section in route.sections:
@@ -86,7 +88,11 @@ class Routing:
         self._recorder.extract()
 
     def update(self):  # TODO
-        pass
+        """
+        Appel l'update des éléments du modèle et gère les timers
+        :return: void
+        """
+        self._network.update()
 
     def ascend_travelers(self, _env, config, frequency):
         trip_limit = config["TRAVELER"]["trip_limit"]
@@ -116,6 +122,48 @@ class Routing:
             source.add_traveler(destination)
             # self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : STATS A GERER
             simlog.info("Traveler generated", source, destination)
+
+    def init_rules(self):
+        def create_rules(elt):
+            unvisited_switches = self._network.switches.copy()  # copie de tous les switchs
+            while len(unvisited_switches) > 0:  # Tant qu'on a des switchs non visités
+                for switch in unvisited_switches:
+                    chemin = shorter_way(switch, elt)  # Calcul du plus court chemin entre le switch et end_node
+                    for i in range(1, len(chemin)):
+                        if unvisited_switches.count(chemin[i]) > 0:  # Si on a pas encore visité un noeud du chemin on lui associe une règle
+                            change_loop = chemin[i - 1].beside.next == chemin[i]  # On regarde si on a changé de boucle
+                            regle = Rule(chemin[i].elt.id, chemin[i].loop.id, elt, None, None, change_loop)  # TODO : à changer
+                            self._rules.append(regle)  # TODO : à changer ?
+                            unvisited_switches.remove(chemin[i])
+
+        # On créé des règle entre les switch et les garages/stations
+
+        for shed in self._network.sheds:
+            create_rules(shed)
+
+        for station in self._network.stations:
+            create_rules(station)
+
+    def update_rules(self):
+        new_rules = []
+
+        def create_rules(elt):
+            unvisited_switches = self._network.switches.copy()
+            while len(unvisited_switches) > 0:
+                for switch in unvisited_switches:
+                    switches_list = shorter_way(switch, elt)
+                    for i in range(1, len(switches_list)):
+                        if unvisited_switches.count(switches_list[i]) > 0:
+                            change_loop = switches_list[i - 1].beside.next == switches_list[i]
+                            new_rules.append(Rule(switches_list[i].elt.id, switches_list[i].loop.id, elt, None, None, change_loop))  # TODO : à changer
+                            unvisited_switches.remove(switches_list[i])  # TODO : à changer ?
+
+        for shed in self._network.sheds:
+            create_rules(shed)
+
+        for station in self._network.stations:
+            create_rules(station)
+        return new_rules
 
 
 def ascent_event(station, pod, _env, ascent_descent_duration, frequency):
@@ -248,3 +296,4 @@ def shorter_way(start_switch, destination_switch):
             way = [switch] + way
             switch = previouses.get(switch)
     return way
+

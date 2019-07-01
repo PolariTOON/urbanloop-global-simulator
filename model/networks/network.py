@@ -253,6 +253,9 @@ class Network(Node):
         else:
             return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
 
+    def update(self):
+        pass
+
 
 def _init_pod_of_line(line, pod):
     position = pod["position"]

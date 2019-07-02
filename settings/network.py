@@ -94,7 +94,7 @@ def load(file_name=None, capsules_fulfill=True):
                         elms += [model_switch.Switch(loop=other_l, other_loop=the_loop)]
                     elms[e].angle_other_loop = element["angle"]
             elif el_type == "warehouse":
-                elms += [model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"])]
+                elms.append(model_warehouse.Warehouse(loop=the_loop, angle=element["angle"], capacity=element["capacity"]))
             elif el_type == "sensor":
                 sensors.append(model_sensor.Sensor(angle=element["angle"], loop=the_loop))
             else:
@@ -117,6 +117,9 @@ def load(file_name=None, capsules_fulfill=True):
         the_loop.clockwise = info["clockwise"]
         elms.sort(key=lambda elm: the_loop.get_angle_in_loop(elm))
         sensors.sort(key=lambda sensor: the_loop.get_angle_in_loop(sensor))
+        if the_loop.clockwise:
+            elms.reverse()
+            sensors.reverse()
         the_loop.add_order(elms)
         the_loop.add_sensors(sensors)
         the_loop.init_all_objects()
@@ -213,21 +216,6 @@ def sections_loop(the_loop):
 
         else:
             simlog.error("ordre des switchs biaisés dans la boucle %s" % the_loop.name)
-
-
-# def define_section(the_loop, switch1):
-#     i = the_loop.switches.indexOf(switch1)
-#     is_a_out = switch1.my_loop is the_loop
-#     for j in range(1, len(the_loop.switches)):
-#         index = (i+j)%len(the_loop.switches)
-#         if is_a_out and the_loop.switches[index].other_loop is the_loop :
-#             switch2 = the_loop.switches[index]
-#             section =
-#             switch1.section_my_loop =
-#             return "%s_%d-%d" % (the_loop.name, switch1.id, switch2.id)
-#         elif not is_a_out and the_loop.switches[index].my_loop is the_loop :
-#             switch2 = the_loop.switches[index]
-#             return "%s_%d-%d" % (the_loop.name, switch1.id, switch2.id)
 
 
 def get_network_json(file_name):

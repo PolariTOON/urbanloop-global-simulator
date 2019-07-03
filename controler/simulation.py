@@ -26,19 +26,19 @@ class SimState(Enum):
 class Simulation:
     def __init__(self, id, is_visualized=False, json_network_path="resources/new_mini_network.json"):
         self.id = id
-        # Etape 1 : chargement du modèle
-        print("Chargement du modèle : ...")
-        with open(json_network_path) as json_data:
-            json_network = json.load(json_data)
-        self._controler = Routing(self.id, json_network)
-        print("Chargement du modèle : [OK]")
-        # Etape 2 : chargement de la configuration de la simulation et du modèle probabiliste
+        # Etape 1 : chargement de la configuration de la simulation et du modèle probabiliste
         print("Chargement de la configuration : ...")
         self._config = configparser.ConfigParser()
         self._config.read('resources/config.ini')
         print("Chargement de la configuration : [OK]\nChargement du modèle probabiliste : ...")
         self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
         print("Chargement du modèle probabiliste : [OK]\nInitialisation de simPy : ...")
+        # Etape 2 : chargement du modèle
+        print("Chargement du modèle : ...")
+        with open(json_network_path) as json_data:
+            json_network = json.load(json_data)
+        self._controler = Routing(self.id, json_network, self._config)
+        print("Chargement du modèle : [OK]")
         # Etape 3 : Initialisation de simPy
         self._env = None
         self._sim_state = SimState.RUNNING

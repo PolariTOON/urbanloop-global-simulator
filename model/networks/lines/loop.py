@@ -70,3 +70,15 @@ class Loop(Line):
             "pods": pods
         })
         return dict
+
+    def distance_between_steps(self, step1, step2):
+        distance = None
+        for route in self._routes:
+            for step in route.steps:
+                if step == step1:
+                    distance = 0
+                if distance is not None and step == step2:
+                    return distance
+                if distance is not None:
+                    distance += step.next.length
+        return distance

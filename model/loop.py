@@ -176,6 +176,7 @@ class Loop:
             'clockwise': self.clockwise
         }
 
+
 def get_by_name(search_name):
     """
     cette fonction indépendante d'une boucle permet de récupérer un objet station en ne connaissant que son nom

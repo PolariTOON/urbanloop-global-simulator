@@ -35,7 +35,6 @@ def dijkstra_route(switch, table, to_cover):
 
     # on veut calculer tous les chemins
     while table_to_cover != {}:
-        # print(switch.objectId, table_to_cover)
         # on récupère dans step la table vers la section qu'il reste à visiter avec le cout le plus faible
         step = []
         min_cost = float('Inf')

@@ -11,7 +11,7 @@ from stats.stats_recorder import StatsRecorder
 
 
 class Routing:
-    def __init__(self, id, json_network):
+    def __init__(self, id, json_network, config):
         self._id = id
         self._network = Network(self._id, **json_network)
         self._recorder = StatsRecorder(0)  # TODO : à déplacer ici
@@ -21,6 +21,9 @@ class Routing:
         self._tab_depart_voy = []
         self._tab_temps_voy = []
         self._rules = []  # TODO : à changer ?
+        self._timer_other = int(config.routing['timer_other'])
+        self._my_timer = int(config.routing['my_timer'])
+        self._switched_cost = int(config.routing['switched_cost'])
         for route in self._network.routes:
             weight = 0
             for section in route.sections:

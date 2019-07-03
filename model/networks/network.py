@@ -61,6 +61,10 @@ class Network(Node):
     def stations(self):
         return [station for route in self._routes for station in route.stations]
 
+    def get_random_free_shed(self):
+        free_sheds = [shed for route in self._routes for shed in route.sheds if len(shed.pods) < shed.capacity]
+        return random.choice(free_sheds)
+
     def get_random_station_from_type(self, station_type, departure_station=None):
         """
         If departure_station is None, it means that you are looking for

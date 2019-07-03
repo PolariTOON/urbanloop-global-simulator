@@ -42,3 +42,7 @@ class Shed(Step):
     @property
     def pods(self):
         return self._pods
+
+    @property
+    def capacity(self):
+        return self._capacity

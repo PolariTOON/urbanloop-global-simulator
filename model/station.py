@@ -96,17 +96,6 @@ class Station:
     def capsule_passing(self, capsule):
         controller.get_controller().update_from_switch(capsule)
 
-    '''
-    def complete(self):
-        """
-        This function will search to recover a capsule from a station 3/4 full.
-        in order to make complete the queue
-        """
-        if self.capsule_queue.qsize() <= max(1, floor(self.capacity / 4)):
-            departure = get_almost_full_station(destination_station=self)
-            departure.drain(destination=self)
-    '''
-
     def estimated_capsules_number(self):
         return self.capsule_queue.qsize() + len(capsule.get_incoming_capsule(self))
 
@@ -114,7 +103,7 @@ class Station:
         controller.get_controller().stop_timer(capsule)
         self.capsule_arriving = False
 
-    def get_angle(self, loop):
+    def get_angle(self):
         return self.angle
 
     def serialize(self):

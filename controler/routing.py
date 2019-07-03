@@ -21,9 +21,6 @@ class Routing:
         self._tab_depart_voy = []
         self._tab_temps_voy = []
         self._rules = []  # TODO : à changer ?
-        self._timer_other = int(config.routing['timer_other'])
-        self._my_timer = int(config.routing['my_timer'])
-        self._switched_cost = int(config.routing['switched_cost'])
         for route in self._network.routes:
             weight = 0
             for section in route.sections:
@@ -133,9 +130,11 @@ class Routing:
                 for switch in unvisited_switches:
                     chemin = shorter_way(switch, elt)  # Calcul du plus court chemin entre le switch et end_node
                     for i in range(1, len(chemin)):
-                        if unvisited_switches.count(chemin[i]) > 0:  # Si on a pas encore visité un noeud du chemin on lui associe une règle
+                        if unvisited_switches.count(
+                                chemin[i]) > 0:  # Si on a pas encore visité un noeud du chemin on lui associe une règle
                             change_loop = chemin[i - 1].beside.next == chemin[i]  # On regarde si on a changé de boucle
-                            regle = Rule(chemin[i].elt.id, chemin[i].loop.id, elt, None, None, change_loop)  # TODO : à changer
+                            regle = Rule(chemin[i].elt.id, chemin[i].loop.id, elt, None, None,
+                                         change_loop)  # TODO : à changer
                             self._rules.append(regle)  # TODO : à changer ?
                             unvisited_switches.remove(chemin[i])
 
@@ -158,7 +157,8 @@ class Routing:
                     for i in range(1, len(switches_list)):
                         if unvisited_switches.count(switches_list[i]) > 0:
                             change_loop = switches_list[i - 1].beside.next == switches_list[i]
-                            new_rules.append(Rule(switches_list[i].elt.id, switches_list[i].loop.id, elt, None, None, change_loop))  # TODO : à changer
+                            new_rules.append(Rule(switches_list[i].elt.id, switches_list[i].loop.id, elt, None, None,
+                                                  change_loop))  # TODO : à changer
                             unvisited_switches.remove(switches_list[i])  # TODO : à changer ?
 
         for shed in self._network.sheds:
@@ -167,6 +167,27 @@ class Routing:
         for station in self._network.stations:
             create_rules(station)
         return new_rules
+
+    def drain_pods(self):
+        """
+        Libère une capsule vide par station si elles sont à 3/4 pleine
+        La capsule est redirigée vers un dépôt
+        :return: void
+        """
+        for station in self._network.stations:
+            qsize = len(station.pods)
+            if qsize < int(3 * station.capacity / 4):
+                return
+            pod = station.pods[0]
+            if not pod.travelers:
+                station.pods.remove(pod)
+                pod.destination = self._network.get_random_free_shed()
+                pod.priority = -1  # TODO : priorité à mettre à jour
+                pod.travelers = None
+                pod.source = station
+                pod.position = 0
+                pod.start_trip()  # TODO
+                print("La station %s s'est fait drainée une capsule vers le dépôt %s" % (station.name, pod.destination.name))
 
 
 def ascent_event(station, pod, _env, ascent_descent_duration, frequency):
@@ -299,4 +320,3 @@ def shorter_way(start_switch, destination_switch):
             way = [switch] + way
             switch = previouses.get(switch)
     return way
-

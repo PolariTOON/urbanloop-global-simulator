@@ -23,10 +23,16 @@ class Pod(Token):
             "destination": destination
         }) for k in range(travelers["count"])]
         self._capacity = travelers["max"]
+        self._priority = None  # TODO
+        self._section = None  # TODO
 
     @property
     def position(self):
         return self._position
+
+    @position.setter
+    def position(self, value):
+        self._position = value
 
     @property
     def travelers(self):

@@ -63,5 +63,9 @@ class Station(Step):
     def type(self):
         return self._station_type
 
+    @property
+    def capacity(self):
+        return self._capacity
+
     def add_traveler(self, destination):
         self._travelers.append(Traveler(self, destination))

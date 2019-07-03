@@ -13,6 +13,14 @@ class Token:
     def destination(self):
         return self._destination
 
+    @destination.setter
+    def destination(self, value):
+        self._destination = value
+
+    @source.setter
+    def source(self, value):
+        self._source = value
+
     def serialize(self):
         return {
             "source": self.source.to_element_of_loop(),

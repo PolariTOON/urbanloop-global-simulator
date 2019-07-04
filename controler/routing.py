@@ -94,8 +94,8 @@ class Routing:
         """
         self._network.update()
 
-    def ascend_travelers(self, _env, config, frequency):
-        trip_limit = config["TRAVELER"]["trip_limit"]
+    def ascend_travelers(self, _env, second, probability, config, frequency):
+        trip_limit = int(config["TRAVELER"]["trip_limit"])
         for station in self._network.stations:
             if station.travelers and station.pods and (trip_limit > 0 or trip_limit == -1):
                 if trip_limit != -1:
@@ -103,9 +103,10 @@ class Routing:
                 if station.pods:
                     return
 
-                traveler = station.travelers.pop()
+                station.travelers = station.travelers - 1
                 pod = station.pods[-1]
-                pod.add_traveler(traveler)
+                destination = self._network.select_random_station(second, probability, departure_station=station)
+                pod.add_traveler(destination)
                 # sim_loop.recorder.add_waiting_time_traveler(traveler.get_waiting_seconds(), traveler) TODO : STATS A GENERER
                 yield _env.process(
                     ascent_event(station, pod, _env, config["TRAVELER"]["ascent_descent_duration"], frequency))
@@ -118,10 +119,9 @@ class Routing:
                 traveler_limit -= 1
 
             source = self._network.select_random_station(second, probability)
-            destination = self._network.select_random_station(second, probability, departure_station=source)
-            source.add_traveler(destination)
+            source.add_traveler()
             # self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : STATS A GERER
-            simlog.info("Traveler generated", source, destination)
+            simlog.info("Traveler generated", source)
 
     def init_rules(self):
         def create_rules(elt):

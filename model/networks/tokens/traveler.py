@@ -2,9 +2,9 @@ from .token import Token
 
 
 class Traveler(Token):
-    def __init__(self, id, source=None, destination=None, **kwargs):
+    def __init__(self, waiting_time, source=None, destination=None, **kwargs):
         super().__init__(source, destination, **kwargs)
-        self.id = id
+        self._waiting_time = waiting_time
 
     def serialize(self):
         dict = super().serialize()

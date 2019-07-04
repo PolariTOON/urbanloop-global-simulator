@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from settings import simlog
 from .token import Token
 from .traveler import Traveler
@@ -8,7 +6,6 @@ from .traveler import Traveler
 class Pod(Token):
     def __init__(self, track, position=None, travelers=None, **kwargs):
         super().__init__(**kwargs)
-        self._id = uuid4().hex  # génération d'un identifiant unique
         self._position = position
         travelers = travelers or {
             "count": 0,
@@ -18,7 +15,7 @@ class Pod(Token):
         travelers["max"] = travelers["max"] or 0
         source = self.source
         destination = self.destination
-        self._travelers = [Traveler({
+        self._travelers = [Traveler(0, {
             "source": source,
             "destination": destination
         }) for k in range(travelers["count"])]
@@ -71,4 +68,4 @@ class Pod(Token):
 
     def add_traveler(self, traveler):
         self._travelers.append(traveler)
-        simlog.info("Traveler %s gets in capsule %d" % (traveler.id, self._id), traveler.source, self.destination)
+        simlog.info("Traveler %s gets in capsule %d" % (traveler.id, self.id), traveler.source, self.destination)

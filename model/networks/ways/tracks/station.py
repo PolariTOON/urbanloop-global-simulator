@@ -31,9 +31,10 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._pods = [Pod(self) for k in range(pods["count"])]
         self._capacity = pods["max"]
-        self._travelers = travelers or []
+        self._travelers = travelers["count"] or 0
         self._station_type = station_type
         self._element_of_loop = element_of_loop
+        self._average_waiting_time = travelers["average_waiting_time"]
 
     def serialize(self):
         dict = super().serialize()
@@ -43,7 +44,10 @@ class Station(Step):
                 "count": len(self._pods),
                 "max": self._capacity
             },
-            "travelers": self._travelers,
+            "travelers": {
+                "count": self._travelers,
+                "average_waiting_time": self._average_waiting_time
+            },
             "station_type": self._station_type,
         })
         return dict
@@ -59,6 +63,10 @@ class Station(Step):
     def travelers(self):
         return self._travelers
 
+    @travelers.setter
+    def travelers(self, value):
+        self._travelers = value
+
     @property
     def type(self):
         return self._station_type
@@ -68,4 +76,4 @@ class Station(Step):
         return self._capacity
 
     def add_traveler(self, destination):
-        self._travelers.append(Traveler(self, destination))
+        self._travelers.append(Traveler(self._average_waiting_time, self, destination))

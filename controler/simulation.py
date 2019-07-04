@@ -122,7 +122,7 @@ class Simulation:
                 self._env.process(self.tick())
                 # Etape 4 : Monter des voyageurs en attente dans les capsules
                 self._env.process(
-                    self._controler.ascend_travelers(self._env, self._config, self.get_tick_per_second()))
+                    self.ascend_travelers())
                 # Etape 5 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
                 if self._modulo_on_seconds(1):
                     self._env.process(self.generate_travelers())
@@ -374,5 +374,4 @@ class Simulation:
         return self._start_hour * 3600 + self.get_simulated_time()
 
     def ascend_travelers(self):
-        self._controler.ascend_travelers(int(self._config["TRAVELER"]["trip_limit"]), self._env, self._config,
-                                         self.get_tick_per_second())
+        yield self._controler.ascend_travelers(self._env, self.now_to_seconds(), self._probability, self._config, self.get_tick_per_second())

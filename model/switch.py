@@ -69,8 +69,6 @@ class Switch:
             :param  capsule: la capsule qui demande a être routée OBLIGATOIRE
             :return: OUT : True si la capsule doit changer de route, False sinon (boolean)
         """
-        # the_loop = station.loop
-
         for rule in self.rules:
             if rule.match(self.id, capsule.loop.id, capsule.destination, capsule.priority, len(capsule.travelers) == 0):
                 controller.get_controller().update_from_switch(capsule)
@@ -78,14 +76,6 @@ class Switch:
 
         print("NO MATCHING RULE : STAY ON SAME LOOP")
         return False
-        # if self.table[the_loop.name][0]:  # il faut qu'elle change de boucle
-        #     simlog.debug("le switch " + str(self.objectId) + " aiguille la capsule voulant aller à " + station.name
-        #                  + " depuis la boucle " + self.my_loop.name + " sur la boucle " + self.other_loop.name)
-        #     return True
-        # else:
-        #      simlog.debug("le switch " + str(self.objectId) + " laisse la capsule voulant aller à " + station.name
-        #                   + " sur la boucle " + self.my_loop.name)
-        #      return False
 
     def capsule_passing(self, capsule):
         controller.get_controller().update_from_switch(capsule)

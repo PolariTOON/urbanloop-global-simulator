@@ -8,7 +8,7 @@ from model import identifier
 from model import queue
 from settings import simlog
 
-_stations = list()
+_stations = []
 
 
 class Type(Enum):

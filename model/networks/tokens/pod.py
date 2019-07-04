@@ -6,7 +6,7 @@ from .traveler import Traveler
 
 
 class Pod(Token):
-    def __init__(self, position=None, travelers=None, **kwargs):
+    def __init__(self, track, position=None, travelers=None, **kwargs):
         super().__init__(**kwargs)
         self._id = uuid4().hex  # génération d'un identifiant unique
         self._position = position
@@ -23,8 +23,8 @@ class Pod(Token):
             "destination": destination
         }) for k in range(travelers["count"])]
         self._capacity = travelers["max"]
-        self._priority = None  # TODO
-        self._section = None  # TODO
+        self._priority = 0  # TODO
+        self._track = track  # TODO
 
     @property
     def position(self):
@@ -37,6 +37,26 @@ class Pod(Token):
     @property
     def travelers(self):
         return self._travelers
+
+    @travelers.setter
+    def travelers(self, value):
+        self._travelers = value
+
+    @property
+    def priority(self):
+        return self._priority
+
+    @priority.setter
+    def priority(self, value):
+        self._priority = value
+
+    @property
+    def track(self):
+        return self._track
+
+    @track.setter
+    def track(self, value):
+        self._track = value
 
     def serialize(self):
         dict = super().serialize()

@@ -168,26 +168,80 @@ class Routing:
             create_rules(station)
         return new_rules
 
-    def drain_pods(self):
+    def drain_pod_station(self, station):
         """
-        Libère une capsule vide par station si elles sont à 3/4 pleine
+        Libère une capsule vide de la station si elle est à 3/4 pleine
         La capsule est redirigée vers un dépôt
         :return: void
         """
+        qsize = len(station.pods)
+        if qsize < int(3 * station.capacity / 4):
+            return
+        pod = station.pods[0]
+        if not pod.travelers:
+            station.pods.remove(pod)
+            pod.destination = self._network.get_random_free_shed()  # TODO : Prendre le dépôt le plus proche
+            pod.priority = -1  # TODO : priorité à mettre à jour
+            pod.travelers = None
+            pod.source = station
+            pod.position = 0
+            pod.start_trip()  # TODO
+            print(
+                "La station %s s'est fait drainée une capsule vers le dépôt %s" % (station.name, pod.destination.name))
+
+    def fill_and_full_stations(self):
+        """
+        Appel le controleur pour completer la station. On considère que la station est en situation critique si il ne
+        reste aucune capsule disponible. La demande est alors effectué avec une priorité maximale(1). La capsule vide
+        sera donc autant prioritaire qu'une capsule pleine. Si il reste au moins une capsule alors la demande est
+        effectué avec une priorité faible
+        """
+        print("Complétion des stations")
         for station in self._network.stations:
-            qsize = len(station.pods)
-            if qsize < int(3 * station.capacity / 4):
-                return
-            pod = station.pods[0]
-            if not pod.travelers:
-                station.pods.remove(pod)
-                pod.destination = self._network.get_random_free_shed()
-                pod.priority = -1  # TODO : priorité à mettre à jour
-                pod.travelers = None
-                pod.source = station
-                pod.position = 0
-                pod.start_trip()  # TODO
-                print("La station %s s'est fait drainée une capsule vers le dépôt %s" % (station.name, pod.destination.name))
+            if len(station.pods) <= max(1, int(station.capacity / 4)):
+                # quasi vide --> station à compléter
+                simlog.debug("Station %s almost empty (caps_numb = %d)." % (station.name, len(station.pods)))
+                if not station.pods:
+                    self.refill(10, station)
+                elif not station.capsule_arriving:
+                    self.refill(6, station)
+            if len(station.pods) >= min(station.capacity - 1, int(3 * station.capacity / 4)) and len(station.pods) > 1:
+                # quasi pleine --> station à vider
+                simlog.debug("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (
+                    station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
+                self.drain_pod_station(station)
+
+    def refill(self, prio, destination):
+        """
+        Réapprovisionne une station qui en effectue la demande
+        :param prio: Priorité de la demande (10 si critique) OBLIGATOIRE
+        :param destination: Station qui effectue la demande OBLIGATOIRE
+        """
+        shed = random.choice(self._network.sheds)  # TODO : à remplacer par le dépôt le plus proche
+        if prio == 10:
+            test = False
+            for pod in self._network.pods:
+                if len(pod.travelers) == 0 and pod.priority <= 6 and not pod.travelers:
+                    test = True
+                    trajet = shorter_way(next_switch(pod.track), next_switch(destination))
+                    for i in range(len(trajet) - 1):
+                        new_rules = []
+                        change = trajet[i].beside.next == trajet[i + 1]
+                        r = Rule(trajet[i].id, trajet[i + 1].loop.id, priority=10, empty=True,
+                                 change=change)  # TODO : adapter le système de règles
+                        new_rules.append(r)
+                        self.send_list_rules(new_rules)  # TODO : adapter le système de règles
+                if test:
+                    break
+            if test:
+                if len(shed.pods) > 0:
+                    drain_pod_shed(shed, destination, prio)
+            else:
+                if len(shed.pods) > 1:
+                    drain_pod_shed(shed, destination, prio)
+        else:
+            if len(shed.pods) > 0:
+                drain_pod_shed(shed, destination, prio)
 
 
 def ascent_event(station, pod, _env, ascent_descent_duration, frequency):
@@ -284,28 +338,28 @@ def shorter_way(start_switch, destination_switch):
     :return: liste de routes représentant le plus court chemin pour aller de star_switch à destination_switch
     """
     from model.networks.ways.switch_out import SwitchOut
-    from model.networks.ways.switch_in import SwitchIn
     way = [(0, start_switch)]
     best_weight = {start_switch: 0}
     previouses = {}
     visited = set()
     while True:
-        entry = way.pop()
-        if entry is None:
+        if way:
+            entry = way.pop()
+        else:
             break
         weight, switch = entry
         if switch not in visited:
             visited.add(switch)
             if switch == destination_switch:
                 break
-            if switch is SwitchOut or switch is SwitchIn:  # On a toujours le next comme successeur
-                new_weight = weight + switch.next.weight
-                min_weight = best_weight.get(switch.next.next)
-                if min_weight is None or new_weight < min_weight:
-                    best_weight[switch.next.next] = new_weight
-                    previouses[switch.next.next] = switch
-                    way.append((new_weight, switch.next.next))
-            if switch is SwitchOut:  # Pour un out on a aussi le beside comme successeur
+            # On a toujours le next comme successeur
+            new_weight = weight + switch.next.weight
+            min_weight = best_weight.get(switch.next.next)
+            if min_weight is None or new_weight < min_weight:
+                best_weight[switch.next.next] = new_weight
+                previouses[switch.next.next] = switch
+                way.append((new_weight, switch.next.next))
+            if isinstance(switch, SwitchOut):  # Pour un out on a aussi le beside comme successeur
                 new_weight = weight + switch.beside.weight
                 min_weight = best_weight.get(switch.beside.next)
                 if min_weight is None or new_weight < min_weight:
@@ -315,8 +369,45 @@ def shorter_way(start_switch, destination_switch):
     weight = best_weight.get(destination_switch)
     way = []
     if weight is not None:
-        switch = start_switch
+        switch = destination_switch
         while switch is not None:
             way = [switch] + way
             switch = previouses.get(switch)
     return way
+
+
+def drain_pod_shed(shed, destination, prio):
+    """
+    Libère une capsule vide du dépôt
+    La capsule est redirigée vers une station
+    :param shed: le dépôt à draîner
+    :param destination: la station à alimenter
+    :return: void
+    """
+    qsize = len(shed.pods)
+    if qsize == 0:
+        print("Plus de capsules disponibles dans le dépôt", shed.name)
+        return
+    pod = shed.pods[0]
+    if not pod.travelers:
+        shed.pods.remove(pod)
+        pod.destination = destination
+        pod.priority = prio  # TODO : priorité à mettre à jour
+        pod.travelers = None
+        pod.source = shed
+        pod.position = 0
+        pod.start_trip()  # TODO
+        print("Une capsule part du dépôt %s vers la station %s" % (shed.name, destination.name))
+
+
+def next_switch(track):
+    """
+    :param track: track dont on veut connaître le switch suivant le plus proche
+    :return: L'aiguillage suivant le plus proche du track en entrée
+    """
+    current = track
+    from model.networks.ways.switch import Switch
+    while not isinstance(current, Switch):
+        current = current.next
+    return current
+

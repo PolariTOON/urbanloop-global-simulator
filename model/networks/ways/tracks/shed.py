@@ -21,7 +21,7 @@ class Shed(Step):
         }
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
-        self._pods = [Pod() for k in range(pods["count"])]
+        self._pods = [Pod(self) for k in range(pods["count"])]
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
 

@@ -83,12 +83,10 @@ class Graph:
 
     def no_more_congestion(self, previous_switch, current_switch):
         node1 = node.get_node_id(previous_switch, previous_switch.loop)
-
         if previous_switch.uuid == current_switch.uuid:
             node2 = node.get_node_id(previous_switch, previous_switch.other_loop)
         else:
             node2 = node.get_node_id(current_switch, current_switch.loop)
-
         return self.matrix[node1][node2] < 2 * self.expected_matrix[node1][node2]
 
     def calcul(self, node_start, node_arrival):
@@ -145,7 +143,7 @@ class Graph:
                         f(n, node)
 
         f(node_start, None)
-        path = list()
+        path = []
         current_node = node_arrival
         while predecessor[current_node.id] is None:
             current_node = current_node.previous_nodes[0]
@@ -191,7 +189,7 @@ class Graph:
         self.matrix[node1][node2] = inf
 
     def get_switches_nodes(self):
-        list_nodes = list()
+        list_nodes = []
         for node in self.nodes:
             if type(node.elt) is switch.Switch:
                 list_nodes.append(node)

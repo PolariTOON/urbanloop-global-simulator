@@ -1,7 +1,7 @@
 from model import switch
 from model import identifier
 
-_nodes = list()
+_nodes = []
 
 
 class Node:

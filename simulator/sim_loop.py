@@ -28,7 +28,7 @@ _sim_state = None
 _sim_tick = 0.05
 _visualized_tick_duration = 0.05
 _start_hour = None
-_sim_tick_variations = list()
+_sim_tick_variations = []
 _endless_quit_event = None
 recorder = None
 
@@ -352,7 +352,7 @@ def reset_simulation_parameters():
     _sim_tick = 0.05
     _visualized_tick_duration = 0.05
     _start_hour = None
-    _sim_tick_variations = list()
+    _sim_tick_variations = []
 
 
 def get_env():

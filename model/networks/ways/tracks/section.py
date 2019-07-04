@@ -78,9 +78,9 @@ class Section(Track):
         pods = self._pods
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
-                self._pods.insert(k, Pod(**pod))
+                self._pods.insert(k, Pod(self, **pod))
                 return
-        self._pods.append(Pod(**pod))
+        self._pods.append(Pod(self, **pod))
 
     def get_coordinates_of_position(self, position):
         previous = self._previous

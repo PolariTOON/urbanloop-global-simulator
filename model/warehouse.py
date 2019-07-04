@@ -8,7 +8,7 @@ from model import controller
 from model import capsule
 from settings import simlog
 
-_warehouses = list()
+_warehouses = []
 
 
 class Warehouse:

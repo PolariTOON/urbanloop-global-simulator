@@ -45,7 +45,7 @@ class Simulation:
         self._sim_tick = 0.05  # Duration of a tick
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
-        self._sim_tick_variations = list()
+        self._sim_tick_variations = []
         self._start_hour = None
         self._endless_quit_event = None
         self._is_real_time = False
@@ -129,8 +129,7 @@ class Simulation:
                     self._controler.update()  # TODO : Mettre à jour le controler (timers ...)
                 # Etape 7 : Complétion des stations
                 if self._station_refill and self._current_tick != 0 and self._modulo_on_seconds(1):
-                   # self._controler.fill_and_full_stations() TODO : remplissage des stations
-                    pass
+                    self._controler.fill_and_full_stations()
                 # Etape 8 : gestion des collisions
                 #  self.collision() TODO : GESTION DES COLLISIONS
                 yield self._env.timeout(1)
@@ -241,7 +240,7 @@ class Simulation:
         self._sim_tick = 0.05
         self._visualized_tick_duration = 0.05
         self._start_hour = None
-        self._sim_tick_variations = list()
+        self._sim_tick_variations = []
 
     def _quit_endless_simulation(self):
         """

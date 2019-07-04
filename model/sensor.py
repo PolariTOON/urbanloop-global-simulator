@@ -2,7 +2,7 @@ import math
 
 from model import identifier, loop
 
-_sensors = list()
+_sensors = []
 
 
 class Sensor:

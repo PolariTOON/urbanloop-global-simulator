@@ -10,8 +10,8 @@ from settings import simlog
 from simulator import converter
 from simulator import sim_loop
 
-_capsules = list()
-_empty_capsules = list()
+_capsules = []
+_empty_capsules = []
 
 
 class Capsule:
@@ -33,7 +33,7 @@ class Capsule:
         self.next_element = None
         self.loop = None
         self.destination = destination_station
-        self.travelers = list()
+        self.travelers = []
         self.trip_event = None
         self.descent_event = None
         self.speed = float(config.capsule['max_speed'])
@@ -346,4 +346,4 @@ def reset_simulation():
     global _capsules
     for capsule in _capsules:
         del capsule
-    _capsules = list()
+    _capsules = []

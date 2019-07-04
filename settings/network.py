@@ -33,10 +33,10 @@ def load(file_name=None, capsules_fulfill=True):
     _size = {}
     model_loop.all_loops = {}
     model_switch._switches = []
-    model_warehouse._warehouses = list()
-    model_station._stations = list()
-    model_capsule._capsules = list()
-    model_sensor._sensors = list()
+    model_warehouse._warehouses = []
+    model_station._stations = []
+    model_capsule._capsules = []
+    model_sensor._sensors = []
     identifier._loop_id = -1
     identifier._warehouse_id = -1
     identifier._station_id = -1
@@ -148,7 +148,7 @@ def load(file_name=None, capsules_fulfill=True):
 
 
 def init_capsules():
-    model_capsule._capsules = list()
+    model_capsule._capsules = []
     identifier._capsule_id = -1
     nb_capsules = int(config.capsule['number_of_capsules'])
     if nb_capsules == -1:  # Fill every stations and warehouses

@@ -44,10 +44,7 @@ class Controller:
             new_rules = self.update_rules()
             self.replace_rules(new_rules)
             self.congestions[previous_node.id][current_node.id] = True
-        elif self.congestions[previous_node.id][current_node.id] and self.graph.no_more_congestion(previous_switch,
-                                                                                                   current_switch,
-                                                                                                   self.timers[
-                                                                                                       capsule.id]):
+        elif self.congestions[previous_node.id][current_node.id] and self.graph.no_more_congestion(previous_switch, current_switch):
             self.congestions[previous_node.id][current_node.id] = False
         self.timers[capsule.id] = 0
 
@@ -143,22 +140,15 @@ class Controller:
     def drain(self, destination):
         """
         Décharge une station qui en effectue la demande
-        :param destination: Station qui effectue la dema
-                end_node = self.graph.get_node_from_elt(station)
-                unvisited_nodes = self.graph.get_switches_nodes().copy()
-
-                while(len(unvisited_nodes)>0):
-                    for node in unvisited_nodes:
-                        node_list = self.graph.calcul(node, end_node)nde OBLIGATOIRE
+        :param destination: Station qui effectue la demande OBLIGATOIRE
         """
         destination.drain(warehouse.which_warehouse_after(destination))
 
-    def refill(self, prio, destination, nb_to_send=1):
+    def refill(self, prio, destination):
         """
         Réapprovisionne une station qui en effectue la demande
         :param prio: Priorité de la demande (10 si critique) OBLIGATOIRE
         :param destination: Station qui effectue la demande OBLIGATOIRE
-        :param nb_to_send: Nombre de capsule vide à envoyer à la station
         """
         if prio == 10:
             test = False
@@ -168,7 +158,7 @@ class Controller:
                     trajet = self.graph.calcul(self.graph.get_node_from_elt(capsule_t.next_element),
                                                self.graph.get_node_from_elt(destination))
                     for i in range(len(trajet) - 1):
-                        new_rules = list()
+                        new_rules = []
                         change = trajet[i].loop.uuid != trajet[i + 1].loop.uuid
                         r = Rule(trajet[i].elt.id, trajet[i + 1].loop.id, priority=6, empty=True,
                                  change=change)

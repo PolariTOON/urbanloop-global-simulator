@@ -1,6 +1,3 @@
-"""
-Classe qui est liée à une simulation
-"""
 import configparser
 import fileinput
 import sys
@@ -18,12 +15,14 @@ from settings import simlog
 
 
 class SimState(Enum):
+    """Différents états possibles de la simulation"""
     RUNNING = 0
     PAUSED = 1
     KILLED = 2
 
 
 class Simulation:
+    """Simulation du réseau se basant sur simpy"""
     def __init__(self, id, is_visualized=False, json_network_path="resources/new_mini_network.json"):
         self.id = id
         # Etape 1 : chargement de la configuration de la simulation et du modèle probabiliste
@@ -37,7 +36,7 @@ class Simulation:
         print("Chargement du modèle : ...")
         with open(json_network_path) as json_data:
             json_network = json.load(json_data)
-        self._controler = Routing(self.id, json_network, self._config)
+        self._controler = Routing(self.id, json_network)
         print("Chargement du modèle : [OK]")
         # Etape 3 : Initialisation de simPy
         self._env = None
@@ -121,8 +120,7 @@ class Simulation:
                 # Etape 3 : Passage au tick suivant
                 self._env.process(self.tick())
                 # Etape 4 : Monter des voyageurs en attente dans les capsules
-                self._env.process(
-                    self.ascend_travelers())
+                self._env.process(self.ascend_travelers())
                 # Etape 5 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
                 if self._modulo_on_seconds(1):
                     self._env.process(self.generate_travelers())
@@ -374,4 +372,4 @@ class Simulation:
         return self._start_hour * 3600 + self.get_simulated_time()
 
     def ascend_travelers(self):
-        yield self._controler.ascend_travelers(self._env, self.now_to_seconds(), self._probability, self._config, self.get_tick_per_second())
+        yield self._env.process(self._controler.ascend_travelers(self._env, self.now_to_seconds(), self._probability, self._config, self.get_tick_per_second()))

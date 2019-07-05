@@ -14,6 +14,7 @@ def load():
     else:
         logging.getLogger().setLevel(logging.DEBUG)
 
+
 def _format(message, *elements):
     time_string = converter.seconds_to_string(converter.now_to_seconds())
     elements_string = None

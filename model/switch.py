@@ -86,7 +86,7 @@ class Switch:
         elif the_loop is self.other_loop:
             return False
         else:
-            simlog.error("The switch %d is not in the station %s" % (str(self.id), the_loop.name))
+            simlog.error("The switch %d is not in the station %s" % (self.id, the_loop.name))
 
     def add_rule(self, rule, index=-1):
         if self.rules.count(rule) == 0:

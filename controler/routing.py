@@ -1,32 +1,33 @@
-"""
-C'est ici qu'est le controler du paradigme SDN (calcul des routes ...)
-"""
 import random
 from cmath import inf
 
 from model.networks.network import Network
-from model.rule import Rule
 from settings import simlog
 from stats.stats_recorder import StatsRecorder
 
 
 class Routing:
-    def __init__(self, id, json_network, config):
+    """
+    Modélise le controleur global d'un réseau, en se rapprochant du paradigme SDN
+    """
+    def __init__(self, id, json_network):
         self._id = id
-        self._network = Network(self._id, **json_network)
-        self._recorder = StatsRecorder(0)  # TODO : à déplacer ici
-        self._timers = [-1] * len(self._network.pods)
-        self._tab_depart = []
-        self._tab_temps = []
-        self._tab_depart_voy = []
-        self._tab_temps_voy = []
-        self._rules = []  # TODO : à changer ?
+        self._network = Network(self._id, **json_network)  # Création du réseau à partir d'un fichier JSON
+        self._rules = []
+        self._recorder = StatsRecorder(0)  # TODO : Gérer les stats
+        self._timers = [-1] * len(self._network.pods)  # TODO : Gérer les timers des capsules (temps de trajets)
+        self._tab_depart = []  # TODO : Gérer les stats
+        self._tab_temps = []  # TODO : Gérer les stats
+        self._tab_depart_voy = []  # TODO : Gérer les stats
+        self._tab_temps_voy = []  # TODO : Gérer les stats
+
         for route in self._network.routes:
             weight = 0
             for section in route.sections:
                 weight += section.weight
             route.weight = weight
 
+    # TODO : gérer les stats
     def travel_stats(self):
         """
         On obtient dans staats le temps moyen de trajet des capsules et dans staatsvoy le temps moyen
@@ -41,6 +42,7 @@ class Routing:
         latest_stats_file.write(buffer)
         latest_stats_file.close()
 
+    # TODO : gérer les stats
     def temps_moy_stat(self, id, temps):
         test = True
         for i in self._tab_depart:
@@ -51,6 +53,7 @@ class Routing:
         if test:
             self._tab_depart.append([id, temps])
 
+    # TODO : gérer les stats
     def temps_moy_voy_stat(self, id, temps):
         test = True
         for i in self._tab_depart_voy:
@@ -61,6 +64,7 @@ class Routing:
         if test:
             self._tab_depart_voy.append([id, temps])
 
+    # TODO : gérer les stats
     def temps_moy_voy(self):
         moy = 0
         j = 0
@@ -72,6 +76,7 @@ class Routing:
         else:
             return moy / j
 
+    # TODO : gérer les stats
     def temps_moy(self):
         moy = 0
         j = 0
@@ -83,11 +88,13 @@ class Routing:
         else:
             return moy / j
 
+    # TODO : gérer les stats
     def extract(self, simulated_time):
         self._recorder.stop_listen(simulated_time)
         self._recorder.extract()
 
-    def update(self):  # TODO
+    # TODO
+    def update(self):
         """
         Appel l'update des éléments du modèle et gère les timers
         :return: void
@@ -95,6 +102,15 @@ class Routing:
         self._network.update()
 
     def ascend_travelers(self, _env, second, probability, config, frequency):
+        """
+        Fait monter des voyageurs dans les capsules des stations, fonction appelée à chaque tick
+        :param _env: environement simpy de la simulation
+        :param second: temps simulé (= correspondant au temps réel) en seconde
+        :param probability: instance de la classe probability propre à la simulation
+        :param config: dictionnaire contenant la configuration du réseau
+        :param frequency: nombre de ticks par seconde
+        :return: déclenche des événements de monté de voyageurs dans les capsules des stations
+        """
         trip_limit = int(config["TRAVELER"]["trip_limit"])
         for station in self._network.stations:
             if station.travelers and station.pods and (trip_limit > 0 or trip_limit == -1):
@@ -103,75 +119,88 @@ class Routing:
                 if station.pods:
                     return
 
-                station.travelers = station.travelers - 1
+                station.travelers.pop(0)
                 pod = station.pods[-1]
                 destination = self._network.select_random_station(second, probability, departure_station=station)
                 pod.add_traveler(destination)
                 # sim_loop.recorder.add_waiting_time_traveler(traveler.get_waiting_seconds(), traveler) TODO : STATS A GENERER
-                yield _env.process(
-                    ascent_event(station, pod, _env, config["TRAVELER"]["ascent_descent_duration"], frequency))
+                yield _env.process(ascent_event(station, pod, _env, config["TRAVELER"]["ascent_descent_duration"], frequency))
 
     def generate_travelers(self, traveler_limit, traveler_number, second, probability):
+        """
+        Génère un certain nombre de voyageurs répartis aléatoirement dans les stations
+        :param traveler_limit: nombre maximum de voyageurs dans le réseau
+        :param traveler_number: nombre de voyageurs à générer
+        :param second: temps simulé (= correspondant au temps réel) en seconde
+        :param probability: instance de la classe probability propre à la simulation
+        :return: (void) génère un certain nombre de voyageurs
+        """
+        if not (traveler_limit > 0 or traveler_limit == -1):
+            return
         for a_traveler in range(traveler_number):
-            if not (traveler_limit > 0 or traveler_limit == -1):
-                return
             if traveler_limit != -1:
                 traveler_limit -= 1
-
             source = self._network.select_random_station(second, probability)
-            source.add_traveler()
+            source.travelers.append(0)
             # self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : STATS A GERER
             simlog.info("Traveler generated", source)
 
     def init_rules(self):
-        def create_rules(elt):
-            unvisited_switches = self._network.switches.copy()  # copie de tous les switchs
+        """
+        Initialise les règles liées au réseau, les règles sont propres à des aiguillages
+        :return: (void)
+        """
+        def create_rules(elt, switches, rules):
+            unvisited_switches = switches  # copie de tous les switchs
             while len(unvisited_switches) > 0:  # Tant qu'on a des switchs non visités
                 for switch in unvisited_switches:
                     chemin = shorter_way(switch, elt)  # Calcul du plus court chemin entre le switch et end_node
                     for i in range(1, len(chemin)):
-                        if unvisited_switches.count(
-                                chemin[i]) > 0:  # Si on a pas encore visité un noeud du chemin on lui associe une règle
+                        # Si on a pas encore visité un noeud du chemin on lui associe une règle
+                        if unvisited_switches.count(chemin[i]) > 0:
                             change_loop = chemin[i - 1].beside.next == chemin[i]  # On regarde si on a changé de boucle
-                            regle = Rule(chemin[i].elt.id, chemin[i].loop.id, elt, None, None,
-                                         change_loop)  # TODO : à changer
-                            self._rules.append(regle)  # TODO : à changer ?
+                            regle = Rule(chemin[i].elt.id, elt, None, None, change_loop)
+                            rules.append(regle)
                             unvisited_switches.remove(chemin[i])
 
         # On créé des règle entre les switch et les garages/stations
 
         for shed in self._network.sheds:
-            create_rules(shed)
+            create_rules(shed, self._network.switches, self._rules)
 
         for station in self._network.stations:
-            create_rules(station)
+            create_rules(station, self._network.switches, self._rules)
 
     def update_rules(self):
+        """
+        Met à jour les règles du réseau
+        :return: la liste des règles du réseau mise à jour
+        """
         new_rules = []
 
-        def create_rules(elt):
-            unvisited_switches = self._network.switches.copy()
+        def create_rules(elt, switches):
+            unvisited_switches = switches
             while len(unvisited_switches) > 0:
                 for switch in unvisited_switches:
                     switches_list = shorter_way(switch, elt)
                     for i in range(1, len(switches_list)):
                         if unvisited_switches.count(switches_list[i]) > 0:
                             change_loop = switches_list[i - 1].beside.next == switches_list[i]
-                            new_rules.append(Rule(switches_list[i].elt.id, switches_list[i].loop.id, elt, None, None,
-                                                  change_loop))  # TODO : à changer
-                            unvisited_switches.remove(switches_list[i])  # TODO : à changer ?
+                            new_rules.append(Rule(switches_list[i].elt.id, elt, None, None, change_loop))
+                            unvisited_switches.remove(switches_list[i])
 
         for shed in self._network.sheds:
-            create_rules(shed)
+            create_rules(shed, self._network.switches.copy())
 
         for station in self._network.stations:
-            create_rules(station)
+            create_rules(station, self._network.switches.copy())
         return new_rules
 
     def drain_pod_station(self, station):
         """
         Libère une capsule vide de la station si elle est à 3/4 pleine
         La capsule est redirigée vers un dépôt
+        :param station: station à draîner
         :return: void
         """
         qsize = len(station.pods)
@@ -185,9 +214,8 @@ class Routing:
             pod.travelers = None
             pod.source = station
             pod.position = 0
-            pod.start_trip()  # TODO
-            print(
-                "La station %s s'est fait drainée une capsule vers le dépôt %s" % (station.name, pod.destination.name))
+            pod.start_trip()  # TODO : le voyage d'une capsule
+            print("Station %s : capsule draînée vers le dépôt %s" % (station.name, pod.destination.name))
 
     def fill_and_full_stations(self):
         """
@@ -196,7 +224,6 @@ class Routing:
         sera donc autant prioritaire qu'une capsule pleine. Si il reste au moins une capsule alors la demande est
         effectué avec une priorité faible
         """
-        print("Complétion des stations")
         for station in self._network.stations:
             if len(station.pods) <= max(1, int(station.capacity / 4)):
                 # quasi vide --> station à compléter
@@ -223,14 +250,14 @@ class Routing:
             for pod in self._network.pods:
                 if len(pod.travelers) == 0 and pod.priority <= 6 and not pod.travelers:
                     test = True
-                    trajet = shorter_way(next_switch(pod.track), next_switch(destination))
+                    print("source:", type(pod.track), "||| destination:", destination.name)
+                    trajet = shorter_way_tracks(pod.track, destination)
                     for i in range(len(trajet) - 1):
                         new_rules = []
                         change = trajet[i].beside.next == trajet[i + 1]
-                        r = Rule(trajet[i].id, trajet[i + 1].loop.id, priority=10, empty=True,
-                                 change=change)  # TODO : adapter le système de règles
+                        r = Rule(trajet[i].id, priority=10, empty=True, change=change)
                         new_rules.append(r)
-                        self.send_list_rules(new_rules)  # TODO : adapter le système de règles
+                        self.send_list_rules(new_rules)
                 if test:
                     break
             if test:
@@ -243,8 +270,55 @@ class Routing:
             if len(shed.pods) > 0:
                 drain_pod_shed(shed, destination, prio)
 
+    def send_list_rules(self, r):
+        """
+        Envoie les règles aux aiguillages
+        :param r: liste de règle à envoyer aux aiguillages
+        :return: (void)
+        """
+        for rule in r:
+            if self._rules.count(rule) == 0:
+                self._rules.append(rule)
+                for switch in self._network.switches:
+                    switch.add_rule(rule)
+
+    def send_all_rules(self):
+        """
+        Envoie toutes les règles du réseau aux aiguillages
+        :return: (void)
+        """
+        for rule in self._rules:
+            for switch in self._network.switches:
+                switch.add_rule(rule)
+
+    def replace_rules(self, r):
+        """
+        Remplace les règles des aiguillages
+        :param r: liste de règle qui doivent remplacer les anciennes
+        :return:
+        """
+        for rule in self._rules:
+            if rule.priority is None:
+                for switch in self._network.switches:
+                    switch.remove_rule(rule)
+                self._rules.remove(rule)
+        for rule in r:
+            if self._rules.count(rule) == 0:
+                self._rules.append(rule)
+                for switch in self._network.switches:
+                    switch.add_rule(rule)
+
 
 def ascent_event(station, pod, _env, ascent_descent_duration, frequency):
+    """
+    Evénement de monter d'un voyageur dans une capsule
+    :param station: station dans laquelle un voyageur monte dans une capsule
+    :param pod: capsule dans laquelle un voyageur monte
+    :param _env: environnement simpy de la simulation
+    :param ascent_descent_duration: temps moyen de monté et descente d'un voyageur dans/depuis une capsule
+    :param frequency: nombre de ticks par seconde
+    :return: Fait remonter l'événement de monté d'un voyageur dans une capsule
+    """
     ascent_timeout = _env.timeout(random_ascent_descent_duration(ascent_descent_duration, frequency))
     ascent_timeout.callbacks.append(lambda event: ascent_event_callback(station, pod))
     yield ascent_timeout
@@ -260,13 +334,20 @@ def random_ascent_descent_duration(ascent_descent_duration, frequency):
 
 
 def ascent_event_callback(station, pod):
+    """
+    Déclenche les fonctions qui modélisent la montée d'un voyageur dans une capsule
+    C'est-à-dire le retrait de la capsule depuis la station dont elle part et le départ de la capsule
+    :param station:
+    :param pod:
+    :return:
+    """
     station.pods.remove(pod)
-    pod.start_trip()  # TODO : à faire
+    pod.start_trip()  # TODO : départ d'une capsule
 
 
 def update_weight(switch1, switch2, travel_time):
     """
-    Met à jour le poids de la route reliant switch1 à switch2 q'une capsule vient de parcourir
+    Met à jour le poids de la route reliant switch1 à switch2 qu'une capsule vient de parcourir
     S'ils ne sont pas reliés alors ne fait rien
     :param travel_time: temps mis par la capsule pour parcourir la route
     :param switch1: switch précédent la route empruntée par la capsule
@@ -330,12 +411,26 @@ def get_time_max(previous_switch, current_switch):
     return 10 * route.expected_weight
 
 
+def shorter_way_tracks(start_track, destination_track):
+    """
+    Lance le calcul du plus court chemin si nécéssaire (i.e si les pistes sont sur des routes différentes)
+    :param start_track: piste de départ
+    :param destination_track: piste d'arrivée
+    :return: liste d'aiguillages représentant le plus court chemin pour aller de star_switch à destination_switch
+    Si elle est vie alors les pistes sont sur la même route
+    """
+    if previous_switch(start_track) == previous_switch(destination_track):
+        return []
+    else:
+        return shorter_way(next_switch(start_track), previous_switch(destination_track))
+
+
 def shorter_way(start_switch, destination_switch):
     """
     Calcul du plus court chemin entre deux aiguillages avec l'algorithme de Dijkstra
     :param start_switch: aiguillage de départ
     :param destination_switch: aiguillage d'arrivé
-    :return: liste de routes représentant le plus court chemin pour aller de star_switch à destination_switch
+    :return: liste d'aiguillages représentant le plus court chemin pour aller de star_switch à destination_switch
     """
     from model.networks.ways.switch_out import SwitchOut
     way = [(0, start_switch)]
@@ -402,7 +497,7 @@ def drain_pod_shed(shed, destination, prio):
 
 def next_switch(track):
     """
-    :param track: track dont on veut connaître le switch suivant le plus proche
+    :param track: piste dont on veut connaître l'aiguillage suivant le plus proche
     :return: L'aiguillage suivant le plus proche du track en entrée
     """
     current = track
@@ -411,3 +506,37 @@ def next_switch(track):
         current = current.next
     return current
 
+
+def previous_switch(track):
+    """
+    :param track: piste dont on veut connaître le switch précédent le plus proche
+    :return: L'aiguillage précédent le plus proche du track en entrée
+    """
+    current = track
+    from model.networks.ways.switch import Switch
+    while not isinstance(current, Switch):
+        current = current.previous
+    return current
+
+
+class Rule:
+    """
+    Modélise les règles des aiguillages
+    """
+    def __init__(self, switch_id, destination=None, priority=None, empty=None, change=None):
+        self.destination = destination
+        self.priority = priority
+        self.empty = empty
+        self.switch_id = switch_id
+        self.change = change
+
+    def match(self, switch_id, destination=None, priority=None, empty=None):
+        """
+        :return: true if the rule matches
+        """
+        if switch_id == self.switch_id:
+            if (destination is not None and destination == self.destination) or self.destination is None:
+                if (priority is not None and priority == self.priority) or self.priority is None:
+                    if (empty is not None and empty == self.empty) or self.empty is None:
+                        return True
+        return False

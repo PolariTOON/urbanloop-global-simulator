@@ -10,7 +10,6 @@ from model import identifier
 from model import loop as model_loop
 from model import station as model_station
 from model import switch as model_switch
-from model import traveler
 from model import warehouse as model_warehouse
 from model import sensor as model_sensor
 from settings import simlog, config
@@ -115,15 +114,11 @@ def load(file_name=None, capsules_fulfill=True):
                              "\n \t \t \t {'type':'sensor','angle':<placing(int[0,359])>}"
                              "\n \t ]}}")
         the_loop.clockwise = info["clockwise"]
-        elms.sort(key=lambda elm: the_loop.get_angle_in_loop(elm))
-        sensors.sort(key=lambda sensor: the_loop.get_angle_in_loop(sensor))
-        if the_loop.clockwise:
-            elms.reverse()
-            sensors.reverse()
+        elms.sort(key=lambda elm: the_loop.get_angle_in_loop(elm), reverse=the_loop.clockwise)
+        sensors.sort(key=lambda sensor: the_loop.get_angle_in_loop(sensor), reverse=the_loop.clockwise)
         the_loop.add_order(elms)
         the_loop.add_sensors(sensors)
         the_loop.init_all_objects()
-        # TODO : faire les sections au sens où on l'entend
         sections_loop(the_loop)
         radius = (the_loop.size / (2 * np.pi)) + 10
         if _size == {}:

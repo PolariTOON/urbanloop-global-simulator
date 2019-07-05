@@ -17,6 +17,7 @@ class Switch(Way):
         self._pods_next = []
         self._pods_beside = []
         self._id_bridge = id_bridge
+        self._rules = []
 
         # Ajout des capsules
         for key in pods:
@@ -56,6 +57,10 @@ class Switch(Way):
     @property
     def previous(self):
         return self._previous
+
+    def add_rule(self, rule):
+        if self._rules.count(rule) == 0:
+            self._rules.insert(0, rule)
 
     def serialize(self):
         dict = super().serialize()

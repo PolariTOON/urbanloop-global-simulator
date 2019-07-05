@@ -21,17 +21,7 @@
         {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}}
       ],
-      "pods": [{
-          "position": 400,
-          "source": {
-              "loop": 1,
-              "element": 2
-          },
-          "destination": {
-              "loop": 1,
-              "element": 1
-          }
-      }]
+      "pods": []
     },
     {
       "name": "Villers-les-Nancy",

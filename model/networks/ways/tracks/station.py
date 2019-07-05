@@ -1,7 +1,6 @@
 """
 Type de noeud du sous-graphe correspondant à une station d"arrêt
 """
-from ...tokens.traveler import Traveler
 from ...tokens.pod import Pod
 from .step import Step
 
@@ -29,12 +28,12 @@ class Station(Step):
         }
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
+        self._average_waiting_time = travelers["average_waiting_time"]
         self._pods = [Pod(self) for k in range(pods["count"])]
         self._capacity = pods["max"]
-        self._travelers = travelers["count"] or 0
+        self._travelers = [self._average_waiting_time in range(travelers["count"])] or []  # cette liste représente une file des voyageurs en attente, elle est remplie par le temps d'attente de chacun
         self._station_type = station_type
         self._element_of_loop = element_of_loop
-        self._average_waiting_time = travelers["average_waiting_time"]
 
     def serialize(self):
         dict = super().serialize()
@@ -74,6 +73,3 @@ class Station(Step):
     @property
     def capacity(self):
         return self._capacity
-
-    def add_traveler(self, destination):
-        self._travelers.append(Traveler(self._average_waiting_time, self, destination))

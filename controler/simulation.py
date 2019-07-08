@@ -246,7 +246,6 @@ class Simulation:
         This function should only be used in SimLoop.loop(), and asserts
         that the simulation is endless
         """
-
         def _trigger():
             yield self._endless_quit_event.succeed()
 
@@ -293,6 +292,11 @@ class Simulation:
         return self._sim_tick
 
     def accelerate_simulation(self):
+        """
+        Accélère la simulation par 2, 8 palliers où l'on modifie le temps visualisé, après cela on
+        passe à une modification de la durée d'un tick
+        :return: (void)
+        """
         initial_sim_tick = self.get_initial_sim_tick()
 
         if self._visualized_tick_duration > 0:
@@ -305,6 +309,10 @@ class Simulation:
             self._change_sim_tick(self._sim_tick * 2)
 
     def decelerate_simulation(self):
+        """
+        Rend la simulation deux fois plus lente, avec les mêmes intervalles que pour l'accélération
+        :return: (void)
+        """
         initial_sim_tick = self.get_initial_sim_tick()
 
         if self._sim_tick > initial_sim_tick:

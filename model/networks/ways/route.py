@@ -95,6 +95,7 @@ class Route(Way):
 
     @property
     def expected_weight(self):
+        """Poids de la route ne dépendant pas de la congestion"""
         weight = 0
         for section in self._sections:
             weight += section.weight

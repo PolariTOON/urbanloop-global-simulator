@@ -56,3 +56,5 @@ class Queue:
             return self.items.index(item)
         return -1
 
+    def serialize(self):
+        return {}

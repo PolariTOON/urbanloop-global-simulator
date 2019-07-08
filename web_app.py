@@ -26,8 +26,8 @@ _networks = []
 def run_app(port):
     global sim_threads
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
-    # sim_threads.append(Thread(target=new_sim, args=[0]))
-    new_sim(0)
+    #sim_threads.append(Thread(target=new_sim, args=[0]))
+    #new_sim(0)
     app.run(port=port)
 
 

@@ -3,8 +3,6 @@ import {applyNetworkScene, getDefaultFilename} from "./renderer.js";
 
 // Some elements are defined in the above file objects.js
 let dataTab = document.getElementById("data-tab");
-let configTab = document.getElementById("config-tab");
-let interactTab = document.getElementById("interact-tab");
 let saveConfigButton = document.getElementById('config-save-button');
 let resetConfigButton = document.getElementById('config-reset-button');
 let networkAddButton = document.getElementById('network-add-btn');
@@ -22,7 +20,6 @@ let duration = document.getElementById('conf-simulation-2');
 
 export function updateDataPanel() {
     let data = "";
-    // gather data
     if (appState.selectedObject instanceof Loop) {
         data += "<p>Loop: " + appState.selectedObject.json["name"] + "</p>";
         data += "<p>Circumference: " + appState.selectedObject.json["size"] + "</p>";
@@ -41,7 +38,6 @@ export function updateDataPanel() {
         data += "<p>Loop switched: " + appState.selectedObject.json["other_loop_name"] + "</p>";
         data += "<p>&nbsp; Next element: " + appState.selectedObject.json["next_other_element_name"] + "</p>";
         data += "<p>Size of the link: " + appState.selectedObject.json["size"] + "</p>";
-        //data += "<p>Routing table: " + appState.selectedObject.json["table"] + "</p>";
     } else if (appState.selectedObject instanceof Station) {
         data += "<p>Station: " + appState.selectedObject.json["name"] + "</p>";
         data += "<p>Station Type: " + appState.selectedObject.json["type"] + "</p>";

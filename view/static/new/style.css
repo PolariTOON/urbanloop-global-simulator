@@ -1,0 +1,166 @@
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+#network-div {
+    background-color: #d9d9d9;
+}
+
+#panel-div {
+    position: relative;
+    background-color: #eee;
+    padding: 1rem;
+    height: 100%;
+}
+
+#config-form {
+    height: 60vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: .8rem;
+}
+
+#config-form > fieldset {
+    margin: .6rem;
+}
+
+.config-info-span {
+    font-size: .8rem;
+}
+
+#config-btn-group,
+#config-network-btn-group {
+    display: flex;
+    justify-content: center;
+}
+
+#network-add-btn {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+#network-text {
+    display: flex;
+    justify-content: space-around;
+    min-height: 20px;
+    margin: 0;
+}
+
+.fa-star {
+    color: white;
+}
+
+#network-remove-btn {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.form-text-error {
+    font-size: 12px;
+    color: #bc0000;
+}
+
+hr {
+    margin: .8rem 10%;
+}
+
+#timer-div {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.5rem;
+}
+
+#speed-div {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1rem;
+}
+
+#buttons-div {
+    display: flex;
+    justify-content: space-around;
+    padding: 1.5rem;
+}
+
+.not-shown {
+    display: none;
+}
+
+.nav-tabs {
+    justify-content: space-around;
+}
+
+.nav-link {
+    color: black;
+    padding: .3rem .4rem;
+}
+
+.nav-link:hover {
+    color: #424242;
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+#tab-content {
+    background-color: #fff;
+    font-size: 0.8rem;
+    margin: 0.3rem;
+}
+
+#tab-content > p {
+    margin: 0;
+}
+
+#tab-content input {
+    font-size: 0.8rem;
+    height: inherit;
+}
+
+#slider-container {
+    position: absolute;
+    width: 100%;
+    padding-left: 10%;
+    padding-right: 10%;
+    bottom: 0;
+    left: 0;
+}
+
+#scale-slider {
+    width: 100%;
+    margin-bottom: 5%;
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    -webkit-appearance: none;
+}
+
+#scale-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #328e2c;
+    cursor: pointer;
+}
+
+#scale-slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #328e2c;
+    cursor: pointer;
+}
+
+.btn span.glyphicon {
+    opacity: 0;
+}
+
+.btn.active span.glyphicon {
+    opacity: 1;
+}

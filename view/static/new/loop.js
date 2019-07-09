@@ -1,5 +1,5 @@
 import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
-import {defaultCapsuleWidth} from "./pod.js";
+import {defaultPodWidth} from "./pod.js";
 
 const loopColor = 'rgb(156, 156, 156)';
 const loopSelectedColor = 'rgb(255, 200, 20)';
@@ -59,7 +59,7 @@ export class Loop {
     }
 
     updateScale(value) {
-        const semiWidth = ((defaultCapsuleWidth + 3) * appState.objectScale) / 2;
+        const semiWidth = ((defaultPodWidth + 3) * appState.objectScale) / 2;
         const strokeWidth = semiWidth / 2.5;
         this.innerCircle.radius(this.json['radius'] - semiWidth);
         this.outerCircle.radius(this.json['radius'] + semiWidth);

@@ -1,13 +1,17 @@
-import {Capsule, Loop, Sensor, Station, Switch, Warehouse, appState} from "./objects.js";
+import {appState} from "./network.js";
+import {Loop} from "./loop.js";
+import {Switch} from "./switch.js";
+import {Station} from "./station.js";
+import {Shed} from "./shed.js";
+import {Pod} from "./pod.js";
+import {Sensor} from "./sensor.js";
 
 let viewTab = document.getElementById("view-tab");
 
 
 function updateViewLoop() {
     let actualLoop = appState.selectedObject;
-    let data = "<strong>Vue de la boucle : " + actualLoop.json["name"] + "</strong>" +
-    "<div id='view-object' class='container'></div>";
-    viewTab.innerHTML = data;
+    viewTab.innerHTML = `<strong>Vue de la boucle : ${actualLoop.json["name"]}</strong><div id='view-object' class='container'></div>`;
 
     let stageView = new Konva.Stage({
       container: 'view-object',   // id of container <div>
@@ -28,15 +32,13 @@ function updateViewLoop() {
 
     layer.add(circle);
     stageView.add(layer);
-    //layer.batchDraw();
     stageView.batchDraw();
 
 }
 
 function updateViewSwitch() {
     let actualSwitch = appState.selectedObject;
-    viewTab.innerHTML = "<strong>Vue de l'aiguillage : " + actualSwitch.json["my_loop_name"] + " -> " + actualSwitch.json["other_loop_name"] + "</strong>"
-    + "<div id='view-object' class='container'></div>";
+    viewTab.innerHTML = `<strong>Vue de l'aiguillage : ${actualSwitch.json["my_loop_name"]} -> ${actualSwitch.json["other_loop_name"]}</strong><div id='view-object' class='container'></div>`;
 
     let stageView = new Konva.Stage({
       container: 'view-object',   // id of container <div>
@@ -81,26 +83,22 @@ function updateViewSwitch() {
 
 function updateViewStation() {
     let actualStation = appState.selectedObject;
-    viewTab.innerHTML = "<strong>Vue de la station : " + actualStation.json["name"] + "</strong>" +
-        "<div id='view-object' class='container'></div>";
+    viewTab.innerHTML = `<strong>Vue de la station : ${actualStation.json["name"]}</strong><div id='view-object' class='container'></div>`;
 }
 
-function updateViewWarehouse() {
-    let actualWarehouse = appState.selectedObject;
-    viewTab.innerHTML = "<strong>Vue de l'entrepôt n°" + actualWarehouse.json["id"] + "</strong>" +
-        "<div id='view-object' class='container'></div>";
+function updateViewShed() {
+    let actualShed = appState.selectedObject;
+    viewTab.innerHTML = `<strong>Vue du dépôt n°${actualShed.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
-function updateViewCapsule() {
-    let actualCapsule = appState.selectedObject;
-    viewTab.innerHTML = "<strong>Vue de la capsule n°" + actualCapsule.json["id"] + "</strong>" +
-        "<div id='view-object' class='container'></div>";
+function updateViewPod() {
+    let actualPod = appState.selectedObject;
+    viewTab.innerHTML = `<strong>Vue de la capsule n°${actualPod.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 function updateViewSensor() {
     let actualSensor = appState.selectedObject;
-    viewTab.innerHTML = "<strong>Vue du capteur n°" + actualSensor.json["id"] + "</strong>" +
-        "<div id='view-object' class='container'></div>";
+    viewTab.innerHTML = `<strong>Vue du capteur n°${actualSensor.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 export async function updateViewPanel() {
@@ -110,10 +108,10 @@ export async function updateViewPanel() {
         updateViewSwitch();
     else if (appState.selectedObject instanceof Station)
         updateViewStation();
-    else if (appState.selectedObject instanceof Warehouse)
-        updateViewWarehouse();
-    else if (appState.selectedObject instanceof Capsule)
-        updateViewCapsule();
+    else if (appState.selectedObject instanceof Shed)
+        updateViewShed();
+    else if (appState.selectedObject instanceof Pod)
+        updateViewPod();
     else if (appState.selectedObject instanceof Sensor)
         updateViewSensor();
 }

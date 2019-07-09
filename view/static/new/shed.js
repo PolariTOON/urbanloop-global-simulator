@@ -1,3 +1,5 @@
+import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
+
 const shedColor = 'rgb(40, 40, 40)';
 const shedSelectedColor = 'rgb(255, 200, 20)';
 
@@ -31,7 +33,7 @@ export class Shed {
             y: y,
             width: 2 * (warehouseRadius + semiWidth),
             height: 2 * (warehouseRadius + semiWidth),
-            fill: warehouseColor,
+            fill: shedColor,
             stroke: 'black',
             strokeWidth: 0.3,
         });
@@ -85,7 +87,7 @@ export class Shed {
         }
 
         appState.selectedObject = this;
-        this.outerRectangle.fill(warehouseSelectedColor);
+        this.outerRectangle.fill(shedSelectedColor);
         networkLayer.batchDraw();
     }
 
@@ -93,7 +95,7 @@ export class Shed {
         if (appState.selectedObject === this) {
             appState.selectedObject = undefined;
         }
-        this.outerRectangle.fill(warehouseColor);
+        this.outerRectangle.fill(shedColor);
         networkLayer.batchDraw();
     }
 
@@ -118,7 +120,7 @@ export class Shed {
     }
 }
 
-function updateShedFromJSON(warehouseJSON) {
+export function updateShedFromJSON(warehouseJSON) {
     let targetWarehouses = appState.objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
     targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
 }

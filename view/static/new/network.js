@@ -1,7 +1,13 @@
-import {running} from "./inputs";
-
-let networkDiv = document.getElementById('network-div');
-let scaleSlider = document.getElementById('scale-slider');
+import {fetchTimeout} from "./main-page";
+import {Loop} from "./loop.js";
+import {Station, updateStationFromJSON} from "./station.js";
+import {Shed, updateShedFromJSON} from "./shed.js";
+import {Switch, updateSwitchFromJSON} from "./switch.js";
+import {Sensor, updateSensorFromJSON} from "./sensor.js";
+import {updateTimeFromJSON} from "./menu.js";
+import {updatePodFromJSON} from "./pod.js";
+import {updateDataPanel} from "./data-panel.js";
+import {updateViewPanel} from "./view-panel.js";
 
 export const appState = {
     clearing: false,
@@ -9,7 +15,8 @@ export const appState = {
     objects: undefined,
     selectedObject: undefined
 };
-let networkSize = 1000;
+
+export let running = false;
 export let stage = new Konva.Stage({
     container: 'network-div',
     width: getNetworkDivSize().width,
@@ -17,6 +24,17 @@ export let stage = new Konva.Stage({
 });
 export let networkLayer = new Konva.Layer();
 export let infoLayer = new Konva.Layer();
+
+const zoomIntensity = 0.9;
+const minScale = 0.01;
+
+let moveIntensity = 1;
+let pressTimeout;
+let doPan = false;
+let networkDiv = document.getElementById('network-div');
+let scaleSlider = document.getElementById('scale-slider');
+let startButton = document.getElementById('start-button');
+let networkSize = 1000;
 let updateLoop;
 
 export function getNetworkDivSize() {
@@ -50,10 +68,42 @@ function getBarycenter() {
     return {x: sumX / loopNumber, y: sumY / loopNumber};
 }
 
-export async function initNetworkScene() {
+export async function initNetworkScene(networkName) {
     appState.objects = [];
     startButton.classList.remove('not-shown');
 
+    await fetch('/config/restore/', { //TODO: requête restore
+        method: "POST"
+    });
+
+    const networkJSON = await (await fetch('/networks/' + networkName + '/load/', { //TODO: requête networks load
+        method: "POST"
+    })).json();
+    networkSize = networkJSON['maxSize'];
+
+    const listLoopJSON = await (await fetch('/loops/')).json(); //TODO: requête loops
+    for (const loopJSON of listLoopJSON) {
+        new Loop(loopJSON);
+    }
+
+    const listStationSetDataJSON = await (await fetch('/stations/')).json(); //TODO: requête stations
+    for (const stationSetDataJSON of listStationSetDataJSON) {
+        new Station(stationSetDataJSON);
+    }
+
+    const listShedSetDataJSON = await (await fetch('/sheds/')).json(); //TODO: requête sheds
+    for (const shedSetDataJSON of listShedSetDataJSON) {
+        new Shed(shedSetDataJSON);
+    }
+
+    const listSwitchSetDataJSON = await (await fetch('/switches/')).json(); //TODO: requête switches
+    for (const switchSetDataJSON of listSwitchSetDataJSON) {
+        new Switch(switchSetDataJSON);
+    }
+    const listSensorSetDataJSON = await (await fetch('/sensors/')).json(); //TODO: requête sensors
+    for (const sensorSetDataJson of listSensorSetDataJSON){
+        new Sensor(sensorSetDataJson);
+    }
     calibrateNetworkScene();
 
     networkLayer.batchDraw();
@@ -61,7 +111,7 @@ export async function initNetworkScene() {
 }
 
 export async function updateNetworkScene() {
-    const listDataJSON = await (await fetchTimeout(1000, '/networks/0/')).json(); //TODO : gestion de plusieurs simulations
+    const listDataJSON = await (await fetchTimeout(1000, '/data/')).json(); //TODO: requête data
 
     if (!appState.clearing) {
         for (const dataJSON of listDataJSON) {
@@ -72,14 +122,14 @@ export async function updateNetworkScene() {
                 case 'station':
                     updateStationFromJSON(dataJSON);
                     break;
-                case 'warehouse':
-                    updateWarehouseFromJSON(dataJSON);
+                case 'shed':
+                    updateShedFromJSON(dataJSON);
                     break;
                 case 'switch':
                     updateSwitchFromJSON(dataJSON);
                     break;
-                case 'capsule':
-                    updateCapsuleFromJSON(dataJSON);
+                case 'pod':
+                    updatePodFromJSON(dataJSON);
                     break;
                 case 'sensor':
                     updateSensorFromJSON(dataJSON);
@@ -223,3 +273,97 @@ function stopUpdateLoop() {
     clearInterval(updateLoop);
     updateLoop = undefined;
 }
+
+window.addEventListener('resize', fitStageIntoParentContainer);
+
+stage.on('mousedown', event => {
+    event.evt.preventDefault();
+    pressTimeout = setTimeout(function () {
+        doPan = true;
+    }, 100);
+});
+
+stage.on('mouseup', event => {
+    event.evt.preventDefault();
+    if (pressTimeout !== null) {
+        clearTimeout(pressTimeout);
+        pressTimeout = null;
+    }
+    doPan = false;
+});
+
+stage.on('mousemove', event => {
+    event.evt.preventDefault();
+    if (doPan) {
+        let deltaX = event.evt.movementX || 0;
+        let deltaY = event.evt.movementY || 0;
+
+        let newPos = {
+            x: stage.x() + moveIntensity * deltaX,
+            y: stage.y() + moveIntensity * deltaY
+        };
+
+        stage.position(newPos);
+        stage.batchDraw();
+    }
+});
+
+stage.on('wheel', event => {
+    event.evt.preventDefault();
+    let oldScale = stage.scaleX();
+
+    let mousePointTo = {
+        x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+        y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
+    };
+
+    let newScale =
+        event.evt.deltaY > 0 ? oldScale * zoomIntensity : oldScale / zoomIntensity;
+
+    if (newScale < minScale) {
+        return;
+    }
+
+    stage.scale({x: newScale, y: newScale});
+
+    let newPos = {
+        x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+        y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
+    };
+
+    stage.position(newPos);
+    stage.batchDraw();
+});
+
+scaleSlider.oninput = () => {
+    scaleSlider.title = 'Objects scale : ' + scaleSlider.value;
+    appState.objectScale = scaleSlider.value;
+    appState.objects.forEach(object => object.updateScale(appState.objectScale));
+    stage.batchDraw();
+};
+
+scaleSlider.onmouseleave = () => {
+    scaleSlider.removeAttribute("title");
+};
+
+document.getElementById('panel-div').onmouseenter = () => {
+    resetCursor();
+};
+
+stage.on('mouseover', event => {
+    event.evt.preventDefault();
+
+    if (networkLayer.getIntersection(stage.getPointerPosition()) === null) {
+        moveCursor();
+    }
+});
+
+stage.on('mousedown', event => {
+    event.evt.preventDefault();
+
+    let shape = networkLayer.getIntersection(stage.getPointerPosition());
+
+    if (appState.selectedObject !== undefined && shape === null) {
+        appState.selectedObject.unselect();
+    }
+});

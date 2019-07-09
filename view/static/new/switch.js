@@ -1,3 +1,5 @@
+import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
+
 const switchColor = 'rgb(200, 40, 40)';
 const switchSelectedColor = 'rgb(255, 200, 20)';
 
@@ -202,6 +204,6 @@ export class Switch {
     }
 }
 
-function updateSwitchFromJSON(switchJSON) {
+export function updateSwitchFromJSON(switchJSON) {
 
 }

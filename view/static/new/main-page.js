@@ -1,4 +1,5 @@
 import {applyNetworkScene} from "./network.js";
+import {updateConfigPanel} from "./config-panel.js";
 
 export function fetchTimeout(timeout, url, options) {
     const controller = new AbortController();

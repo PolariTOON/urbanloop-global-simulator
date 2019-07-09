@@ -1,3 +1,5 @@
+import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
+
 const stationColor = 'rgb(40, 40, 200)';
 const stationSelectedColor = 'rgb(255, 200, 20)';
 
@@ -155,7 +157,7 @@ export class Station {
     }
 }
 
-function updateStationFromJSON(stationJSON) {
+export function updateStationFromJSON(stationJSON) {
     let targetStations = appState.objects.filter(station => station.uuid.includes(stationJSON['uuid']));
     targetStations.forEach(station => station.update(stationJSON));
 }

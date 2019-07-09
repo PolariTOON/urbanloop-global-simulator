@@ -1,34 +1,36 @@
-export const defaultCapsuleWidth = 5;
-const capsuleInnerEmptyColor = 'rgb(173, 72, 45)';
-const capsuleOuterEmptyColor = 'rgb(255, 100, 63)';
-const capsuleInnerAboardColor = 'rgb(96, 167, 27)';
-const capsuleOuterAboardColor = 'rgb(128, 214, 30)';
-const capsuleInnerSelectedColor = 'rgb(255, 200, 20)';
-const capsuleOuterSelectedColor = 'rgb(255, 234, 87)';
+import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
+
+export const defaultPodWidth = 5;
+const podInnerEmptyColor = 'rgb(173, 72, 45)';
+const podOuterEmptyColor = 'rgb(255, 100, 63)';
+const podInnerAboardColor = 'rgb(96, 167, 27)';
+const podOuterAboardColor = 'rgb(128, 214, 30)';
+const podInnerSelectedColor = 'rgb(255, 200, 20)';
+const podOuterSelectedColor = 'rgb(255, 234, 87)';
 
 export class Pod {
-    constructor(capsuleJSON, capsuleWidth = defaultCapsuleWidth) {
-        this.json = capsuleJSON;
-        this.uuid = capsuleJSON['uuid'];
-        this.id = capsuleJSON['id'];
-        this.travelerNumber = capsuleJSON['travelerNumber'];
+    constructor(podJSON, podWidth = defaultPodWidth) {
+        this.json = podJSON;
+        this.uuid = podJSON['uuid'];
+        this.id = podJSON['id'];
+        this.travelerNumber = podJSON['travelerNumber'];
         this.isDocked = true;
 
         this.innerCircle = new Konva.Circle({
             name: this.uuid,
-            radius: capsuleWidth - Math.sqrt(capsuleWidth),
+            radius: podWidth - Math.sqrt(podWidth),
         });
 
         this.outerCircle = new Konva.Circle({
             name: this.uuid,
-            radius: capsuleWidth,
+            radius: podWidth,
         });
 
         initBehaviors(this, this.innerCircle, this.outerCircle);
 
         networkLayer.add(this.outerCircle);
         networkLayer.add(this.innerCircle);
-        this.update(capsuleJSON);
+        this.update(podJSON);
 
         appState.objects.push(this);
     }
@@ -39,8 +41,8 @@ export class Pod {
         }
 
         appState.selectedObject = this;
-        this.innerCircle.fill(capsuleInnerSelectedColor);
-        this.outerCircle.fill(capsuleOuterSelectedColor);
+        this.innerCircle.fill(podInnerSelectedColor);
+        this.outerCircle.fill(podOuterSelectedColor);
         networkLayer.batchDraw();
     }
 
@@ -53,28 +55,28 @@ export class Pod {
         networkLayer.batchDraw();
     }
 
-    update(capsuleJSON) {
-        const x = capsuleJSON['x'];
-        const y = getNetworkDivSize().height - capsuleJSON['y'];
+    update(podJSON) {
+        const x = podJSON['x'];
+        const y = getNetworkDivSize().height - podJSON['y'];
         this.innerCircle.x(x);
         this.innerCircle.y(y);
         this.outerCircle.x(x);
         this.outerCircle.y(y);
-        this.isDocked = !capsuleJSON['moving'];
-        this.travelerNumber = capsuleJSON['travelerNumber'];
-        this.json = capsuleJSON;
-        this.currentElementUuid = capsuleJSON['currentElementUuid'];
+        this.isDocked = !podJSON['moving'];
+        this.travelerNumber = podJSON['travelerNumber'];
+        this.json = podJSON;
+        this.currentElementUuid = podJSON['currentElementUuid'];
 
         if (this.isDocked) {
-            if (capsuleJSON['stationIndex'] === -1) { // THIS IS HOTFIX FOR GHOST CAPS
+            if (podJSON['stationIndex'] === -1) { // THIS IS HOTFIX FOR GHOST CAPS
                 this.innerCircle.hide();
                 this.outerCircle.hide();
                 return;
             }
-            let targetStations = appState.objects.filter(station => station.uuid.includes(capsuleJSON['currentElementUuid']));
+            let targetStations = appState.objects.filter(station => station.uuid.includes(podJSON['currentElementUuid']));
             targetStations.forEach(station => {
-                this.innerCircle.x(x + 10 * station.stationRadius + (6 * capsuleJSON['stationIndex'] + 2) * station.dockSize);
-                this.outerCircle.x(x + 10 * station.stationRadius + (6 * capsuleJSON['stationIndex'] + 2) * station.dockSize);
+                this.innerCircle.x(x + 10 * station.stationRadius + (6 * podJSON['stationIndex'] + 2) * station.dockSize);
+                this.outerCircle.x(x + 10 * station.stationRadius + (6 * podJSON['stationIndex'] + 2) * station.dockSize);
             });
         }
 
@@ -100,11 +102,11 @@ export class Pod {
         }
 
         if (this.isAboard()) {
-            this.innerCircle.fill(capsuleInnerAboardColor);
-            this.outerCircle.fill(capsuleOuterAboardColor);
+            this.innerCircle.fill(podInnerAboardColor);
+            this.outerCircle.fill(podOuterAboardColor);
         } else {
-            this.innerCircle.fill(capsuleInnerEmptyColor);
-            this.outerCircle.fill(capsuleOuterEmptyColor);
+            this.innerCircle.fill(podInnerEmptyColor);
+            this.outerCircle.fill(podOuterEmptyColor);
         }
     }
 
@@ -120,12 +122,12 @@ export class Pod {
     }
 }
 
-function updatePodFromJSON(capsuleJSON) {
-    let targetCapsules = appState.objects.filter(capsule => capsule.uuid.includes(capsuleJSON['uuid']));
+export function updatePodFromJSON(podJSON) {
+    let targetPods = appState.objects.filter(pod => pod.uuid.includes(podJSON['uuid']));
 
-    if (targetCapsules.length <= 0) {
-        new Capsule(capsuleJSON).updateScale(appState.objectScale);
+    if (targetPods.length <= 0) {
+        new Pod(podJSON).updateScale(appState.objectScale);
     } else {
-        targetCapsules.forEach(capsule => capsule.update(capsuleJSON));
+        targetPods.forEach(pod => pod.update(podJSON));
     }
 }

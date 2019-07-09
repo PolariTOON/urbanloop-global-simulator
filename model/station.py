@@ -103,7 +103,7 @@ class Station:
         controller.get_controller().stop_timer(capsule)
         self.capsule_arriving = False
 
-    def get_angle(self):
+    def get_angle(self, loop):
         return self.angle
 
     def serialize(self):
@@ -148,10 +148,10 @@ def fill_and_full_stations():
                 "Station %s almost empty (caps_numb = %d)." % (station.name, station.estimated_capsules_number()))
             nb_to_send = station.capacity - station.estimated_capsules_number() - 1
             if station.estimated_capsules_number() == 0 and not station.capsule_arriving:
-                controller.get_controller().refill(10, station, nb_to_send)
+                controller.get_controller().refill(10, station)
                 station.capsule_arriving = True
             elif not station.capsule_arriving:
-                controller.get_controller().refill(6, station, nb_to_send)
+                controller.get_controller().refill(6, station)
                 station.capsule_arriving = True
                 # j'en envoie une depuis un entrepot
         if station.estimated_capsules_number() >= min(station.capacity - 1, floor(

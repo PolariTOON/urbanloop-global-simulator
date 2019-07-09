@@ -1,3 +1,4 @@
+import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
 
 const sensorColor = 'rgb(188,13,255)';
 const sensorSelectedColor = 'rgb(255, 200, 20)';
@@ -7,7 +8,6 @@ export class Sensor {
         this.json = sensorJSON;
         this.uuid = sensorJSON['uuid'];
         this.id = sensorJSON['id'];
-        this.sensorRadius = sensorRadius;
         this.x = sensorJSON['x'];
         const x = this.x;
         this.y = sensorJSON['y'];
@@ -115,7 +115,7 @@ export class Sensor {
 
 }
 
-function updateSensorFromJSON(sensorJSON) {
+export function updateSensorFromJSON(sensorJSON) {
     let targetSensor = appState.objects.filter(sensor => sensor.uuid.includes(sensorJSON['uuid']));
     targetSensor.forEach(sensor => sensor.update(sensorJSON));
 }

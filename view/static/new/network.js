@@ -256,7 +256,7 @@ export async function applyNetworkScene(networkName = getDefaultFilename()) {
     stage.add(infoLayer);
     await initNetworkScene(networkName);
     appState.clearing = false;
-    startUpdateLoop();
+    startUpdateLoop(); //TODO : s'arrêter ici dans un premier temps (affichage du modèle avant lancement de la simulation)
 }
 
 function startUpdateLoop() {

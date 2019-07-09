@@ -1,5 +1,5 @@
 import {applyNetworkScene, getDefaultFilename} from "./network.js";
-import {fetchTimeout} from "./main-page";
+import {fetchTimeout} from "./main-page.js";
 
 export let networkSelection = document.getElementById('conf-topology-0');
 export let saveConfigButton = document.getElementById('config-save-button');

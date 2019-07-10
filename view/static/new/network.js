@@ -1,29 +1,13 @@
-import {fetchTimeout} from "./main-page";
+import {fetchTimeout} from "./main-page.js";
 import {Loop} from "./loop.js";
-import {Station, updateStationFromJSON} from "./station.js";
-import {Shed, updateShedFromJSON} from "./shed.js";
-import {Switch, updateSwitchFromJSON} from "./switch.js";
-import {Sensor, updateSensorFromJSON} from "./sensor.js";
+import {updateStationFromJSON} from "./station.js";
+import {updateShedFromJSON} from "./shed.js";
+import {updateSwitchFromJSON} from "./switch.js";
+import {updateSensorFromJSON} from "./sensor.js";
 import {updateTimeFromJSON} from "./menu.js";
 import {updatePodFromJSON} from "./pod.js";
 import {updateDataPanel} from "./data-panel.js";
 import {updateViewPanel} from "./view-panel.js";
-
-export const appState = {
-    clearing: false,
-    objectScale: undefined,
-    objects: undefined,
-    selectedObject: undefined
-};
-
-export let running = false;
-export let stage = new Konva.Stage({
-    container: 'network-div',
-    width: getNetworkDivSize().width,
-    height: getNetworkDivSize().height
-});
-export let networkLayer = new Konva.Layer();
-export let infoLayer = new Konva.Layer();
 
 const zoomIntensity = 0.9;
 const minScale = 0.01;
@@ -36,6 +20,23 @@ let scaleSlider = document.getElementById('scale-slider');
 let startButton = document.getElementById('start-button');
 let networkSize = 1000;
 let updateLoop;
+
+export const appState = {
+    clearing: false,
+    objectScale: undefined,
+    objects: undefined,
+    selectedObject: undefined
+};
+
+export let running = false;
+
+export let stage = new Konva.Stage({
+    container: 'network-div',
+    width: getNetworkDivSize().width,
+    height: getNetworkDivSize().height
+});
+export let networkLayer = new Konva.Layer();
+export let infoLayer = new Konva.Layer();
 
 export function getNetworkDivSize() {
     return {
@@ -68,42 +69,24 @@ function getBarycenter() {
     return {x: sumX / loopNumber, y: sumY / loopNumber};
 }
 
-export async function initNetworkScene(networkName) {
+export async function initNetworkScene(network_index) {
     appState.objects = [];
     startButton.classList.remove('not-shown');
 
-    await fetch('/config/restore/', { //TODO: requête restore
+    /*await fetch('/networks/0/load/', {
         method: "POST"
     });
 
-    const networkJSON = await (await fetch('/networks/' + networkName + '/load/', { //TODO: requête networks load
-        method: "POST"
-    })).json();
-    networkSize = networkJSON['maxSize'];
+    const networkJSON = await (await fetch('/networks/0/', { //TODO: requête networks load
+        method: "GET"
+    })).json();*/
 
-    const listLoopJSON = await (await fetch('/loops/')).json(); //TODO: requête loops
-    for (const loopJSON of listLoopJSON) {
-        new Loop(loopJSON);
-    }
+    const networkJSON = await (await fetch('/networks/'+ network_index +'/', {method: "GET"})).json();
 
-    const listStationSetDataJSON = await (await fetch('/stations/')).json(); //TODO: requête stations
-    for (const stationSetDataJSON of listStationSetDataJSON) {
-        new Station(stationSetDataJSON);
+    for (const loop of networkJSON["loop"]){
+        //TODO
     }
 
-    const listShedSetDataJSON = await (await fetch('/sheds/')).json(); //TODO: requête sheds
-    for (const shedSetDataJSON of listShedSetDataJSON) {
-        new Shed(shedSetDataJSON);
-    }
-
-    const listSwitchSetDataJSON = await (await fetch('/switches/')).json(); //TODO: requête switches
-    for (const switchSetDataJSON of listSwitchSetDataJSON) {
-        new Switch(switchSetDataJSON);
-    }
-    const listSensorSetDataJSON = await (await fetch('/sensors/')).json(); //TODO: requête sensors
-    for (const sensorSetDataJson of listSensorSetDataJSON){
-        new Sensor(sensorSetDataJson);
-    }
     calibrateNetworkScene();
 
     networkLayer.batchDraw();
@@ -250,13 +233,13 @@ function clearScene() {
     stage.destroyChildren();
 }
 
-export async function applyNetworkScene(networkName = getDefaultFilename()) {
+export async function applyNetworkScene(networkName = 0) {
     clearScene();
     stage.add(networkLayer);
     stage.add(infoLayer);
     await initNetworkScene(networkName);
     appState.clearing = false;
-    startUpdateLoop(); //TODO : s'arrêter ici dans un premier temps (affichage du modèle avant lancement de la simulation)
+    // startUpdateLoop(); //TODO : s'arrêter ici dans un premier temps (affichage du modèle avant lancement de la simulation)
 }
 
 function startUpdateLoop() {
@@ -273,6 +256,7 @@ function stopUpdateLoop() {
     clearInterval(updateLoop);
     updateLoop = undefined;
 }
+
 
 window.addEventListener('resize', fitStageIntoParentContainer);
 

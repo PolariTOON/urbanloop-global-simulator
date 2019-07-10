@@ -92,7 +92,6 @@ class Network(Node):
         :return: (void) Le réseau est construit
         """
         #  Etape 1 : Récupérer les infos du json sous forme pratique
-        print("Etape 1 : ...")
         for b in range(len(self._loops)):
             self._loops[b]["switches"] = []
             self._loops[b]["routes"] = []
@@ -138,8 +137,6 @@ class Network(Node):
                 "steps": steps,
                 "sections": sections
             })
-        print("Etape 1 : [OK]")
-        print("Etape 2 : ...")
         #  Etape 2 : Instanciation des routes
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
@@ -160,8 +157,6 @@ class Network(Node):
             })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._routes.append(new_route)
             self._bridges[p]["routes"] = [new_route]  # On ajoute sa route au bridge
-        print("Etape 2 : [OK]")
-        print("Etape 3 : ...")
         #  Etape 3 : Instanciation des aiguillages, ajout de leurs capsules et liaison avec les routes
         for b in range(len(self._loops)):
             first_switch = len(self._switches)
@@ -186,8 +181,6 @@ class Network(Node):
                     new_switch = SwitchOut(id_switch, **switch)
                 self._switches.append(new_switch)
                 self._loops[b]["switches"][s] = new_switch
-        print("Etape 3 : [OK]")
-        print("Etape 4 : ...")
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
         for p in range(len(self._bridges)):
             bridge = self._bridges[p]
@@ -200,7 +193,6 @@ class Network(Node):
             loop = self._loops[b]
             self._init_pods_of_line(loop)
             self._loops[b] = Loop(b, **loop)
-        print("Etape 4 : [OK]")
 
     def _init_pods_of_line(self, line):
         for pod in line["pods"]:

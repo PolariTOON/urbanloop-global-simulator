@@ -26,18 +26,13 @@ class Simulation:
     def __init__(self, id, is_visualized=False, json_network_path="resources/new_mini_network.json"):
         self.id = id
         # Etape 1 : chargement de la configuration de la simulation et du modèle probabiliste
-        print("Chargement de la configuration : ...")
         self._config = configparser.ConfigParser()
         self._config.read('resources/config.ini')
-        print("Chargement de la configuration : [OK]\nChargement du modèle probabiliste : ...")
         self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
-        print("Chargement du modèle probabiliste : [OK]\nInitialisation de simPy : ...")
         # Etape 2 : chargement du modèle
-        print("Chargement du modèle : ...")
         with open(json_network_path) as json_data:
             json_network = json.load(json_data)
         self._controler = Routing(self.id, json_network)
-        print("Chargement du modèle : [OK]")
         # Etape 3 : Initialisation de simPy
         self._env = None
         self._sim_state = SimState.RUNNING
@@ -65,12 +60,12 @@ class Simulation:
         self._tick_event = self._env.event()
         self._endless_quit_event = self._env.event()
         # Etape 5 : Lancement de la simulation
-        print("Initialisation de simPy : [OK]\nLancement de la simulation : ...")
         self._env.process(self._run_simulation())
+        """
         if self._is_endless:
             self._env.run(self._endless_quit_event)
             return
-        self._env.run(until=int(self._config['SIM']['duration']))
+        self._env.run(until=int(self._config['SIM']['duration']))"""
 
     def _load_env(self):
         """
@@ -108,7 +103,6 @@ class Simulation:
         You can create several independents process while the
         SimState is RUNNING.
         """
-        print("Simulation is running.")
         tick_start_time = 0
         while True:
             if self._sim_state == SimState.RUNNING:
@@ -136,7 +130,6 @@ class Simulation:
                     sleep_time = self._visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
             elif self._sim_state == SimState.KILLED:
-                print("killed")
                 self._controler.extract(self.get_simulated_time())
                 self.reset_simulation_parameters("resources/new_mini_network.json")
                 if self._is_endless:

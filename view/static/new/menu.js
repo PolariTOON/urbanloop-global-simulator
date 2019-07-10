@@ -1,5 +1,6 @@
-import {changeNetworkButtonState} from "../tabs";
-import {applyNetworkScene} from "../renderer";
+import {changeNetworkButtonState} from "./config-panel.js";
+import {applyNetworkScene} from "./network.js";
+
 
 let startButton = document.getElementById('start-button');
 let stopButton = document.getElementById('stop-button');

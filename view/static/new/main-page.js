@@ -10,5 +10,5 @@ export function fetchTimeout(timeout, url, options) {
 
 (async () => {
     await applyNetworkScene();
-    updateConfigPanel();
+    //updateConfigPanel();
 }) ();

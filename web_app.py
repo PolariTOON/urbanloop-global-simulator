@@ -1,7 +1,6 @@
 """
 Cette classe permet de gérer le code lié à un lancement d'une simulation avec interface graphique
 """
-
 import logging
 from threading import Thread
 
@@ -26,8 +25,8 @@ _networks = []
 def run_app(port):
     global sim_threads
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
-    #sim_threads.append(Thread(target=new_sim, args=[0]))
-    #new_sim(0)
+    print("Static loading of the new json file (http://127.0.0.1:%d/new/index.html)" % port)
+    new_sim(0)
     app.run(port=port)
 
 
@@ -252,3 +251,10 @@ def _get_step(network_index, route_index, step_index):
 def _get_section(network_index, route_index, section_index):
     global _networks
     return jsonify(_networks[network_index].routes[route_index].sections[section_index].serialize())
+
+
+@app.route("/networks/<int:network_index>/load/", methods=["POST"])
+def _load_network(network_index):
+    new_sim(network_index)
+    return ''
+

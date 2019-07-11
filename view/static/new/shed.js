@@ -1,25 +1,24 @@
-import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
 
 const shedColor = 'rgb(40, 40, 40)';
 const shedSelectedColor = 'rgb(255, 200, 20)';
 
 export class Shed {
-    constructor(warehouseJSON, warehouseRadius = 12, warehouseWidth = 4) {
-        this.json = warehouseJSON;
-        this.uuid = warehouseJSON['uuid'];
-        this.id = warehouseJSON['id'];
+    constructor(shedJSON, shedRadius = 12, shedWidth = 4) {
+        this.json = shedJSON;
+        this.name = shedJSON["name"];
 
-        const x = warehouseJSON['x'];
-        this.y = warehouseJSON['y'];
+        const x = shedJSON['x'];
+        this.y = shedJSON['y'];
         const y = getNetworkDivSize().height - this.y;
-        const semiWidth = Math.floor(warehouseWidth / 2);
+        const semiWidth = Math.floor(shedWidth / 2);
 
         this.innerRectangle = new Konva.Rect({
-            name: this.uuid,
+            name: this.name,
             x: x,
             y: y,
-            width: 2 * (warehouseRadius - semiWidth),
-            height: 2 * (warehouseRadius - semiWidth),
+            width: 2 * (shedRadius - semiWidth),
+            height: 2 * (shedRadius - semiWidth),
             fill: 'white',
             stroke: 'black',
             strokeWidth: 0.3,
@@ -28,11 +27,11 @@ export class Shed {
         this.innerRectangle.offsetY(this.innerRectangle.height() / 2);
 
         this.outerRectangle = new Konva.Rect({
-            name: this.uuid,
+            name: this.name,
             x: x,
             y: y,
-            width: 2 * (warehouseRadius + semiWidth),
-            height: 2 * (warehouseRadius + semiWidth),
+            width: 2 * (shedRadius + semiWidth),
+            height: 2 * (shedRadius + semiWidth),
             fill: shedColor,
             stroke: 'black',
             strokeWidth: 0.3,
@@ -64,7 +63,7 @@ export class Shed {
 
         this.info.add(
             new Konva.Text({
-                text: 'Warehouse : ' + warehouseJSON['name'] + ' | Capacity : ' + warehouseJSON['capacity'],
+                text: 'Shed : ' + shedJSON['name'] + ' | Capacity : ' + shedJSON['pods']["max"],
                 fontFamily: 'Calibri',
                 fontSize: 18,
                 padding: 5,
@@ -115,12 +114,12 @@ export class Shed {
         this.info.scaleY(value);
     }
 
-    update(warehouseJSON) {
-        this.json = warehouseJSON;
+    update(shedJSON) {
+        this.json = shedJSON;
     }
 }
 
-export function updateShedFromJSON(warehouseJSON) {
-    let targetWarehouses = appState.objects.filter(warehouse => warehouse.uuid.includes(warehouseJSON['uuid']));
-    targetWarehouses.forEach(warehouse => warehouse.update(warehouseJSON));
+export function updateShedFromJSON(shedJSON) {
+    let targetSheds = appState.objects.filter(shed => shed.uuid.includes(shedJSON['uuid']));
+    targetSheds.forEach(shed => shed.update(shedJSON));
 }

@@ -3,6 +3,7 @@ Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
 import random
+import math
 
 from .ways.tracks.station import station_types
 from ..node2 import Node
@@ -14,12 +15,13 @@ from .ways.switch_out import SwitchOut
 
 
 class Network(Node):
-    def __init__(self, id, bridges=None, loops=None, switches=None, routes=None, **kwargs):
+    def __init__(self, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, **kwargs):
         super().__init__(id, **kwargs)
         self._bridges = bridges or []
         self._loops = loops or []
         self._switches = switches or []
         self._routes = routes or []
+        self._view_box = view_box or {}
         self._init_graph_from_json()
 
     @property
@@ -61,6 +63,27 @@ class Network(Node):
     def stations(self):
         return [station for route in self._routes for station in route.stations]
 
+    @property
+    def view_box(self):
+        if self._view_box:
+            return self._view_box
+        min_x = math.inf
+        max_x = 0
+        min_y = math.inf
+        max_y = 0
+        for loop in self._loops:
+            if loop.x_min < min_x:
+                min_x = loop.x_min
+            if loop.x_max > max_x:
+                max_x = loop.x_max
+            if loop.y_min < min_y:
+                min_y = loop.y_min
+            if loop.y_max > max_y:
+                max_y = loop.y_max
+        width = max_x - min_x
+        height = max_y - min_y
+        return {"x": width / 2, "y": height / 2, "width": width, "height": height}  # TODO: x et y à revoir
+
     def get_random_free_shed(self):
         free_sheds = [shed for route in self._routes for shed in route.sheds if len(shed.pods) < shed.capacity]
         return random.choice(free_sheds)
@@ -81,8 +104,9 @@ class Network(Node):
         loops = [loop.serialize() for loop in self._loops]
         dict = super().serialize()
         dict.update({
-            "bridges": bridges,
             "loops": loops,
+            "bridges": bridges,
+            "view_box": self.view_box
         })
         return dict
 

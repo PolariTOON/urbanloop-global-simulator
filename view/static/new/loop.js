@@ -1,4 +1,4 @@
-import {appState, networkLayer, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, getNetworkDivSize   } from "./network.js";
 import {Station} from "./station.js";
 import {Shed} from "./shed.js";
 import {Sensor} from "./sensor.js";
@@ -24,7 +24,7 @@ export class Loop {
         this.json = loopJSON;
         const averagePointLoop = averagePoint(loopJSON["elements"]);
         this.averageX = averagePointLoop[0];
-        this.averageY = averagePointLoop[1];
+        this.averageY = getNetworkDivSize().height - averagePointLoop[1];
         this.name = loopJSON["name"];
 
         for (const elt of loopJSON["elements"]){
@@ -33,14 +33,14 @@ export class Loop {
                     new Station(elt);
                     break;
                 case "shed":
-                    //new Shed(elt);
+                    new Shed(elt);
                     break;
                 case "sensor":
-                    //new Sensor(elt);
+                    new Sensor(elt);
                     break;
                 case "switch_in":
                 case "switch_out":
-                    //new Switch(elt);
+                    new Switch(elt);
                     break;
             }
         }
@@ -59,7 +59,6 @@ export class Loop {
         this.text.offsetY(this.text.height() / 2);
 
         //initBehaviors(this, this.innerCircle, this.outerCircle);
-        console.log("x: " + this.averageX + "| y: " + this.averageY);
         networkLayer.add(this.text);
 
         appState.objects.push(this);
@@ -82,7 +81,7 @@ export class Loop {
     }
 
     updatePosition() {
-        const y = getNetworkDivSize().height - this.json['y'];
+        const y = getNetworkDivSize().height - this.averageY;
         this.text.y(y);
     }
 

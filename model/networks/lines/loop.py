@@ -3,6 +3,7 @@ Réunis des routes pour former les boucles du réseau
 """
 
 from .line import Line
+import math
 
 
 class Loop(Line):
@@ -29,6 +30,66 @@ class Loop(Line):
     @property
     def pods(self):
         return [pod for route in self._routes for pod in route.pods]
+
+    @property
+    def x_min(self):
+        return self.min_xy(True)
+
+    @property
+    def x_max(self):
+        return self.max_xy(True)
+
+    @property
+    def y_min(self):
+        return self.min_xy(False)
+
+    @property
+    def y_max(self):
+        return self.max_xy(False)
+
+    def min_xy(self, choice):
+        """
+        :param choice: si True alors on travaille avec x (abscisse) sinon on travaille en y (ordonnée)
+        :return: (float) la plus petite abscisse ou ordonnée selon le choix, parmi les éléments de la boucle
+        (utile pour récupérer les dimensions du réseau dans la vue)
+        """
+        mini = math.inf
+        for index in range(len(self._routes)):
+            if choice:
+                temp = self._routes[index].x_min
+            else:
+                temp = self._routes[index].y_min
+            if temp < mini:
+                mini = temp
+            if choice:
+                temp = self._switches[index].x
+            else:
+                temp = self._switches[index].y
+            if temp < mini:
+                mini = temp
+        return mini
+
+    def max_xy(self, choice):
+        """
+        :param choice: si True alors on travaille avec x (abscisse) sinon on travaille en y (ordonnée)
+        :return: (float) la plus grande abscisse ou ordonnée selon le choix, parmi les éléments de la boucle
+        (utile pour récupérer les dimensions du réseau dans la vue)
+        """
+        maxi = 0
+        for index in range(len(self._routes)):
+            if choice:
+                temp = self._routes[index].x_max
+            else:
+                temp = self._routes[index].y_max
+            if temp > maxi:
+                maxi = temp
+            if choice:
+                temp = self._switches[index].x
+            else:
+                temp = self._switches[index].y
+            if temp < maxi:
+                maxi = temp
+        return maxi
 
     def serialize(self):
         elements = []

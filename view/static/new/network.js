@@ -5,7 +5,7 @@ import {updateShedFromJSON} from "./shed.js";
 import {updateSwitchFromJSON} from "./switch.js";
 import {updateSensorFromJSON} from "./sensor.js";
 import {updateTimeFromJSON} from "./menu.js";
-import {updatePodFromJSON} from "./pod.js";
+import {updatePodFromJSON, Pod} from "./pod.js";
 import {updateDataPanel} from "./data-panel.js";
 import {updateViewPanel} from "./view-panel.js";
 
@@ -83,8 +83,8 @@ export async function initNetworkScene(network_index) {
 
     const networkJSON = await (await fetch('/networks/'+ network_index +'/', {method: "GET"})).json();
 
-    for (const loop of networkJSON["loop"]){
-        //TODO
+    for (const loop of networkJSON["loops"]){
+        new Loop(loop);
     }
 
     calibrateNetworkScene();
@@ -156,7 +156,7 @@ export function fitStageIntoParentContainer() {
     calibrateNetworkScene();
 
     appState.objects.forEach(object => {
-        if (!(object instanceof Capsule)) {
+        if (!(object instanceof Pod)) {
             object.updatePosition();
         }
     });

@@ -16,7 +16,7 @@ let configTab = document.getElementById("config-tab");
 let interactTab = document.getElementById("interact-tab");
 
 export function updateTimeFromJSON(timeJSON) {
-    timerSpan.innerHTML = "Day " + timeJSON['day'] + "<br><br>" + timeJSON['time'];
+    timerSpan.innerHTML = `Day ${timeJSON['day']}<br><br>${timeJSON['time']}`;
     speedSpan.innerHTML = timeJSON['speed'];
 
     if (timeJSON['decelerateJerky'] === 1) {

@@ -5,10 +5,9 @@ export let networkSelection = document.getElementById('conf-topology-0');
 export let saveConfigButton = document.getElementById('config-save-button');
 export let resetConfigButton = document.getElementById('config-reset-button');
 
-let networkErrorText = document.getElementById('network-error-text');
-let refillCheckBox = document.getElementById('conf-capsule-2');
+
 let fulfillPeriod = document.getElementById('conf-capsule-3');
-let endlessCheckBox = document.getElementById('conf-simulation-1');
+
 let duration = document.getElementById('conf-simulation-2');
 let networkAddButton = document.getElementById('network-add-btn');
 let networkDlButton = document.getElementById('network-dl-btn');
@@ -16,6 +15,9 @@ let networkFavButton = document.getElementById('network-fav-btn');
 let networkRemoveButton = document.getElementById('network-remove-btn');
 let networkText = document.getElementById('network-text');
 let networkFileInput = document.getElementById('conf-topology-1');
+let endlessCheckBox = document.getElementById('conf-simulation-1');
+let networkErrorText = document.getElementById('network-error-text');
+let refillCheckBox = document.getElementById('conf-capsule-2');
 
 function resetNetworkErrorText() {
     networkErrorText.innerHTML = "Select, add, remove or download a network JSON file";

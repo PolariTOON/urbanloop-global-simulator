@@ -46,7 +46,7 @@ class Simulation:
             self._station_refill = False  # TODO : doit disparaître
         self._tick_event = self._env.event()
         # Etape 5 : Lancement de la simulation
-        self._env.process(self._run_simulation())
+        # self._env.process(self._run_simulation())
 
     def _modulo_on_seconds(self, seconds):
         """
@@ -78,7 +78,7 @@ class Simulation:
         tick_start_time = 0
         while True:
             if self._running:
-                loop_sleep_boolean = self._is_visualized and not self._is_real_time and self._visualized_tick_duration != 0
+                loop_sleep_boolean = self._visualized_tick_duration != 0
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()  # temps de la boucle
                 # Etape 1 : génération de statistiques
@@ -277,6 +277,14 @@ class Simulation:
 
     def ascend_travelers(self):
         yield self._env.process(self._controler.ascend_travelers(self._env, self.now_to_seconds(), self._probability, self._config, self.get_tick_per_second()))
+
+    @property
+    def running(self):
+        return self._running
+
+    @running.setter
+    def running(self, value):
+        self._running = value
 
     def update(self):
         if self._running:

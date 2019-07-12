@@ -35,7 +35,7 @@ async def _run_simulations():
     _loop = get_running_loop()
     _load_new_mini_network()
     while True:
-        await sleep(0)  # TODO: calculer selon la vitesse de la simulation voulue
+        await sleep(.5)  # TODO: calculer selon la vitesse et la précision de la simulation, ainsi que l'occupation du serveur
         for key in _simulations:
             simulation = _simulations[key]
             simulation.update()

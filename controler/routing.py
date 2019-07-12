@@ -10,9 +10,8 @@ class Routing:
     """
     Modélise le controleur global d'un réseau, en se rapprochant du paradigme SDN
     """
-    def __init__(self, id, json_network):
-        self._id = id
-        self._network = Network(self._id, **json_network)  # Création du réseau à partir d'un fichier JSON
+    def __init__(self, id, **kwargs):
+        self._network = Network(id, **kwargs)  # Création du réseau à partir d'un fichier JSON
         self._rules = []
         self._recorder = StatsRecorder(0)  # TODO : Gérer les stats
         self._timers = [-1] * len(self._network.pods)  # TODO : Gérer les timers des capsules (temps de trajets)

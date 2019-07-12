@@ -2,10 +2,9 @@ import configparser
 import fileinput
 import sys
 import time
-import json
-from enum import Enum
-import simpy
 from math import floor
+from random import random, seed
+from simpy import Environment
 
 from controler import probability, converter
 from controler.probability import Probability
@@ -14,39 +13,28 @@ from shutil import copyfile
 from settings import simlog
 
 
-class SimState(Enum):
-    """Différents états possibles de la simulation"""
-    RUNNING = 0
-    PAUSED = 1
-    KILLED = 2
-
-
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, is_visualized=False, json_network_path="resources/new_mini_network.json"):
-        self.id = id
+    def __init__(self, id, state=None, running=None, **kwargs):
         # Etape 1 : chargement de la configuration de la simulation et du modèle probabiliste
+        state = state or (seed(), random())[1]
+        running = running or False
         self._config = configparser.ConfigParser()
         self._config.read('resources/config.ini')
         self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
         # Etape 2 : chargement du modèle
-        with open(json_network_path) as json_data:
-            json_network = json.load(json_data)
-        self._controler = Routing(self.id, json_network)
+        self._controler = Routing(id, **kwargs)
         # Etape 3 : Initialisation de simPy
-        self._env = None
-        self._sim_state = SimState.RUNNING
+        self._env = Environment()
+        self._state = state
+        self._running = running
         self._sim_tick = 0.05  # Duration of a tick
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
         self._sim_tick_variations = []
         self._start_hour = None
-        self._endless_quit_event = None
-        self._is_real_time = False
-        self._is_endless = False
         self._station_refill = True  # Todo : à déplacer dans station
         self._fulfill_period = int(self._config['CAPSULE']['fulfill_period'])
-        self._is_visualized = is_visualized
         self._tab_depart = []
         self._tab_temps = []
         self._ascent_generator = None  # ascent_generator.AscentGenerator() # TODO : monter des voyageurs
@@ -56,25 +44,9 @@ class Simulation:
             self._is_endless = True
         if self._config['CAPSULE']['station_refill'] in ['false', 'False']:
             self._station_refill = False  # TODO : doit disparaître
-        self._load_env()
         self._tick_event = self._env.event()
-        self._endless_quit_event = self._env.event()
         # Etape 5 : Lancement de la simulation
         self._env.process(self._run_simulation())
-        """
-        if self._is_endless:
-            self._env.run(self._endless_quit_event)
-            return
-        self._env.run(until=int(self._config['SIM']['duration']))"""
-
-    def _load_env(self):
-        """
-        Load the simulation environment with configuration, real_time or not
-        """
-        if self._is_real_time:
-            self._env = simpy.rt.RealtimeEnvironment(factor=self._sim_tick)
-        else:
-            self._env = simpy.Environment()
 
     def _modulo_on_seconds(self, seconds):
         """
@@ -105,7 +77,7 @@ class Simulation:
         """
         tick_start_time = 0
         while True:
-            if self._sim_state == SimState.RUNNING:
+            if self._running:
                 loop_sleep_boolean = self._is_visualized and not self._is_real_time and self._visualized_tick_duration != 0
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()  # temps de la boucle
@@ -129,14 +101,6 @@ class Simulation:
                 if loop_sleep_boolean:
                     sleep_time = self._visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
-            elif self._sim_state == SimState.KILLED:
-                self._controler.extract(self.get_simulated_time())
-                self.reset_simulation_parameters("resources/new_mini_network.json")
-                if self._is_endless:
-                    self._quit_endless_simulation()
-                else:
-                    yield self._env.process(self._env.exit())
-                return
 
     def reset_config(self):
         """
@@ -216,34 +180,6 @@ class Simulation:
 
         return result
 
-    def reset_simulation_parameters(self, json_network_path):
-        """
-        Reset the current simulation parameters. The SimState needs to be KILLED
-        """
-        if self._sim_state != SimState.KILLED:
-            return
-
-        simlog.warn("Resetting the simulation parameters")
-        with open(json_network_path) as json_data:
-            json_network = json.load(json_data)
-        self._controler = Routing(self.id, json_network)
-        self._current_tick = 0
-        self._sim_tick = 0.05
-        self._visualized_tick_duration = 0.05
-        self._start_hour = None
-        self._sim_tick_variations = []
-
-    def _quit_endless_simulation(self):
-        """
-        Stop an endless simulation by triggering the _endless_quit_event.
-        This function should only be used in SimLoop.loop(), and asserts
-        that the simulation is endless
-        """
-        def _trigger():
-            yield self._endless_quit_event.succeed()
-
-        self._env.process(_trigger())
-
     def _change_sim_tick(self, value=None):
         """
         Change the current sim_tick value. Bigger is the sim_tick value,
@@ -255,10 +191,6 @@ class Simulation:
         """
         if value is None:
             value = self._sim_tick
-
-        if type(self._env) is simpy.rt.RealtimeEnvironment:
-            simlog.warn("You can't change the sim_tick in a real-time environment")
-            return
 
         if value <= 0:
             simlog.warn("The sim_tick needs to be greater than zero")
@@ -317,35 +249,6 @@ class Simulation:
             if self._visualized_tick_duration == 0:
                 self._visualized_tick_duration = initial_sim_tick * pow(2, -8)
 
-    def change_state(self, sim_state=SimState.RUNNING):
-        """
-        :param sim_state: The desired simulation state
-        """
-        simlog.debug("Changing SimState to %s" % sim_state.name)
-        self._sim_state = sim_state
-
-    def stop_simulation(self):
-        """
-        Stop the simulation definitely. After call this method, The SimLoop.loop()
-        function will manage the case endless or not, and reset all simulation parameters
-        """
-        simlog.warn("Simulation KILLED")
-        self.change_state(SimState.KILLED)
-
-    def pause_simulation(self):
-        """
-        Pause the simulation. Call run_simulation_after_pause to restart the simulation
-        """
-        simlog.warn("Simulation PAUSED")
-        self.change_state(SimState.PAUSED)
-
-    def run_simulation_after_pause(self):
-        """
-        Re-run the simulation after a PAUSED state.
-        """
-        simlog.warn("Simulation re-RUNNING")
-        self.change_state(SimState.RUNNING)
-
     def get_tick_per_second(self):
         """
         :return: The simulation ticks per second
@@ -374,3 +277,20 @@ class Simulation:
 
     def ascend_travelers(self):
         yield self._env.process(self._controler.ascend_travelers(self._env, self.now_to_seconds(), self._probability, self._config, self.get_tick_per_second()))
+
+    def update(self):
+        if self._running:
+            seed(self._state)
+            until = floor(self._env.now) + 1
+            self._env.run(until=until)
+            self._state = random()
+
+    def serialize(self):
+        dict = self._controler._network.serialize()
+        state = self._state
+        running = self._running
+        dict.update({
+            "state": state,
+            "running": running
+        })
+        return dict

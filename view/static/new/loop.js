@@ -1,33 +1,64 @@
-import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
-import {defaultPodWidth} from "./pod.js";
+import {appState, networkLayer, getNetworkDivSize   } from "./network.js";
+import {Station} from "./station.js";
+import {Shed} from "./shed.js";
+import {Sensor} from "./sensor.js";
+import {Switch} from "./switch.js";
 
 const loopColor = 'rgb(156, 156, 156)';
 const loopSelectedColor = 'rgb(255, 200, 20)';
 
+function averagePoint(elements){
+    let x = 0;
+    let y = 0;
+    for (const elt of elements){
+        x += elt["x"];
+        y += elt["y"];
+    }
+    x /= elements.length;
+    y /= elements.length;
+    return [x, y];
+}
+
 export class Loop {
     constructor(loopJSON) {
         this.json = loopJSON;
-        this.id = loopJSON['id'];
-        const x = loopJSON['x'];
-        const y = getNetworkDivSize().height - loopJSON['y'];
+        const averagePointLoop = averagePoint(loopJSON["elements"]);
+        this.averageX = averagePointLoop[0];
+        this.averageY = getNetworkDivSize().height - averagePointLoop[1];
+        this.name = loopJSON["name"];
+
+        for (const elt of loopJSON["elements"]){
+            switch (elt["type"]){
+                case "station":
+                    new Station(elt);
+                    break;
+                case "shed":
+                    new Shed(elt);
+                    break;
+                case "sensor":
+                    new Sensor(elt);
+                    break;
+                case "switch_in":
+                case "switch_out":
+                    new Switch(elt);
+                    break;
+            }
+        }
 
         this.text = new Konva.Text({
-            name: this.uuid,
-            x: x,
-            y: y,
-            text: loopJSON['name'],
+            name: this.name,
+            x: this.averageX,
+            y: this.averageY,
+            text: loopJSON["name"],
             fontFamily: "Georgia, serif",
             fontSize: 20,
             fontVariant: "small-caps",
-            fill: 'black'
+            fill: "black"
         });
         this.text.offsetX(this.text.width() / 2);
         this.text.offsetY(this.text.height() / 2);
 
-        initBehaviors(this, this.innerCircle, this.outerCircle);
-
-        networkLayer.add(this.outerCircle);
-        networkLayer.add(this.innerCircle);
+        //initBehaviors(this, this.innerCircle, this.outerCircle);
         networkLayer.add(this.text);
 
         appState.objects.push(this);
@@ -39,7 +70,6 @@ export class Loop {
         }
 
         appState.selectedObject = this;
-        this.outerCircle.fill(loopSelectedColor);
         networkLayer.batchDraw();
     }
 
@@ -47,24 +77,15 @@ export class Loop {
         if (appState.selectedObject === this) {
             appState.selectedObject = undefined;
         }
-        this.outerCircle.fill(loopColor);
         networkLayer.batchDraw();
     }
 
     updatePosition() {
-        const y = getNetworkDivSize().height - this.json['y'];
-        this.innerCircle.y(y);
-        this.outerCircle.y(y);
+        const y = getNetworkDivSize().height - this.averageY;
         this.text.y(y);
     }
 
     updateScale(value) {
-        const semiWidth = ((defaultPodWidth + 3) * appState.objectScale) / 2;
-        const strokeWidth = semiWidth / 2.5;
-        this.innerCircle.radius(this.json['radius'] - semiWidth);
-        this.outerCircle.radius(this.json['radius'] + semiWidth);
-        this.innerCircle.strokeWidth(strokeWidth);
-        this.outerCircle.strokeWidth(strokeWidth);
         this.text.scaleX(value);
         this.text.scaleY(value);
     }

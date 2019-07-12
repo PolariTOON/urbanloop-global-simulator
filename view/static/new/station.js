@@ -1,20 +1,19 @@
-import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
 
-const stationColor = 'rgb(40, 40, 200)';
-const stationSelectedColor = 'rgb(255, 200, 20)';
+const stationColor = "rgb(40, 40, 200)";
+const stationSelectedColor = "rgb(255, 200, 20)";
 
 export class Station {
     constructor(stationJSON, stationRadius = 12, stationWidth = 4, dockSize = 24) {
         this.json = stationJSON;
-        this.uuid = stationJSON['uuid'];
-        this.id = stationJSON['id'];
-        this.capacity = stationJSON['capacity'];
+        this.capacity = stationJSON["capacity"];
         this.stationRadius = stationRadius;
         this.dockSize = dockSize;
+        this.name = stationJSON["name"];
 
-        this.x = stationJSON['x'];
+        this.x = stationJSON["x"];
         const x = this.x;
-        this.y = stationJSON['y'];
+        this.y = stationJSON["y"];
         const y = getNetworkDivSize().height - this.y;
         const semiWidth = Math.floor(stationWidth / 2);
 
@@ -23,8 +22,8 @@ export class Station {
             x: x,
             y: y,
             radius: stationRadius - semiWidth,
-            fill: 'white',
-            stroke: 'black',
+            fill: "white",
+            stroke: "black",
             strokeWidth: 0.3,
         });
 
@@ -34,20 +33,20 @@ export class Station {
             y: y,
             radius: stationRadius + semiWidth,
             fill: stationColor,
-            stroke: 'black',
+            stroke: "black",
             strokeWidth: 0.3,
         });
 
         this.dockList = [];
         for (let i = 0; i < this.capacity; i++) {
             let dockRect = new Konva.Rect({
-                name: this.uuid,
+                name: this.name,
                 x: x + 10 * stationRadius + (6 * i + 2) * dockSize,
                 y: y,
                 width: dockSize,
                 height: dockSize,
-                fill: 'white',
-                stroke: 'black',
+                fill: "white",
+                stroke: "black",
                 strokeWidth: 1,
             });
             dockRect.offsetX(dockRect.width() / 2);
@@ -65,12 +64,12 @@ export class Station {
 
         this.info.add(
             new Konva.Tag({
-                fill: 'black',
-                pointerDirection: 'down',
+                fill: "black",
+                pointerDirection: "down",
                 pointerWidth: 10,
                 pointerHeight: 10,
-                lineJoin: 'round',
-                shadowColor: 'black',
+                lineJoin: "round",
+                shadowColor: "black",
                 shadowBlur: 10,
                 shadowOffset: 10,
                 shadowOpacity: 0.2
@@ -79,11 +78,11 @@ export class Station {
 
         this.info.add(
             new Konva.Text({
-                text: 'Station : ' + stationJSON['name'] + ' | Capacity : ' + stationJSON['capacity'],
-                fontFamily: 'Calibri',
+                text: "Station : " + stationJSON["name"] + " | Capacity : " + stationJSON["pods"]["max"],
+                fontFamily: "Calibri",
                 fontSize: 18,
                 padding: 5,
-                fill: 'white'
+                fill: "white"
             })
         );
 
@@ -158,6 +157,6 @@ export class Station {
 }
 
 export function updateStationFromJSON(stationJSON) {
-    let targetStations = appState.objects.filter(station => station.uuid.includes(stationJSON['uuid']));
+    let targetStations = appState.objects.filter(station => station.uuid.includes(stationJSON["uuid"]));
     targetStations.forEach(station => station.update(stationJSON));
 }

@@ -10,7 +10,7 @@
         {"type": "station", "name": "Campus_ARTEM", "x": 527, "y": 555, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0}},
         {"type": "switch_out", "x": 486, "y": 551, "id_bridge": 1, "pods": {"previous": [], "next": [], "beside": []}},
         {"type": "switch_out", "x": 430, "y": 590, "id_bridge": 2, "pods": {"previous": [], "next": [], "beside": []}},
-        {"type": "sensor", "x": 420, "y": 580}
+        {"type": "sensor", "x": 430, "y": 570}
       ],
       "sections": [
         {"speed": 22.22, "path": {"type": "line"}},
@@ -31,9 +31,11 @@
         {"type": "station", "name": "Telecom Nancy", "x": 371, "y": 315, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0}},
         {"type": "station", "name": "Eglise", "x": 222, "y": 322, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0}},
         {"type": "shed", "name": "Jean-paul", "x": 189, "y": 400, "pods": {"max": 50, "count": 50}},
-        {"type": "switch_out", "x": 215, "y": 471, "id_bridge": 3, "pods": {"previous": [], "next": [], "beside": []}}
+        {"type": "switch_out", "x": 215, "y": 471, "id_bridge": 3, "pods": {"previous": [], "next": [], "beside": []}},
+        {"type": "sensor", "x": 200, "y": 405}
       ],
       "sections": [
+        {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}},

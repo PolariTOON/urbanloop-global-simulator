@@ -1,4 +1,4 @@
-import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
 
 const switchColor = 'rgb(200, 40, 40)';
 const switchSelectedColor = 'rgb(255, 200, 20)';
@@ -6,85 +6,40 @@ const switchSelectedColor = 'rgb(255, 200, 20)';
 export class Switch {
     constructor(switchJSON, switchRadius = 12, switchWidth = 4) {
         this.json = switchJSON;
-        this.uuid = switchJSON['uuid'];
-        this.id = switchJSON['id'];
+        this.name = switchJSON["name"];
 
-        const xIn = switchJSON['xIn'];
-        const yIn = getNetworkDivSize().height - switchJSON['yIn'];
-        const xOut = switchJSON['xOut'];
-        const yOut = getNetworkDivSize().height - switchJSON['yOut'];
+        const x = switchJSON['x'];
+        const y = getNetworkDivSize().height - switchJSON['y'];
         const semiWidth = Math.floor(switchWidth / 2);
 
-        this.innerInCircle = new Konva.Circle({
-            x: xIn,
-            y: yIn,
+        this.innerCircle = new Konva.Circle({
+            x: x,
+            y: y,
             radius: switchRadius - semiWidth,
             fill: 'white',
             stroke: 'black',
             strokeWidth: 0.3,
         });
 
-        this.outerInCircle = new Konva.Circle({
-            name: this.uuid,
-            x: xIn,
-            y: yIn,
+        this.outerCircle = new Konva.Circle({
+            name: this.name,
+            x: x,
+            y: y,
             radius: switchRadius + semiWidth,
             fill: switchColor,
             stroke: 'black',
             strokeWidth: 0.3,
         });
 
-        this.innerOutCircle = new Konva.Circle({
-            x: xOut,
-            y: yOut,
-            radius: switchRadius - semiWidth,
-            fill: 'white',
-            stroke: 'black',
-            strokeWidth: 0.3,
-        });
-
-        this.outerOutCircle = new Konva.Circle({
-            name: this.uuid,
-            x: xOut,
-            y: yOut,
-            radius: switchRadius + semiWidth,
-            fill: switchColor,
-            stroke: 'black',
-            strokeWidth: 0.3,
-        });
-
-        this.link = new Konva.Line({
-            points: [xIn, yIn, xOut, yOut],
-            stroke: 'black',
-            strokeWidth: 2,
-        });
-
-        this.arrow = new Konva.Arrow({
-            points: [xIn, yIn, (xIn + xOut) / 2, (yIn + yOut) / 2],
-            pointerLength: 10,
-            pointerWidth: 10,
-            fill: 'black',
-            stroke: 'black',
-            strokeWidth: 2
-        });
-
-        this.infoIn = new Konva.Label({
-            x: xIn,
-            y: yIn,
+        this.info = new Konva.Label({
+            x: x,
+            y: y,
             opacity: 0.75,
             visible: false,
             listening: false
         });
 
-        this.infoOut = new Konva.Label({
-            x: xOut,
-            y: yOut,
-            opacity: 0.75,
-            visible: false,
-            listening: false
-        });
-
-        this.infoIn.add(new Konva.Tag({
+        this.info.add(new Konva.Tag({
             fill: 'black',
             pointerDirection: 'down',
             pointerWidth: 10,
@@ -96,21 +51,9 @@ export class Switch {
             shadowOpacity: 0.2
         }));
 
-        this.infoOut.add(new Konva.Tag({
-            fill: 'black',
-            pointerDirection: 'down',
-            pointerWidth: 10,
-            pointerHeight: 10,
-            lineJoin: 'round',
-            shadowColor: 'black',
-            shadowBlur: 10,
-            shadowOffset: 10,
-            shadowOpacity: 0.2
-        }));
-
-        this.infoIn.add(
+        this.info.add(
             new Konva.Text({
-                text: switchJSON['nameIn'],
+                text: switchJSON['name'],
                 fontFamily: 'Calibri',
                 fontSize: 18,
                 padding: 5,
@@ -118,27 +61,11 @@ export class Switch {
             })
         );
 
-        this.infoOut.add(
-            new Konva.Text({
-                text: switchJSON['nameOut'],
-                fontFamily: 'Calibri',
-                fontSize: 18,
-                padding: 5,
-                fill: 'white'
-            })
-        );
+        initBehaviors(this, this.innerCircle, this.outerCircle, this.info);
 
-        initBehaviors(this, this.innerInCircle, this.outerInCircle, this.infoIn);
-        initBehaviors(this, this.innerOutCircle, this.outerOutCircle, this.infoOut);
-
-        networkLayer.add(this.arrow);
-        networkLayer.add(this.link);
-        networkLayer.add(this.outerInCircle);
-        networkLayer.add(this.innerInCircle);
-        networkLayer.add(this.outerOutCircle);
-        networkLayer.add(this.innerOutCircle);
-        infoLayer.add(this.infoIn);
-        infoLayer.add(this.infoOut);
+        networkLayer.add(this.outerCircle);
+        networkLayer.add(this.innerCircle);
+        infoLayer.add(this.info);
 
         appState.objects.push(this);
     }
@@ -149,10 +76,7 @@ export class Switch {
         }
 
         appState.selectedObject = this;
-        this.arrow.stroke(switchSelectedColor);
-        this.arrow.fill(switchSelectedColor);
-        this.outerInCircle.fill(switchSelectedColor);
-        this.outerOutCircle.fill(switchSelectedColor);
+        this.outerCircle.fill(switchSelectedColor);
         networkLayer.batchDraw();
     }
 
@@ -160,47 +84,25 @@ export class Switch {
         if (appState.selectedObject === this) {
             appState.selectedObject = undefined;
         }
-        this.arrow.stroke('black');
-        this.arrow.fill('black');
-        this.outerInCircle.fill(switchColor);
-        this.outerOutCircle.fill(switchColor);
+        this.outerCircle.fill(switchColor);
         networkLayer.batchDraw();
     }
 
     updatePosition() {
         const height = getNetworkDivSize().height;
-        const xIn = this.json['xIn'];
-        const yIn = height - this.json['yIn'];
-        const xOut = this.json['xOut'];
-        const yOut = height - this.json['yOut'];
-
-        this.innerInCircle.y(yIn);
-        this.outerInCircle.y(yIn);
-        this.innerOutCircle.y(yOut);
-        this.outerOutCircle.y(yOut);
-        this.infoIn.y(yIn);
-        this.infoOut.y(yOut);
-        this.link.points([xIn, yIn, xOut, yOut]);
-        this.arrow.points([xIn, yIn, (xIn + xOut) / 2, (yIn + yOut) / 2]);
+        const y = height - this.json['y'];
+        this.innerCircle.y(y);
+        this.outerCircle.y(y);
+        this.info.y(y);
     }
 
     updateScale(value) {
-        this.innerInCircle.scaleX(value);
-        this.innerInCircle.scaleY(value);
-        this.outerInCircle.scaleX(value);
-        this.outerInCircle.scaleY(value);
-        this.innerOutCircle.scaleX(value);
-        this.innerOutCircle.scaleY(value);
-        this.outerOutCircle.scaleX(value);
-        this.outerOutCircle.scaleY(value);
-        this.infoIn.scaleX(value);
-        this.infoIn.scaleY(value);
-        this.infoOut.scaleX(value);
-        this.infoOut.scaleY(value);
-        this.link.strokeWidth(2 * value);
-        this.arrow.strokeWidth(2 * value);
-        this.arrow.pointerWidth(10 * value);
-        this.arrow.pointerLength(10 * value);
+        this.innerCircle.scaleX(value);
+        this.innerCircle.scaleY(value);
+        this.outerCircle.scaleX(value);
+        this.outerCircle.scaleY(value);
+        this.info.scaleX(value);
+        this.info.scaleY(value);
     }
 }
 

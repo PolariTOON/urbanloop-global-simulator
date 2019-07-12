@@ -8,6 +8,7 @@ from .tracks.section import Section
 from .tracks.sensor import Sensor
 from .tracks.shed import Shed
 from .tracks.station import Station
+import math
 
 
 class Route(Way):
@@ -100,6 +101,54 @@ class Route(Way):
         for section in self._sections:
             weight += section.weight
         return weight
+
+    @property
+    def x_min(self):
+        return self.min_xy(True)
+
+    @property
+    def x_max(self):
+        return self.max_xy(True)
+
+    @property
+    def y_min(self):
+        return self.min_xy(False)
+
+    @property
+    def y_max(self):
+        return self.max_xy(False)
+
+    def min_xy(self, choice):
+        """
+        :param choice: si True alors on travaille avec x (abscisse) sinon on travaille en y (ordonnée)
+        :return: (float) la plus petite abscisse ou ordonnée selon le choix, parmi les éléments de la route
+        (utile pour récupérer les dimensions du réseau dans la vue)
+        """
+        mini = math.inf
+        for step in self._steps:
+            if choice:
+                temp = step.x
+            else:
+                temp = step.y
+            if temp < mini:
+                mini = temp
+        return mini
+
+    def max_xy(self, choice):
+        """
+        :param choice: si True alors on travaille avec x (abscisse) sinon on travaille en y (ordonnée)
+        :return: (float) la plus grande abscisse ou ordonnée selon le choix, parmi les éléments de la route
+        (utile pour récupérer les dimensions du réseau dans la vue)
+        """
+        maxi = 0
+        for step in self._steps:
+            if choice:
+                temp = step.x
+            else:
+                temp = step.y
+            if temp > maxi:
+                maxi = temp
+        return maxi
 
     def serialize(self):
         pods = [pod.serialize() for track in self._sections + self._steps for pod in track.pods]

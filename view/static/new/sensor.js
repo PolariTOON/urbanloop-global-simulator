@@ -1,38 +1,28 @@
-import {appState, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
 
-const sensorColor = 'rgb(188,13,255)';
+const sensorColor = 'rgb(255,24,231)';
 const sensorSelectedColor = 'rgb(255, 200, 20)';
 
 export class Sensor {
-    constructor(sensorJSON, sensorRadius = 12, sensorWidth = 4) {
+    constructor(sensorJSON, sensorRadius = 12) {
         this.json = sensorJSON;
-        this.uuid = sensorJSON['uuid'];
-        this.id = sensorJSON['id'];
-        this.x = sensorJSON['x'];
+        this.name = sensorJSON["name"];
+        this.x = sensorJSON["x"];
         const x = this.x;
-        this.y = sensorJSON['y'];
+        this.y = sensorJSON["y"];
         const y = getNetworkDivSize().height - this.y;
-        const semiWidth = Math.floor(sensorWidth / 2);
 
-        this.innerCircle = new Konva.Circle({
-            name: this.uuid,
+        this.star = new Konva.Star({
+            name: this.name,
             x: x,
             y: y,
-            radius: sensorRadius - semiWidth,
-            fill: 'white',
-            stroke: 'black',
-            strokeWidth: 0.3,
-        });
-
-        this.outerCircle = new Konva.Circle({
-            name: this.uuid,
-            x: x,
-            y: y,
-            radius: sensorRadius + semiWidth,
+            numPoints: 5,
+            innerRadius: sensorRadius / 2,
+            outerRadius: sensorRadius,
             fill: sensorColor,
             stroke: 'black',
-            strokeWidth: 0.3,
-        });
+            strokeWidth: 0.3
+      });
 
         this.info = new Konva.Label({
             x: x,
@@ -58,7 +48,7 @@ export class Sensor {
 
         this.info.add(
             new Konva.Text({
-                text: 'Sensor : ' + sensorJSON['name'],
+                text: "Sensor",
                 fontFamily: 'Calibri',
                 fontSize: 18,
                 padding: 5,
@@ -66,13 +56,13 @@ export class Sensor {
             })
         );
 
-        initBehaviors(this, this.innerCircle, this.outerCircle, this.info);
+        initBehaviors(this, this.star, undefined, this.info);
 
-        networkLayer.add(this.outerCircle);
-        networkLayer.add(this.innerCircle);
+        networkLayer.add(this.star);
         infoLayer.add(this.info);
 
         appState.objects.push(this);
+        console.log("xy:" + this.x + " " + this.y)
     }
 
     select() {
@@ -81,7 +71,7 @@ export class Sensor {
         }
 
         appState.selectedObject = this;
-        this.outerCircle.fill(sensorSelectedColor);
+        this.star.fill(sensorSelectedColor);
         networkLayer.batchDraw();
     }
 
@@ -89,22 +79,19 @@ export class Sensor {
         if (appState.selectedObject === this) {
             appState.selectedObject = undefined;
         }
-        this.outerCircle.fill(sensorColor);
+        this.star.fill(sensorColor);
         networkLayer.batchDraw();
     }
 
     updatePosition() {
         const y = getNetworkDivSize().height - this.y;
-        this.innerCircle.y(y);
-        this.outerCircle.y(y);
+        this.star.y(y);
         this.info.y(y);
     }
 
     updateScale(value) {
-        this.innerCircle.scaleX(value);
-        this.innerCircle.scaleY(value);
-        this.outerCircle.scaleX(value);
-        this.outerCircle.scaleY(value);
+        this.star.scaleX(value);
+        this.star.scaleY(value);
         this.info.scaleX(value);
         this.info.scaleY(value);
     }
@@ -116,6 +103,6 @@ export class Sensor {
 }
 
 export function updateSensorFromJSON(sensorJSON) {
-    let targetSensor = appState.objects.filter(sensor => sensor.uuid.includes(sensorJSON['uuid']));
+    let targetSensor = appState.objects.filter(sensor => sensor.name.includes(sensorJSON["name"]));
     targetSensor.forEach(sensor => sensor.update(sensorJSON));
 }

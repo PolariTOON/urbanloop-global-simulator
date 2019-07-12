@@ -31,7 +31,10 @@ class Station(Step):
         self._average_waiting_time = travelers["average_waiting_time"]
         self._pods = [Pod(self) for k in range(pods["count"])]
         self._capacity = pods["max"]
-        self._travelers = [self._average_waiting_time in range(travelers["count"])] or []  # cette liste représente une file des voyageurs en attente, elle est remplie par le temps d'attente de chacun
+        if travelers["count"]:
+            self._travelers = [self._average_waiting_time in range(travelers["count"])]  # cette liste représente une file des voyageurs en attente, elle est remplie par le temps d'attente de chacun
+        else:
+            self._travelers = []
         self._station_type = station_type
         self._element_of_loop = element_of_loop
 
@@ -44,7 +47,7 @@ class Station(Step):
                 "max": self._capacity
             },
             "travelers": {
-                "count": self._travelers,
+                "count": len(self._travelers),
                 "average_waiting_time": self._average_waiting_time
             },
             "station_type": self._station_type,

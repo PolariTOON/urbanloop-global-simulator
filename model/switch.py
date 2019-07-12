@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from model import identifier, controller, node
+from model import identifier
 from model import routing
 from model import switch as model_switch
 from model import controller

@@ -5,11 +5,11 @@ import {updateShedFromJSON} from "./shed.js";
 import {updateSwitchFromJSON} from "./switch.js";
 import {updateSensorFromJSON} from "./sensor.js";
 import {updateTimeFromJSON} from "./menu.js";
-import {updatePodFromJSON} from "./pod.js";
+import {updatePodFromJSON, Pod} from "./pod.js";
 import {updateDataPanel} from "./data-panel.js";
 import {updateViewPanel} from "./view-panel.js";
 
-const zoomIntensity = 0.9;
+const zoomIntensity = 0.8;
 const minScale = 0.01;
 
 let moveIntensity = 1;
@@ -57,8 +57,8 @@ function getBarycenter() {
     appState.objects.forEach(object => {
         if (object instanceof Loop) {
             loopNumber += 1;
-            sumX += object.json['x'];
-            sumY += getNetworkDivSize().height - object.json['y'];
+            sumX += object.averageX;
+            sumY += getNetworkDivSize().height - object.averageY;
         }
     });
 
@@ -82,9 +82,11 @@ export async function initNetworkScene(network_index) {
     })).json();*/
 
     const networkJSON = await (await fetch('/networks/'+ network_index +'/', {method: "GET"})).json();
-
-    for (const loop of networkJSON["loop"]){
-        //TODO
+    const viewBox = networkJSON["view_box"];
+    networkSize = Math.max(viewBox["width"], viewBox["height"])*1.05;
+    console.log(networkSize);
+    for (const loop of networkJSON["loops"]){
+        new Loop(loop);
     }
 
     calibrateNetworkScene();
@@ -156,7 +158,7 @@ export function fitStageIntoParentContainer() {
     calibrateNetworkScene();
 
     appState.objects.forEach(object => {
-        if (!(object instanceof Capsule)) {
+        if (!(object instanceof Pod)) {
             object.updatePosition();
         }
     });
@@ -164,14 +166,32 @@ export function fitStageIntoParentContainer() {
     stage.batchDraw();
 }
 
-export function initBehaviors(object, innerShape, outerShape, info = undefined) {
+export function initBehaviors(object, innerShape, outerShape = undefined, info = undefined) {
     const hasInfo = info !== undefined;
 
-    innerShape.on('mousedown', () => {
+    if (outerShape){
+        outerShape.on('mousedown', () => {
         object.select();
-    });
+        });
 
-    outerShape.on('mousedown', () => {
+        outerShape.on('mouseover', () => {
+        handCursor();
+        if (hasInfo) {
+            info.show();
+            infoLayer.batchDraw();
+        }
+        });
+
+        outerShape.on('mouseout', () => {
+        moveCursor();
+        if (hasInfo) {
+            info.hide();
+            infoLayer.batchDraw();
+        }
+        });
+    }
+
+    innerShape.on('mousedown', () => {
         object.select();
     });
 
@@ -183,23 +203,7 @@ export function initBehaviors(object, innerShape, outerShape, info = undefined) 
         }
     });
 
-    outerShape.on('mouseover', () => {
-        handCursor();
-        if (hasInfo) {
-            info.show();
-            infoLayer.batchDraw();
-        }
-    });
-
     innerShape.on('mouseout', () => {
-        moveCursor();
-        if (hasInfo) {
-            info.hide();
-            infoLayer.batchDraw();
-        }
-    });
-
-    outerShape.on('mouseout', () => {
         moveCursor();
         if (hasInfo) {
             info.hide();

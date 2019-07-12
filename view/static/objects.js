@@ -1148,6 +1148,7 @@ function updateCapsuleFromJSON(capsuleJSON) {
 export function calibrateNetworkScene() {
     calibrateStageScale();
     appState.objectScale = Math.min(networkSize / getNetworkDivSize().height, scaleSlider.max);
+    console.log("appstate object scale: " + appState.objectScale);
     scaleSlider.value = appState.objectScale;
     scaleSlider.title = "Objects scale : " + scaleSlider.value;
     calibrateStagePosition();
@@ -1187,6 +1188,7 @@ function calibrateStagePosition() {
 
 function calibrateStageScale() {
     const stageScale = Math.min(getNetworkDivSize().width, getNetworkDivSize().height) / networkSize;
+    console.log("stage scale: " + stageScale);
     stage.scale({x: stageScale, y: stageScale});
 }
 

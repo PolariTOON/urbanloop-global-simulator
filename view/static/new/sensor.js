@@ -4,18 +4,16 @@ const sensorColor = 'rgb(255,24,231)';
 const sensorSelectedColor = 'rgb(255, 200, 20)';
 
 export class Sensor {
-    constructor(sensorJSON, sensorRadius = 12) {
+    constructor(sensorJSON, sensorRadius = 15) {
         this.json = sensorJSON;
         this.name = sensorJSON["name"];
         this.x = sensorJSON["x"];
-        const x = this.x;
-        this.y = sensorJSON["y"];
-        const y = getNetworkDivSize().height - this.y;
+        this.y = getNetworkDivSize().height - sensorJSON["y"];
 
         this.star = new Konva.Star({
             name: this.name,
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             numPoints: 5,
             innerRadius: sensorRadius / 2,
             outerRadius: sensorRadius,
@@ -25,8 +23,8 @@ export class Sensor {
       });
 
         this.info = new Konva.Label({
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             opacity: 0.75,
             visible: false,
             listening: false
@@ -48,7 +46,7 @@ export class Sensor {
 
         this.info.add(
             new Konva.Text({
-                text: "Sensor",
+                text: this.name,
                 fontFamily: 'Calibri',
                 fontSize: 18,
                 padding: 5,
@@ -62,7 +60,6 @@ export class Sensor {
         infoLayer.add(this.info);
 
         appState.objects.push(this);
-        console.log("xy:" + this.x + " " + this.y)
     }
 
     select() {

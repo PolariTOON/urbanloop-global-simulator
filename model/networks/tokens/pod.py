@@ -55,9 +55,14 @@ class Pod(Token):
     def track(self, value):
         self._track = value
 
+    @property
+    def name(self):
+        return "pod n° %s" % self.id
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
+            "name": self.name,
             "position": self._position,
             "travelers": {
                 "count": len(self._travelers),

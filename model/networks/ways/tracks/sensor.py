@@ -13,10 +13,15 @@ class Sensor(Step):
     def serialize(self):
         dict = super().serialize()
         dict.update({
-            "type": "sensor"
+            "type": "sensor",
+            "name": self.name
         })
         return dict
 
     @property
     def pods(self):
         return []
+
+    @property
+    def name(self):
+        return "sensor"

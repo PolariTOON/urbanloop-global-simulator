@@ -50,7 +50,7 @@ class Station(Step):
                 "count": len(self._travelers),
                 "average_waiting_time": self._average_waiting_time
             },
-            "station_type": self._station_type,
+            "station_type": self._station_type
         })
         return dict
 

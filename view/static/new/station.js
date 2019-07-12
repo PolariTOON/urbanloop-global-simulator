@@ -10,17 +10,15 @@ export class Station {
         this.stationRadius = stationRadius;
         this.dockSize = dockSize;
         this.name = stationJSON["name"];
-
         this.x = stationJSON["x"];
-        const x = this.x;
-        this.y = stationJSON["y"];
-        const y = getNetworkDivSize().height - this.y;
+        this.y = getNetworkDivSize().height - stationJSON["y"];
+
         const semiWidth = Math.floor(stationWidth / 2);
 
         this.innerCircle = new Konva.Circle({
             name: this.uuid,
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             radius: stationRadius - semiWidth,
             fill: "white",
             stroke: "black",
@@ -29,8 +27,8 @@ export class Station {
 
         this.outerCircle = new Konva.Circle({
             name: this.uuid,
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             radius: stationRadius + semiWidth,
             fill: stationColor,
             stroke: "black",
@@ -41,8 +39,8 @@ export class Station {
         for (let i = 0; i < this.capacity; i++) {
             let dockRect = new Konva.Rect({
                 name: this.name,
-                x: x + 10 * stationRadius + (6 * i + 2) * dockSize,
-                y: y,
+                x: this.x + 10 * stationRadius + (6 * i + 2) * dockSize,
+                y: this.y,
                 width: dockSize,
                 height: dockSize,
                 fill: "white",
@@ -55,8 +53,8 @@ export class Station {
         }
 
         this.info = new Konva.Label({
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             opacity: 0.75,
             visible: false,
             listening: false

@@ -8,15 +8,14 @@ export class Shed {
         this.json = shedJSON;
         this.name = shedJSON["name"];
 
-        const x = shedJSON['x'];
-        this.y = shedJSON['y'];
-        const y = getNetworkDivSize().height - this.y;
+        this.x = shedJSON['x'];
+        this.y = getNetworkDivSize().height - shedJSON['y'];
         const semiWidth = Math.floor(shedWidth / 2);
 
         this.innerRectangle = new Konva.Rect({
             name: this.name,
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             width: 2 * (shedRadius - semiWidth),
             height: 2 * (shedRadius - semiWidth),
             fill: 'white',
@@ -28,8 +27,8 @@ export class Shed {
 
         this.outerRectangle = new Konva.Rect({
             name: this.name,
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             width: 2 * (shedRadius + semiWidth),
             height: 2 * (shedRadius + semiWidth),
             fill: shedColor,
@@ -40,8 +39,8 @@ export class Shed {
         this.outerRectangle.offsetY(this.outerRectangle.height() / 2);
 
         this.info = new Konva.Label({
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             opacity: 0.75,
             visible: false,
             listening: false

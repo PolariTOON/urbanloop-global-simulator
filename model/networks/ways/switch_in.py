@@ -25,9 +25,14 @@ class SwitchIn(Switch):
     def switch_out(self, value):
         self._switch_out = value
 
+    @property
+    def name(self):
+        return "switchIn"
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
+            "name": self.name,
             "type": "switch_in"
         })
         return dict

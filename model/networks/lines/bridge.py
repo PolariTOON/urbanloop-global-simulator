@@ -7,7 +7,7 @@ from .line import Line
 
 
 class Bridge(Line):
-    def __init__(self, id, routes=None, switches=None, **kwargs):
+    def __init__(self, id, routes=None, switches=None, switch_out=None, switch_in=None, **kwargs):
         """
         Instancie un pont
         :param id: id du pont
@@ -18,6 +18,8 @@ class Bridge(Line):
         super().__init__(id, **kwargs)
         self._routes = routes or []
         self._switches = switches or []
+        self._switch_out = switch_out or None
+        self._switch_in = switch_in or None
 
     def serialize(self):
         section = self._routes[0].sections[0]
@@ -33,10 +35,17 @@ class Bridge(Line):
         section = section.serialize()
         dict = super().serialize()
         dict.update({
+            "name": self.name,
             "section": section,
-            "pods": pods
+            "pods": pods,
+            "switch_in": self._switch_in,
+            "switch_out": self._switch_out
         })
         return dict
+
+    @property
+    def name(self):
+        return "Bridge"
 
     @property
     def pods(self):

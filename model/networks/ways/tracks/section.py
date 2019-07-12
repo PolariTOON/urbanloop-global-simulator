@@ -27,6 +27,10 @@ class Section(Track):
         return self._speed
 
     @property
+    def name(self):
+        return "section: %s -> %s" % (self._previous.name, self._next.name)
+
+    @property
     def length(self):
         return self._length
 
@@ -67,6 +71,7 @@ class Section(Track):
     def serialize(self):
         dict = super().serialize()
         dict.update({
+            "name": self.name,
             "speed": self._speed,
             "path": {
                 "type": self._path_type

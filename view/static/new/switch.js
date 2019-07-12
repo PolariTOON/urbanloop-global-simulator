@@ -8,13 +8,13 @@ export class Switch {
         this.json = switchJSON;
         this.name = switchJSON["name"];
 
-        const x = switchJSON['x'];
-        const y = getNetworkDivSize().height - switchJSON['y'];
+        this.x = switchJSON['x'];
+        this.y = getNetworkDivSize().height - switchJSON['y'];
         const semiWidth = Math.floor(switchWidth / 2);
 
         this.innerCircle = new Konva.Circle({
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             radius: switchRadius - semiWidth,
             fill: 'white',
             stroke: 'black',
@@ -23,8 +23,8 @@ export class Switch {
 
         this.outerCircle = new Konva.Circle({
             name: this.name,
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             radius: switchRadius + semiWidth,
             fill: switchColor,
             stroke: 'black',
@@ -32,8 +32,8 @@ export class Switch {
         });
 
         this.info = new Konva.Label({
-            x: x,
-            y: y,
+            x: this.x,
+            y: this.y,
             opacity: 0.75,
             visible: false,
             listening: false

@@ -8,6 +8,7 @@ import {updateTimeFromJSON} from "./menu.js";
 import {updatePodFromJSON, Pod} from "./pod.js";
 import {updateDataPanel} from "./data-panel.js";
 import {updateViewPanel} from "./view-panel.js";
+import {Bridge} from "./bridge.js";
 
 const zoomIntensity = 0.8;
 const minScale = 0.01;
@@ -81,12 +82,21 @@ export async function initNetworkScene(network_index) {
         method: "GET"
     })).json();*/
 
+    // On ajoute les boucles
+    let loops = [];
     const networkJSON = await (await fetch('/networks/'+ network_index +'/', {method: "GET"})).json();
     const viewBox = networkJSON["view_box"];
     networkSize = Math.max(viewBox["width"], viewBox["height"])*1.05;
-    console.log(networkSize);
     for (const loop of networkJSON["loops"]){
-        new Loop(loop);
+        const l = new Loop(loop);
+        loops.push(l);
+    }
+
+    // On ajoute les ponts
+    for (const bridge of networkJSON["bridges"]){
+        const switchIn = loops[bridge["switch_in"]["loop"]].elements[bridge["switch_in"]["element"]];
+        const switchOut = loops[bridge["switch_out"]["loop"]].elements[bridge["switch_out"]["element"]];
+        new Bridge(bridge, switchIn, switchOut);
     }
 
     calibrateNetworkScene();
@@ -212,7 +222,7 @@ export function initBehaviors(object, innerShape, outerShape = undefined, info =
     });
 }
 
-function handCursor() {
+export function handCursor() {
     document.body.style.cursor = 'pointer';
 }
 

@@ -15,7 +15,3 @@ class Line:
         return {
             "name": self._name
         }
-
-    @property
-    def pods(self):
-        raise NotImplementedError

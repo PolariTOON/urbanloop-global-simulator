@@ -1,15 +1,20 @@
-import uuid
+from uuid import uuid4
+from ...entity import Entity
 
 
-class Token:
-    def __init__(self, source=None, destination=None, **kwargs):
+class Token(Entity):
+    def __init__(self, env, source=None, destination=None, **kwargs):
+        super().__init__(env, uuid4().hex, **kwargs)
         self._source = source or None
         self._destination = destination or None
-        self._id = uuid.uuid4().hex
 
     @property
     def source(self):
         return self._source
+
+    @source.setter
+    def source(self, value):
+        self._source = value
 
     @property
     def destination(self):
@@ -19,16 +24,10 @@ class Token:
     def destination(self, value):
         self._destination = value
 
-    @source.setter
-    def source(self, value):
-        self._source = value
-
-    @property
-    def id(self):
-        return self._id
-
     def serialize(self):
-        return {
+        dict = super().serialize()
+        dict.update({
             "source": self.source.to_element_of_loop(),
             "destination": self.destination.to_element_of_loop()
-        }
+        })
+        return dict

@@ -5,8 +5,8 @@ from .switch import Switch
 
 
 class SwitchIn(Switch):
-    def __init__(self, id, **kwargs):
-        super().__init__(id, **kwargs)
+    def __init__(self, env, id, **kwargs):
+        super().__init__(env, id, **kwargs)
         self._switch_out = None
 
         # Liaison de la route et des sections du pont

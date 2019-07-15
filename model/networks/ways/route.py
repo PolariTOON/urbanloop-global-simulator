@@ -8,12 +8,12 @@ from .tracks.section import Section
 from .tracks.sensor import Sensor
 from .tracks.shed import Shed
 from .tracks.station import Station
-import math
+from math import inf
 
 
 class Route(Way):
-    def __init__(self, id, steps=None, sections=None, **kwargs):
-        super().__init__(id, **kwargs)
+    def __init__(self, env, id, steps=None, sections=None, **kwargs):
+        super().__init__(env, id, **kwargs)
         self._steps = steps or []  # [shed, capteur, station, ...]
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)
         self._previous = None
@@ -23,18 +23,18 @@ class Route(Way):
         #  Etape 42 : On instancie les pistes mais pas les liaisons de la premiere et de la dernière section
         for section_index in range(len(self._sections)):
             section = self._sections[section_index]
-            section = Section(section_index, **section)
+            section = Section(env, section_index, **section)
             self._sections[section_index] = section
         for step_index in range(len(self._steps)):
             step = self._steps[step_index]
             step["previous"] = self._sections[step_index]
             step["next"] = self._sections[step_index + 1]
             if step["type"] == "sensor":
-                step = Sensor(step_index, **step)
+                step = Sensor(env, step_index, **step)
             elif step["type"] == "shed":
-                step = Shed(step_index, **step)
+                step = Shed(env, step_index, **step)
             elif step["type"] == "station":
-                step = Station(step_index, **step)
+                step = Station(env, step_index, **step)
             else:
                 raise TypeError("invalid element type")
             self._steps[step_index] = step
@@ -126,7 +126,7 @@ class Route(Way):
         :return: (float) la plus petite abscisse ou ordonnée selon le choix, parmi les éléments de la route
         (utile pour récupérer les dimensions du réseau dans la vue)
         """
-        mini = math.inf
+        mini = inf
         for step in self._steps:
             if choice:
                 temp = step.x

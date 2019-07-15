@@ -8,8 +8,8 @@ from .track import Track
 
 
 class Section(Track):
-    def __init__(self, id, speed=None, path=None, **kwargs):
-        super().__init__(id, **kwargs)
+    def __init__(self, env, id, speed=None, path=None, **kwargs):
+        super().__init__(env, id, **kwargs)
         speed = speed or 0
         path = path or {
             "type": "line"
@@ -80,12 +80,13 @@ class Section(Track):
         return dict
 
     def insert_pod(self, **pod):
+        env = self._env
         pods = self._pods
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
-                self._pods.insert(k, Pod(self, **pod))
+                self._pods.insert(k, Pod(env, self, **pod))
                 return
-        self._pods.append(Pod(self, **pod))
+        self._pods.append(Pod(env, self, **pod))
 
     def get_coordinates_of_position(self, position):
         previous = self._previous

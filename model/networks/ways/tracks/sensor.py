@@ -7,8 +7,8 @@ from .step import Step
 
 
 class Sensor(Step):
-    def __init__(self, id, **kwargs):
-        super().__init__(id, **kwargs)
+    def __init__(self, env, id, **kwargs):
+        super().__init__(env, id, **kwargs)
 
     def serialize(self):
         dict = super().serialize()

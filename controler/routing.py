@@ -10,8 +10,8 @@ class Routing:
     """
     Modélise le controleur global d'un réseau, en se rapprochant du paradigme SDN
     """
-    def __init__(self, id, **kwargs):
-        self._network = Network(id, **kwargs)  # Création du réseau à partir d'un fichier JSON
+    def __init__(self, env, id, **kwargs):
+        self._network = Network(env, id, **kwargs)  # Création du réseau à partir d'un fichier JSON
         self._rules = []
         self._recorder = StatsRecorder(0)  # TODO : Gérer les stats
         self._timers = [-1] * len(self._network.pods)  # TODO : Gérer les timers des capsules (temps de trajets)
@@ -247,7 +247,7 @@ class Routing:
         if prio == 10:
             test = False
             for pod in self._network.pods:
-                if len(pod.travelers) == 0 and pod.priority <= 6 and not pod.travelers:
+                if len(pod.travelers) == 0 and pod.priority <= 6 and not pod.travelers:  # TODO: mémoriser les capsules vides
                     test = True
                     print("source:", type(pod.track), "||| destination:", destination.name)
                     trajet = shorter_way_tracks(pod.track, destination)

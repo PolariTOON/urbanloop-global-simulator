@@ -6,8 +6,8 @@ from .way import Way
 
 
 class Switch(Way):
-    def __init__(self, id, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
-        super().__init__(id, **kwargs)
+    def __init__(self, env, id, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
+        super().__init__(env, id, **kwargs)
         self._x = x or 0
         self._y = y or 0
         self._previous = previous
@@ -24,11 +24,11 @@ class Switch(Way):
             pods_key = pods[key]
             for pod in pods_key:
                 if key == "loop_in":
-                    self._pods_previous.append(Pod(self, **pod))
+                    self._pods_previous.append(Pod(env, self, **pod))
                 elif key == "loop_out":
-                    self._pods_next.append(Pod(self, **pod))
+                    self._pods_next.append(Pod(env, self, **pod))
                 else:
-                    self._pods_beside.append(Pod(self, **pod))
+                    self._pods_beside.append(Pod(env, self, **pod))
 
         # Liaison des routes et sections de la boucle à l'aiguillage
         # Route précédente

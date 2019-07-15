@@ -3,7 +3,7 @@ Réunis des routes pour former les boucles du réseau
 """
 
 from .line import Line
-import math
+from math import inf
 
 
 class Loop(Line):
@@ -26,10 +26,6 @@ class Loop(Line):
     @property
     def switches(self):
         return self._switches
-
-    @property
-    def pods(self):
-        return [pod for route in self._routes for pod in route.pods]
 
     @property
     def x_min(self):
@@ -60,7 +56,7 @@ class Loop(Line):
         :return: (float) la plus petite abscisse ou ordonnée selon le choix, parmi les éléments de la boucle
         (utile pour récupérer les dimensions du réseau dans la vue)
         """
-        mini = math.inf
+        mini = inf
         for index in range(len(self._routes)):
             if choice:
                 temp = self._routes[index].x_min

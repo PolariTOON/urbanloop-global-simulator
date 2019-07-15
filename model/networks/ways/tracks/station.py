@@ -12,8 +12,8 @@ station_types = {
 
 
 class Station(Step):
-    def __init__(self, id, pods=None, travelers=None, station_type=None, element_of_loop=None, **kwargs):
-        super().__init__(id, **kwargs)
+    def __init__(self, env, id, pods=None, travelers=None, station_type=None, element_of_loop=None, **kwargs):
+        super().__init__(env, id, **kwargs)
         pods = pods or {
             "count": 0,
             "max": 0
@@ -29,7 +29,7 @@ class Station(Step):
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = travelers["average_waiting_time"]
-        self._pods = [Pod(self) for k in range(pods["count"])]
+        self._pods = [Pod(env, self) for k in range(pods["count"])]
         self._capacity = pods["max"]
         if travelers["count"]:
             self._travelers = [self._average_waiting_time in range(travelers["count"])]  # cette liste représente une file des voyageurs en attente, elle est remplie par le temps d'attente de chacun

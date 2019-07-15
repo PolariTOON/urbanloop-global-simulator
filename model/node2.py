@@ -1,6 +1,9 @@
-class Node:
-    def __init__(self, id, name=None, **kwargs):
-        self._id = id
+from .entity import Entity
+
+
+class Node(Entity):
+    def __init__(self, env, id, name=None, **kwargs):
+        super().__init__(env, id, **kwargs)
         self._name = name or ""
 
     @property
@@ -16,6 +19,8 @@ class Node:
         raise NotImplementedError()
 
     def serialize(self):
-        return {
+        dict = super().serialize()
+        dict.update({
             "name": self._name
-        }
+        })
+        return dict

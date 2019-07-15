@@ -42,11 +42,3 @@ class Bridge(Line):
             "switch_out": self._switch_out
         })
         return dict
-
-    @property
-    def name(self):
-        return "Bridge"
-
-    @property
-    def pods(self):
-        return [pod for route in self._routes for pod in route.pods]

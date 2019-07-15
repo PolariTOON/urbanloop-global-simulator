@@ -22,12 +22,12 @@ class Simulation:
         self._config = configparser.ConfigParser()
         self._config.read('resources/config.ini')
         self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
-        # Etape 2 : chargement du modèle
-        self._controler = Routing(id, **kwargs)
-        # Etape 3 : Initialisation de simPy
+        # Etape 2 : Initialisation de simPy
         self._env = Environment()
         self._state = state
         self._running = running
+        # Etape 3 : chargement du modèle
+        self._controler = Routing(self._env, id, **kwargs)
         self._sim_tick = 0.05  # Duration of a tick
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
@@ -38,10 +38,6 @@ class Simulation:
         self._tab_depart = []
         self._tab_temps = []
         self._ascent_generator = None  # ascent_generator.AscentGenerator() # TODO : monter des voyageurs
-        if self._config['SIM']['real_time'] in ['true', 'True']:
-            self._is_real_time = True
-        if self._config['SIM']['endless'] in ['true', 'True']:
-            self._is_endless = True
         if self._config['CAPSULE']['station_refill'] in ['false', 'False']:
             self._station_refill = False  # TODO : doit disparaître
         self._tick_event = self._env.event()

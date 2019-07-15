@@ -6,8 +6,8 @@ from .track import Track
 
 
 class Step(Track):
-    def __init__(self, id, x=None, y=None, previous=None, next=None, **kwargs):
-        super().__init__(id, **kwargs)
+    def __init__(self, env, id, x=None, y=None, previous=None, next=None, **kwargs):
+        super().__init__(env, id, **kwargs)
         self._x = x or 0
         self._y = y or 0
         self._previous = previous or None

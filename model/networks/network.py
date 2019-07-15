@@ -2,8 +2,8 @@
 Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
-import random
-import math
+from math import inf
+from random import choice, uniform
 
 from .ways.tracks.station import station_types
 from ..node2 import Node
@@ -15,23 +15,20 @@ from .ways.switch_out import SwitchOut
 
 
 class Network(Node):
-    def __init__(self, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, **kwargs):
-        super().__init__(id, **kwargs)
+    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, **kwargs):
+        super().__init__(env, id, **kwargs)
         self._bridges = bridges or []
         self._loops = loops or []
         self._switches = switches or []
         self._routes = routes or []
         self._view_box = view_box or {}
-        self._init_graph_from_json()
+        self._init_graph_from_json(env)
 
     @property
     def pods(self):
         pods = []
         for route in self._routes:
             for pod in route.pods:
-                pods.append(pod)
-        for bridge in self._bridges:
-            for pod in bridge.pods:
                 pods.append(pod)
         return pods
 
@@ -67,9 +64,9 @@ class Network(Node):
     def view_box(self):
         if self._view_box:
             return self._view_box
-        min_x = math.inf
+        min_x = inf
         max_x = 0
-        min_y = math.inf
+        min_y = inf
         max_y = 0
         for loop in self._loops:
             if loop.x_min < min_x:
@@ -86,7 +83,7 @@ class Network(Node):
 
     def get_random_free_shed(self):
         free_sheds = [shed for route in self._routes for shed in route.sheds if len(shed.pods) < shed.capacity]
-        return random.choice(free_sheds)
+        return choice(free_sheds)
 
     def get_random_station_from_type(self, station_type, departure_station=None):
         """
@@ -97,7 +94,7 @@ class Network(Node):
         """
         stations = [station for route in self._routes for station in route.stations if
                     station.type == station_type and (departure_station is None or station != departure_station)]
-        return random.choice(stations)
+        return choice(stations)
 
     def serialize(self):
         bridges = [bridge.serialize() for bridge in self._bridges]
@@ -110,7 +107,7 @@ class Network(Node):
         })
         return dict
 
-    def _init_graph_from_json(self):
+    def _init_graph_from_json(self, env):
         """
         Création du model à partir du dictionnaire obtenu à partir du fichier json
         :return: (void) Le réseau est construit
@@ -165,8 +162,7 @@ class Network(Node):
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
-                new_route = Route(len(self._routes), **routes[
-                    route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
+                new_route = Route(env, len(self._routes), **routes[route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
                 routes[route - 1] = new_route
@@ -175,7 +171,7 @@ class Network(Node):
         for p in range(len(self._bridges)):
             steps = []
             sections = [self._bridges[p]["section"]]
-            new_route = Route(l + p, **{
+            new_route = Route(env, l + p, **{
                 "steps": steps,
                 "sections": sections
             })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
@@ -200,9 +196,9 @@ class Network(Node):
                 switch["next"] = self._routes[id_switch]  # loop_out
                 switch["beside"] = self._routes[l + switch["id_bridge"]]  # route_bridge
                 if switch["type"] == "switch_in":
-                    new_switch = SwitchIn(id_switch, **switch)
+                    new_switch = SwitchIn(env, id_switch, **switch)
                 else:
-                    new_switch = SwitchOut(id_switch, **switch)
+                    new_switch = SwitchOut(env, id_switch, **switch)
                 self._switches.append(new_switch)
                 self._loops[b]["switches"][s] = new_switch
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
@@ -266,7 +262,7 @@ class Network(Node):
                                                            is_arrival=is_arrival) + city_prob
         activity_prob = probability.station_probability(station_types["activity"], second,
                                                         is_arrival=is_arrival) + residential_prob
-        prob = random.uniform(0, 1)
+        prob = uniform(0, 1)
 
         if prob < city_prob:
             return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
@@ -276,9 +272,6 @@ class Network(Node):
             return self.get_random_station_from_type(station_types["activity"], departure_station=departure_station)
         else:
             return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
-
-    def update(self):
-        pass
 
 
 def _init_pod_of_line(line, pod):

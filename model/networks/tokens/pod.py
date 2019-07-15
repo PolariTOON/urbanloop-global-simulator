@@ -4,8 +4,8 @@ from .traveler import Traveler
 
 
 class Pod(Token):
-    def __init__(self, track, position=None, travelers=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, env, track, position=None, travelers=None, **kwargs):
+        super().__init__(env, **kwargs)
         self._position = position
         travelers = travelers or {
             "count": 0,
@@ -15,7 +15,7 @@ class Pod(Token):
         travelers["max"] = travelers["max"] or 0
         source = self.source
         destination = self.destination
-        self._travelers = [Traveler(0, {
+        self._travelers = [Traveler(env, 0, {
             "source": source,
             "destination": destination
         }) for k in range(travelers["count"])]

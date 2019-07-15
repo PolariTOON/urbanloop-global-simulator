@@ -96,7 +96,7 @@ export class Loop {
     }
 
     updatePosition() {
-        const y = getNetworkDivSize().height - this.averageY;
+        const y = this.averageY;
         this.text.y(y);
     }
 
@@ -105,4 +105,3 @@ export class Loop {
         this.text.scaleY(value);
     }
 }
-

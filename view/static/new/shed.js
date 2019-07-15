@@ -98,7 +98,7 @@ export class Shed {
     }
 
     updatePosition() {
-        const y = getNetworkDivSize().height - this.y;
+        const y = getNetworkDivSize().height - this.json["y"];
         this.innerRectangle.y(y);
         this.outerRectangle.y(y);
         this.info.y(y);

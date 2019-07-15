@@ -126,7 +126,7 @@ export class Station {
     }
 
     updatePosition() {
-        const y = getNetworkDivSize().height - this.y;
+        const y = getNetworkDivSize().height - this.json["y"];
         this.innerCircle.y(y);
         this.outerCircle.y(y);
         this.info.y(y);

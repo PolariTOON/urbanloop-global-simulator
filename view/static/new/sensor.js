@@ -81,7 +81,7 @@ export class Sensor {
     }
 
     updatePosition() {
-        const y = getNetworkDivSize().height - this.y;
+        const y = getNetworkDivSize().height - this.json["y"];
         this.star.y(y);
         this.info.y(y);
     }

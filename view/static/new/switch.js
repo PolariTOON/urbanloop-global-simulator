@@ -89,8 +89,7 @@ export class Switch {
     }
 
     updatePosition() {
-        const height = getNetworkDivSize().height;
-        const y = height - this.json['y'];
+        const y = getNetworkDivSize().height - this.json["y"];
         this.innerCircle.y(y);
         this.outerCircle.y(y);
         this.info.y(y);

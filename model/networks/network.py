@@ -233,8 +233,12 @@ class Network(Node):
         if loop < 0 or loop > len(self._loops):
             raise ValueError("Loop's index out of range")
         loop = self._loops[loop]
-        routes = loop["routes"]
-        switches = loop["switches"]
+        if isinstance(loop, Loop):
+            routes = loop.routes
+            switches = loop.switches
+        else:
+            routes = loop["routes"]
+            switches = loop["switches"]
         if element < 0:
             raise ValueError("Element's index out of range")
         elt = 0

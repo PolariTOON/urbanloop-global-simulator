@@ -88,6 +88,8 @@ class Route(Way):
 
     @property
     def weight(self):
+        """Poids actuel de la route (qui dépend de la congestion), à ne pas confondre avec expected_weight
+        à l'initialisation on a weight = expected_weight puis cela évolue avec le traffic"""
         return self._weight
 
     @weight.setter
@@ -151,9 +153,9 @@ class Route(Way):
         return maxi
 
     def serialize(self):
-        pods = [pod.serialize() for track in self._sections + self._steps for pod in track.pods]
+        pods = [pod.serialize() for section in self._sections for pod in section.pods]
         dict = super().serialize()
         dict.update({
-            "pod": pods
+            "pods": pods
         })
         return dict

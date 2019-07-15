@@ -47,6 +47,13 @@ class Loop(Line):
     def y_max(self):
         return self.max_xy(False)
 
+    @property
+    def length(self):
+        d = 0
+        for r in self._routes:
+            d += r.length
+        return d
+
     def min_xy(self, choice):
         """
         :param choice: si True alors on travaille avec x (abscisse) sinon on travaille en y (ordonnée)

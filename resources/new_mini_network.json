@@ -22,7 +22,7 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": [
-        {"position": 200, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
+        {"position": 470, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
       ]
     },
     {
@@ -46,7 +46,7 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": [
-          {"position": 200, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
+          {"position": 630, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
       ]
     },
     {
@@ -70,12 +70,14 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": [
-        {"position": 200, "source": {"loop": 0, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
+        {"position": 840, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
       ]
     }
   ],
   "bridges": [
-    {"name": "bridge 0", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
+    {"name": "bridge 0", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": [
+      {"position": 100, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
+    ]},
     {"name": "bridge 1", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
     {"name": "bridge 2", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
     {"name": "bridge 3", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []}

@@ -18,45 +18,63 @@ function distanceBetween(beginElement, endElement, path) {
     return d;
 }
 
-function xyFromPosition(podJSON, loopJSON){
-    const loopSize = loopJSON["elements"].length;
+function xyFromPosition(podJSON, lineJSON, loopsJSON=null){
     let d = 0;
-    let index = 0;
-    let distanceToNext = 0;
-    while (d < podJSON["position"]){
-        const beginElement = loopJSON["elements"][index];
-        const endElement = loopJSON["elements"][(index+1)%loopSize];
-        const path = loopJSON["sections"][index]["path"];
-        distanceToNext = distanceBetween(beginElement, endElement, path);
-        if (d + distanceToNext < podJSON["position"]){
-            d += distanceToNext;
-            ++index;
+    let path;
+    let xy;
+    let beginElement, endElement;
+    if (loopsJSON){
+        d = podJSON["position"];
+        const loopBeginElement = lineJSON["switch_out"]["loop"];
+        const loopEndElement = lineJSON["switch_in"]["loop"];
+        const beginElementIndex = lineJSON["switch_out"]["element"];
+        const endElementIndex = lineJSON["switch_in"]["element"];
+        beginElement = loopsJSON[loopBeginElement]["elements"][beginElementIndex];
+        endElement = loopsJSON[loopEndElement]["elements"][endElementIndex];
+        path = lineJSON["section"]["path"];
+        xy = [beginElement["x"], beginElement["y"]];
+    } else {
+        const loopSize = lineJSON["elements"].length;
+        let index = 0;
+        let distanceToNext = 0;
+        while (d < podJSON["position"]){
+            beginElement = lineJSON["elements"][index];
+            endElement = lineJSON["elements"][(index+1)%loopSize];
+            path = lineJSON["sections"][index]["path"];
+            distanceToNext = distanceBetween(beginElement, endElement, path);
+            if (d + distanceToNext < podJSON["position"]){
+                d += distanceToNext;
+                ++index;
+            }
+            else
+                break;
         }
-        else
-            break;
+        d = podJSON["position"] - d;
+        beginElement = lineJSON["elements"][index];
+        endElement = lineJSON["elements"][(index+1)%loopSize];
+        path = lineJSON["sections"][index]["path"];
+        xy = [lineJSON["elements"][index]["x"], lineJSON["elements"][index]["y"]];
     }
-    d = podJSON["position"] - d;
-    const beginElement = loopJSON["elements"][index];
-    const endElement = loopJSON["elements"][(index+1)%loopSize];
-    const D = distanceBetween(beginElement, endElement, loopJSON["sections"][index]["path"]);
-    let xy = [loopJSON["elements"][index]["x"], loopJSON["elements"][index]["y"]];
-    switch (loopJSON["sections"][index]["path"]["type"]){
-        case "line":
-        default:
-            const coeff = d / D;
-            xy[0] = coeff * (beginElement["x"] + endElement["x"]);
-            xy[1] = coeff * (beginElement["y"] + endElement["y"]);
-    }
+    const D = distanceBetween(beginElement, endElement, path);
+    switch (path["type"]){
+            case "line":
+            default:
+                const coeff = d / D;
+                xy[0] += coeff * (endElement["x"] - beginElement["x"]);
+                xy[1] += coeff * (endElement["y"] - beginElement["y"]);
+        }
+    xy[1] = getNetworkDivSize().height - xy[1];
     return xy;
+
 }
 
 export class Pod {
-    constructor(podJSON, loopJSON, isDocked, podWidth = defaultPodWidth) {
+    constructor(podJSON, lineJSON, isDocked, loopsJSON, podWidth = defaultPodWidth) {
         this.json = podJSON;
         this.id = podJSON["name"];
         this.travelerNumber = podJSON["travelers"]["count"];
         this.isDocked = isDocked;
-        const xy = xyFromPosition(podJSON, loopJSON);
+        const xy = xyFromPosition(podJSON, lineJSON, loopsJSON);
         this.x = xy[0];
         this.y = xy[1];
 
@@ -79,8 +97,8 @@ export class Pod {
 
         networkLayer.add(this.outerCircle);
         networkLayer.add(this.innerCircle);
-        //this.update(podJSON);
-        this.updateColor()
+        this.update(podJSON);
+        this.updateColor();
         appState.objects.push(this);
     }
 

@@ -60,7 +60,7 @@ export class Loop {
 
         // On ajoute les capsules déjà présente sur les sections
         for (const pod of loopJSON["pods"]){
-            //new Pod(pod, loopJSON, false);
+            new Pod(pod, loopJSON, false);
         }
 
         this.text = new Konva.Text({

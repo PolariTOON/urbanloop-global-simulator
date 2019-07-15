@@ -212,6 +212,8 @@ class Network(Node):
         for b in range(len(self._loops)):
             loop = self._loops[b]
             self._init_pods_of_line(loop)
+        for b in range(len(self._loops)):
+            loop = self._loops[b]
             self._loops[b] = Loop(b, **loop)
 
     def _init_pods_of_line(self, line):
@@ -229,12 +231,8 @@ class Network(Node):
         if loop < 0 or loop > len(self._loops):
             raise ValueError("Loop's index out of range")
         loop = self._loops[loop]
-        if isinstance(loop, Loop):
-            routes = loop.routes
-            switches = loop.switches
-        else:
-            routes = loop["routes"]
-            switches = loop["switches"]
+        routes = loop["routes"]
+        switches = loop["switches"]
         if element < 0:
             raise ValueError("Element's index out of range")
         elt = 0

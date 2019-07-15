@@ -1,10 +1,10 @@
 import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
 
-const sensorColor = 'rgb(255,24,231)';
+const sensorColor = 'rgb(40,158,0)';
 const sensorSelectedColor = 'rgb(255, 200, 20)';
 
 export class Sensor {
-    constructor(sensorJSON, sensorRadius = 15) {
+    constructor(sensorJSON, sensorRadius = 18) {
         this.json = sensorJSON;
         this.name = sensorJSON["name"];
         this.x = sensorJSON["x"];

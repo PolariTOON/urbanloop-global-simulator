@@ -96,7 +96,7 @@ export async function initNetworkScene(network_index) {
     for (const bridge of networkJSON["bridges"]){
         const switchIn = loops[bridge["switch_in"]["loop"]].elements[bridge["switch_in"]["element"]];
         const switchOut = loops[bridge["switch_out"]["loop"]].elements[bridge["switch_out"]["element"]];
-        new Bridge(bridge, switchIn, switchOut);
+        new Bridge(bridge, switchIn, switchOut, networkJSON["loops"]);
     }
 
     calibrateNetworkScene();

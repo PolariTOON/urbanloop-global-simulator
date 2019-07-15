@@ -8,9 +8,9 @@ function drawLine(beginElement, endElement) {
         points: [beginElement.x, beginElement.y, endElement.x, endElement.y],
         stroke: sectionColor,
         tension: 1,
-        strokeWidth: 3.5,
-        pointerLength : 5,
-        pointerWidth : 5
+        strokeWidth: 2.5,
+        pointerLength : 4,
+        pointerWidth : 4
     });
 }
 

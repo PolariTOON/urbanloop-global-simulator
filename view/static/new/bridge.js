@@ -1,10 +1,11 @@
 import {appState, getNetworkDivSize, handCursor, infoLayer, moveCursor, networkLayer} from "./network.js";
+import {Pod} from "./pod.js";
 
 const bridgeColor = 'rgb(156,63,28)';
 const bridgeSelectedColor = 'rgb(255, 200, 20)';
 
 export class Bridge{
-    constructor(bridgeJSON, switchIn, switchOut){
+    constructor(bridgeJSON, switchIn, switchOut, loopsJSON){
         this.json = bridgeJSON;
         this.section = bridgeJSON["section"];
         this.name = bridgeJSON["name"];
@@ -17,9 +18,9 @@ export class Bridge{
             points: [switchOut.x, switchOut.y, switchIn.x, switchIn.y],
             stroke: bridgeColor,
             tension: 1,
-            strokeWidth: 3.5,
-            pointerLength : 5,
-            pointerWidth : 5
+            strokeWidth: 2.5,
+            pointerLength : 4,
+            pointerWidth : 4
         });
 
         this.info = new Konva.Label({
@@ -68,10 +69,14 @@ export class Bridge{
 
         this.line.on('mousedown', () => {
         this.select();
-    });
+        });
 
         networkLayer.add(this.line);
         infoLayer.add(this.info);
+
+        for (const pod of bridgeJSON["pods"]){
+            new Pod(pod, bridgeJSON, false, loopsJSON);
+        }
 
     }
 

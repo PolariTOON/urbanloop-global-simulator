@@ -2,6 +2,7 @@ html,
 body {
     height: 100%;
     overflow: hidden;
+    font-family: sans-serif;
 }
 
 #network-div {
@@ -82,6 +83,16 @@ hr {
     display: flex;
     justify-content: space-around;
     padding: 1.5rem;
+}
+
+#play-pause-button::before {
+    content: "\23EF\FE0E  ";
+}
+#decelerate-button::before {
+    content: "\23EA\FE0E  ";
+}
+#accelerate-button::before {
+    content: "\23E9\FE0E  ";
 }
 
 .not-shown {

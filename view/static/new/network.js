@@ -18,7 +18,6 @@ let pressTimeout;
 let doPan = false;
 let networkDiv = document.getElementById('network-div');
 let scaleSlider = document.getElementById('scale-slider');
-let startButton = document.getElementById('start-button');
 let networkSize = 1000;
 let updateLoop;
 
@@ -72,7 +71,6 @@ function getBarycenter() {
 
 export async function initNetworkScene(network_index) {
     appState.objects = [];
-    startButton.classList.remove('not-shown');
 
     /*await fetch('/networks/0/load/', {
         method: "POST"

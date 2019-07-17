@@ -12,30 +12,28 @@
     <script type="module" src="./main-page.js"></script>
     <title>UrbanLoop Simulator</title>
 </head>
-<body id="all-container" class="container-fluid table-container h-100">
-    <div class="row table-row h-100">
-        <div class="col-md-9 no-float table-col" id="network-div"></div>
-        <div class="col-md-3 no-float table-col" id="panel-div">
-            <div id="timer-div">
-                <span id="timer-span" class="badge badge-light">
-                    Day -
-                    <br>
-                    <br>
-                    --:--:--
-                </span>
-            </div>
-            <div id="buttons-div">
-                <button type="button" class="btn btn-light" id="play-pause-button">Play</button>
-                <button type="button" class="btn btn-light" id="decelerate-button">Decelerate</button>
-                <button type="button" class="btn btn-light" id="accelerate-button">Accelerate</button>
-            </div>
-            <div id="speed-div">
-                <span id="speed-span" class="badge badge-light">
-                    Speed
-                </span>
-            </div>
-            <hr/>
-            <div class="container">
+    <body id="all-container">
+        <nav id="menu-div">
+            <menu>
+                <li><button type="button" id="network-add-btn" class="btn btn-success">&#10133;</button></li>
+                <li><button type="button" id="network-dl-btn" class="btn btn-dark">&#128190;</button></li>
+                <li><button type="button" id="network-fav-btn" class="btn btn-dark">&#9733;</button></li>
+                <li><button type="button" id="network-remove-btn" class="btn btn-danger">&#10134;</button></li>
+                <li><input type="file" style="display:none" accept=".json" id="conf-topology-1"></li>
+                <li><small id="network-text" class="form-text text-muted network-tip-text"></small></li>
+            </menu>
+            <menu>
+                <li><button type="button" class="btn btn-dark" id="play-pause-button">Play</button></li>
+                <li><button type="button" class="btn btn-dark" id="decelerate-button">Decelerate</button></li>
+                <li><button type="button" class="btn btn-dark" id="accelerate-button">Accelerate</button></li>
+            </menu>
+            <p><label><input type="range" min="0.1" max="6" step="0.1" id="scale-slider"></label></p>
+            <p id="timer-div">Day -<br>--:--:--</p>
+            <p id="speed-div">Speed</p>
+        </nav>
+        <section id="network-div"></section>
+        <aside id="panel-div">
+            <div>
                 <ul class="nav nav-tabs">
                     <li class="nav-item active"><a class="nav-link" data-toggle="tab" href="#data-tab">Data</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#config-tab">Configuration</a></li>
@@ -86,16 +84,6 @@
                                 <select class="form-control browser-default custom-select" id="conf-topology-0" required>
                                 </select>
                                 <small id="network-error-text" class="form-text text-muted">Select a network JSON file for the simulation</small>
-                            </p>
-                            <p class="form-group">
-                                <span id="config-network-btn-group" class="btn btn-group">
-                                    <button type="button" id="network-add-btn" class="btn btn-success">&#10133;</button>
-                                    <button type="button" id="network-dl-btn" class="btn btn-dark">&#128190;</button>
-                                    <button type="button" id="network-fav-btn" class="btn btn-dark">&#9733;</button>
-                                    <button type="button" id="network-remove-btn" class="btn btn-danger">&#10134;</button>
-                                    <input type="file" style="display:none" accept=".json" id="conf-topology-1">
-                                </span>
-                                <small id="network-text" class="form-text text-muted network-tip-text"></small>
                             </p>
                             </fieldset>
                             <fieldset>
@@ -196,11 +184,6 @@
                     </div>
                 </div>
             </div>
-            <p id="slider-container">
-                <label for="scale-slider"></label>
-                <input type="range" min="0.1" max="6" step="0.1" id="scale-slider">
-            </p>
-        </div>
-    </div>
-</body>
+        </aside>
+    </body>
 </html>

@@ -1,4 +1,4 @@
-import {appState, networkLayer, getNetworkDivSize} from "./network.js";
+import {appState, networkLayer} from "./network.js";
 import {Station} from "./station.js";
 import {Shed} from "./shed.js";
 import {Sensor} from "./sensor.js";
@@ -23,7 +23,7 @@ export class Loop {
         this.json = loopJSON;
         const averagePointLoop = averagePoint(loopJSON["elements"]);
         this.averageX = averagePointLoop[0];
-        this.averageY = getNetworkDivSize().height - averagePointLoop[1];
+        this.averageY = averagePointLoop[1];
         this.name = loopJSON["name"];
         this.elements = [];
 
@@ -93,11 +93,6 @@ export class Loop {
             appState.selectedObject = undefined;
         }
         networkLayer.batchDraw();
-    }
-
-    updatePosition() {
-        const y = this.averageY;
-        this.text.y(y);
     }
 
     updateScale(value) {

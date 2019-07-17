@@ -1,4 +1,4 @@
-import {appState, networkLayer, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, initBehaviors} from "./network.js";
 
 export const defaultPodWidth = 5;
 const podInnerEmptyColor = 'rgb(173, 72, 45)';
@@ -63,7 +63,6 @@ function xyFromPosition(podJSON, lineJSON, loopsJSON=null){
                 xy[0] += coeff * (endElement["x"] - beginElement["x"]);
                 xy[1] += coeff * (endElement["y"] - beginElement["y"]);
         }
-    xy[1] = getNetworkDivSize().height - xy[1];
     return xy;
 
 }

@@ -1,4 +1,4 @@
-import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, infoLayer, initBehaviors} from "./network.js";
 
 const shedColor = 'rgb(40, 40, 40)';
 const shedSelectedColor = 'rgb(255, 200, 20)';
@@ -9,7 +9,7 @@ export class Shed {
         this.name = shedJSON["name"];
 
         this.x = shedJSON['x'];
-        this.y = getNetworkDivSize().height - shedJSON['y'];
+        this.y = shedJSON['y'];
         const semiWidth = Math.floor(shedWidth / 2);
 
         this.innerRectangle = new Konva.Rect({
@@ -95,13 +95,6 @@ export class Shed {
         }
         this.outerRectangle.fill(shedColor);
         networkLayer.batchDraw();
-    }
-
-    updatePosition() {
-        const y = getNetworkDivSize().height - this.json["y"];
-        this.innerRectangle.y(y);
-        this.outerRectangle.y(y);
-        this.info.y(y);
     }
 
     updateScale(value) {

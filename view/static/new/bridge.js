@@ -1,4 +1,4 @@
-import {appState, getNetworkDivSize, handCursor, infoLayer, moveCursor, networkLayer} from "./network.js";
+import {appState, handCursor, infoLayer, moveCursor, networkLayer} from "./network.js";
 import {Pod} from "./pod.js";
 
 const bridgeColor = 'rgb(156,63,28)';
@@ -96,12 +96,6 @@ export class Bridge{
         }
         this.line.stroke(bridgeColor);
         networkLayer.batchDraw();
-    }
-
-    updatePosition() {
-        const y = getNetworkDivSize().height - this.y;
-        this.line.y(y);
-        this.info.y(y);
     }
 
     update(bridgeJSON) {

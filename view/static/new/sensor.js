@@ -1,4 +1,4 @@
-import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, infoLayer, initBehaviors} from "./network.js";
 
 const sensorColor = 'rgb(40,158,0)';
 const sensorSelectedColor = 'rgb(255, 200, 20)';
@@ -8,7 +8,7 @@ export class Sensor {
         this.json = sensorJSON;
         this.name = sensorJSON["name"];
         this.x = sensorJSON["x"];
-        this.y = getNetworkDivSize().height - sensorJSON["y"];
+        this.y = sensorJSON["y"];
 
         this.star = new Konva.Star({
             name: this.name,
@@ -78,12 +78,6 @@ export class Sensor {
         }
         this.star.fill(sensorColor);
         networkLayer.batchDraw();
-    }
-
-    updatePosition() {
-        const y = getNetworkDivSize().height - this.json["y"];
-        this.star.y(y);
-        this.info.y(y);
     }
 
     updateScale(value) {

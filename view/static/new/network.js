@@ -18,32 +18,23 @@ let pressTimeout;
 let doPan = false;
 let networkDiv = document.getElementById('network-div');
 let scaleSlider = document.getElementById('scale-slider');
-let networkSize = 1000;
 let updateLoop;
 
 export const appState = {
     clearing: false,
     objectScale: undefined,
     objects: undefined,
-    selectedObject: undefined
+    selectedObject: undefined,
+    viewBox: null
 };
 
 export let running = false;
 
 export let stage = new Konva.Stage({
-    container: 'network-div',
-    width: getNetworkDivSize().width,
-    height: getNetworkDivSize().height
+    container: 'network-div'
 });
 export let networkLayer = new Konva.Layer();
 export let infoLayer = new Konva.Layer();
-
-export function getNetworkDivSize() {
-    return {
-        width: Math.min(networkDiv.offsetWidth, window.innerWidth),
-        height: Math.min(networkDiv.offsetHeight, window.innerHeight)
-    }
-}
 
 function scaleObjects() {
     appState.objects.forEach(object => object.updateScale(appState.objectScale));
@@ -58,7 +49,7 @@ function getBarycenter() {
         if (object instanceof Loop) {
             loopNumber += 1;
             sumX += object.averageX;
-            sumY += getNetworkDivSize().height - object.averageY;
+            sumY += object.averageY;
         }
     });
 
@@ -84,7 +75,7 @@ export async function initNetworkScene(network_index) {
     let loops = [];
     const networkJSON = await (await fetch('/networks/'+ network_index +'/', {method: "GET"})).json();
     const viewBox = networkJSON["view_box"];
-    networkSize = Math.max(viewBox["width"], viewBox["height"])*1.05;
+    appState.viewBox = viewBox;
     for (const loop of networkJSON["loops"]){
         const l = new Loop(loop);
         loops.push(l);
@@ -96,8 +87,7 @@ export async function initNetworkScene(network_index) {
         const switchOut = loops[bridge["switch_out"]["loop"]].elements[bridge["switch_out"]["element"]];
         new Bridge(bridge, switchIn, switchOut, networkJSON["loops"]);
     }
-
-    calibrateNetworkScene();
+    resize()
 
     networkLayer.batchDraw();
     infoLayer.batchDraw();
@@ -134,42 +124,37 @@ export async function updateNetworkScene() {
     infoLayer.batchDraw();
 }
 
-export function calibrateNetworkScene() {
-    calibrateStageScale();
-    appState.objectScale = Math.min(networkSize / getNetworkDivSize().height, scaleSlider.max);
+function resize() {
+    const container = stage.container();
+    const {offsetWidth, offsetHeight} = container;
+    const {width, height} = appState.viewBox;
+    let scaledWidth = Math.min(Math.max(offsetWidth, 0), width);
+    let scaledHeight = Math.min(Math.max(offsetHeight, 0), height);
+    const a = scaledWidth * height;
+    const b = scaledHeight * width;
+    if (a < b) {
+        scaledHeight = height * scaledWidth / width;
+    } else if (b < a) {
+        scaledWidth = width * scaledHeight / height;
+    }
+    const x = (offsetWidth - scaledWidth) / 2;
+    const y = (offsetHeight - scaledHeight) / 2;
+    stage.size({
+        width: offsetWidth,
+        height: offsetHeight
+    });
+    stage.position({
+        x: x,
+        y: y
+    });
+    stage.scale({
+        x: scaledWidth / width,
+        y: scaledHeight / height
+    });
+    appState.objectScale = 1;
     scaleSlider.value = appState.objectScale;
     scaleSlider.title = "Objects scale : " + scaleSlider.value;
-    calibrateStagePosition();
     scaleObjects();
-}
-
-function calibrateStagePosition() {
-    if (appState.objectScale === 0) return;
-    const barycenter = getBarycenter();
-    const scale = networkSize / Math.min(getNetworkDivSize().width, getNetworkDivSize().height);
-    const stagePos = {
-        x: -barycenter.x / scale + getNetworkDivSize().width / 2,
-        y: -barycenter.y / scale + getNetworkDivSize().height / 2
-    };
-    stage.position(stagePos);
-}
-
-function calibrateStageScale() {
-    const stageScale = Math.min(getNetworkDivSize().width, getNetworkDivSize().height) / networkSize;
-    stage.scale({x: stageScale, y: stageScale});
-}
-
-export function fitStageIntoParentContainer() {
-    stage.width(getNetworkDivSize().width);
-    stage.height(getNetworkDivSize().height);
-
-    calibrateNetworkScene();
-
-    appState.objects.forEach(object => {
-        if (!(object instanceof Pod)) {
-            object.updatePosition();
-        }
-    });
 
     stage.batchDraw();
 }
@@ -270,7 +255,7 @@ function stopUpdateLoop() {
 }
 
 
-window.addEventListener('resize', fitStageIntoParentContainer);
+window.addEventListener("resize", resize);
 
 stage.on('mousedown', event => {
     event.evt.preventDefault();

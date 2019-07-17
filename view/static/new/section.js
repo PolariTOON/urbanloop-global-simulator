@@ -1,4 +1,4 @@
-import {appState, getNetworkDivSize, handCursor, infoLayer, moveCursor, networkLayer} from "./network.js";
+import {appState, handCursor, infoLayer, moveCursor, networkLayer} from "./network.js";
 
 const sectionColor = 'rgb(156, 156, 156)';
 const sectionSelectedColor = 'rgb(255, 200, 20)';
@@ -100,14 +100,7 @@ export class Section {
         networkLayer.batchDraw();
     }
 
-    updatePosition() {
-        const y = getNetworkDivSize().height - this.y;
-        this.line.y(y);
-        this.info.y(y);
-    }
-
     update(sectionJSON) {
         this.json = sectionJSON;
     }
 }
-

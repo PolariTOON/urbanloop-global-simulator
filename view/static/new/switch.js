@@ -1,4 +1,4 @@
-import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, infoLayer, initBehaviors} from "./network.js";
 
 const switchColor = 'rgb(200, 40, 40)';
 const switchSelectedColor = 'rgb(255, 200, 20)';
@@ -9,7 +9,7 @@ export class Switch {
         this.name = switchJSON["name"];
 
         this.x = switchJSON['x'];
-        this.y = getNetworkDivSize().height - switchJSON['y'];
+        this.y = switchJSON['y'];
         const semiWidth = Math.floor(switchWidth / 2);
 
         this.innerCircle = new Konva.Circle({
@@ -86,13 +86,6 @@ export class Switch {
         }
         this.outerCircle.fill(switchColor);
         networkLayer.batchDraw();
-    }
-
-    updatePosition() {
-        const y = getNetworkDivSize().height - this.json["y"];
-        this.innerCircle.y(y);
-        this.outerCircle.y(y);
-        this.info.y(y);
     }
 
     updateScale(value) {

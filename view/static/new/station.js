@@ -1,4 +1,4 @@
-import {appState, networkLayer, infoLayer, getNetworkDivSize, initBehaviors} from "./network.js";
+import {appState, networkLayer, infoLayer, initBehaviors} from "./network.js";
 
 const stationColor = "rgb(40, 40, 200)";
 const stationSelectedColor = "rgb(255, 200, 20)";
@@ -11,7 +11,7 @@ export class Station {
         this.dockSize = dockSize;
         this.name = stationJSON["name"];
         this.x = stationJSON["x"];
-        this.y = getNetworkDivSize().height - stationJSON["y"];
+        this.y = stationJSON["y"];
 
         const semiWidth = Math.floor(stationWidth / 2);
 
@@ -123,16 +123,6 @@ export class Station {
         });
 
         networkLayer.batchDraw();
-    }
-
-    updatePosition() {
-        const y = getNetworkDivSize().height - this.json["y"];
-        this.innerCircle.y(y);
-        this.outerCircle.y(y);
-        this.info.y(y);
-        this.dockList.forEach(dock => {
-            dock.y(y);
-        });
     }
 
     updateScale(value) {

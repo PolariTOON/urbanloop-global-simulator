@@ -5,16 +5,16 @@ import {applyNetworkScene} from "./network.js";
 let playPauseButton = document.getElementById('play-pause-button');
 let accelerateButton = document.getElementById('accelerate-button');
 let decelerateButton = document.getElementById('decelerate-button');
-let timerSpan = document.getElementById('timer-span');
-let speedSpan = document.getElementById('speed-span');
+let timerDiv = document.getElementById('timer-div');
+let speedDiv = document.getElementById('speed-div');
 let running = false;
 
 let configTab = document.getElementById("config-tab");
 let interactTab = document.getElementById("interact-tab");
 
 export function updateTimeFromJSON(timeJSON) {
-    timerSpan.innerHTML = `Day ${timeJSON['day']}<br><br>${timeJSON['time']}`;
-    speedSpan.innerHTML = timeJSON['speed'];
+    timerDiv.innerHTML = `Day ${timeJSON['day']}<br>${timeJSON['time']}`;
+    speedDiv.innerHTML = timeJSON['speed'];
 
     if (timeJSON['decelerateJerky'] === 1) {
         if (!accelerateButton.classList.contains("btn-warning")) {

@@ -1,4 +1,4 @@
-import {appState, handCursor, infoLayer, moveCursor, networkLayer} from "./network.js";
+import {appState, setCursor, infoLayer, networkLayer} from "./network.js";
 import {Pod} from "./pod.js";
 
 const bridgeColor = 'rgb(156,63,28)';
@@ -55,14 +55,14 @@ export class Bridge{
             })
         );
 
-        this.line.on('mouseover', () => {
-            handCursor();
+        this.line.on('mouseenter', () => {
+            setCursor("pointer");
             this.info.show();
             infoLayer.batchDraw();
         });
 
-        this.line.on('mouseout', () => {
-            moveCursor();
+        this.line.on('mouseleave', () => {
+            setCursor("auto");
             this.info.hide();
             infoLayer.batchDraw();
         });

@@ -1,4 +1,4 @@
-import {appState, handCursor, infoLayer, moveCursor, networkLayer} from "./network.js";
+import {appState, setCursor, infoLayer, networkLayer} from "./network.js";
 
 const sectionColor = 'rgb(156, 156, 156)';
 const sectionSelectedColor = 'rgb(255, 200, 20)';
@@ -62,14 +62,14 @@ export class Section {
             })
         );
 
-        this.line.on('mouseover', () => {
-            handCursor();
+        this.line.on('mouseenter', () => {
+            setCursor("pointer");
             this.info.show();
             infoLayer.batchDraw();
         });
 
-        this.line.on('mouseout', () => {
-            moveCursor();
+        this.line.on('mouseleave', () => {
+            setCursor("auto");
             this.info.hide();
             infoLayer.batchDraw();
         });

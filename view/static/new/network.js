@@ -144,8 +144,8 @@ function resize() {
     const offsetX = (offsetWidth - scaledWidth) / 2 - x * zoom;
     const offsetY = (offsetHeight - scaledHeight) / 2 - y * zoom;
     const ratio = zoom / appState.origin.zoom;
-    const translateX = (stage.x() - appState.origin.offsetX) * ratio;
-    const translateY = (stage.y() - appState.origin.offsetY) * ratio;
+    const translateX = (stage.x() - appState.origin.offsetX) * ratio + offsetX;
+    const translateY = (stage.y() - appState.origin.offsetY) * ratio + offsetY;
     const scaleX = stage.scaleX() * ratio;
     const scaleY = stage.scaleY() * ratio;
     appState.origin = {offsetX, offsetY, zoom};
@@ -154,8 +154,8 @@ function resize() {
         height: offsetHeight
     });
     stage.position({
-        x: offsetX + translateX,
-        y: offsetY + translateY
+        x: translateX,
+        y: translateY
     });
     stage.scale({
         x: scaleX,
@@ -177,16 +177,16 @@ export function initBehaviors(object, innerShape, outerShape = undefined, info =
         object.select();
         });
 
-        outerShape.on('mouseover', () => {
-        handCursor();
+        outerShape.on('mouseenter', () => {
+        setCursor("pointer");
         if (hasInfo) {
             info.show();
             infoLayer.batchDraw();
         }
         });
 
-        outerShape.on('mouseout', () => {
-        moveCursor();
+        outerShape.on('mouseleave', () => {
+        setCursor("auto");
         if (hasInfo) {
             info.hide();
             infoLayer.batchDraw();
@@ -198,16 +198,16 @@ export function initBehaviors(object, innerShape, outerShape = undefined, info =
         object.select();
     });
 
-    innerShape.on('mouseover', () => {
-        handCursor();
+    innerShape.on('mouseenter', () => {
+        setCursor("pointer");
         if (hasInfo) {
             info.show();
             infoLayer.batchDraw();
         }
     });
 
-    innerShape.on('mouseout', () => {
-        moveCursor();
+    innerShape.on('mouseleave', () => {
+        setCursor("auto");
         if (hasInfo) {
             info.hide();
             infoLayer.batchDraw();
@@ -215,16 +215,8 @@ export function initBehaviors(object, innerShape, outerShape = undefined, info =
     });
 }
 
-export function handCursor() {
-    document.body.style.cursor = 'pointer';
-}
-
-export function moveCursor() {
-    document.body.style.cursor = 'move';
-}
-
-export function resetCursor() {
-    document.body.style.cursor = 'auto';
+export function setCursor(cursor) {
+    document.body.style.cursor = cursor;
 }
 
 export function getDefaultFilename() {
@@ -267,31 +259,44 @@ function stopUpdateLoop() {
 
 window.addEventListener("resize", resize);
 
-stage.on('wheel', event => {
+stage.on("dragstart", (event) => {
     event.evt.preventDefault();
-    let oldScale = stage.scaleX();
+    setCursor("move");
+});
 
-    let mousePointTo = {
-        x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-        y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
-    };
+stage.on("dragend", (event) => {
+    event.evt.preventDefault();
+    setCursor("auto");
+});
 
-    let newScale =
-        event.evt.deltaY > 0 ? oldScale * zoomIntensity : oldScale / zoomIntensity;
-
-    if (newScale < minScale) {
-        return;
-    }
-
-    stage.scale({x: newScale, y: newScale});
-
-    let newPos = {
-        x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-        y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
-    };
-
-    stage.position(newPos);
+stage.on("wheel", (event) => {
+    event.evt.preventDefault();
+    const ratio = zoomIntensity ** Math.sign(event.evt.deltaY);
+    const ratioX = Math.max(ratio, minScale / stage.scaleX());
+    const ratioY = Math.max(ratio, minScale / stage.scaleY());
+    const restX = 1 - ratioX;
+    const restY = 1 - ratioY;
+    const translateX = stage.x() * ratioX + stage.getPointerPosition().x * restX;
+    const translateY = stage.y() * ratioY + stage.getPointerPosition().y * restY;
+    const scaleX = stage.scaleX() * ratioX;
+    const scaleY = stage.scaleY() * ratioY;
+    stage.position({
+        x: translateX,
+        y: translateY
+    });
+    stage.scale({
+        x: scaleX,
+        y: scaleY
+    });
     stage.batchDraw();
+});
+
+stage.on("mousedown", (event) => {
+    event.evt.preventDefault();
+    const shape = networkLayer.getIntersection(stage.getPointerPosition());
+    if (appState.selectedObject !== undefined && shape === null) {
+        appState.selectedObject.unselect();
+    }
 });
 
 scaleSlider.oninput = () => {
@@ -304,25 +309,3 @@ scaleSlider.oninput = () => {
 scaleSlider.onmouseleave = () => {
     scaleSlider.removeAttribute("title");
 };
-
-document.getElementById('panel-div').onmouseenter = () => {
-    resetCursor();
-};
-
-stage.on('mouseover', event => {
-    event.evt.preventDefault();
-
-    if (networkLayer.getIntersection(stage.getPointerPosition()) === null) {
-        moveCursor();
-    }
-});
-
-stage.on('mousedown', event => {
-    event.evt.preventDefault();
-
-    let shape = networkLayer.getIntersection(stage.getPointerPosition());
-
-    if (appState.selectedObject !== undefined && shape === null) {
-        appState.selectedObject.unselect();
-    }
-});

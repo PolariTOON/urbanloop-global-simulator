@@ -21,7 +21,8 @@ export const appState = {
     objectScale: undefined,
     objects: undefined,
     selectedObject: undefined,
-    viewBox: null
+    viewBox: null,
+    origin: null
 };
 
 export let running = false;
@@ -72,7 +73,10 @@ export async function initNetworkScene(network_index) {
     let loops = [];
     const networkJSON = await (await fetch('/networks/'+ network_index +'/', {method: "GET"})).json();
     const viewBox = networkJSON["view_box"];
-    appState.viewBox = viewBox;
+    const {x, y, width, height} = viewBox;
+    const [offsetX, offsetY, zoom] = [0, 0, 1];
+    appState.viewBox = {x, y, width, height};
+    appState.origin = {offsetX, offsetY, zoom};
     for (const loop of networkJSON["loops"]){
         const l = new Loop(loop);
         loops.push(l);
@@ -127,9 +131,9 @@ function resize() {
     const {x, y, width, height} = appState.viewBox;
     const a = offsetWidth * height;
     const b = offsetHeight * width;
+    let zoom = 1;
     let scaledWidth = offsetWidth;
     let scaledHeight = offsetHeight;
-    let zoom = 1;
     if (a < b) {
         zoom = scaledWidth / width;
         scaledHeight = height * zoom;
@@ -139,17 +143,23 @@ function resize() {
     }
     const offsetX = (offsetWidth - scaledWidth) / 2 - x * zoom;
     const offsetY = (offsetHeight - scaledHeight) / 2 - y * zoom;
+    const ratio = zoom / appState.origin.zoom;
+    const translateX = (stage.x() - appState.origin.offsetX) * ratio;
+    const translateY = (stage.y() - appState.origin.offsetY) * ratio;
+    const scaleX = stage.scaleX() * ratio;
+    const scaleY = stage.scaleY() * ratio;
+    appState.origin = {offsetX, offsetY, zoom};
     stage.size({
         width: offsetWidth,
         height: offsetHeight
     });
     stage.position({
-        x: offsetX,
-        y: offsetY
+        x: offsetX + translateX,
+        y: offsetY + translateY
     });
     stage.scale({
-        x: zoom,
-        y: zoom
+        x: scaleX,
+        y: scaleY
     });
     appState.objectScale = 1;
     scaleSlider.value = appState.objectScale;

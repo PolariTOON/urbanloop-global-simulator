@@ -13,10 +13,6 @@ import {Bridge} from "./bridge.js";
 const zoomIntensity = 0.8;
 const minScale = 0.01;
 
-let moveIntensity = 1;
-let pressTimeout;
-let doPan = false;
-let networkDiv = document.getElementById('network-div');
 let scaleSlider = document.getElementById('scale-slider');
 let updateLoop;
 
@@ -31,7 +27,8 @@ export const appState = {
 export let running = false;
 
 export let stage = new Konva.Stage({
-    container: 'network-div'
+    container: 'network-div',
+    draggable: true
 });
 export let networkLayer = new Konva.Layer();
 export let infoLayer = new Konva.Layer();
@@ -127,29 +124,32 @@ export async function updateNetworkScene() {
 function resize() {
     const container = stage.container();
     const {offsetWidth, offsetHeight} = container;
-    const {width, height} = appState.viewBox;
-    let scaledWidth = Math.min(Math.max(offsetWidth, 0), width);
-    let scaledHeight = Math.min(Math.max(offsetHeight, 0), height);
-    const a = scaledWidth * height;
-    const b = scaledHeight * width;
+    const {x, y, width, height} = appState.viewBox;
+    const a = offsetWidth * height;
+    const b = offsetHeight * width;
+    let scaledWidth = offsetWidth;
+    let scaledHeight = offsetHeight;
+    let zoom = 1;
     if (a < b) {
-        scaledHeight = height * scaledWidth / width;
+        zoom = scaledWidth / width;
+        scaledHeight = height * zoom;
     } else if (b < a) {
-        scaledWidth = width * scaledHeight / height;
+        zoom = scaledHeight / height;
+        scaledWidth = width * zoom;
     }
-    const x = (offsetWidth - scaledWidth) / 2;
-    const y = (offsetHeight - scaledHeight) / 2;
+    const offsetX = (offsetWidth - scaledWidth) / 2 - x * zoom;
+    const offsetY = (offsetHeight - scaledHeight) / 2 - y * zoom;
     stage.size({
         width: offsetWidth,
         height: offsetHeight
     });
     stage.position({
-        x: x,
-        y: y
+        x: offsetX,
+        y: offsetY
     });
     stage.scale({
-        x: scaledWidth / width,
-        y: scaledHeight / height
+        x: zoom,
+        y: zoom
     });
     appState.objectScale = 1;
     scaleSlider.value = appState.objectScale;
@@ -256,38 +256,6 @@ function stopUpdateLoop() {
 
 
 window.addEventListener("resize", resize);
-
-stage.on('mousedown', event => {
-    event.evt.preventDefault();
-    pressTimeout = setTimeout(function () {
-        doPan = true;
-    }, 100);
-});
-
-stage.on('mouseup', event => {
-    event.evt.preventDefault();
-    if (pressTimeout !== null) {
-        clearTimeout(pressTimeout);
-        pressTimeout = null;
-    }
-    doPan = false;
-});
-
-stage.on('mousemove', event => {
-    event.evt.preventDefault();
-    if (doPan) {
-        let deltaX = event.evt.movementX || 0;
-        let deltaY = event.evt.movementY || 0;
-
-        let newPos = {
-            x: stage.x() + moveIntensity * deltaX,
-            y: stage.y() + moveIntensity * deltaY
-        };
-
-        stage.position(newPos);
-        stage.batchDraw();
-    }
-});
 
 stage.on('wheel', event => {
     event.evt.preventDefault();

@@ -25,3 +25,7 @@ class Sensor(Step):
     @property
     def name(self):
         return "sensor"
+
+    def update(self):
+        return
+        yield

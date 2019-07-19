@@ -20,6 +20,7 @@ class Routing:
         self._tab_depart_voy = []  # TODO : Gérer les stats
         self._tab_temps_voy = []  # TODO : Gérer les stats
 
+        # Initialisation des poids des routes
         for route in self._network.routes:
             weight = 0
             for section in route.sections:

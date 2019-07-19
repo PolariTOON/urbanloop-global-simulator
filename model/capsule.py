@@ -109,7 +109,6 @@ class Capsule:
         """
         :return: Trip event generator
         """
-
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
         self.segment_length = dist_to_next_element
         time_to_next_element = dist_to_next_element / self.speed

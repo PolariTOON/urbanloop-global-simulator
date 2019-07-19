@@ -159,3 +159,7 @@ class Route(Way):
             "pods": pods
         })
         return dict
+
+    def update(self):
+        return
+        yield

@@ -36,3 +36,7 @@ class SwitchIn(Switch):
             "type": "switch_in"
         })
         return dict
+
+    def update(self):
+        return
+        yield

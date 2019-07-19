@@ -36,3 +36,7 @@ class SwitchOut(Switch):
             "type": "switch_out"
         })
         return dict
+
+    def update(self):
+        return
+        yield

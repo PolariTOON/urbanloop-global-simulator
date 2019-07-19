@@ -76,3 +76,7 @@ class Station(Step):
     @property
     def capacity(self):
         return self._capacity
+
+    def update(self):
+        return
+        yield

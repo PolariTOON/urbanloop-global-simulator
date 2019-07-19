@@ -79,7 +79,7 @@ class Network(Node):
                 max_y = loop.y_max
         width = max_x - min_x
         height = max_y - min_y
-        return {"x": width / 2, "y": height / 2, "width": width, "height": height}  # TODO: x et y à revoir
+        return {"x": 0, "y": 0, "width": width, "height": height}  # TODO: x et y à revoir
 
     def get_random_free_shed(self):
         free_sheds = [shed for route in self._routes for shed in route.sheds if len(shed.pods) < shed.capacity]
@@ -270,6 +270,10 @@ class Network(Node):
             return self.get_random_station_from_type(station_types["activity"], departure_station=departure_station)
         else:
             return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
+
+    def update(self):
+        return
+        yield
 
 
 def _init_pod_of_line(line, pod):

@@ -68,6 +68,10 @@ class Section(Track):
     def weight(self):
         return self._length / self._speed
 
+    def update(self):
+        return
+        yield
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
@@ -84,9 +88,9 @@ class Section(Track):
         pods = self._pods
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
-                self._pods.insert(k, Pod(env, self, **pod))
+                self._pods.insert(k, Pod(env, self, 0, **pod))
                 return
-        self._pods.append(Pod(env, self, **pod))
+        self._pods.append(Pod(env, self, self._speed, **pod))
 
     def get_coordinates_of_position(self, position):
         previous = self._previous

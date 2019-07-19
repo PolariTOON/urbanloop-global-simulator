@@ -28,7 +28,7 @@ class Simulation:
         self._running = running
         # Etape 3 : chargement du modèle
         self._controler = Routing(self._env, id, **kwargs)
-        self._sim_tick = 0.05  # Duration of a tick
+        self._env.sim_tick = 0.05  # Duration of a tick
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
         self._sim_tick_variations = []
@@ -51,9 +51,9 @@ class Simulation:
         :param seconds: The desired modulo
         :return: Boolean, if the current_tick is in phase with the given frequency
         """
-        if (seconds / self._sim_tick) < 1 or seconds < 1:
+        if (seconds / self._env._sim_tick) < 1 or seconds < 1:
             return True
-        return self._current_tick % (seconds / self._sim_tick) == 0
+        return self._current_tick % (seconds / self._env.sim_tick) == 0
 
     def tick(self):
         """
@@ -79,21 +79,21 @@ class Simulation:
                     tick_start_time = time.perf_counter()  # temps de la boucle
                 # Etape 1 : génération de statistiques
                 # self._controler.travel_stats()  # TODO : génération des statistiques
-                # Etape 3 : Passage au tick suivant
+                # Etape 2 : Passage au tick suivant
                 self._env.process(self.tick())
-                # Etape 4 : Monter des voyageurs en attente dans les capsules
+                # Etape 3 : Monter des voyageurs en attente dans les capsules
                 self._env.process(self.ascend_travelers())
-                # Etape 5 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
+                # Etape 4 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
                 if self._modulo_on_seconds(1):
                     self._env.process(self.generate_travelers())
                     self._controler.update()  # TODO : Mettre à jour le controler (timers ...)
-                # Etape 7 : Complétion des stations
+                # Etape 5 : Complétion des stations
                 if self._station_refill and self._current_tick != 0 and self._modulo_on_seconds(1):
                     self._controler.fill_and_full_stations()
-                # Etape 8 : gestion des collisions
+                # Etape 6 : gestion des collisions
                 #  self.collision() TODO : GESTION DES COLLISIONS
                 yield self._env.timeout(1)
-                # Etape 9 : Gestion de la fin de la simulation
+                # Etape 7 : Gestion de la fin de la simulation
                 if loop_sleep_boolean:
                     sleep_time = self._visualized_tick_duration - (time.perf_counter() - tick_start_time)
                     time.sleep(max(0.0, sleep_time))
@@ -163,7 +163,7 @@ class Simulation:
 
         if not self._sim_tick_variations:
             # Empty case
-            return tick * self._sim_tick
+            return tick * self._env.sim_tick
 
         result = 0
         for start_tick, tick_duration, sim_tick in self._sim_tick_variations:
@@ -172,7 +172,7 @@ class Simulation:
             result += tick_duration * sim_tick
 
         last_end_tick = self._sim_tick_variations[-1][0] + self._sim_tick_variations[-1][1]
-        result += (tick - last_end_tick) * self._sim_tick
+        result += (tick - last_end_tick) * self._env.sim_tick
 
         return result
 
@@ -186,7 +186,7 @@ class Simulation:
         :param value: The desired new sim_tick value
         """
         if value is None:
-            value = self._sim_tick
+            value = self._env.sim_tick
 
         if value <= 0:
             simlog.warn("The sim_tick needs to be greater than zero")
@@ -196,13 +196,13 @@ class Simulation:
             # Not empty case
             start_tick = self._sim_tick_variations[-1][0] + self._sim_tick_variations[-1][1]
             tick_duration = self._current_tick - start_tick
-            self._sim_tick_variations.append((start_tick, tick_duration, self._sim_tick))
+            self._sim_tick_variations.append((start_tick, tick_duration, self._env.sim_tick))
         else:
             # Empty case
-            self._sim_tick_variations.append((0, self._current_tick, self._sim_tick))
+            self._sim_tick_variations.append((0, self._current_tick, self._env.sim_tick))
 
-        self._sim_tick = value
-        simlog.warn("Changing _sim_tick. One tick equals now %f seconds" % self._sim_tick)
+        self._env.sim_tick = value
+        simlog.warn("Changing _sim_tick. One tick equals now %f seconds" % self._env.sim_tick)
 
     def get_initial_sim_tick(self):
         """
@@ -210,7 +210,7 @@ class Simulation:
         """
         if self._sim_tick_variations:
             return self._sim_tick_variations[0][2]
-        return self._sim_tick
+        return self._env.sim_tick
 
     def accelerate_simulation(self):
         """
@@ -226,8 +226,8 @@ class Simulation:
                 self._visualized_tick_duration = 0
             return
 
-        if self._sim_tick < initial_sim_tick * 2 ** 7:
-            self._change_sim_tick(self._sim_tick * 2)
+        if self._env.sim_tick < initial_sim_tick * 2 ** 7:
+            self._change_sim_tick(self._env.sim_tick * 2)
 
     def decelerate_simulation(self):
         """
@@ -236,8 +236,8 @@ class Simulation:
         """
         initial_sim_tick = self.get_initial_sim_tick()
 
-        if self._sim_tick > initial_sim_tick:
-            self._change_sim_tick(self._sim_tick / 2)
+        if self._env.sim_tick > initial_sim_tick:
+            self._change_sim_tick(self._env.sim_tick / 2)
             return
 
         if self._visualized_tick_duration < initial_sim_tick:
@@ -249,7 +249,7 @@ class Simulation:
         """
         :return: The simulation ticks per second
         """
-        return 1 / self._sim_tick
+        return 1 / self._env.sim_tick
 
     def generate_travelers(self):
         """

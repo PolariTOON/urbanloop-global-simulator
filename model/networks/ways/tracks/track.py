@@ -21,6 +21,10 @@ class Track(Node):
     def next(self):
         raise NotImplementedError()
 
+    @property
+    def length(self):
+        return 0
+
     def serialize(self):
         dict = super().serialize()
         dict.update({})

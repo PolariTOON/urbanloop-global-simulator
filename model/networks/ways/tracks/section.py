@@ -69,8 +69,24 @@ class Section(Track):
         return self._length / self._speed
 
     def update(self):
-        return
-        yield
+        while True:
+            while True:
+                message = yield from self.read()
+                if message is None:
+                    break
+                elif "pod_exit" in message["type"]:
+                    pod = message["author"]
+                    self._pods.remove(pod)
+                    yield from self._next.write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": pod
+                    })
+                elif "pod_entry" in message["type"]:
+                    pod = message["pod"]
+                    self._pods.append(pod)
+                else:
+                    break
 
     def serialize(self):
         dict = super().serialize()

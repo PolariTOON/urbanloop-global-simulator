@@ -4,7 +4,7 @@ from .traveler import Traveler
 
 
 class Pod(Token):
-    def __init__(self, env, track, speed, position=None, travelers=None, **kwargs):
+    def __init__(self, env, track_or_switch, speed, position=None, travelers=None, **kwargs):
         super().__init__(env, **kwargs)
         self._position = position or 0
         travelers = travelers or {
@@ -16,7 +16,7 @@ class Pod(Token):
         self._travelers = [Traveler(env, 0) for k in range(travelers["count"])]
         self._capacity = travelers["max"]
         self._priority = 0  # TODO
-        self._track = track  # TODO
+        self._track_or_switch = track_or_switch  # TODO
         self._speed = speed
 
     @property
@@ -44,12 +44,12 @@ class Pod(Token):
         self._priority = value
 
     @property
-    def track(self):
-        return self._track
+    def track_or_switch(self):
+        return self._track_or_switch
 
-    @track.setter
-    def track(self, value):
-        self._track = value
+    @track_or_switch.setter
+    def track_or_switch(self, value):
+        self._track_or_switch = value
 
     @property
     def name(self):
@@ -73,20 +73,18 @@ class Pod(Token):
 
     def update(self):
         while True:
-            new_pos = self._position + self._speed * self.env.sim_tick
-            self._position = new_pos  # TODO : c'est qu'une premiere tentative naïve
-            '''if isinstance(self._track, Track) and isinstance(self._track.next, SwitchOut):
-                # TODO : algo aiguillage
-            elif '''
-            yield from self._track.write({
-                "author": self,
-                "type": "pod_pos",
-            })
+            self._position += self._speed * self.env.sim_tick
+            if self._position > self._track_or_switch.length:
+                self._position -= self._track_or_switch.length
+                yield from self._track_or_switch.write({
+                    "author": self,
+                    "type": "pod_exit",
+                })
             while True:
                 message = yield from self.read()
                 if message is None:
                     break
-                if "speed" in message["type"]:
+                elif "speed" in message["type"]:
                     self._speed = message["speed"]
                 else:
                     break

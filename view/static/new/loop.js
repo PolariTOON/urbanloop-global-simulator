@@ -1,3 +1,4 @@
+import {appState} from "./network.js";
 import {Station} from "./station.js";
 import {Shed} from "./shed.js";
 import {Sensor} from "./sensor.js";
@@ -32,27 +33,35 @@ export class Loop {
         // On ajoute les éléments
         for (const elt of json["elements"]) {
             switch (elt["type"]){
-                case "station":
+                case "station": {
                     const station = new Station(elt, infoLayer);
                     this.elements.push(station);
                     networkLayer.add(station);
+                    appState.objects.push(station);
                     break;
-                case "shed":
+                }
+                case "shed": {
                     const shed = new Shed(elt, infoLayer);
                     this.elements.push(shed);
                     networkLayer.add(shed);
+                    appState.objects.push(shed);
                     break;
-                case "sensor":
+                }
+                case "sensor": {
                     const sensor = new Sensor(elt, infoLayer);
                     this.elements.push(sensor);
                     networkLayer.add(sensor);
+                    appState.objects.push(sensor);
                     break;
+                }
                 case "switch_in":
-                case "switch_out":
+                case "switch_out": {
                     const sw = new Switch(elt, infoLayer);
                     this.elements.push(sw);
                     networkLayer.add(sw);
+                    appState.objects.push(sw);
                     break;
+                }
             }
         }
 
@@ -62,12 +71,14 @@ export class Loop {
             const endElement = this.elements[(i + 1) % li];
             const section = new Section(json["sections"][i], beginElement, endElement, true, infoLayer);
             networkLayer.add(section);
+            appState.objects.push(section);
         }
 
         // On ajoute les capsules déjà présente sur les sections
         for (const pod of json["pods"]) {
             const p = new Pod(pod, json, false, null, infoLayer);
             networkLayer.add(p);
+            appState.objects.push(p);
         }
 
         this.text = new Text({

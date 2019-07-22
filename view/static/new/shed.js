@@ -1,10 +1,10 @@
-import {appState} from "./network.js";
-const {Group, Label, Rect, Tag, Text} = Konva;
+import {Entity} from "./entity.js";
+const {Rect} = Konva;
 
 const shedColor = 'rgb(40, 40, 40)';
 const shedSelectedColor = 'rgb(255, 200, 20)';
 
-export class Shed extends Group {
+export class Shed extends Entity {
     constructor(json, infoLayer) {
         const name = json["name"];
         const x = json["x"];
@@ -14,14 +14,15 @@ export class Shed extends Group {
         const semiWidth = Math.floor(shedWidth / 2);
         const innerSize = 2 * (shedRadius - semiWidth);
         const outerSize = 2 * (shedRadius + semiWidth);
+        const label = 'Shed : ' + json['name'] + ' | Capacity : ' + json['pods']["max"];
         super({
             name,
+            label,
             x,
             y,
             offsetX: x,
             offsetY: y
-        });
-
+        }, infoLayer);
         this.innerRectangle = new Rect({
             x: x,
             y: y,
@@ -33,7 +34,6 @@ export class Shed extends Group {
             stroke: 'black',
             strokeWidth: 0.3,
         });
-
         this.outerRectangle = new Rect({
             x: x,
             y: y,
@@ -45,65 +45,14 @@ export class Shed extends Group {
             stroke: 'black',
             strokeWidth: 0.3,
         });
-
-        this.info = new Label({
-            x,
-            y,
-            opacity: 0.75,
-            visible: false,
-            listening: false
-        });
-
-        this.info.add(
-            new Tag({
-                fill: 'black',
-                pointerDirection: 'down',
-                pointerWidth: 10,
-                pointerHeight: 10,
-                lineJoin: 'round',
-                shadowColor: 'black',
-                shadowBlur: 10,
-                shadowOffset: 10,
-                shadowOpacity: 0.2
-            })
-        );
-
-        this.info.add(
-            new Text({
-                text: 'Shed : ' + json['name'] + ' | Capacity : ' + json['pods']["max"],
-                fontFamily: 'Calibri',
-                fontSize: 18,
-                padding: 5,
-                fill: 'white'
-            })
-        );
-
         this.add(this.outerRectangle);
         this.add(this.innerRectangle);
-        infoLayer.add(this.info);
-
-        appState.objects.push(this);
+        this.unselect();
     }
-
     select() {
         this.outerRectangle.fill(shedSelectedColor);
     }
-
     unselect() {
         this.outerRectangle.fill(shedColor);
     }
-
-    updateScale(value) {
-        this.innerRectangle.scaleX(value);
-        this.innerRectangle.scaleY(value);
-        this.outerRectangle.scaleX(value);
-        this.outerRectangle.scaleY(value);
-        this.info.scaleX(value);
-        this.info.scaleY(value);
-    }
-}
-
-export function updateShedFromJSON(json) {
-    let targetSheds = appState.objects.filter(shed => shed.uuid.includes(json['uuid']));
-    targetSheds.forEach(shed => shed.update(json));
 }

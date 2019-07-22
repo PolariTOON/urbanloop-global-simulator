@@ -1,15 +1,9 @@
-import {fetchTimeout} from "./main-page.js";
-import {Loop} from "./loop.js";
-import {updateStationFromJSON} from "./station.js";
-import {updateShedFromJSON} from "./shed.js";
-import {updateSwitchFromJSON} from "./switch.js";
-import {updateSensorFromJSON} from "./sensor.js";
-import {updateTimeFromJSON} from "./menu.js";
-import {updatePodFromJSON} from "./pod.js";
-import {updateDataPanel} from "./data-panel.js";
-import {updateViewPanel} from "./view-panel.js";
 import {Bridge} from "./bridge.js";
-const {Group, Layer, Stage} = Konva;
+import {Entity} from "./entity.js";
+import {updateDataPanel} from "./data-panel.js";
+import {Loop} from "./loop.js";
+import {updateViewPanel} from "./view-panel.js";
+const {Layer, Stage} = Konva;
 
 const zoomIntensity = 0.8;
 const minScale = 0.01;
@@ -36,7 +30,14 @@ const networkLayer = new Layer();
 const infoLayer = new Layer();
 
 function scaleObjects() {
-    appState.objects.forEach(object => object.updateScale(appState.objectScale));
+    const scale = appState.objectScale;
+    for (const object of appState.objects) {
+        object.scale({
+            x: scale,
+            y: scale,
+        });
+    }
+    stage.batchDraw();
 }
 
 function getBarycenter() {
@@ -95,32 +96,6 @@ export async function initNetworkScene(network_index) {
 }
 
 export async function updateNetworkScene() {
-    const listDataJSON = await (await fetchTimeout(1000, '/data/')).json(); //TODO: requête data
-
-    if (!appState.clearing) {
-        for (const dataJSON of listDataJSON) {
-            switch (dataJSON['jsonType']) {
-                case 'time':
-                    updateTimeFromJSON(dataJSON);
-                    break;
-                case 'station':
-                    updateStationFromJSON(dataJSON);
-                    break;
-                case 'shed':
-                    updateShedFromJSON(dataJSON);
-                    break;
-                case 'switch':
-                    updateSwitchFromJSON(dataJSON);
-                    break;
-                case 'pod':
-                    updatePodFromJSON(dataJSON);
-                    break;
-                case 'sensor':
-                    updateSensorFromJSON(dataJSON);
-            }
-        }
-    }
-
     networkLayer.batchDraw();
     infoLayer.batchDraw();
 }
@@ -248,12 +223,12 @@ stage.on("wheel", (event) => {
 stage.on("mouseover", (event) => {
     event.evt.preventDefault();
     let shape = event.target;
-    while (shape !== null && !(shape instanceof Group)) {
+    while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
     if (shape !== null) {
         setCursor("pointer");
-        shape.info.show();
+        shape.showHint();
     }
     infoLayer.batchDraw();
 });
@@ -261,12 +236,12 @@ stage.on("mouseover", (event) => {
 stage.on("mouseout", (event) => {
     event.evt.preventDefault();
     let shape = event.target;
-    while (shape !== null && !(shape instanceof Group)) {
+    while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
     if (shape !== null) {
         setCursor("auto");
-        shape.info.hide();
+        shape.hideHint();
     }
     infoLayer.batchDraw();
 });
@@ -274,7 +249,7 @@ stage.on("mouseout", (event) => {
 stage.on("mousedown", (event) => {
     event.evt.preventDefault();
     let shape = event.target;
-    while (shape !== null && !(shape instanceof Group)) {
+    while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
     if (shape === appState.selectedObject) {
@@ -292,10 +267,10 @@ stage.on("mousedown", (event) => {
 });
 
 scaleSlider.oninput = () => {
-    scaleSlider.title = 'Objects scale : ' + scaleSlider.value;
-    appState.objectScale = scaleSlider.value;
-    appState.objects.forEach(object => object.updateScale(appState.objectScale));
-    stage.batchDraw();
+    const scale = scaleSlider.value;
+    scaleSlider.title = 'Objects scale : ' + scale;
+    appState.objectScale = scale;
+    scaleObjects();
 };
 
 scaleSlider.onmouseleave = () => {

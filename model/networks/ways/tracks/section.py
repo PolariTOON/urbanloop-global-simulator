@@ -72,6 +72,8 @@ class Section(Track):
         while True:
             while True:
                 message = yield from self.read()
+                if message is not None:
+                    print("section <%s>:" % self, message)
                 if message is None:
                     break
                 elif "pod_exit" in message["type"]:
@@ -85,6 +87,16 @@ class Section(Track):
                 elif "pod_entry" in message["type"]:
                     pod = message["pod"]
                     self._pods.append(pod)
+                    yield from pod.write({
+                        "author": self,
+                        "type": "set_track_or_switch",
+                        "track_or_switch": self
+                    })
+                    yield from pod.write({
+                        "author": self,
+                        "type": "speed",
+                        "speed": self._speed
+                    })
                 else:
                     break
 
@@ -104,9 +116,9 @@ class Section(Track):
         pods = self._pods
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
-                self._pods.insert(k, Pod(env, self, 0, **pod))
+                self._pods.insert(k, Pod(env, self, 0, True, **pod))
                 return
-        self._pods.append(Pod(env, self, self._speed, **pod))
+        self._pods.append(Pod(env, self, pod["speed"], False, **pod))
 
     def get_coordinates_of_position(self, position):
         previous = self._previous

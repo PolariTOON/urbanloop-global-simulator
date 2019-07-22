@@ -21,17 +21,15 @@
         {"type": "sensor", "x": 450, "y": 380}
       ],
       "sections": [
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}}
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}}
       ],
-      "pods": [
-        {"position": 0, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
-      ]
+      "pods": []
     },
     {
       "name": "Villers-les-Nancy",
@@ -45,16 +43,17 @@
         {"type": "sensor", "x": 280, "y": 520}
       ],
       "sections": [
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}}
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}}
       ],
       "pods": [
-          {"position": 0, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
+                {"position": 200, "speed": 70.70, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
+
       ]
     },
     {
@@ -69,25 +68,21 @@
         {"type": "sensor", "x": 280, "y": 350}
       ],
       "sections": [
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}}
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}},
+        {"speed": 70.70, "path": {"type": "line"}}
       ],
-      "pods": [
-        {"position": 0, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
-      ]
+      "pods": []
     }
   ],
   "bridges": [
-    {"name": "bridge 0", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": [
-      {"position": 100, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
-    ]},
-    {"name": "bridge 1", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
-    {"name": "bridge 2", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
-    {"name": "bridge 3", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []}
+    {"name": "bridge 0", "section": {"speed": 70.70, "path": {"type": "line"}}, "pods": []},
+    {"name": "bridge 1", "section": {"speed": 70.70, "path": {"type": "line"}}, "pods": []},
+    {"name": "bridge 2", "section": {"speed": 70.70, "path": {"type": "line"}}, "pods": []},
+    {"name": "bridge 3", "section": {"speed": 70.70, "path": {"type": "line"}}, "pods": []}
   ]
 }

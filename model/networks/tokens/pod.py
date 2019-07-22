@@ -4,7 +4,7 @@ from .traveler import Traveler
 
 
 class Pod(Token):
-    def __init__(self, env, track_or_switch, speed, position=None, travelers=None, **kwargs):
+    def __init__(self, env, track_or_switch, pod_speed, is_docked, position=None, travelers=None, **kwargs):
         super().__init__(env, **kwargs)
         self._position = position or 0
         travelers = travelers or {
@@ -17,7 +17,8 @@ class Pod(Token):
         self._capacity = travelers["max"]
         self._priority = 0  # TODO
         self._track_or_switch = track_or_switch  # TODO
-        self._speed = speed
+        self._speed = pod_speed
+        self._is_docked = is_docked
 
     @property
     def position(self):
@@ -26,6 +27,14 @@ class Pod(Token):
     @position.setter
     def position(self, value):
         self._position = value
+
+    @property
+    def is_docked(self):
+        return self._is_docked
+
+    @is_docked.setter
+    def is_docked(self, value):
+        self._is_docked = value
 
     @property
     def travelers(self):
@@ -55,6 +64,14 @@ class Pod(Token):
     def name(self):
         return "pod n° %s" % self.id
 
+    @property
+    def speed(self):
+        return self._speed
+
+    @speed.setter
+    def speed(self, value):
+        self._speed = value
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
@@ -73,8 +90,10 @@ class Pod(Token):
 
     def update(self):
         while True:
+            if self._position != 0:
+                print(self._position, " | ", self._track_or_switch)
             self._position += self._speed * self.env.sim_tick
-            if self._position > self._track_or_switch.length:
+            if self._track_or_switch.length != 0 and self._position > self._track_or_switch.length:
                 self._position -= self._track_or_switch.length
                 yield from self._track_or_switch.write({
                     "author": self,
@@ -82,9 +101,16 @@ class Pod(Token):
                 })
             while True:
                 message = yield from self.read()
+                if message is not None:
+                    print("pod <%s>:" % self, message)
                 if message is None:
                     break
                 elif "speed" in message["type"]:
                     self._speed = message["speed"]
+                elif "docked" in message["type"]:
+                    self._speed = 0
+                    self._is_docked = True
+                elif "set_track_or_switch" in message["type"]:
+                    self._track_or_switch = message["track_or_switch"]
                 else:
                     break

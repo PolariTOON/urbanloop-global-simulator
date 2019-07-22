@@ -62,13 +62,10 @@ function getBarycenter() {
 export async function initNetworkScene(network_index) {
     appState.objects = [];
 
-    /*await fetch('/networks/0/load/', {
+    /*await fetch('/networks/0/', {
         method: "POST"
-    });
+    });*/
 
-    const networkJSON = await (await fetch('/networks/0/', { //TODO: requête networks load
-        method: "GET"
-    })).json();*/
 
     // On ajoute les boucles
     const loops = [];
@@ -91,7 +88,7 @@ export async function initNetworkScene(network_index) {
         const bridge = new Bridge(json, switchIn, switchOut, networkJSON["loops"], networkLayer, infoLayer);
         bridges.push(bridge);
     }
-    resize()
+    resize();
 
     networkLayer.batchDraw();
     infoLayer.batchDraw();

@@ -29,7 +29,7 @@ class Station(Step):
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = travelers["average_waiting_time"]
-        self._pods = [Pod(env, self) for k in range(pods["count"])]
+        self._pods = [Pod(env, self, 0, True) for k in range(pods["count"])]
         self._capacity = pods["max"]
         if travelers["count"]:
             self._travelers = [self._average_waiting_time in range(travelers["count"])]  # cette liste représente une file des voyageurs en attente, elle est remplie par le temps d'attente de chacun
@@ -76,3 +76,34 @@ class Station(Step):
     @property
     def capacity(self):
         return self._capacity
+
+    def update(self):
+        while True:
+            while True:
+                message = yield from self.read()
+                if message is not None:
+                    print("station <%s>:" % self, message)
+                if message is None:
+                    break
+                elif "pod_entry" in message["type"]:
+                    pod = message["pod"]
+                    yield from pod.write({
+                        "author": self,
+                        "type": "set_track_or_switch",
+                        "track_or_switch": self
+                    })
+                    if pod.destination != self:  # la capsule ne fait que passer
+                        yield from self.next.write({
+                            "author": self,
+                            "type": "pod_entry",
+                            "pod": pod
+                        })
+                    else:  # la capsule va se garer dans la station
+                        pod.is_docked = True
+                        self._pods.append(pod)
+                        yield from pod.write({
+                            "author": self,
+                            "type": "docked"
+                        })
+                else:
+                    break

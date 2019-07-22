@@ -25,3 +25,26 @@ class Sensor(Step):
     @property
     def name(self):
         return "sensor"
+
+    def update(self):
+        while True:
+            while True:
+                message = yield from self.read()
+                if message is not None:
+                    print("sensor <%s>:" % self, message)
+                if message is None:
+                    break
+                elif "pod_entry" in message["type"]:  # Un capsule ne s'arrête pas devant un capteur donc il passe directement l'info du passage à son suivant
+                    pod = message["pod"]
+                    yield from pod.write({
+                        "author": self,
+                        "type": "set_track_or_switch",
+                        "track_or_switch": self
+                    })
+                    yield from self.next.write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": pod
+                    })
+                else:
+                    break

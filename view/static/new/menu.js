@@ -1,16 +1,9 @@
-import {changeNetworkButtonState} from "./config-panel.js";
-import {applyNetworkScene} from "./network.js";
-
-
 let playPauseButton = document.getElementById('play-pause-button');
 let accelerateButton = document.getElementById('accelerate-button');
 let decelerateButton = document.getElementById('decelerate-button');
 let timerDiv = document.getElementById('timer-div');
 let speedDiv = document.getElementById('speed-div');
 let running = false;
-
-let configTab = document.getElementById("config-tab");
-let interactTab = document.getElementById("interact-tab");
 
 export function updateTimeFromJSON(timeJSON) {
     timerDiv.innerHTML = `Day ${timeJSON['day']}<br>${timeJSON['time']}`;
@@ -50,12 +43,12 @@ decelerateButton.disabled = true;
 
 playPauseButton.addEventListener("click", () => {
     if (!running) {
-        fetch('/clock/play/', { //TODO : requête play
+        fetch('/networks/0/clock/play/', { //TODO : requête play
             method: "POST"
         });
         playPauseButton.innerHTML = "Pause";
     } else {
-        fetch('/clock/pause/', { //TODO : requête pause
+        fetch('/networks/0/clock/pause/', { //TODO : requête pause
             method: "POST"
         });
         playPauseButton.innerHTML = "Play";

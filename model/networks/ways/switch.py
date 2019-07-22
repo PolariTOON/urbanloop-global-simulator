@@ -24,11 +24,11 @@ class Switch(Way):
             pods_key = pods[key]
             for pod in pods_key:
                 if key == "loop_in":
-                    self._pods_previous.append(Pod(env, self, **pod))
+                    self._pods_previous.append(Pod(env, self, pod["speed"], False, **pod))
                 elif key == "loop_out":
-                    self._pods_next.append(Pod(env, self, **pod))
+                    self._pods_next.append(Pod(env, self, pod["speed"], False, **pod))
                 else:
-                    self._pods_beside.append(Pod(env, self, **pod))
+                    self._pods_beside.append(Pod(env, self, pod["speed"], False, **pod))
 
         # Liaison des routes et sections de la boucle à l'aiguillage
         # Route précédente
@@ -45,6 +45,10 @@ class Switch(Way):
     @property
     def y(self):
         return self._y
+
+    @property
+    def length(self):
+        return 0
 
     @property
     def beside(self):

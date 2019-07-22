@@ -68,6 +68,38 @@ class Section(Track):
     def weight(self):
         return self._length / self._speed
 
+    def update(self):
+        while True:
+            while True:
+                message = yield from self.read()
+                if message is not None:
+                    print("section <%s>:" % self, message)
+                if message is None:
+                    break
+                elif "pod_exit" in message["type"]:
+                    pod = message["author"]
+                    self._pods.remove(pod)
+                    yield from self._next.write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": pod
+                    })
+                elif "pod_entry" in message["type"]:
+                    pod = message["pod"]
+                    self._pods.append(pod)
+                    yield from pod.write({
+                        "author": self,
+                        "type": "set_track_or_switch",
+                        "track_or_switch": self
+                    })
+                    yield from pod.write({
+                        "author": self,
+                        "type": "speed",
+                        "speed": self._speed
+                    })
+                else:
+                    break
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
@@ -84,9 +116,9 @@ class Section(Track):
         pods = self._pods
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
-                self._pods.insert(k, Pod(env, self, **pod))
+                self._pods.insert(k, Pod(env, self, 0, True, **pod))
                 return
-        self._pods.append(Pod(env, self, **pod))
+        self._pods.append(Pod(env, self, pod["speed"], False, **pod))
 
     def get_coordinates_of_position(self, position):
         previous = self._previous

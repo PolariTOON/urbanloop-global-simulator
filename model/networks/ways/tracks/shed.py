@@ -21,7 +21,7 @@ class Shed(Step):
         }
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
-        self._pods = [Pod(env, self) for k in range(pods["count"])]
+        self._pods = [Pod(env, self, 0, True) for k in range(pods["count"])]
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
 
@@ -46,3 +46,34 @@ class Shed(Step):
     @property
     def capacity(self):
         return self._capacity
+
+    def update(self):
+        while True:
+            while True:
+                message = yield from self.read()
+                if message is not None:
+                    print("shed <%s>:" % self, message)
+                if message is None:
+                    break
+                elif "pod_entry" in message["type"]:
+                    pod = message["pod"]
+                    yield from pod.write({
+                        "author": self,
+                        "type": "set_track_or_switch",
+                        "track_or_switch": self
+                    })
+                    if pod.destination != self:  # la capsule ne fait que passer
+                        yield from self.next.write({
+                            "author": self,
+                            "type": "pod_entry",
+                            "pod": pod
+                        })
+                    else:  # la capsule va se garer dans le dépôt
+                        self._pods.append(pod)
+                        yield from pod.write({
+                            "author": self,
+                            "type": "docked"
+                        })
+                else:
+                    break
+

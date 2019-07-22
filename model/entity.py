@@ -9,7 +9,7 @@ class Entity:
         self._env = env
         self._id = id
         self._store = Store(env)
-        Process(env, self.update())
+        Process(self._env, self.update())
 
     @property
     def env(self):
@@ -41,8 +41,6 @@ class Entity:
         return message
 
     def update(self):
-        return # TODO: implémenter
-        yield
         raise NotImplementedError()
 
     def serialize(self):

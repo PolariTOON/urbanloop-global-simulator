@@ -4,24 +4,21 @@ from .traveler import Traveler
 
 
 class Pod(Token):
-    def __init__(self, env, track, position=None, travelers=None, **kwargs):
+    def __init__(self, env, track_or_switch, pod_speed, is_docked, position=None, travelers=None, **kwargs):
         super().__init__(env, **kwargs)
-        self._position = position
+        self._position = position or 0
         travelers = travelers or {
             "count": 0,
             "max": 0
         }
         travelers["count"] = travelers["count"] or 0
         travelers["max"] = travelers["max"] or 0
-        source = self.source
-        destination = self.destination
-        self._travelers = [Traveler(env, 0, {
-            "source": source,
-            "destination": destination
-        }) for k in range(travelers["count"])]
+        self._travelers = [Traveler(env, 0) for k in range(travelers["count"])]
         self._capacity = travelers["max"]
         self._priority = 0  # TODO
-        self._track = track  # TODO
+        self._track_or_switch = track_or_switch  # TODO
+        self._speed = pod_speed
+        self._is_docked = is_docked
 
     @property
     def position(self):
@@ -30,6 +27,14 @@ class Pod(Token):
     @position.setter
     def position(self, value):
         self._position = value
+
+    @property
+    def is_docked(self):
+        return self._is_docked
+
+    @is_docked.setter
+    def is_docked(self, value):
+        self._is_docked = value
 
     @property
     def travelers(self):
@@ -48,16 +53,24 @@ class Pod(Token):
         self._priority = value
 
     @property
-    def track(self):
-        return self._track
+    def track_or_switch(self):
+        return self._track_or_switch
 
-    @track.setter
-    def track(self, value):
-        self._track = value
+    @track_or_switch.setter
+    def track_or_switch(self, value):
+        self._track_or_switch = value
 
     @property
     def name(self):
         return "pod n° %s" % self.id
+
+    @property
+    def speed(self):
+        return self._speed
+
+    @speed.setter
+    def speed(self, value):
+        self._speed = value
 
     def serialize(self):
         dict = super().serialize()
@@ -74,3 +87,30 @@ class Pod(Token):
     def add_traveler(self, traveler):
         self._travelers.append(traveler)
         simlog.info("Traveler %s gets in capsule %d" % (traveler.id, self.id), traveler.source, self.destination)
+
+    def update(self):
+        while True:
+            if self._position != 0:
+                print(self._position, " | ", self._track_or_switch)
+            self._position += self._speed * self.env.sim_tick
+            if self._track_or_switch.length != 0 and self._position > self._track_or_switch.length:
+                self._position -= self._track_or_switch.length
+                yield from self._track_or_switch.write({
+                    "author": self,
+                    "type": "pod_exit",
+                })
+            while True:
+                message = yield from self.read()
+                if message is not None:
+                    print("pod <%s>:" % self, message)
+                if message is None:
+                    break
+                elif "speed" in message["type"]:
+                    self._speed = message["speed"]
+                elif "docked" in message["type"]:
+                    self._speed = 0
+                    self._is_docked = True
+                elif "set_track_or_switch" in message["type"]:
+                    self._track_or_switch = message["track_or_switch"]
+                else:
+                    break

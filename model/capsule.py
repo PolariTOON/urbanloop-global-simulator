@@ -109,7 +109,6 @@ class Capsule:
         """
         :return: Trip event generator
         """
-
         dist_to_next_element = self.loop.distance_between(self.current_element, self.next_element)
         self.segment_length = dist_to_next_element
         time_to_next_element = dist_to_next_element / self.speed
@@ -179,13 +178,11 @@ class Capsule:
     def end_trip(self):
         controller.get_controller().temps_moy_stat(self.id, sim_loop.get_simulated_time())
         self.current_element.end_capsule_trip(self)
-        simlog.info("Capsule %d (%s) ends its trip" %
-                    (self.id, self._get_capacity_state()), self.destination.name)
+        simlog.info("Capsule %d (%s) ends its trip" % (self.id, self._get_capacity_state()), self.destination.name)
         sim_loop.recorder.add_arrival_to_station(self.current_element)
         self.current_element.capsule_queue.put(self)
         self.destination = None
-        simlog.debug(
-            "Contains %d capsules now" % (self.current_element.capsule_queue.qsize()), self.current_element.name)
+        simlog.debug("Contains %d capsules now" % (self.current_element.capsule_queue.qsize()), self.current_element.name)
         self.moving = False
         if self.travelers:
             _empty_capsules.append(self)

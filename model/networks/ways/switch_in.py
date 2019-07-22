@@ -36,3 +36,27 @@ class SwitchIn(Switch):
             "type": "switch_in"
         })
         return dict
+
+    def update(self):
+        while True:
+            while True:
+                message = yield from self.read()
+                if message is not None:
+                    print("switch_in <%s>:" % self, message)
+                if message is None:
+                    break
+                elif "pod_entry" in message["type"]:  # pour le moment la capsule ne fait que de passer todo : algo aiguillage à un plus haut niveau
+                    pod = message["pod"]
+                    yield from pod.write({
+                        "author": self,
+                        "type": "set_track_or_switch",
+                        "track_or_switch": self
+                    })
+                    yield from self.next.sections[0].write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": pod
+                    })
+                else:
+                    break
+

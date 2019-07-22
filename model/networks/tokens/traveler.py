@@ -11,3 +11,7 @@ class Traveler(Token):
         dict = super().serialize()
         dict.update({})
         return dict
+
+    def update(self):
+        return
+        yield

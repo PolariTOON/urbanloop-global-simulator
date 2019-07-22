@@ -87,23 +87,29 @@ class Station(Step):
                     break
                 elif "pod_entry" in message["type"]:
                     pod = message["pod"]
-                    yield from pod.write({
+                    yield from self.parent.write({
                         "author": self,
-                        "type": "set_track_or_switch",
-                        "track_or_switch": self
+                        "type": "pod_entry",
+                        "pod": pod
                     })
-                    if pod.destination != self:  # la capsule ne fait que passer
-                        yield from self.next.write({
-                            "author": self,
-                            "type": "pod_entry",
-                            "pod": pod
-                        })
-                    else:  # la capsule va se garer dans la station
-                        pod.is_docked = True
+                    # la capsule va se garer dans la station
+                    if pod.destination == self:  # todo : ?
                         self._pods.append(pod)
+                        yield from pod.write({
+                            "author": self,
+                            "type": "set_track_or_switch",
+                            "track_or_switch": self
+                        })
                         yield from pod.write({
                             "author": self,
                             "type": "docked"
                         })
+                elif "pod_exit" in message["type"]:
+                    pod = message["pod"]
+                    self._pods.remove(pod)
+                    yield from pod.write({
+                        "author": self,
+                        "type": "ack"
+                    })
                 else:
                     break

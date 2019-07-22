@@ -57,23 +57,20 @@ class Shed(Step):
                     break
                 elif "pod_entry" in message["type"]:
                     pod = message["pod"]
+                    yield from self._parent.write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": pod
+                    })
+                    if pod.destination == self:  # TODO : ?
+                        break
+                elif "pod_exit" in message["type"]:
+                    pod = message["pod"]
                     yield from pod.write({
                         "author": self,
-                        "type": "set_track_or_switch",
-                        "track_or_switch": self
+                        "type": "ack"
                     })
-                    if pod.destination != self:  # la capsule ne fait que passer
-                        yield from self.next.write({
-                            "author": self,
-                            "type": "pod_entry",
-                            "pod": pod
-                        })
-                    else:  # la capsule va se garer dans le dépôt
-                        self._pods.append(pod)
-                        yield from pod.write({
-                            "author": self,
-                            "type": "docked"
-                        })
+                    break
                 else:
                     break
 

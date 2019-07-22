@@ -79,24 +79,18 @@ class Section(Track):
                 elif "pod_exit" in message["type"]:
                     pod = message["author"]
                     self._pods.remove(pod)
-                    yield from self._next.write({
+                    yield from pod.write({
                         "author": self,
-                        "type": "pod_entry",
-                        "pod": pod
+                        "type": "ack"
                     })
                 elif "pod_entry" in message["type"]:
                     pod = message["pod"]
                     self._pods.append(pod)
-                    yield from pod.write({
+                    yield from self._parent.write({
                         "author": self,
-                        "type": "set_track_or_switch",
-                        "track_or_switch": self
+                        "type": "pod_entry"
                     })
-                    yield from pod.write({
-                        "author": self,
-                        "type": "speed",
-                        "speed": self._speed
-                    })
+                    break
                 else:
                     break
 

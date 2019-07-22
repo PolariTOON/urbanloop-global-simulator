@@ -1,34 +1,43 @@
-import {appState, networkLayer, infoLayer, initBehaviors} from "./network.js";
+import {appState} from "./network.js";
+const {Circle, Group, Label, Rect, Tag, Text} = Konva;
+
 
 const stationColor = "rgb(40, 40, 200)";
 const stationSelectedColor = "rgb(255, 200, 20)";
 
-export class Station {
-    constructor(stationJSON, stationRadius = 12, stationWidth = 4, dockSize = 24) {
-        this.json = stationJSON;
-        this.capacity = stationJSON["capacity"];
+export class Station extends Group {
+    constructor(json, infoLayer) {
+        const name = json["name"];
+        const x = json["x"];
+        const y = json["y"];
+        const stationRadius = 12;
+        const stationWidth = 4;
+        const dockSize = 24;
+        const semiWidth = Math.floor(stationWidth / 2);
+        super({
+            name,
+            x,
+            y,
+            offsetX: x,
+            offsetY: y
+        });
+
+        this.capacity = json["capacity"];
         this.stationRadius = stationRadius;
         this.dockSize = dockSize;
-        this.name = stationJSON["name"];
-        this.x = stationJSON["x"];
-        this.y = stationJSON["y"];
 
-        const semiWidth = Math.floor(stationWidth / 2);
-
-        this.innerCircle = new Konva.Circle({
-            name: this.uuid,
-            x: this.x,
-            y: this.y,
+        this.innerCircle = new Circle({
+            x,
+            y,
             radius: stationRadius - semiWidth,
             fill: "white",
             stroke: "black",
             strokeWidth: 0.3,
         });
 
-        this.outerCircle = new Konva.Circle({
-            name: this.uuid,
-            x: this.x,
-            y: this.y,
+        this.outerCircle = new Circle({
+            x,
+            y,
             radius: stationRadius + semiWidth,
             fill: stationColor,
             stroke: "black",
@@ -37,10 +46,9 @@ export class Station {
 
         this.dockList = [];
         for (let i = 0; i < this.capacity; i++) {
-            let dockRect = new Konva.Rect({
-                name: this.name,
-                x: this.x + 10 * stationRadius + (6 * i + 2) * dockSize,
-                y: this.y,
+            let dockRect = new Rect({
+                x: x + 10 * stationRadius + (6 * i + 2) * dockSize,
+                y: y,
                 width: dockSize,
                 height: dockSize,
                 fill: "white",
@@ -52,16 +60,16 @@ export class Station {
             this.dockList.push(dockRect);
         }
 
-        this.info = new Konva.Label({
-            x: this.x,
-            y: this.y,
+        this.info = new Label({
+            x,
+            y,
             opacity: 0.75,
             visible: false,
             listening: false
         });
 
         this.info.add(
-            new Konva.Tag({
+            new Tag({
                 fill: "black",
                 pointerDirection: "down",
                 pointerWidth: 10,
@@ -75,8 +83,8 @@ export class Station {
         );
 
         this.info.add(
-            new Konva.Text({
-                text: "Station : " + stationJSON["name"] + " | Capacity : " + stationJSON["pods"]["max"],
+            new Text({
+                text: "Station : " + json["name"] + " | Capacity : " + json["pods"]["max"],
                 fontFamily: "Calibri",
                 fontSize: 18,
                 padding: 5,
@@ -84,12 +92,10 @@ export class Station {
             })
         );
 
-        initBehaviors(this, this.innerCircle, this.outerCircle, this.info);
-
-        networkLayer.add(this.outerCircle);
-        networkLayer.add(this.innerCircle);
+        this.add(this.outerCircle);
+        this.add(this.innerCircle);
         this.dockList.forEach(dock => {
-            networkLayer.add(dock);
+            this.add(dock);
             dock.hide();
         });
         infoLayer.add(this.info);
@@ -98,31 +104,19 @@ export class Station {
     }
 
     select() {
-        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
-            appState.selectedObject.unselect();
-        }
-
-        appState.selectedObject = this;
         this.outerCircle.fill(stationSelectedColor);
 
         this.dockList.forEach(dock => {
             dock.show();
         });
-
-        networkLayer.batchDraw();
     }
 
     unselect() {
-        if (appState.selectedObject === this) {
-            appState.selectedObject = undefined;
-        }
         this.outerCircle.fill(stationColor);
 
         this.dockList.forEach(dock => {
             dock.hide();
         });
-
-        networkLayer.batchDraw();
     }
 
     updateScale(value) {
@@ -138,13 +132,9 @@ export class Station {
         this.info.scaleY(value);
 
     }
-
-    update(stationJSON) {
-        this.json = stationJSON;
-    }
 }
 
-export function updateStationFromJSON(stationJSON) {
-    let targetStations = appState.objects.filter(station => station.uuid.includes(stationJSON["uuid"]));
-    targetStations.forEach(station => station.update(stationJSON));
+export function updateStationFromJSON(json) {
+    let targetStations = appState.objects.filter(station => station.uuid.includes(json["uuid"]));
+    targetStations.forEach(station => station.update(json));
 }

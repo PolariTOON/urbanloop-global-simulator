@@ -1,104 +1,19 @@
-import {appState, setCursor, infoLayer, networkLayer} from "./network.js";
 import {Pod} from "./pod.js";
+import {Section} from "./section.js";
 
-const bridgeColor = 'rgb(156,63,28)';
-const bridgeSelectedColor = 'rgb(255, 200, 20)';
-
-export class Bridge{
-    constructor(bridgeJSON, switchIn, switchOut, loopsJSON){
-        this.json = bridgeJSON;
-        this.section = bridgeJSON["section"];
-        this.name = bridgeJSON["name"];
-        this.switchIn = switchIn;
-        this.switchOut = switchOut;
-        this.x = (this.switchIn.x + this.switchOut.x) / 2;
-        this.y = (this.switchIn.y + this.switchOut.y) / 2;
-
-        this.line = new Konva.Arrow({
-            points: [switchOut.x, switchOut.y, switchIn.x, switchIn.y],
-            stroke: bridgeColor,
-            tension: 1,
-            strokeWidth: 2.5,
-            pointerLength : 4,
-            pointerWidth : 4
-        });
-
-        this.info = new Konva.Label({
-            x: this.x,
-            y: this.y,
-            opacity: 0.75,
-            visible: false,
-            listening: false
-        });
-
-        this.info.add(
-            new Konva.Tag({
-                fill: 'black',
-                pointerDirection: 'down',
-                pointerWidth: 10,
-                pointerHeight: 10,
-                lineJoin: 'round',
-                shadowColor: 'black',
-                shadowBlur: 10,
-                shadowOffset: 10,
-                shadowOpacity: 0.2
-            })
-        );
-
-        this.info.add(
-            new Konva.Text({
-                text: this.name,
-                fontFamily: 'Calibri',
-                fontSize: 9,
-                padding: 5,
-                fill: 'white'
-            })
-        );
-
-        this.line.on('mouseenter', () => {
-            setCursor("pointer");
-            this.info.show();
-            infoLayer.batchDraw();
-        });
-
-        this.line.on('mouseleave', () => {
-            setCursor("auto");
-            this.info.hide();
-            infoLayer.batchDraw();
-        });
-
-        this.line.on('mousedown', () => {
-        this.select();
-        });
-
-        networkLayer.add(this.line);
-        infoLayer.add(this.info);
-
-        for (const pod of bridgeJSON["pods"]){
-            new Pod(pod, bridgeJSON, false, loopsJSON);
+export class Bridge {
+    constructor(json, switchIn, switchOut, loopsJSON, networkLayer, infoLayer) {
+        const name = json["name"];
+        const x = (switchOut.x() + switchIn.x()) / 2;
+        const y = (switchOut.y() + switchIn.y()) / 2;
+        this.name = name;
+        this.x = x;
+        this.y = y;
+        const section = new Section(json["section"], switchOut, switchIn, false, infoLayer);
+        networkLayer.add(section);
+        for (const pod of json["pods"]) {
+            const p = new Pod(pod, json, false, loopsJSON, infoLayer);
+            networkLayer.add(p);
         }
-
-    }
-
-    select() {
-        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
-            appState.selectedObject.unselect();
-        }
-
-        appState.selectedObject = this;
-        this.line.stroke(bridgeSelectedColor);
-        networkLayer.batchDraw();
-    }
-
-    unselect() {
-        if (appState.selectedObject === this) {
-            appState.selectedObject = undefined;
-        }
-        this.line.stroke(bridgeColor);
-        networkLayer.batchDraw();
-    }
-
-    update(bridgeJSON) {
-        this.json = bridgeJSON;
     }
 }

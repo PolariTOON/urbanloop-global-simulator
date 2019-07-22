@@ -1,45 +1,50 @@
-import {appState, setCursor, infoLayer, networkLayer} from "./network.js";
+const {Arrow, Group, Label, Tag, Text} = Konva;
 
-const sectionColor = 'rgb(156, 156, 156)';
-const sectionSelectedColor = 'rgb(255, 200, 20)';
+const loopColor = 'rgb(156, 156, 156)';
+const loopSelectedColor = 'rgb(255, 200, 20)';
 
-function drawLine(beginElement, endElement) {
-    return new Konva.Arrow({
-        points: [beginElement.x, beginElement.y, endElement.x, endElement.y],
-        stroke: sectionColor,
-        tension: 1,
-        strokeWidth: 2.5,
-        pointerLength : 4,
-        pointerWidth : 4
-    });
-}
+const bridgeColor = 'rgb(156,63,28)';
+const bridgeSelectedColor = 'rgb(255, 200, 20)';
 
-export class Section {
-    constructor(sectionJSON, beginElement, endElement){
-        this.name = sectionJSON["name"];
-        this.beginElement = beginElement;
-        this.endElement = endElement;
-        this.pathType = sectionJSON["path"]["type"];
-        this.x = (this.beginElement.x + this.endElement.x)/2;
-        this.y = (this.beginElement.y + this.endElement.y) / 2;
+export class Section extends Group {
+    constructor(json, startElement, endElement, loopOrBridge, infoLayer) {
+        const name = json["name"];
+        const x = (startElement.x() + endElement.x()) / 2;
+        const y = (startElement.y() + endElement.y()) / 2;
+        super({
+            name,
+            x,
+            y,
+            offsetX: x,
+            offsetY: y
+        });
+        this.loopOrBridge = loopOrBridge;
 
-        switch (this.pathType){
+        switch (json["path"]["type"]) {
             case "line":
-            default:
-                this.line = drawLine(this.beginElement, this.endElement);
+            default: {
+                this.path = new Arrow({
+                    points: [startElement.x(), startElement.y(), endElement.x(), endElement.y()],
+                    stroke: loopOrBridge ? loopColor : bridgeColor,
+                    tension: 1,
+                    strokeWidth: 2.5,
+                    pointerLength : 4,
+                    pointerWidth : 4
+                });
                 break;
+            }
         }
 
-        this.info = new Konva.Label({
-            x: this.x,
-            y: this.y,
+        this.info = new Label({
+            x,
+            y,
             opacity: 0.75,
             visible: false,
             listening: false
         });
 
         this.info.add(
-            new Konva.Tag({
+            new Tag({
                 fill: 'black',
                 pointerDirection: 'down',
                 pointerWidth: 10,
@@ -53,8 +58,8 @@ export class Section {
         );
 
         this.info.add(
-            new Konva.Text({
-                text: this.name,
+            new Text({
+                text: name,
                 fontFamily: 'Calibri',
                 fontSize: 9,
                 padding: 5,
@@ -62,45 +67,15 @@ export class Section {
             })
         );
 
-        this.line.on('mouseenter', () => {
-            setCursor("pointer");
-            this.info.show();
-            infoLayer.batchDraw();
-        });
-
-        this.line.on('mouseleave', () => {
-            setCursor("auto");
-            this.info.hide();
-            infoLayer.batchDraw();
-        });
-
-        this.line.on('mousedown', () => {
-        this.select();
-    });
-
-        networkLayer.add(this.line);
+        this.add(this.path);
         infoLayer.add(this.info);
     }
 
     select() {
-        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
-            appState.selectedObject.unselect();
-        }
-
-        appState.selectedObject = this;
-        this.line.stroke(sectionSelectedColor);
-        networkLayer.batchDraw();
+        this.path.stroke(this.loopOrBridge ? loopSelectedColor : bridgeSelectedColor);
     }
 
     unselect() {
-        if (appState.selectedObject === this) {
-            appState.selectedObject = undefined;
-        }
-        this.line.stroke(sectionColor);
-        networkLayer.batchDraw();
-    }
-
-    update(sectionJSON) {
-        this.json = sectionJSON;
+        this.path.stroke(this.loopOrBridge ? loopColor : bridgeColor);
     }
 }

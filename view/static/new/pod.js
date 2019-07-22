@@ -1,6 +1,6 @@
-import {appState, networkLayer, initBehaviors} from "./network.js";
+import {appState} from "./network.js";
+const {Circle, Group, Label, Tag, Text} = Konva;
 
-export const defaultPodWidth = 5;
 const podInnerEmptyColor = 'rgb(173, 72, 45)';
 const podOuterEmptyColor = 'rgb(255, 100, 63)';
 const podInnerAboardColor = 'rgb(96, 167, 27)';
@@ -13,18 +13,18 @@ function distanceBetween(beginElement, endElement, path) {
     switch (path["type"]) {
         case "line":
         default:
-            d = Math.sqrt((beginElement["x"] - endElement["x"])**2 + (beginElement["y"] - endElement["y"])**2);
+            d = Math.hypot(beginElement["x"] - endElement["x"], beginElement["y"] - endElement["y"]);
     }
     return d;
 }
 
-function xyFromPosition(podJSON, lineJSON, loopsJSON=null){
+function xyFromPosition(json, lineJSON, loopsJSON){
     let d = 0;
     let path;
     let xy;
     let beginElement, endElement;
     if (loopsJSON){
-        d = podJSON["position"];
+        d = json["position"];
         const loopBeginElement = lineJSON["switch_out"]["loop"];
         const loopEndElement = lineJSON["switch_in"]["loop"];
         const beginElementIndex = lineJSON["switch_out"]["element"];
@@ -37,19 +37,19 @@ function xyFromPosition(podJSON, lineJSON, loopsJSON=null){
         const loopSize = lineJSON["elements"].length;
         let index = 0;
         let distanceToNext = 0;
-        while (d < podJSON["position"]){
+        while (d < json["position"]){
             beginElement = lineJSON["elements"][index];
             endElement = lineJSON["elements"][(index+1)%loopSize];
             path = lineJSON["sections"][index]["path"];
             distanceToNext = distanceBetween(beginElement, endElement, path);
-            if (d + distanceToNext < podJSON["position"]){
+            if (d + distanceToNext < json["position"]){
                 d += distanceToNext;
                 ++index;
             }
             else
                 break;
         }
-        d = podJSON["position"] - d;
+        d = json["position"] - d;
         beginElement = lineJSON["elements"][index];
         endElement = lineJSON["elements"][(index+1)%loopSize];
         path = lineJSON["sections"][index]["path"];
@@ -67,76 +67,99 @@ function xyFromPosition(podJSON, lineJSON, loopsJSON=null){
 
 }
 
-export class Pod {
-    constructor(podJSON, lineJSON, isDocked, loopsJSON, podWidth = defaultPodWidth) {
-        this.json = podJSON;
-        this.id = podJSON["name"];
-        this.travelerNumber = podJSON["travelers"]["count"];
+export class Pod extends Group {
+    constructor(json, lineJSON, isDocked, loopsJSON, infoLayer) {
+        const name = json["name"];
+        const xy = xyFromPosition(json, lineJSON, loopsJSON);
+        const x = xy[0];
+        const y = xy[1];
+        const podWidth = 5;
+        super({
+            name,
+            x,
+            y,
+            offsetX: x,
+            offsetY: y
+        });
+        this.travelerNumber = json["travelers"]["count"];
         this.isDocked = isDocked;
-        const xy = xyFromPosition(podJSON, lineJSON, loopsJSON);
-        this.x = xy[0];
-        this.y = xy[1];
 
-
-        this.innerCircle = new Konva.Circle({
-            x: this.x,
-            y: this.y,
-            name: this.id,
+        this.innerCircle = new Circle({
+            x,
+            y,
             radius: podWidth - Math.sqrt(podWidth),
         });
 
-        this.outerCircle = new Konva.Circle({
-            x: this.x,
-            y: this.y,
-            name: this.id,
+        this.outerCircle = new Circle({
+            x,
+            y,
             radius: podWidth,
         });
 
-        initBehaviors(this, this.innerCircle, this.outerCircle);
+        this.info = new Label({
+            x,
+            y,
+            opacity: 0.75,
+            visible: false,
+            listening: false
+        });
 
-        networkLayer.add(this.outerCircle);
-        networkLayer.add(this.innerCircle);
-        this.update(podJSON);
-        this.updateColor();
+        this.info.add(
+            new Tag({
+                fill: "black",
+                pointerDirection: "down",
+                pointerWidth: 10,
+                pointerHeight: 10,
+                lineJoin: "round",
+                shadowColor: "black",
+                shadowBlur: 10,
+                shadowOffset: 10,
+                shadowOpacity: 0.2
+            })
+        );
+
+        this.info.add(
+            new Text({
+                text: "Pod : " + json["name"] + " | Capacity : " + json["travelers"]["max"],
+                fontFamily: "Calibri",
+                fontSize: 18,
+                padding: 5,
+                fill: "white"
+            })
+        );
+
+        this.add(this.outerCircle);
+        this.add(this.innerCircle);
+        infoLayer.add(this.info);
+        this.update();
         appState.objects.push(this);
     }
 
     select() {
-        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
-            appState.selectedObject.unselect();
-        }
-
-        appState.selectedObject = this;
         this.innerCircle.fill(podInnerSelectedColor);
         this.outerCircle.fill(podOuterSelectedColor);
-        networkLayer.batchDraw();
     }
 
     unselect() {
-        if (appState.selectedObject === this) {
-            appState.selectedObject = undefined;
-        }
-
         this.updateColor();
-        networkLayer.batchDraw();
     }
 
-    update(podJSON) {
-        /*this.isDocked = !podJSON['moving'];
-        this.travelerNumber = podJSON["travelers"]["count"];*/
-        this.json = podJSON;
-        //this.track = podJSON['currentElementUuid']; TODO: à gérer
+    update(json) {
+        /*this.isDocked = !json['moving'];
+        this.travelerNumber = json["travelers"]["count"];*/
+        this.json = json;
+        //this.track = json['currentElementUuid']; TODO: à gérer
 
         /*if (this.isDocked) {
-            if (podJSON['stationIndex'] === -1) { // THIS IS HOTFIX FOR GHOST CAPS
+            if (json['stationIndex'] === -1) { // THIS IS HOTFIX FOR GHOST CAPS
                 this.innerCircle.hide();
                 this.outerCircle.hide();
                 return;
             }
-            let targetStations = appState.objects.filter(station => station.uuid.includes(podJSON['currentElementUuid']));
+            let targetStations = appState.objects.filter(station => station.uuid.includes(json['currentElementUuid']));
             targetStations.forEach(station => {
-                this.innerCircle.x(x + 10 * station.stationRadius + (6 * podJSON['stationIndex'] + 2) * station.dockSize);
-                this.outerCircle.x(x + 10 * station.stationRadius + (6 * podJSON['stationIndex'] + 2) * station.dockSize);
+                this.innerCircle.x(x + 10 * station.stationRadius + (6 * json['stationIndex'] + 2) * station.dockSize);
+                this.outerCircle.x(x + 10 * station.stationRadius + (6 * json['stationIndex'] + 2) * station.dockSize);
             });
         }*/
 
@@ -182,12 +205,12 @@ export class Pod {
     }
 }
 
-export function updatePodFromJSON(podJSON) {
-    let targetPods = appState.objects.filter(pod => pod.uuid.includes(podJSON["name"]));
+export function updatePodFromJSON(json) {
+    let targetPods = appState.objects.filter(pod => pod.uuid.includes(json["name"]));
 
     if (targetPods.length <= 0) {
-        new Pod(podJSON).updateScale(appState.objectScale);
+        new Pod(json).updateScale(appState.objectScale); // TODO: ajouter les capsules quelque part
     } else {
-        targetPods.forEach(pod => pod.update(podJSON));
+        targetPods.forEach(pod => pod.update(json));
     }
 }

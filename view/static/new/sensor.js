@@ -1,19 +1,26 @@
-import {appState, networkLayer, infoLayer, initBehaviors} from "./network.js";
+import {appState} from "./network.js";
+const {Group, Label, Star, Tag, Text} = Konva;
 
 const sensorColor = 'rgb(40,158,0)';
 const sensorSelectedColor = 'rgb(255, 200, 20)';
 
-export class Sensor {
-    constructor(sensorJSON, sensorRadius = 18) {
-        this.json = sensorJSON;
-        this.name = sensorJSON["name"];
-        this.x = sensorJSON["x"];
-        this.y = sensorJSON["y"];
+export class Sensor extends Group {
+    constructor(json, infoLayer) {
+        const name = json["name"];
+        const x = json["x"];
+        const y = json["y"];
+        const sensorRadius = 18;
+        super({
+            name,
+            x,
+            y,
+            offsetX: x,
+            offsetY: y
+        });
 
-        this.star = new Konva.Star({
-            name: this.name,
-            x: this.x,
-            y: this.y,
+        this.star = new Star({
+            x,
+            y,
             numPoints: 5,
             innerRadius: sensorRadius / 2,
             outerRadius: sensorRadius,
@@ -22,16 +29,16 @@ export class Sensor {
             strokeWidth: 0.3
       });
 
-        this.info = new Konva.Label({
-            x: this.x,
-            y: this.y,
+        this.info = new Label({
+            x,
+            y,
             opacity: 0.75,
             visible: false,
             listening: false
         });
 
         this.info.add(
-            new Konva.Tag({
+            new Tag({
                 fill: 'black',
                 pointerDirection: 'down',
                 pointerWidth: 10,
@@ -45,8 +52,8 @@ export class Sensor {
         );
 
         this.info.add(
-            new Konva.Text({
-                text: this.name,
+            new Text({
+                text: name,
                 fontFamily: 'Calibri',
                 fontSize: 18,
                 padding: 5,
@@ -54,30 +61,18 @@ export class Sensor {
             })
         );
 
-        initBehaviors(this, this.star, undefined, this.info);
-
-        networkLayer.add(this.star);
+        this.add(this.star);
         infoLayer.add(this.info);
 
         appState.objects.push(this);
     }
 
     select() {
-        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
-            appState.selectedObject.unselect();
-        }
-
-        appState.selectedObject = this;
         this.star.fill(sensorSelectedColor);
-        networkLayer.batchDraw();
     }
 
     unselect() {
-        if (appState.selectedObject === this) {
-            appState.selectedObject = undefined;
-        }
         this.star.fill(sensorColor);
-        networkLayer.batchDraw();
     }
 
     updateScale(value) {
@@ -85,10 +80,6 @@ export class Sensor {
         this.star.scaleY(value);
         this.info.scaleX(value);
         this.info.scaleY(value);
-    }
-
-    update(sensorJSON) {
-        this.json = sensorJSON;
     }
 
 }

@@ -5,6 +5,8 @@ import {Station} from "./station.js";
 import {Shed} from "./shed.js";
 import {Pod} from "./pod.js";
 import {Sensor} from "./sensor.js";
+const {Circle, Layer, Line, Stage} = Konva;
+
 
 let viewTab = document.getElementById("view-tab");
 
@@ -13,15 +15,15 @@ function updateViewLoop() {
     let actualLoop = appState.selectedObject;
     viewTab.innerHTML = `<strong>Vue de la boucle : ${actualLoop.json["name"]}</strong><div id='view-object' class='container'></div>`;
 
-    let stageView = new Konva.Stage({
+    let stageView = new Stage({
       container: 'view-object',   // id of container <div>
       width: 200,
       height: 200
     });
 
-    let layer = new Konva.Layer();
+    let layer = new Layer();
 
-    let circle = new Konva.Circle({
+    let circle = new Circle({
       x: stageView.width() / 2,
       y: stageView.height() / 2,
       radius: 70,
@@ -40,15 +42,15 @@ function updateViewSwitch() {
     let actualSwitch = appState.selectedObject;
     viewTab.innerHTML = `<strong>Vue de l'aiguillage : ${actualSwitch.json["my_loop_name"]} -> ${actualSwitch.json["other_loop_name"]}</strong><div id='view-object' class='container'></div>`;
 
-    let stageView = new Konva.Stage({
+    let stageView = new Stage({
       container: 'view-object',   // id of container <div>
       width: 300,
       height: 300
     });
 
-    let layer = new Konva.Layer();
+    let layer = new Layer();
 
-    let insert = new Konva.Line({
+    let insert = new Line({
       x: 5,
       y: 10,
       points: [10, 10, 290, 10],
@@ -57,7 +59,7 @@ function updateViewSwitch() {
       tension: 1
     });
 
-    let goal = new Konva.Line({
+    let goal = new Line({
       x: 5,
       y: 130,
       points: [10, 10, 290, 10],
@@ -66,7 +68,7 @@ function updateViewSwitch() {
       tension: 1
     });
 
-    let link = new Konva.Line({
+    let link = new Line({
       x: 5,
       y: 10,
       points: [50, 10, 260, 130],

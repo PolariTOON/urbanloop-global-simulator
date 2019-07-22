@@ -5,10 +5,11 @@ import {updateShedFromJSON} from "./shed.js";
 import {updateSwitchFromJSON} from "./switch.js";
 import {updateSensorFromJSON} from "./sensor.js";
 import {updateTimeFromJSON} from "./menu.js";
-import {updatePodFromJSON, Pod} from "./pod.js";
+import {updatePodFromJSON} from "./pod.js";
 import {updateDataPanel} from "./data-panel.js";
 import {updateViewPanel} from "./view-panel.js";
 import {Bridge} from "./bridge.js";
+const {Group, Layer, Stage} = Konva;
 
 const zoomIntensity = 0.8;
 const minScale = 0.01;
@@ -20,19 +21,19 @@ export const appState = {
     clearing: false,
     objectScale: undefined,
     objects: undefined,
-    selectedObject: undefined,
+    selectedObject: null,
     viewBox: null,
     origin: null
 };
 
-export let running = false;
+let running = false;
 
-export let stage = new Konva.Stage({
+const stage = new Stage({
     container: 'network-div',
     draggable: true
 });
-export let networkLayer = new Konva.Layer();
-export let infoLayer = new Konva.Layer();
+const networkLayer = new Layer();
+const infoLayer = new Layer();
 
 function scaleObjects() {
     appState.objects.forEach(object => object.updateScale(appState.objectScale));
@@ -70,23 +71,25 @@ export async function initNetworkScene(network_index) {
     })).json();*/
 
     // On ajoute les boucles
-    let loops = [];
+    const loops = [];
+    const bridges = [];
     const networkJSON = await (await fetch('/networks/'+ network_index +'/', {method: "GET"})).json();
     const viewBox = networkJSON["view_box"];
     const {x, y, width, height} = viewBox;
     const [offsetX, offsetY, zoom] = [0, 0, 1];
     appState.viewBox = {x, y, width, height};
     appState.origin = {offsetX, offsetY, zoom};
-    for (const loop of networkJSON["loops"]){
-        const l = new Loop(loop);
-        loops.push(l);
+    for (const json of networkJSON["loops"]) {
+        const loop = new Loop(json, networkLayer, infoLayer);
+        loops.push(loop);
     }
 
     // On ajoute les ponts
-    for (const bridge of networkJSON["bridges"]){
-        const switchIn = loops[bridge["switch_in"]["loop"]].elements[bridge["switch_in"]["element"]];
-        const switchOut = loops[bridge["switch_out"]["loop"]].elements[bridge["switch_out"]["element"]];
-        new Bridge(bridge, switchIn, switchOut, networkJSON["loops"]);
+    for (const json of networkJSON["bridges"]) {
+        const switchIn = loops[json["switch_in"]["loop"]].elements[json["switch_in"]["element"]];
+        const switchOut = loops[json["switch_out"]["loop"]].elements[json["switch_out"]["element"]];
+        const bridge = new Bridge(json, switchIn, switchOut, networkJSON["loops"], networkLayer, infoLayer);
+        bridges.push(bridge);
     }
     resize()
 
@@ -169,53 +172,7 @@ function resize() {
     stage.batchDraw();
 }
 
-export function initBehaviors(object, innerShape, outerShape = undefined, info = undefined) {
-    const hasInfo = info !== undefined;
-
-    if (outerShape){
-        outerShape.on('mousedown', () => {
-        object.select();
-        });
-
-        outerShape.on('mouseenter', () => {
-        setCursor("pointer");
-        if (hasInfo) {
-            info.show();
-            infoLayer.batchDraw();
-        }
-        });
-
-        outerShape.on('mouseleave', () => {
-        setCursor("auto");
-        if (hasInfo) {
-            info.hide();
-            infoLayer.batchDraw();
-        }
-        });
-    }
-
-    innerShape.on('mousedown', () => {
-        object.select();
-    });
-
-    innerShape.on('mouseenter', () => {
-        setCursor("pointer");
-        if (hasInfo) {
-            info.show();
-            infoLayer.batchDraw();
-        }
-    });
-
-    innerShape.on('mouseleave', () => {
-        setCursor("auto");
-        if (hasInfo) {
-            info.hide();
-            infoLayer.batchDraw();
-        }
-    });
-}
-
-export function setCursor(cursor) {
+function setCursor(cursor) {
     document.body.style.cursor = cursor;
 }
 
@@ -227,7 +184,7 @@ function clearScene() {
     appState.clearing = true;
     stopUpdateLoop();
     appState.objects = [];
-    appState.selectedObject = undefined;
+    appState.selectedObject = null;
     stage.getLayers().forEach(layer => layer.destroyChildren());
     stage.destroyChildren();
 }
@@ -291,12 +248,50 @@ stage.on("wheel", (event) => {
     stage.batchDraw();
 });
 
+stage.on("mouseover", (event) => {
+    event.evt.preventDefault();
+    let shape = event.target;
+    while (shape !== null && !(shape instanceof Group)) {
+        shape = shape.getParent();
+    }
+    if (shape !== null) {
+        setCursor("pointer");
+        shape.info.show();
+    }
+    infoLayer.batchDraw();
+});
+
+stage.on("mouseout", (event) => {
+    event.evt.preventDefault();
+    let shape = event.target;
+    while (shape !== null && !(shape instanceof Group)) {
+        shape = shape.getParent();
+    }
+    if (shape !== null) {
+        setCursor("auto");
+        shape.info.hide();
+    }
+    infoLayer.batchDraw();
+});
+
 stage.on("mousedown", (event) => {
     event.evt.preventDefault();
-    const shape = networkLayer.getIntersection(stage.getPointerPosition());
-    if (appState.selectedObject !== undefined && shape === null) {
-        appState.selectedObject.unselect();
+    let shape = event.target;
+    while (shape !== null && !(shape instanceof Group)) {
+        shape = shape.getParent();
     }
+    if (shape === appState.selectedObject) {
+        return;
+    }
+    if (appState.selectedObject !== null) {
+        appState.selectedObject.unselect();
+        appState.selectedObject = null;
+    }
+    if (shape !== null) {
+        shape.select();
+        appState.selectedObject = shape;
+    }
+    networkLayer.batchDraw();
 });
 
 scaleSlider.oninput = () => {

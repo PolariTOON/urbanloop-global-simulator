@@ -1,10 +1,10 @@
-import {appState, networkLayer} from "./network.js";
 import {Station} from "./station.js";
 import {Shed} from "./shed.js";
 import {Sensor} from "./sensor.js";
 import {Switch} from "./switch.js";
 import {Section} from "./section.js";
 import {Pod} from "./pod.js";
+const {Text} = Konva;
 
 function averagePoint(elements){
     let x = 0;
@@ -19,55 +19,61 @@ function averagePoint(elements){
 }
 
 export class Loop {
-    constructor(loopJSON) {
-        this.json = loopJSON;
-        const averagePointLoop = averagePoint(loopJSON["elements"]);
-        this.averageX = averagePointLoop[0];
-        this.averageY = averagePointLoop[1];
-        this.name = loopJSON["name"];
+    constructor(json, networkLayer, infoLayer) {
+        const name = json["name"];
+        const averagePointLoop = averagePoint(json["elements"]);
+        const x = averagePointLoop[0];
+        const y = averagePointLoop[1];
+        this.name = name;
+        this.x = x;
+        this.y = y;
         this.elements = [];
 
         // On ajoute les éléments
-        for (const elt of loopJSON["elements"]){
+        for (const elt of json["elements"]) {
             switch (elt["type"]){
                 case "station":
-                    const station = new Station(elt);
+                    const station = new Station(elt, infoLayer);
                     this.elements.push(station);
+                    networkLayer.add(station);
                     break;
                 case "shed":
-                    const shed = new Shed(elt);
+                    const shed = new Shed(elt, infoLayer);
                     this.elements.push(shed);
+                    networkLayer.add(shed);
                     break;
                 case "sensor":
-                    const sensor = new Sensor(elt);
+                    const sensor = new Sensor(elt, infoLayer);
                     this.elements.push(sensor);
+                    networkLayer.add(sensor);
                     break;
                 case "switch_in":
                 case "switch_out":
-                    const sw = new Switch(elt);
+                    const sw = new Switch(elt, infoLayer);
                     this.elements.push(sw);
+                    networkLayer.add(sw);
                     break;
             }
         }
 
         // On ajoute les sections
-        const loopSize = loopJSON["sections"].length;
-        for (let section = 0; section < loopSize; section++){
-            const beginElement = this.elements[section];
-            const endElement = this.elements[(section + 1) % loopSize];
-            new Section(loopJSON["sections"][section], beginElement, endElement);
+        for (let i = 0, li = json["sections"].length; i < li; i++) {
+            const beginElement = this.elements[i];
+            const endElement = this.elements[(i + 1) % li];
+            const section = new Section(json["sections"][i], beginElement, endElement, true, infoLayer);
+            networkLayer.add(section);
         }
 
         // On ajoute les capsules déjà présente sur les sections
-        for (const pod of loopJSON["pods"]){
-            new Pod(pod, loopJSON, false);
+        for (const pod of json["pods"]) {
+            const p = new Pod(pod, json, false, null, infoLayer);
+            networkLayer.add(p);
         }
 
-        this.text = new Konva.Text({
-            name: this.name,
-            x: this.averageX,
-            y: this.averageY,
-            text: loopJSON["name"],
+        this.text = new Text({
+            x,
+            y,
+            text: name,
             fontFamily: "Georgia, serif",
             fontSize: 20,
             fontVariant: "small-caps",
@@ -76,27 +82,6 @@ export class Loop {
         this.text.offsetX(this.text.width() / 2);
         this.text.offsetY(this.text.height() / 2);
 
-        networkLayer.add(this.text);
-        appState.objects.push(this);
-    }
-
-    select() {
-        if (appState.selectedObject !== undefined && appState.selectedObject !== this) {
-            appState.selectedObject.unselect();
-        }
-        appState.selectedObject = this;
-        networkLayer.batchDraw();
-    }
-
-    unselect() {
-        if (appState.selectedObject === this) {
-            appState.selectedObject = undefined;
-        }
-        networkLayer.batchDraw();
-    }
-
-    updateScale(value) {
-        this.text.scaleX(value);
-        this.text.scaleY(value);
+        infoLayer.add(this.text);
     }
 }

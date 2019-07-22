@@ -91,13 +91,21 @@ class Pod(Token):
     def update(self):
         while True:
             if self._position != 0:
-                print(self._position, " | ", self._track_or_switch)
-            self._position += self._speed * self.env.sim_tick
-            if self._track_or_switch.length != 0 and self._position > self._track_or_switch.length:
+                print(self._position, " | ", self._track_or_switch, " | ", self._is_docked)
+            # La capsule avance
+            if self._is_docked:
+                self._position = 0
+            else:
+                self._position += self._speed * self.env.sim_tick
+            # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
+            # capsule indique à la section sur laquelle elle rentre qu'elle y est
+            if self._position > self._track_or_switch.length:
                 self._position -= self._track_or_switch.length
+                self._track_or_switch = self._track_or_switch.next
                 yield from self._track_or_switch.write({
                     "author": self,
-                    "type": "pod_exit",
+                    "type": "pod_entry",
+                    "pod": self
                 })
             while True:
                 message = yield from self.read()
@@ -110,7 +118,7 @@ class Pod(Token):
                 elif "docked" in message["type"]:
                     self._speed = 0
                     self._is_docked = True
-                elif "set_track_or_switch" in message["type"]:
-                    self._track_or_switch = message["track_or_switch"]
+                elif "ack" in message["type"]:
+                    break
                 else:
                     break

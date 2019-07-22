@@ -23,6 +23,7 @@ class Network(Node):
         self._routes = routes or []
         self._view_box = view_box or {}
         self._init_graph_from_json(env)
+        self._init_parent_of_children()
 
     @property
     def pods(self):
@@ -162,7 +163,8 @@ class Network(Node):
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
-                new_route = Route(env, len(self._routes), **routes[route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
+                new_route = Route(env, len(self._routes), **routes[
+                    route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
                 routes[route - 1] = new_route
@@ -192,7 +194,8 @@ class Network(Node):
                         pod["destination"] = self._get_elt_of_loop(**pod["destination"])
                 #  Routes et Id
                 id_switch = len(self._switches)
-                switch["previous"] = self._routes[(id_switch - first_switch - 1) % len(self._loops[b]["switches"]) + first_switch]  # loop_in
+                switch["previous"] = self._routes[
+                    (id_switch - first_switch - 1) % len(self._loops[b]["switches"]) + first_switch]  # loop_in
                 switch["next"] = self._routes[id_switch]  # loop_out
                 switch["beside"] = self._routes[l + switch["id_bridge"]]  # route_bridge
                 if switch["type"] == "switch_in":
@@ -215,6 +218,17 @@ class Network(Node):
         for b in range(len(self._loops)):
             loop = self._loops[b]
             self._loops[b] = Loop(b, **loop)
+
+    def _init_parent_of_children(self):
+        """
+        Initialise le parent des routes et aiguillages comme étant le réseau
+        :return: void
+        """
+        for switch in self._switches:
+            switch.parent = self
+        for route in self._routes:
+            route.parent = self
+            route.init_parent_of_children()
 
     def _init_pods_of_line(self, line):
         for pod in line["pods"]:
@@ -272,8 +286,13 @@ class Network(Node):
             return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
 
     def update(self):
-        return
-        yield
+        while True:
+            while True:
+                message = yield from self.read()
+                if message is None:
+                    break
+                else:
+                    break
 
 
 def _init_pod_of_line(line, pod):

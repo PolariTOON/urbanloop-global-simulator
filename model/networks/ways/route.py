@@ -160,6 +160,35 @@ class Route(Way):
         })
         return dict
 
+    def init_parent_of_children(self):
+        """
+        Initialise le parent des pistes de la route comme étant la route
+        :return: void
+        """
+        for index in range(len(self._sections)):
+            section = self._sections[index]
+            section.parent = self
+            if index < len(self._steps):
+                step = self._steps[index]
+                step.parent = self
+
     def update(self):
-        return
-        yield
+        while True:
+            while True:
+                message = yield from self.read()
+                if message is None:
+                    break
+                elif "pod_entry" in message["type"]:
+                    pod = message["pod"]
+                    track_author = message["author"]
+                    previous_track = track_author.previous
+                    yield from previous_track.write({
+                        "author": self,
+                        "type": "pod_exit",
+                        "pod": pod
+                    })
+                elif "pod_exit" in message["type"]:
+                    # TODO
+                    break
+                else:
+                    break

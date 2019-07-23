@@ -8,12 +8,10 @@ const {Layer, Stage} = Konva;
 const zoomIntensity = 0.8;
 const minScale = 0.01;
 
-let scaleSlider = document.getElementById('scale-slider');
 let updateLoop;
 
 export const appState = {
     clearing: false,
-    objectScale: undefined,
     objects: undefined,
     selectedObject: null,
     viewBox: null,
@@ -28,17 +26,6 @@ const stage = new Stage({
 });
 const networkLayer = new Layer();
 const infoLayer = new Layer();
-
-function scaleObjects() {
-    const scale = appState.objectScale;
-    for (const object of appState.objects) {
-        object.scale({
-            x: scale,
-            y: scale,
-        });
-    }
-    stage.batchDraw();
-}
 
 function getBarycenter() {
     let loopNumber = 0;
@@ -128,20 +115,39 @@ function resize() {
         width: offsetWidth,
         height: offsetHeight
     });
+    transform(translateX, translateY, scaleX, scaleY);
+}
+
+function zoom(delta) {
+    const ratio = zoomIntensity ** Math.sign(delta);
+    const ratioX = Math.max(ratio, minScale / stage.scaleX());
+    const ratioY = Math.max(ratio, minScale / stage.scaleY());
+    const restX = 1 - ratioX;
+    const restY = 1 - ratioY;
+    const translateX = stage.x() * ratioX + stage.getPointerPosition().x * restX;
+    const translateY = stage.y() * ratioY + stage.getPointerPosition().y * restY;
+    const scaleX = stage.scaleX() * ratioX;
+    const scaleY = stage.scaleY() * ratioY;
+    transform(translateX, translateY, scaleX, scaleY);
+}
+
+function transform(translateX, translateY, scaleX, scaleY) {
     stage.position({
         x: translateX,
-        y: translateY
+        y: translateY,
     });
     stage.scale({
         x: scaleX,
-        y: scaleY
+        y: scaleY,
     });
-    appState.objectScale = 1;
-    scaleSlider.value = appState.objectScale;
-    scaleSlider.title = "Objects scale : " + scaleSlider.value;
-    scaleObjects();
-
-    stage.batchDraw();
+    const invertedScaleX = 1 / scaleX;
+    const invertedScaleY = 1 / scaleY;
+    for (const object of appState.objects) {
+        object.scale({
+            x: invertedScaleX,
+            y: invertedScaleY,
+        });
+    }
 }
 
 function setCursor(cursor) {
@@ -185,8 +191,12 @@ function stopUpdateLoop() {
     updateLoop = undefined;
 }
 
-
-window.addEventListener("resize", resize);
+window.addEventListener("resize", (event) => {
+    event.preventDefault();
+    resize();
+    networkLayer.batchDraw();
+    infoLayer.batchDraw();
+});
 
 stage.on("dragstart", (event) => {
     event.evt.preventDefault();
@@ -200,24 +210,9 @@ stage.on("dragend", (event) => {
 
 stage.on("wheel", (event) => {
     event.evt.preventDefault();
-    const ratio = zoomIntensity ** Math.sign(event.evt.deltaY);
-    const ratioX = Math.max(ratio, minScale / stage.scaleX());
-    const ratioY = Math.max(ratio, minScale / stage.scaleY());
-    const restX = 1 - ratioX;
-    const restY = 1 - ratioY;
-    const translateX = stage.x() * ratioX + stage.getPointerPosition().x * restX;
-    const translateY = stage.y() * ratioY + stage.getPointerPosition().y * restY;
-    const scaleX = stage.scaleX() * ratioX;
-    const scaleY = stage.scaleY() * ratioY;
-    stage.position({
-        x: translateX,
-        y: translateY
-    });
-    stage.scale({
-        x: scaleX,
-        y: scaleY
-    });
-    stage.batchDraw();
+    zoom(event.evt.deltaY);
+    networkLayer.batchDraw();
+    infoLayer.batchDraw();
 });
 
 stage.on("mouseover", (event) => {
@@ -226,11 +221,14 @@ stage.on("mouseover", (event) => {
     while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
-    if (shape !== null) {
-        setCursor("pointer");
-        shape.showHint();
+    if (shape === null) {
+        return;
     }
-    infoLayer.batchDraw();
+    setCursor("pointer");
+    if (shape !== appState.selectedObject) {
+        shape.showHint();
+        infoLayer.batchDraw();
+    }
 });
 
 stage.on("mouseout", (event) => {
@@ -239,11 +237,14 @@ stage.on("mouseout", (event) => {
     while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
-    if (shape !== null) {
-        setCursor("auto");
-        shape.hideHint();
+    if (shape === null) {
+        return;
     }
-    infoLayer.batchDraw();
+    setCursor("auto");
+    if (shape !== appState.selectedObject) {
+        shape.hideHint();
+        infoLayer.batchDraw();
+    }
 });
 
 stage.on("mousedown", (event) => {
@@ -256,23 +257,15 @@ stage.on("mousedown", (event) => {
         return;
     }
     if (appState.selectedObject !== null) {
+        appState.selectedObject.hideHint();
         appState.selectedObject.unselect();
         appState.selectedObject = null;
     }
     if (shape !== null) {
+        shape.showHint();
         shape.select();
         appState.selectedObject = shape;
     }
     networkLayer.batchDraw();
+    infoLayer.batchDraw();
 });
-
-scaleSlider.oninput = () => {
-    const scale = scaleSlider.value;
-    scaleSlider.title = 'Objects scale : ' + scale;
-    appState.objectScale = scale;
-    scaleObjects();
-};
-
-scaleSlider.onmouseleave = () => {
-    scaleSlider.removeAttribute("title");
-};

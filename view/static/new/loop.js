@@ -94,5 +94,6 @@ export class Loop {
         this.text.offsetY(this.text.height() / 2);
 
         infoLayer.add(this.text);
+        appState.objects.push(this.text)
     }
 }

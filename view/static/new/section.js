@@ -7,6 +7,10 @@ const loopSelectedColor = 'rgb(255, 200, 20)';
 const bridgeColor = 'rgb(156,63,28)';
 const bridgeSelectedColor = 'rgb(255, 200, 20)';
 
+const strokeWidth = 2.5;
+const pointerLength = 4;
+const pointerWidth = 4;
+
 export class Section extends Entity {
     constructor(json, startElement, endElement, loopOrBridge, infoLayer) {
         const name = json["name"];
@@ -19,7 +23,7 @@ export class Section extends Entity {
             x,
             y,
             offsetX: x,
-            offsetY: y
+            offsetY: y,
         }, infoLayer);
         this.loopOrBridge = loopOrBridge;
         switch (json["path"]["type"]) {
@@ -29,9 +33,9 @@ export class Section extends Entity {
                     points: [startElement.x(), startElement.y(), endElement.x(), endElement.y()],
                     stroke: loopOrBridge ? loopColor : bridgeColor,
                     tension: 1,
-                    strokeWidth: 2.5,
-                    pointerLength : 4,
-                    pointerWidth : 4
+                    strokeWidth,
+                    pointerLength,
+                    pointerWidth,
                 });
                 break;
             }
@@ -45,7 +49,20 @@ export class Section extends Entity {
     unselect() {
         this.path.stroke(this.loopOrBridge ? loopColor : bridgeColor);
     }
-    scale() {
-        return super.scale();
+    scale(...args) {
+        super.scale(...args);
+        const {x, y} = super.scale();
+        const scale = (x + y) / 2;
+        super.scale({
+            x: 1,
+            y: 1,
+        });
+        this.path.strokeWidth(strokeWidth * scale)
+        this.path.pointerLength(pointerLength * scale)
+        this.path.pointerWidth(pointerWidth * scale)
+        return {
+            x: scale,
+            y: scale,
+        };
     }
 }

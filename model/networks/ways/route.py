@@ -176,19 +176,24 @@ class Route(Way):
         while True:
             while True:
                 message = yield from self.read()
+                if message is not None:
+                    print(self, "||", message)
                 if message is None:
                     break
-                elif "pod_entry" in message["type"]:
+                elif "pod_entry" == message["type"]:
                     pod = message["pod"]
-                    track_author = message["author"]
-                    previous_track = track_author.previous
-                    yield from previous_track.write({
+                    track = pod.track_or_switch.previous
+                    yield from track.write({
                         "author": self,
                         "type": "pod_exit",
                         "pod": pod
                     })
-                elif "pod_exit" in message["type"]:
-                    # TODO
-                    break
+                elif "docked" == message["type"]:
+                    pod = message["pod"]
+                    yield from self._parent.write({
+                        "author": self,
+                        "type": "docked",
+                        "pod": pod
+                    })
                 else:
-                    break
+                    raise ValueError("Invalid message")

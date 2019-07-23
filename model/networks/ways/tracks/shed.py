@@ -52,25 +52,33 @@ class Shed(Step):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print("shed <%s>:" % self, message)
+                    print(self, "||", message)
                 if message is None:
                     break
-                elif "pod_entry" in message["type"]:
+                elif "pod_entry" == message["type"]:
                     pod = message["pod"]
                     yield from self._parent.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": pod
                     })
-                    if pod.destination == self:  # TODO : ?
-                        break
-                elif "pod_exit" in message["type"]:
-                    pod = message["pod"]
+                    if pod.destination == self:
+                        self._pods.append(pod)
+                        yield from pod.write({
+                            "author": self,
+                            "type": "docked"
+                        })
+                        yield from self.parent.write({
+                            "author": self,
+                            "type": "docked",
+                            "pod": pod
+                        })
                     yield from pod.write({
                         "author": self,
                         "type": "ack"
                     })
-                    break
+                elif "pod_exit" in message["type"]:
+                    pass
                 else:
-                    break
+                    raise ValueError("Invalid message")
 

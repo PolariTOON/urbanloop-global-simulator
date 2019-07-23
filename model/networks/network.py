@@ -289,10 +289,14 @@ class Network(Node):
         while True:
             while True:
                 message = yield from self.read()
+                if message is not None:
+                    print(self, "||", message)
                 if message is None:
                     break
+                elif "docked" == message["type"]:
+                    pass
                 else:
-                    break
+                    raise ValueError("Invalid message")
 
 
 def _init_pod_of_line(line, pod):

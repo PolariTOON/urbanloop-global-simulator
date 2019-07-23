@@ -42,15 +42,16 @@ class SwitchOut(Switch):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print("switch_out <%s>:" % self, message)
+                    print(self, "||", message)
                 if message is None:
                     break
                 elif "pod_entry" in message["type"]:  # pour le moment la capsule ne fait que de passer todo : algo aiguillage à un plus haut niveau
                     pod = message["pod"]
-                    yield from self.next.sections[0].write({
+                    track = pod.track_or_switch.previous.sections[-1]
+                    yield from track.write({
                         "author": self,
-                        "type": "pod_entry",
+                        "type": "pod_exit",
                         "pod": pod
                     })
                 else:
-                    break
+                    pass

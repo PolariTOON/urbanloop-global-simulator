@@ -82,10 +82,10 @@ class Station(Step):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print("station <%s>:" % self, message)
+                    print(self, "||", message)
                 if message is None:
                     break
-                elif "pod_entry" in message["type"]:
+                elif "pod_entry" == message["type"]:
                     pod = message["pod"]
                     yield from self.parent.write({
                         "author": self,
@@ -93,23 +93,22 @@ class Station(Step):
                         "pod": pod
                     })
                     # la capsule va se garer dans la station
-                    if pod.destination == self:  # todo : ?
+                    if pod.destination == self:
                         self._pods.append(pod)
-                        yield from pod.write({
-                            "author": self,
-                            "type": "set_track_or_switch",
-                            "track_or_switch": self
-                        })
                         yield from pod.write({
                             "author": self,
                             "type": "docked"
                         })
-                elif "pod_exit" in message["type"]:
-                    pod = message["pod"]
-                    self._pods.remove(pod)
+                        yield from self.parent.write({
+                            "author": self,
+                            "type": "docked",
+                            "pod": pod
+                        })
                     yield from pod.write({
                         "author": self,
                         "type": "ack"
                     })
+                elif "pod_exit" == message["type"]:
+                    pass
                 else:
-                    break
+                    raise ValueError("Invalid message")

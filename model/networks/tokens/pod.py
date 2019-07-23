@@ -2,7 +2,6 @@ from settings import simlog
 from .token import Token
 from .traveler import Traveler
 
-
 class Pod(Token):
     def __init__(self, env, track_or_switch, pod_speed, is_docked, position=None, travelers=None, **kwargs):
         super().__init__(env, **kwargs)
@@ -89,36 +88,45 @@ class Pod(Token):
         simlog.info("Traveler %s gets in capsule %d" % (traveler.id, self.id), traveler.source, self.destination)
 
     def update(self):
+        """
+        Fonction qui gère le processus "pod", à chaque tour d'événement simpy les actions sont exécutées
+        :return: void
+        """
         while True:
-            if self._position != 0:
-                print(self._position, " | ", self._track_or_switch, " | ", self._is_docked)
             # La capsule avance
-            if self._is_docked:
-                self._position = 0
-            else:
+            if not self._is_docked and self._speed != 0:
                 self._position += self._speed * self.env.sim_tick
+
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
             # capsule indique à la section sur laquelle elle rentre qu'elle y est
             if self._position > self._track_or_switch.length:
                 self._position -= self._track_or_switch.length
-                self._track_or_switch = self._track_or_switch.next
+                if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" or str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_in.SwitchIn'>":
+                    self._track_or_switch = self._track_or_switch.next.sections[0]  # todo : ça peut être le beside si nécessaire
+                else:
+                    self._track_or_switch = self._track_or_switch.next
                 yield from self._track_or_switch.write({
                     "author": self,
                     "type": "pod_entry",
                     "pod": self
                 })
+
+            # Gestion des messages reçus
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print("pod <%s>:" % self, message)
+                    print(self, "||", message)
                 if message is None:
                     break
-                elif "speed" in message["type"]:
+                elif "speed" == message["type"]:
                     self._speed = message["speed"]
-                elif "docked" in message["type"]:
+                elif "docked" == message["type"]:  # todo : correction à apporter ?
                     self._speed = 0
                     self._is_docked = True
-                elif "ack" in message["type"]:
-                    break
+                elif "ack" == message["type"]:
+                    pass
+                elif "set_track_or_bridge" == message["type"]:
+                    track_or_switch = message["track_or_switch"]
+                    self._track_or_switch = track_or_switch
                 else:
-                    break
+                    pass

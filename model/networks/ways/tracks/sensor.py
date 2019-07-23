@@ -31,21 +31,17 @@ class Sensor(Step):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print("sensor <%s>:" % self, message)
+                    print("sensor %s:" % self, message)
                 if message is None:
                     break
-                elif "pod_entry" in message["type"]:  # Un capsule ne s'arrête pas devant un capteur donc il passe directement l'info du passage à son suivant
+                elif "pod_entry" == message["type"]:  # Un capsule ne s'arrête pas devant un capteur donc il passe directement l'info du passage à son suivant
                     pod = message["pod"]
                     yield from self._parent.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": pod
                     })
-                elif "pod_exit" in message["type"]:
-                    pod = message["pod"]
-                    yield from pod.write({
-                        "author": self,
-                        "type": "ack"
-                    })
+                elif "pod_exit" == message["type"]:
+                    pass
                 else:
-                    break
+                    raise ValueError("Invalid message")

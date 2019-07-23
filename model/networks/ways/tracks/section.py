@@ -73,26 +73,27 @@ class Section(Track):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print("section <%s>:" % self, message)
+                    print(self, "||", message)
                 if message is None:
                     break
-                elif "pod_exit" in message["type"]:
-                    pod = message["author"]
+                elif "pod_exit" == message["type"]:
+                    pod = message["pod"]
                     self._pods.remove(pod)
-                    yield from pod.write({
-                        "author": self,
-                        "type": "ack"
-                    })
-                elif "pod_entry" in message["type"]:
+                elif "pod_entry" == message["type"]:
                     pod = message["pod"]
                     self._pods.append(pod)
                     yield from self._parent.write({
                         "author": self,
-                        "type": "pod_entry"
+                        "type": "pod_entry",
+                        "pod": pod
                     })
-                    break
+                    yield from pod.write({
+                        "author": self,
+                        "type": "speed",
+                        "speed": self._speed
+                    })
                 else:
-                    break
+                    raise ValueError("Invalid message")
 
     def serialize(self):
         dict = super().serialize()

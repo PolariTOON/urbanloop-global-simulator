@@ -29,9 +29,7 @@
         {"speed": 70.70, "path": {"type": "line"}},
         {"speed": 70.70, "path": {"type": "line"}}
       ],
-      "pods": [
-        {"position": 50, "speed": 70.70, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
-      ]
+      "pods": []
     },
     {
       "name": "Villers-les-Nancy",
@@ -53,7 +51,9 @@
         {"speed": 70.70, "path": {"type": "line"}},
         {"speed": 70.70, "path": {"type": "line"}}
       ],
-      "pods": []
+      "pods": [
+        {"position": 50, "speed": 70.70, "source": {"loop": 1, "element": 2}, "destination": {"loop": 1, "element": 1}, "travelers": {"count": 0, "max": 0}}
+      ]
     },
     {
       "name": "Laxou",

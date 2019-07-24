@@ -9,7 +9,6 @@ class SwitchOut(Switch):
         super().__init__(env, id, **kwargs)
         self._switch_in = None
         self._c1_to_insert = 50
-        self._insert_to_bridge = 10
         self._insert_to_end = 101
         # Liaison de la route et des sections du pont
         self._beside.previous = self
@@ -71,19 +70,52 @@ class SwitchOut(Switch):
                     pods_discretized = self._switch_in.pods_discretized
                     if None in pods_discretized:
                         if pods_discretized[-1] is None:
-                            yield from pod.write({  # todo : dans pod
+                            l_shift = self._c1_to_insert - pod.position + self._beside.sections[0].length + self.env.sim_tick * self.average_speed * self._switch_in.tick_count
+                            d_discr = self.average_speed * l_shift / (self.limit_speed - self.average_speed)  # distance allouée pour rejoindre la place de discrétisation
+                            discr_speed = self.average_speed * (d_discr + l_shift) / d_discr  # vitesse nécessaire pour rejoindre la place sur d_discr
+                            time_to_discretize = {"time": d_discr / discr_speed, "average_speed": self.average_speed}
+                            yield from pod.write({
                                 "author": self,
-                                "type": "turn"
+                                "type": "turn",
+                                "distance": self._c1_to_insert
+                            })
+                            yield from pod.write({
+                                "author": self,
+                                "type": "discretize",
+                                "speed": discr_speed,
+                                "time": time_to_discretize
                             })
                         else:
                             for index in range(len(pods_discretized) - 2, 0, -1):
                                 place = pods_discretized[index]
                                 if place is not None:
-                                    yield from place.write({  # todo : dans pod
+                                    l_shift = self.d_min
+                                    d_discr = self.average_speed * l_shift / (self.limit_speed - self.average_speed)
+                                    discr_speed = self.average_speed * (d_discr + l_shift) / d_discr
+                                    time_to_discretize = {"time": d_discr / discr_speed, "average_speed": self.average_speed}
+                                    yield from place.write({
                                         "author": self,
-                                        "type": "shift"
+                                        "type": "discretize",
+                                        "speed": discr_speed,
+                                        "time": time_to_discretize
                                     })
-                                else:
+                                else:  # On donne un ordre de vitesse à la capsule pour qu'elle rejoigne une place de discrétisation
+                                    l_shift = self._c1_to_insert - pod.position + self._beside.sections[0].length + self.env.sim_tick * self.average_speed * self._switch_in.tick_count
+                                    d_discr = self.average_speed * l_shift / (self.limit_speed - self.average_speed)  # distance allouée pour rejoindre la place de discrétisation
+                                    discr_speed = self.average_speed * (d_discr + l_shift) / d_discr  # vitesse nécessaire pour rejoindre la place sur d_discr
+                                    time_to_discretize = {"time": d_discr / discr_speed, "average_speed": self.average_speed}
+                                    yield from pod.write({
+                                        "author": self,
+                                        "type": "turn"
+                                    })
+                                    yield from pod.write({
+                                        "author": self,
+                                        "type": "discretize",
+                                        "speed": discr_speed,
+                                        "time": time_to_discretize
+                                    })
                                     break
+                    else:  # la capsule n'est pas aiguillée et refait un tour de boucle
+                        pass
                 else:
                     pass

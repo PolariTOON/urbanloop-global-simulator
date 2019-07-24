@@ -9,12 +9,10 @@ class SwitchIn(Switch):
         super().__init__(env, id, **kwargs)
         self._switch_out = None
         self._c2_to_insert = 101
-        self._bridge_to_insert = 10
         self._insert_to_end = 50
-        self._margin = 2
-        self._pod_size = 2
         discrete_places = int(((self._c2_to_insert + self._insert_to_end) / self.d_min))
         self._pods_discretized = [None for place in range(discrete_places)]
+        self._tick_count = 0
         # Liaison de la route et des sections du pont
         self._beside.next = self
         self._beside.sections[-1].next = self
@@ -44,12 +42,12 @@ class SwitchIn(Switch):
         return self._c2_to_insert + self._insert_to_end
 
     @property
-    def d_min(self):
-        return self._pod_size + self._margin
+    def index_to_insert(self):
+        return int(self._c2_to_insert / self.d_min)
 
     @property
-    def limit_speed(self):
-        return 22.7
+    def tick_count(self):
+        return self._tick_count
 
     def serialize(self):
         dict = super().serialize()
@@ -65,10 +63,9 @@ class SwitchIn(Switch):
 
     def update(self):
         ticks_to_shift = self.d_min / (self.average_speed * self.env.sim_tick)
-        tick_count = 0
         while True:
-            if tick_count == ticks_to_shift:  # On fait avancer les places discrétisées
-                tick_count = 0
+            if self._tick_count == ticks_to_shift:  # On fait avancer les places discrétisées
+                self._tick_count = 0
                 self._shift_discretized_pods()
             while True:
                 message = yield from self.read()
@@ -76,32 +73,45 @@ class SwitchIn(Switch):
                     print(self.name, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
-                elif "pod_entry" in message["type"]:  # Détéction d'une capsule => on lui envoie un ordre de vitesse pour qu'elle soit discrétisée
+                elif "pod_entry" in message["type"]:  # Détéction d'une capsule => on lui envoie un ordre de vitesse pour qu'elle soit discrétisée si elle provient de la boucle
                     pod = message["pod"]
-                    track = pod.track_or_switch.previous.sections[-1]
-                    yield from track.write({
-                        "author": self,
-                        "type": "pod_exit",
-                        "pod": pod
-                    })
-                    d_pod = pod.position
-                    if self._pods_discretized[0] is not None:  # On positionnera la capsule sur la place qui suit (accélération)
-                        d_place = tick_count * self.average_speed * self.env.sim_tick
-                    else:  # On positionnera la capsule sur la place qui va suivre (décélération)
-                        d_place = tick_count * self.average_speed * self.env.sim_tick - self.d_min  # todo : à vérifier pour la décélération
-                    l_shift = d_place - d_pod  # Si on décélère on a un Ldécalage < 0 sinon > 0
-                    d_discr = self.average_speed * l_shift / (self.limit_speed - self.average_speed)  # distance allouée pour rejoindre la place de discrétisation
-                    discr_speed = self.average_speed * (d_discr + l_shift) / d_discr  # vitesse nécessaire pour rejoindre la place sur d_discr
-                    time_to_discretize = {"time": d_discr / discr_speed, "average_speed": self.average_speed}
-                    yield from pod.write({
-                        "author": self,
-                        "type": "discretize",
-                        "speed": discr_speed,
-                        "time": time_to_discretize
-                    })
+                    if pod.on_beside:  # La capsule provient du pont
+                        track = self._beside.sections[0]
+                        yield from track.write({
+                            "author": self,
+                            "type": "pod_exit",
+                            "pod": pod
+                        })
+                        self._pods.append(pod)
+                        if self._pods_discretized[self.index_to_insert] is None:
+                            self._pods_discretized[self.index_to_insert] = pod
+                        else:
+                            raise ValueError("place must be None")
+                    else:  # La capsule provient de la boucle
+                        track = pod.track_or_switch.previous.sections[-1]
+                        yield from track.write({
+                            "author": self,
+                            "type": "pod_exit",
+                            "pod": pod
+                        })
+                        d_pod = pod.position
+                        if self._pods_discretized[0] is not None:  # On positionnera la capsule sur la place qui suit (accélération)
+                            d_place = self._tick_count * self.average_speed * self.env.sim_tick
+                        else:  # On positionnera la capsule sur la place qui va suivre (décélération)
+                            d_place = self._tick_count * self.average_speed * self.env.sim_tick - self.d_min  # todo : à vérifier pour la décélération
+                        l_shift = d_place - d_pod  # Si on décélère on a un Ldécalage < 0 sinon > 0
+                        d_discr = self.average_speed * l_shift / (self.limit_speed - self.average_speed)  # distance allouée pour rejoindre la place de discrétisation
+                        discr_speed = self.average_speed * (d_discr + l_shift) / d_discr  # vitesse nécessaire pour rejoindre la place sur d_discr
+                        time_to_discretize = {"time": d_discr / discr_speed, "average_speed": self.average_speed}
+                        yield from pod.write({
+                            "author": self,
+                            "type": "discretize",
+                            "speed": discr_speed,
+                            "time": time_to_discretize
+                        })
                 elif "end_discretize" == message["type"]:
                     pod = message["pod"]
                     self._pods_discretized[0] = pod
                 else:
                     pass
-            tick_count += 1
+            self._tick_count += 1

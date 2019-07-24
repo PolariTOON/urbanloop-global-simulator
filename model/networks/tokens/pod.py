@@ -18,6 +18,8 @@ class Pod(Token):
         self._track_or_switch = track_or_switch  # TODO
         self._speed = pod_speed
         self._is_docked = is_docked
+        self._on_beside = False
+        self._turn = False
 
     @property
     def position(self):
@@ -71,6 +73,14 @@ class Pod(Token):
     def speed(self, value):
         self._speed = value
 
+    @property
+    def on_beside(self):
+        return self._on_beside
+
+    @on_beside.setter
+    def on_beside(self, value):
+        self._on_beside = value
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
@@ -92,29 +102,33 @@ class Pod(Token):
         Fonction qui gère le processus "pod", à chaque tour d'événement simpy les actions sont exécutées
         :return: void
         """
+        distance_before_turn = 0
         time_to_discretize = None
         while True:
+
             # Si la capsule est dans un aiguillage est qu'elle est en train de se discrétiser
             # on met à jour le vitesse si elle s'est placée après le bon temps
             if time_to_discretize is not None:
                 time_to_discretize["time"] -= self.env.sim_tick
                 if time_to_discretize["time"] <= 0:
                     self._speed = time_to_discretize["average_speed"]
+                    time_to_discretize = None
                     self.track_or_switch.write({
                         "author": self,
                         "type": "end_discretized",
                         "pod": self
                     })
+
             # La capsule avance
             if not self._is_docked and self._speed != 0:
                 self._position += self._speed * self.env.sim_tick
 
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
-            # capsule indique à la section sur laquelle elle rentre qu'elle y est
+            # capsule indique à la piste/l'aiguillage sur laquelle/lequel elle rentre
             if self._position > self._track_or_switch.length:
                 self._position -= self._track_or_switch.length
                 if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" or str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_in.SwitchIn'>":
-                    self._track_or_switch = self._track_or_switch.next.sections[0]  # todo : ça peut être le beside si nécessaire
+                    self._track_or_switch = self._track_or_switch.next.sections[0]
                 else:
                     self._track_or_switch = self._track_or_switch.next
                 yield from self._track_or_switch.write({
@@ -122,7 +136,19 @@ class Pod(Token):
                     "type": "pod_entry",
                     "pod": self
                 })
-
+            # Gestion de si la voiture tourne à un aiguillage
+            if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" and self._turn:
+                distance_before_turn -= self._speed * self.env.sim_tick
+                if distance_before_turn <= 0:
+                    self._track_or_switch = self._track_or_switch.beside.sections[0]
+                    self._position = -distance_before_turn
+                    distance_before_turn = 0
+                    self._on_beside = True
+                    yield from self._track_or_switch.write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": self
+                    })
             # Gestion des messages reçus
             while True:
                 message = yield from self.read()
@@ -132,7 +158,7 @@ class Pod(Token):
                     break
                 elif "speed" == message["type"]:
                     self._speed = message["speed"]
-                elif "docked" == message["type"]:  # todo : correction à apporter ?
+                elif "docked" == message["type"]:
                     self._speed = 0
                     self._is_docked = True
                 elif "ack" == message["type"]:
@@ -144,5 +170,8 @@ class Pod(Token):
                     discr_speed = message["speed"]
                     time_to_discretize = message["time"]
                     self._speed = discr_speed
+                elif "turn" == message["type"]:
+                    distance_before_turn = message["distance"]
+                    self._turn = True
                 else:
                     pass

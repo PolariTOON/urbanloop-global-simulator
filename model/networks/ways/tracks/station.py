@@ -82,7 +82,7 @@ class Station(Step):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self, "||", message)
+                    print(self.name, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

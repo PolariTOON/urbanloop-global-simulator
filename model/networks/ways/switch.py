@@ -47,16 +47,16 @@ class Switch(Way):
         return self._y
 
     @property
-    def length(self):
-        return 0
-
-    @property
     def beside(self):
         return self._beside
 
     @property
     def next(self):
         return self._next
+
+    @property
+    def average_speed(self):
+        return self._beside.sections[0].speed
 
     @property
     def previous(self):

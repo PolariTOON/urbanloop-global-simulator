@@ -92,7 +92,19 @@ class Pod(Token):
         Fonction qui gère le processus "pod", à chaque tour d'événement simpy les actions sont exécutées
         :return: void
         """
+        time_to_discretize = None
         while True:
+            # Si la capsule est dans un aiguillage est qu'elle est en train de se discrétiser
+            # on met à jour le vitesse si elle s'est placée après le bon temps
+            if time_to_discretize is not None:
+                time_to_discretize["time"] -= self.env.sim_tick
+                if time_to_discretize["time"] <= 0:
+                    self._speed = time_to_discretize["average_speed"]
+                    self.track_or_switch.write({
+                        "author": self,
+                        "type": "end_discretized",
+                        "pod": self
+                    })
             # La capsule avance
             if not self._is_docked and self._speed != 0:
                 self._position += self._speed * self.env.sim_tick
@@ -115,7 +127,7 @@ class Pod(Token):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self, "||", message)
+                    print(self.id, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
                 elif "speed" == message["type"]:
@@ -128,5 +140,9 @@ class Pod(Token):
                 elif "set_track_or_bridge" == message["type"]:
                     track_or_switch = message["track_or_switch"]
                     self._track_or_switch = track_or_switch
+                elif "discretize" == message["type"]:
+                    discr_speed = message["speed"]
+                    time_to_discretize = message["time"]
+                    self._speed = discr_speed
                 else:
                     pass

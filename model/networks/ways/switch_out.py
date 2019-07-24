@@ -8,7 +8,9 @@ class SwitchOut(Switch):
     def __init__(self, env, id, **kwargs):
         super().__init__(env, id, **kwargs)
         self._switch_in = None
-
+        self._c1_to_insert = 50
+        self._insert_to_bridge = 10
+        self._insert_to_end = 101
         # Liaison de la route et des sections du pont
         self._beside.previous = self
         self._beside.sections[0].previous = self
@@ -29,6 +31,10 @@ class SwitchOut(Switch):
     def name(self):
         return "switchOut"
 
+    @property
+    def length(self):
+        return self._c1_to_insert + self._insert_to_end
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
@@ -42,7 +48,7 @@ class SwitchOut(Switch):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self, "||", message)
+                    print(self.name, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
                 elif "pod_entry" in message["type"]:  # pour le moment la capsule ne fait que de passer todo : algo aiguillage à un plus haut niveau
@@ -53,5 +59,31 @@ class SwitchOut(Switch):
                         "type": "pod_exit",
                         "pod": pod
                     })
+                    yield from self.parent.write({
+                        "author": self,
+                        "type": "routing",
+                        "pod": pod
+                    })
+                elif "pod_passing" == message["type"]:
+                    pass
+                elif "insert" == message["type"]:
+                    pod = message["pod"]
+                    pods_discretized = self._switch_in.pods_discretized
+                    if None in pods_discretized:
+                        if pods_discretized[-1] is None:
+                            yield from pod.write({  # todo : dans pod
+                                "author": self,
+                                "type": "turn"
+                            })
+                        else:
+                            for index in range(len(pods_discretized) - 2, 0, -1):
+                                place = pods_discretized[index]
+                                if place is not None:
+                                    yield from place.write({  # todo : dans pod
+                                        "author": self,
+                                        "type": "shift"
+                                    })
+                                else:
+                                    break
                 else:
                     pass

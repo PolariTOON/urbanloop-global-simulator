@@ -177,7 +177,7 @@ class Route(Way):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self, "||", message)
+                    print("Route ||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

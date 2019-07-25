@@ -13,22 +13,15 @@ class Switch(Way):
         self._previous = previous
         self._next = next
         self._beside = beside
-        self._pods_previous = []
-        self._pods_next = []
-        self._pods_beside = []
+        self._pods = []
         self._id_bridge = id_bridge
         self._rules = []
+        self._margin = 2
+        self._pod_size = 2
 
         # Ajout des capsules
-        for key in pods:
-            pods_key = pods[key]
-            for pod in pods_key:
-                if key == "loop_in":
-                    self._pods_previous.append(Pod(env, self, pod["speed"], False, **pod))
-                elif key == "loop_out":
-                    self._pods_next.append(Pod(env, self, pod["speed"], False, **pod))
-                else:
-                    self._pods_beside.append(Pod(env, self, pod["speed"], False, **pod))
+        for pod in pods:
+            self._pods.append(Pod(env, self, pod["speed"], False, **pod))
 
         # Liaison des routes et sections de la boucle à l'aiguillage
         # Route précédente
@@ -47,10 +40,6 @@ class Switch(Way):
         return self._y
 
     @property
-    def length(self):
-        return 0
-
-    @property
     def beside(self):
         return self._beside
 
@@ -62,6 +51,18 @@ class Switch(Way):
     def previous(self):
         return self._previous
 
+    @property
+    def average_speed(self):
+        return self._beside.sections[0].speed
+
+    @property
+    def limit_speed(self):
+        return 22.7
+
+    @property
+    def d_min(self):
+        return self._pod_size + self._margin
+
     def add_rule(self, rule):
         if self._rules.count(rule) == 0:
             self._rules.insert(0, rule)
@@ -70,11 +71,7 @@ class Switch(Way):
         dict = super().serialize()
         dict.update({
             "type": "switch",
-            "pods": {
-                "previous": [pod.serialize() for pod in self._pods_previous],
-                "next": [pod.serialize() for pod in self._pods_next],
-                "beside": [pod.serialize() for pod in self._pods_beside]
-            },
+            "pods": [pod.serialize() for pod in self._pods],
             "x": self._x,
             "y": self._y,
             "id_bridge": self._id_bridge
@@ -83,4 +80,4 @@ class Switch(Way):
 
     @property
     def pods(self):
-        return self._pods_previous + self._pods_next + self._pods_beside
+        return self._pods

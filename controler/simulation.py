@@ -8,7 +8,7 @@ from simpy import Environment
 
 from controler import probability, converter
 from controler.probability import Probability
-from controler.routing import Routing
+from model.networks.network import Network
 from shutil import copyfile
 from settings import simlog
 
@@ -27,8 +27,8 @@ class Simulation:
         self._state = state
         self._running = running
         # Etape 3 : chargement du modèle
-        self._controler = Routing(self._env, id, **kwargs)
-        self._env.sim_tick = 0.05  # Duration of a tick
+        self._controler = Network(self._env, id, **kwargs)
+        self._env.sim_tick = 0.05  # Duration of a tick todo tristan : en lien avec les vitesses des capsules
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
         self._sim_tick_variations = []
@@ -51,7 +51,7 @@ class Simulation:
         :param seconds: The desired modulo
         :return: Boolean, if the current_tick is in phase with the given frequency
         """
-        if (seconds / self._env._sim_tick) < 1 or seconds < 1:
+        if (seconds / self._env.sim_tick) < 1 or seconds < 1:
             return True
         return self._current_tick % (seconds / self._env.sim_tick) == 0
 
@@ -86,7 +86,6 @@ class Simulation:
                 # Etape 4 : Génération de nouveaux voyageurs + Etape 6 : Mise à jour du controller
                 if self._modulo_on_seconds(1):
                     self._env.process(self.generate_travelers())
-                    self._controler.update()  # TODO : Mettre à jour le controler (timers ...)
                 # Etape 5 : Complétion des stations
                 if self._station_refill and self._current_tick != 0 and self._modulo_on_seconds(1):
                     self._controler.fill_and_full_stations()
@@ -290,7 +289,7 @@ class Simulation:
             self._state = random()
 
     def serialize(self):
-        dict = self._controler._network.serialize()
+        dict = self._controler.serialize()
         state = self._state
         running = self._running
         dict.update({

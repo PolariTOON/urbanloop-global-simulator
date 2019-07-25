@@ -120,6 +120,10 @@ class Route(Way):
     def y_max(self):
         return self.max_xy(False)
 
+    @property
+    def name(self):
+        return "ROUTE"
+
     def min_xy(self, choice):
         """
         :param choice: si True alors on travaille avec x (abscisse) sinon on travaille en y (ordonnée)
@@ -177,7 +181,7 @@ class Route(Way):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self, "||", message)
+                    print("Route ||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:
@@ -195,5 +199,7 @@ class Route(Way):
                         "type": "docked",
                         "pod": pod
                     })
+                elif "pod_exit" == message["type"]:
+                    pass
                 else:
                     raise ValueError("Invalid message")

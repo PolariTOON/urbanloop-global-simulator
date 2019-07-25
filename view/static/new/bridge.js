@@ -1,4 +1,4 @@
-import {appState} from "./network.js";
+import {state} from "./state.js";
 import {Pod} from "./pod.js";
 import {Section} from "./section.js";
 
@@ -12,11 +12,11 @@ export class Bridge {
         this.y = y;
         const section = new Section(json["section"], switchOut, switchIn, false, infoLayer);
         networkLayer.add(section);
-        appState.objects.push(section);
+        state.objects.push(section);
         for (const pod of json["pods"]) {
             const p = new Pod(pod, json, false, loopsJSON, infoLayer);
             networkLayer.add(p);
-            appState.objects.push(p);
+            state.objects.push(p);
         }
     }
 }

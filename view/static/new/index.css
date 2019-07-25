@@ -1,0 +1,245 @@
+*,
+::before,
+::after {
+    box-sizing: border-box;
+    outline: 0;
+    vertical-align: top;
+    line-height: inherit;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+}
+::selection {
+    background-color: #fc39;
+    color: #333;
+}
+::-moz-focus-inner {
+    border: 0;
+}
+/*~~~~~~ html, body ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+html {
+    font-size: .625em; /* 1rem */
+}
+body {
+    grid-template-rows: auto 1fr;
+    display: grid;
+    margin: 0;
+    line-height: 1.25;
+    color: #333;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.6em; /* 1.6rem */
+}
+/*~~~~~~ header ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+header {
+    z-index: 1;
+    grid-template-columns: auto 1fr;
+    display: grid;
+    padding: 0 1rem;
+    background-color: #fff;
+    box-shadow: 0 0 .4rem #3333;
+}
+header > hgroup,
+header > nav {
+    display: flex;
+}
+header > hgroup > *,
+header > nav > * {
+    margin: 0;
+    padding: 1rem;
+}
+/*~~~~~~ main ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+main {
+    grid-template-columns: 1fr auto;
+    display: grid;
+    overflow: hidden;
+}
+main > article,
+main > aside {
+    display: flex;
+    flex-direction: column;
+}
+main > article {
+    justify-content: end;
+    z-index: 0;
+    background-color: #eee;
+}
+main > article > h2,
+main > article > p {
+    margin: 0;
+    padding: 1rem;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+main > article > h2 {
+    margin-bottom: auto;
+}
+main > article > p > label {
+    margin: 0;
+}
+main > article > .konvajs-content {
+    position: absolute !important;
+}
+main > aside {
+    z-index: 1;
+    width: 40rem;
+    padding: 0 !important; /* TODO: changer en 1rem lorsque l'apparté sera géré */
+    background-color: #fff;
+    box-shadow: 0 0 .4rem #3333;
+    overflow: auto;
+}
+main > aside > * {
+    margin: 0 !important; /* TODO: retirer quand Bootstrap le sera */
+    padding: 1rem !important; /* TODO: retirer quand Bootstrap le sera */
+}
+/*~~~~~~ menu ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+menu > li {
+    display: inline-block;
+}
+menu > li > a[download],
+menu > li > label {
+    display: inline-block;
+    width: 4rem;
+    height: 4rem;
+    margin: 0 !important; /* TODO: retirer quand Bootstrap le sera */
+    cursor: default;
+    font-size: 0;
+}
+menu > li > a[download]:focus-within,
+menu > li > label:focus-within {
+    outline: .1rem dashed #3339;
+    outline-offset: .1rem;
+}
+menu > li > a[download]::before,
+menu > li > label > input {
+    content: attr(href);
+    -webkit-appearance: none;
+    appearance: none;
+    display: inline-block;
+    width: 3.6rem;
+    height: 3.6rem;
+    margin: .2rem;
+    padding: 0 0 0 3.2rem;
+    padding-left: 3.2rem;
+    border: .2rem solid transparent;
+    border-radius: .4rem;
+    background-repeat: no-repeat;
+    background-size: 3.2rem 3.2rem;
+    background-color: #333;
+    font-size: 1.6rem;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    overflow: hidden;
+    transition: background-color .2s;
+}
+menu > li > a[download]:hover::before,
+menu > li > label:hover > input,
+menu > li > a[download]:focus-within::before,
+menu > li > label:focus-within > input {
+    background-color: #369;
+}
+menu > li > a[download]:active::before,
+menu > li > label:active > input {
+    box-shadow: inset 0 0 0 .2rem #fff;
+}
+menu > li > a[download]:not([href])::before,
+menu > li > label > input:disabled {
+    background-color: #ccc;
+    box-shadow: none;
+}
+/*~~~~~~ #identifiers, .classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+a[download]#download-button::before {
+    background-image: url("./icons.svg#download");
+}
+label#upload-button > input {
+    background-image: url("./icons.svg#upload");
+}
+label#create-button > input {
+    background-image: url("./icons.svg#create");
+}
+label#delete-button > input {
+    background-image: url("./icons.svg#delete");
+}
+label#play-button > input {
+    background-image: url("./icons.svg#play");
+}
+label#pause-button > input {
+    background-image: url("./icons.svg#pause");
+}
+label#accelerate-button > input {
+    background-image: url("./icons.svg#accelerate");
+}
+label#decelerate-button > input {
+    background-image: url("./icons.svg#decelerate");
+}
+
+.badge,
+.btn {
+    font-size: inherit;
+}
+.nav.nav-tabs {
+    position: sticky;
+    top: 0;
+    background: #fff;
+}
+
+#config-form > fieldset {
+    margin: 2rem;
+}
+
+#config-btn-group,
+#config-network-btn-group {
+    display: flex;
+    justify-content: center;
+}
+
+#network-text {
+    display: flex;
+    justify-content: space-around;
+    min-height: 20px;
+    margin: 0;
+}
+
+.fa-star {
+    color: white;
+}
+
+.form-text-error {
+    font-size: 12px;
+    color: #bc0000;
+}
+
+.not-shown {
+    display: none;
+}
+
+.nav-tabs {
+    justify-content: space-around;
+}
+
+.nav-link {
+    color: black;
+    padding: .3rem .4rem;
+}
+
+.nav-link:hover {
+    color: #424242;
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+#tab-content > p {
+    margin: 0;
+}
+
+#tab-content input {
+    height: inherit;
+}

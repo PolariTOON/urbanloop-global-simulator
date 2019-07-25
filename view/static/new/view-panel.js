@@ -1,4 +1,4 @@
-import {appState} from "./network.js";
+import {state} from "./state.js";
 import {Loop} from "./loop.js";
 import {Switch} from "./switch.js";
 import {Station} from "./station.js";
@@ -12,7 +12,7 @@ let viewTab = document.getElementById("view-tab");
 
 
 function updateViewLoop() {
-    let actualLoop = appState.selectedObject;
+    let actualLoop = state.selectedObject;
     viewTab.innerHTML = `<strong>Vue de la boucle : ${actualLoop.json["name"]}</strong><div id='view-object' class='container'></div>`;
 
     let stageView = new Stage({
@@ -39,7 +39,7 @@ function updateViewLoop() {
 }
 
 function updateViewSwitch() {
-    let actualSwitch = appState.selectedObject;
+    let actualSwitch = state.selectedObject;
     viewTab.innerHTML = `<strong>Vue de l'aiguillage : ${actualSwitch.json["my_loop_name"]} -> ${actualSwitch.json["other_loop_name"]}</strong><div id='view-object' class='container'></div>`;
 
     let stageView = new Stage({
@@ -84,36 +84,36 @@ function updateViewSwitch() {
 }
 
 function updateViewStation() {
-    let actualStation = appState.selectedObject;
+    let actualStation = state.selectedObject;
     viewTab.innerHTML = `<strong>Vue de la station : ${actualStation.json["name"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 function updateViewShed() {
-    let actualShed = appState.selectedObject;
+    let actualShed = state.selectedObject;
     viewTab.innerHTML = `<strong>Vue du dépôt n°${actualShed.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 function updateViewPod() {
-    let actualPod = appState.selectedObject;
+    let actualPod = state.selectedObject;
     viewTab.innerHTML = `<strong>Vue de la capsule n°${actualPod.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 function updateViewSensor() {
-    let actualSensor = appState.selectedObject;
+    let actualSensor = state.selectedObject;
     viewTab.innerHTML = `<strong>Vue du capteur n°${actualSensor.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 export async function updateViewPanel() {
-    if (appState.selectedObject instanceof Loop)
+    if (state.selectedObject instanceof Loop)
         updateViewLoop();
-    else if (appState.selectedObject instanceof Switch)
+    else if (state.selectedObject instanceof Switch)
         updateViewSwitch();
-    else if (appState.selectedObject instanceof Station)
+    else if (state.selectedObject instanceof Station)
         updateViewStation();
-    else if (appState.selectedObject instanceof Shed)
+    else if (state.selectedObject instanceof Shed)
         updateViewShed();
-    else if (appState.selectedObject instanceof Pod)
+    else if (state.selectedObject instanceof Pod)
         updateViewPod();
-    else if (appState.selectedObject instanceof Sensor)
+    else if (state.selectedObject instanceof Sensor)
         updateViewSensor();
 }

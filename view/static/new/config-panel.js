@@ -1,36 +1,9 @@
-import {applyNetworkScene, getDefaultFilename} from "./network.js";
-import {fetchTimeout} from "./main-page.js";
-
-export let networkSelection = document.getElementById('conf-topology-0');
-export let saveConfigButton = document.getElementById('config-save-button');
-export let resetConfigButton = document.getElementById('config-reset-button');
-
-
+let saveConfigButton = document.getElementById('config-save-button');
+let resetConfigButton = document.getElementById('config-reset-button');
 let fulfillPeriod = document.getElementById('conf-capsule-3');
-
 let duration = document.getElementById('conf-simulation-2');
-let networkAddButton = document.getElementById('network-add-btn');
-let networkDlButton = document.getElementById('network-dl-btn');
-let networkFavButton = document.getElementById('network-fav-btn');
-let networkRemoveButton = document.getElementById('network-remove-btn');
-let networkText = document.getElementById('network-text');
-let networkFileInput = document.getElementById('conf-topology-1');
 let endlessCheckBox = document.getElementById('conf-simulation-1');
-let networkErrorText = document.getElementById('network-error-text');
 let refillCheckBox = document.getElementById('conf-capsule-2');
-
-function resetNetworkErrorText() {
-    networkErrorText.innerHTML = "Select, add, remove or download a network JSON file";
-    networkErrorText.classList.remove('form-text-error');
-    networkErrorText.classList.add('text-muted');
-}
-
-export function changeNetworkButtonState(disabled = false) {
-    networkAddButton.disabled = disabled;
-    networkDlButton.disabled = disabled;
-    networkFavButton.disabled = disabled;
-    networkRemoveButton.disabled = disabled;
-}
 
 export async function updateConfigPanel() {
     const configJSON = await (await fetch('/config/')).json(); //TODO : requête config
@@ -62,158 +35,10 @@ export async function updateConfigPanel() {
 
     duration.disabled = ['true', 'True'].includes(configJSON['endless']);
     fulfillPeriod.disabled = ['false, False'].includes(configJSON['station_refill']);
-
-    updateNetworkSelection();
 }
-
-async function updateNetworkSelection() {
-    while (networkSelection.firstChild) {
-        networkSelection.removeChild(networkSelection.firstChild);
-    }
-    const listNetworkFileNameJSON = await (await fetch('/networks/')).json(); //TODO : requête networks
-    for (const networkFileNameJSON of listNetworkFileNameJSON) {
-        let option = document.createElement('option');
-        option.innerHTML = networkFileNameJSON['fileName'];
-        networkSelection.appendChild(option);
-    }
-}
-
 
 refillCheckBox.onclick = () => {
     fulfillPeriod.disabled = !refillCheckBox.checked;
-};
-
-networkSelection.onchange = () => {
-    networkErrorText.innerHTML = "Select, add, remove or download a network JSON file";
-    networkErrorText.classList.remove('form-text-error');
-    networkErrorText.classList.add('text-muted');
-
-    let selectedName = networkSelection[networkSelection.selectedIndex].value;
-    applyNetworkScene(selectedName)
-};
-
-networkFileInput.onchange = () => {
-    let value = networkFileInput.value;
-    let extension = value.substr(value.lastIndexOf('.') + 1).toLowerCase();
-
-    if (extension !== 'json') {
-        networkErrorText.innerHTML = "Network file extension must be .json";
-        networkErrorText.classList.remove('text-muted');
-        networkErrorText.classList.add('form-text-error');
-        return;
-    }
-
-    resetNetworkErrorText();
-    changeNetworkButtonState(true);
-
-    let name;
-    if (value.includes('/')) {
-        let slashSplit = value.split('/');
-        name = slashSplit[slashSplit.length - 1]
-    } else {
-        let backslashSplit = value.split('\\');
-        name = backslashSplit[backslashSplit.length - 1]
-    }
-
-    let reader = new FileReader();
-    reader.readAsText(networkFileInput.files[0], "UTF-8");
-    reader.onload = async (event) => {
-        let isValidJSON = true;
-        let parsedJSON;
-
-        try {
-            parsedJSON = JSON.parse(event.target.result);
-        } catch (error) {
-            isValidJSON = false;
-        }
-
-        // In the future, isValidJSON should be false if the uploaded file doesn't respect network syntax
-        if (!isValidJSON) {
-            networkErrorText.innerHTML = "The uploaded JSON file isn't valid";
-            networkErrorText.classList.remove('text-muted');
-            networkErrorText.classList.add('form-text-error');
-            changeNetworkButtonState(false);
-            return;
-        }
-
-        await fetchTimeout(1000, '/' + name + '/add/', { //TODO : requête add
-            method: 'POST',
-            body: JSON.stringify(parsedJSON)
-        });
-        networkAddButton.title = "Network file has been added !";
-        setTimeout(() => {
-            networkAddButton.removeAttribute("title");
-        }, 3000);
-    };
-
-    reader.onerror = () => {
-        networkErrorText.innerHTML = "An error occurred while loading file";
-        networkErrorText.classList.remove('text-muted');
-        networkErrorText.classList.add('form-text-error');
-    };
-};
-
-networkAddButton.onclick = () => {
-    document.getElementById('conf-topology-1').dispatchEvent(new CustomEvent('click'));
-};
-
-networkAddButton.onmouseenter = () => {
-    networkText.innerHTML = "Add network json file"
-};
-
-networkAddButton.onmouseleave = () => {
-    networkText.innerHTML = String();
-};
-
-networkRemoveButton.onclick = async () => {
-    let selectedName = networkSelection[networkSelection.selectedIndex].value;
-
-    if (selectedName === getDefaultFilename()) {
-        networkErrorText.innerHTML = "Cannot remove default file";
-        networkErrorText.classList.remove('text-muted');
-        networkErrorText.classList.add('form-text-error');
-        return;
-    }
-
-    resetNetworkErrorText();
-    changeNetworkButtonState(true);
-
-    await fetchTimeout(1000, '/' + selectedName + '/remove/', { // TODO : requête remove
-        method: "POST"
-    });
-    document.getElementById('conf-topology-0').dispatchEvent(new CustomEvent('change'));
-    networkRemoveButton.title = "Selected network has been removed !";
-    setTimeout(() => {
-        networkRemoveButton.removeAttribute("title");
-    }, 3000);
-};
-
-networkRemoveButton.onmouseenter = () => {
-    networkText.innerHTML = "Remove selected network from the list"
-};
-
-networkRemoveButton.onmouseleave = () => {
-    networkText.innerHTML = String();
-};
-
-networkDlButton.onclick = async () => {
-    let selectedName = networkSelection[networkSelection.selectedIndex].value;
-    const networkJSON = await (await fetch('/networks/' + selectedName + '/')).json(); //TODO : requête networks
-    let downloadLink = window.document.createElement('a');
-    downloadLink.href = window.URL.createObjectURL(new Blob([JSON.stringify(networkJSON, null, 2)], {type: "application/json"}));
-    downloadLink.download = selectedName + '.json';
-
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-};
-
-networkDlButton.onmouseenter = () => {
-    networkText.innerHTML = "Download selected network file"
-};
-
-networkDlButton.onmouseleave = () => {
-    networkText.innerHTML = String();
 };
 
 endlessCheckBox.onclick = () => {

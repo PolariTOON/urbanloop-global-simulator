@@ -2,37 +2,42 @@ import {Bridge} from "./bridge.js";
 import {Entity} from "./entity.js";
 import {updateDataPanel} from "./data-panel.js";
 import {Loop} from "./loop.js";
+import {state} from "./state.js";
 import {updateViewPanel} from "./view-panel.js";
 const {Layer, Stage} = Konva;
 
 const zoomIntensity = 0.8;
 const minScale = 0.01;
 
-let updateLoop;
-
-export const appState = {
-    clearing: false,
-    objects: undefined,
-    selectedObject: null,
-    viewBox: null,
-    origin: null
-};
+let updateLoop = -1;
 
 let running = false;
 
-const stage = new Stage({
-    container: 'network-div',
+const article = document.querySelector("main > article");
+export const stage = new Stage({
+    container: article,
     draggable: true
 });
-const networkLayer = new Layer();
-const infoLayer = new Layer();
+export const heading = document.createElement("h2");
+heading.textContent = "Réseau non défini"; // TODO
+const firstParagraph = document.createElement("p");
+export const datetimeView = document.createElement("label");
+datetimeView.innerHTML = "Date: <output>Day - ---:--:--</output></label>";
+firstParagraph.append(datetimeView);
+const secondParagraph = document.createElement("p");
+export const speedView = document.createElement("label");
+speedView.innerHTML = "Speed: <output>&times;-</output></label>";
+secondParagraph.append(speedView);
+article.prepend(heading, firstParagraph, secondParagraph);
+export const networkLayer = new Layer();
+export const infoLayer = new Layer();
 
 function getBarycenter() {
     let loopNumber = 0;
     let sumX = 0;
     let sumY = 0;
 
-    appState.objects.forEach(object => {
+    state.objects.forEach(object => {
         if (object instanceof Loop) {
             loopNumber += 1;
             sumX += object.averageX;
@@ -47,28 +52,21 @@ function getBarycenter() {
     return {x: sumX / loopNumber, y: sumY / loopNumber};
 }
 
-export async function initNetworkScene(network_index) {
-    appState.objects = [];
-
-    /*await fetch('/networks/0/', {
-        method: "POST"
-    });*/
-
-
+export async function load(networkJSON) {
+    stage.add(networkLayer);
+    stage.add(infoLayer);
     // On ajoute les boucles
     const loops = [];
     const bridges = [];
-    const networkJSON = await (await fetch('/networks/'+ network_index +'/', {method: "GET"})).json();
     const viewBox = networkJSON["view_box"];
     const {x, y, width, height} = viewBox;
     const [offsetX, offsetY, zoom] = [0, 0, 1];
-    appState.viewBox = {x, y, width, height};
-    appState.origin = {offsetX, offsetY, zoom};
+    state.viewBox = {x, y, width, height};
+    state.origin = {offsetX, offsetY, zoom};
     for (const json of networkJSON["loops"]) {
         const loop = new Loop(json, networkLayer, infoLayer);
         loops.push(loop);
     }
-
     // On ajoute les ponts
     for (const json of networkJSON["bridges"]) {
         const switchIn = loops[json["switch_in"]["loop"]].elements[json["switch_in"]["element"]];
@@ -77,20 +75,28 @@ export async function initNetworkScene(network_index) {
         bridges.push(bridge);
     }
     resize();
-
     networkLayer.batchDraw();
     infoLayer.batchDraw();
+    // startUpdateLoop(); // TODO
 }
 
-export async function updateNetworkScene() {
-    networkLayer.batchDraw();
-    infoLayer.batchDraw();
+export async function unload() {
+    networkLayer.destroyChildren();
+    infoLayer.destroyChildren();
+    networkLayer.remove();
+    infoLayer.remove();
+    transform(0, 0, 1, 1);
+    state.objects.length = 0;
+    state.selectedObject = null;
+    state.viewBox = null;
+    state.origin = null;
+    // stopUpdateLoop(); // TODO
 }
 
 function resize() {
     const container = stage.container();
     const {offsetWidth, offsetHeight} = container;
-    const {x, y, width, height} = appState.viewBox;
+    const {x, y, width, height} = state.viewBox;
     const a = offsetWidth * height;
     const b = offsetHeight * width;
     let zoom = 1;
@@ -105,12 +111,12 @@ function resize() {
     }
     const offsetX = (offsetWidth - scaledWidth) / 2 - x * zoom;
     const offsetY = (offsetHeight - scaledHeight) / 2 - y * zoom;
-    const ratio = zoom / appState.origin.zoom;
-    const translateX = (stage.x() - appState.origin.offsetX) * ratio + offsetX;
-    const translateY = (stage.y() - appState.origin.offsetY) * ratio + offsetY;
+    const ratio = zoom / state.origin.zoom;
+    const translateX = (stage.x() - state.origin.offsetX) * ratio + offsetX;
+    const translateY = (stage.y() - state.origin.offsetY) * ratio + offsetY;
     const scaleX = stage.scaleX() * ratio;
     const scaleY = stage.scaleY() * ratio;
-    appState.origin = {offsetX, offsetY, zoom};
+    state.origin = {offsetX, offsetY, zoom};
     stage.size({
         width: offsetWidth,
         height: offsetHeight
@@ -142,7 +148,7 @@ function transform(translateX, translateY, scaleX, scaleY) {
     });
     const invertedScaleX = 1 / scaleX;
     const invertedScaleY = 1 / scaleY;
-    for (const object of appState.objects) {
+    for (const object of state.objects) {
         object.scale({
             x: invertedScaleX,
             y: invertedScaleY,
@@ -154,26 +160,9 @@ function setCursor(cursor) {
     document.body.style.cursor = cursor;
 }
 
-export function getDefaultFilename() {
-    return 'new_mini_network';
-}
-
-function clearScene() {
-    appState.clearing = true;
-    stopUpdateLoop();
-    appState.objects = [];
-    appState.selectedObject = null;
-    stage.getLayers().forEach(layer => layer.destroyChildren());
-    stage.destroyChildren();
-}
-
-export async function applyNetworkScene(networkName = 0) {
-    clearScene();
-    stage.add(networkLayer);
-    stage.add(infoLayer);
-    await initNetworkScene(networkName);
-    appState.clearing = false;
-    // startUpdateLoop(); //TODO : s'arrêter ici dans un premier temps (affichage du modèle avant lancement de la simulation)
+function updateNetworkScene() {
+    networkLayer.batchDraw();
+    infoLayer.batchDraw();
 }
 
 function startUpdateLoop() {
@@ -188,7 +177,7 @@ function startUpdateLoop() {
 
 function stopUpdateLoop() {
     clearInterval(updateLoop);
-    updateLoop = undefined;
+    updateLoop = -1;
 }
 
 window.addEventListener("resize", (event) => {
@@ -225,7 +214,7 @@ stage.on("mouseover", (event) => {
         return;
     }
     setCursor("pointer");
-    if (shape !== appState.selectedObject) {
+    if (shape !== state.selectedObject) {
         shape.showHint();
         infoLayer.batchDraw();
     }
@@ -241,7 +230,7 @@ stage.on("mouseout", (event) => {
         return;
     }
     setCursor("auto");
-    if (shape !== appState.selectedObject) {
+    if (shape !== state.selectedObject) {
         shape.hideHint();
         infoLayer.batchDraw();
     }
@@ -253,18 +242,18 @@ stage.on("mousedown", (event) => {
     while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
-    if (shape === appState.selectedObject) {
+    if (shape === state.selectedObject) {
         return;
     }
-    if (appState.selectedObject !== null) {
-        appState.selectedObject.hideHint();
-        appState.selectedObject.unselect();
-        appState.selectedObject = null;
+    if (state.selectedObject !== null) {
+        state.selectedObject.hideHint();
+        state.selectedObject.unselect();
+        state.selectedObject = null;
     }
     if (shape !== null) {
         shape.showHint();
         shape.select();
-        appState.selectedObject = shape;
+        state.selectedObject = shape;
     }
     networkLayer.batchDraw();
     infoLayer.batchDraw();

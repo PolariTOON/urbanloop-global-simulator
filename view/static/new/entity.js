@@ -1,4 +1,4 @@
-import {appState} from "./network.js";
+import {state} from "./state.js";
 const {Group, Label, Tag, Text} = Konva;
 export class Entity extends Group {
     constructor(options, infoLayer) {
@@ -30,7 +30,7 @@ export class Entity extends Group {
             fill: "white"
         }));
         infoLayer.add(this._hint);
-        appState.objects.push(this._hint)
+        state.objects.push(this._hint)
     }
     showHint() {
         this._hint.show();

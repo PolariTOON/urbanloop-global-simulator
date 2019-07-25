@@ -1,9 +1,15 @@
-let playPauseButton = document.getElementById('play-pause-button');
-let accelerateButton = document.getElementById('accelerate-button');
-let decelerateButton = document.getElementById('decelerate-button');
+import {load, unload} from "./network.js";
+import {state} from "./state.js";
+const uploadButton = document.getElementById("upload-button").control;
+const downloadButton = document.getElementById("download-button");
+const createButton = document.getElementById("create-button").control;
+const deleteButton = document.getElementById("delete-button").control;
+const playButton = document.getElementById("play-button").control;
+const pauseButton = document.getElementById("pause-button").control;
+const accelerateButton = document.getElementById("accelerate-button").control;
+const decelerateButton = document.getElementById("decelerate-button").control;
 let timerDiv = document.getElementById('timer-div');
 let speedDiv = document.getElementById('speed-div');
-let running = false;
 
 export function updateTimeFromJSON(timeJSON) {
     timerDiv.innerHTML = `Day ${timeJSON['day']}<br>${timeJSON['time']}`;
@@ -37,35 +43,89 @@ export function updateTimeFromJSON(timeJSON) {
         }
     }
 }
-
-accelerateButton.disabled = true;
-decelerateButton.disabled = true;
-
-playPauseButton.addEventListener("click", () => {
-    if (!running) {
-        fetch('/networks/0/clock/play/', { //TODO : requête play
-            method: "POST"
-        });
-        playPauseButton.innerHTML = "Pause";
-    } else {
-        fetch('/networks/0/clock/pause/', { //TODO : requête pause
-            method: "POST"
-        });
-        playPauseButton.innerHTML = "Play";
+export async function init(network) {
+    if (network !== null) {
+        uploadButton.disabled = true;
+        downloadButton.download = `network-${state.networkIndex}.json`;
+        downloadButton.href = `/networks/${state.networkIndex}/`;
+        // createButton.disabled = true;
+        deleteButton.disabled = false;
+        playButton.disabled = network.running;
+        pauseButton.disabled = !network.running;
+        // decelerateButton.disabled = false;
+        // accelerateButton.disabled = false;
+        load(network);
+        return;
     }
-    running = !running
+    uploadButton.disabled = false;
+    downloadButton.download = "";
+    downloadButton.removeAttribute("href");
+    // createButton.disabled = false;
+    deleteButton.disabled = true;
+    playButton.disabled = true;
+    pauseButton.disabled = true;
+    // decelerateButton.disabled = true;
+    // accelerateButton.disabled = true;
+    unload();
+}
+async function play() {
+    playButton.disabled = true;
+    pauseButton.disabled = false;
+}
+async function pause() {
+    playButton.disabled = false;
+    pauseButton.disabled = true;
+}
+uploadButton.addEventListener("input", async () => {
+    const {files} = uploadButton;
+    if (files.length !== 1) {
+        return;
+    }
+    try {
+        const input = JSON.stringify(await new Response(files.item(0)).json()); // TODO: effectuer des contrôles sémantiques
+        const output = await (await fetch(`/networks/${state.networkIndex}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json;charset=utf-8"
+            },
+            body: input
+        })).json();
+        init(output);
+    } catch {} // TODO
 });
-
-accelerateButton.addEventListener("click", () => {
-    if (!running) return;
-    fetch('/clock/decelerate/', { //TODO : requête decelerate
+createButton.addEventListener("click", async () => {
+    const output = null; // TODO
+    init(output);
+});
+deleteButton.addEventListener("click", async () => {
+    const output = await (await fetch(`/networks/${state.networkIndex}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json;charset=utf-8"
+        },
+        body: "null"
+    })).json();
+    init(output);
+});
+playButton.addEventListener("click", async () => {
+    fetch(`/networks/${state.networkIndex}/clock/play/`, {
+        method: "POST"
+    });
+    play();
+});
+pauseButton.addEventListener("click", async () => {
+    fetch(`/networks/${state.networkIndex}/clock/pause/`, {
+        method: "POST"
+    });
+    pause()
+});
+decelerateButton.addEventListener("click", async () => {
+    fetch(`/networks/${state.networkIndex}/clock/decelerate/`, {
         method: "POST"
     });
 });
-
-decelerateButton.addEventListener("click", () => {
-    if (!running) return;
-    fetch('/clock/accelerate/', { //TODO : requête accelerate
+accelerateButton.addEventListener("click", async () => {
+    fetch(`/networks/${state.networkIndex}/clock/accelerate/`, {
         method: "POST"
     });
 });

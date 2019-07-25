@@ -30,7 +30,6 @@
         {"speed": 70.70, "path": {"type": "line"}}
       ],
       "pods": [
-        {"position": 260, "speed": 70.70, "source": {"loop": 0, "element": 2}, "destination": {"loop": 0, "element": 1}, "travelers": {"count": 0, "max": 0}}
       ]
     },
     {
@@ -53,7 +52,8 @@
         {"speed": 70.70, "path": {"type": "line"}},
         {"speed": 70.70, "path": {"type": "line"}}
       ],
-      "pods": []
+      "pods": [
+      ]
     },
     {
       "name": "Laxou",
@@ -75,7 +75,9 @@
         {"speed": 70.70, "path": {"type": "line"}},
         {"speed": 70.70, "path": {"type": "line"}}
       ],
-      "pods": []
+      "pods": [
+        {"position": 610, "speed": 70.70, "source": {"loop": 0, "element": 2}, "destination": {"loop": 0, "element": 1}, "travelers": {"count": 0, "max": 0}}
+      ]
     }
   ],
   "bridges": [

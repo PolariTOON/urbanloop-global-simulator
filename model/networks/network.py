@@ -37,7 +37,7 @@ class Network(Node):
         self._moving_pods = []
         for pod in self.pods:
             if pod.speed > 0:
-                self._moving_pods.append({"pod": pod, "way": shorter_way_tracks(pod.source, pod.destination)})
+                self._moving_pods.append({"pod": pod, "way": shorter_way_tracks(pod.track_or_switch, pod.destination)})
 
     @property
     def pods(self):

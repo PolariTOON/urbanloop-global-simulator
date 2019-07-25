@@ -15,7 +15,8 @@ class SwitchOut(Switch):
         self._beside.sections[0].previous = self
         # Liaison inter aiguillage
         if self._beside.sections[-1].next is not None:
-            self._switch_out = self._beside.sections[-1].next
+            self._switch_in = self._beside.sections[-1].next
+            self._switch_in._switch_out = self
             self._beside.sections[-1].next.switch_in = self
 
     @property
@@ -50,8 +51,11 @@ class SwitchOut(Switch):
                     print(self.name, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
-                elif "pod_entry" in message["type"]:  # pour le moment la capsule ne fait que de passer todo : algo aiguillage à un plus haut niveau
+                elif "pod_entry" in message["type"]:
                     pod = message["pod"]
+                    self._pods.append(pod)
+                    if pod.track_or_switch != self:  # petite correction (j'espere temporaire!!)
+                        pod.track_or_switch = self
                     track = pod.track_or_switch.previous.sections[-1]
                     yield from track.write({
                         "author": self,
@@ -69,21 +73,12 @@ class SwitchOut(Switch):
                     pod = message["pod"]
                     pods_discretized = self._switch_in.pods_discretized
                     if None in pods_discretized:
-                        if pods_discretized[-1] is None:
-                            l_shift = self._c1_to_insert - pod.position + self._beside.sections[0].length + self.env.sim_tick * self.average_speed * self._switch_in.tick_count
-                            d_discr = self.average_speed * l_shift / (self.limit_speed - self.average_speed)  # distance allouée pour rejoindre la place de discrétisation
-                            discr_speed = self.average_speed * (d_discr + l_shift) / d_discr  # vitesse nécessaire pour rejoindre la place sur d_discr
-                            time_to_discretize = {"time": d_discr / discr_speed, "average_speed": self.average_speed}
+                        index_to_see = int((self._c1_to_insert - pod.position + self._beside.length) / self.d_min)  # décalage de place à faire sur le temps qu'il va s'écouler entre maintenant et le moment où la capsule sera potentiellement insérée
+                        if pods_discretized[self._switch_in.index_to_insert + 1 - index_to_see] is None or pods_discretized[self._switch_in.index_to_insert - index_to_see] is None:
                             yield from pod.write({
                                 "author": self,
                                 "type": "turn",
-                                "distance": self._c1_to_insert
-                            })
-                            yield from pod.write({
-                                "author": self,
-                                "type": "discretize",
-                                "speed": discr_speed,
-                                "time": time_to_discretize
+                                "distance": self._c1_to_insert - pod.position
                             })
                         else:
                             for index in range(len(pods_discretized) - 2, 0, -1):
@@ -97,25 +92,18 @@ class SwitchOut(Switch):
                                         "author": self,
                                         "type": "discretize",
                                         "speed": discr_speed,
-                                        "time": time_to_discretize
+                                        "time": time_to_discretize,
+                                        "place": place + 1
                                     })
                                 else:  # On donne un ordre de vitesse à la capsule pour qu'elle rejoigne une place de discrétisation
-                                    l_shift = self._c1_to_insert - pod.position + self._beside.sections[0].length + self.env.sim_tick * self.average_speed * self._switch_in.tick_count
-                                    d_discr = self.average_speed * l_shift / (self.limit_speed - self.average_speed)  # distance allouée pour rejoindre la place de discrétisation
-                                    discr_speed = self.average_speed * (d_discr + l_shift) / d_discr  # vitesse nécessaire pour rejoindre la place sur d_discr
-                                    time_to_discretize = {"time": d_discr / discr_speed, "average_speed": self.average_speed}
                                     yield from pod.write({
                                         "author": self,
                                         "type": "turn"
                                     })
-                                    yield from pod.write({
-                                        "author": self,
-                                        "type": "discretize",
-                                        "speed": discr_speed,
-                                        "time": time_to_discretize
-                                    })
-                                    break
                     else:  # la capsule n'est pas aiguillée et refait un tour de boucle
                         pass
+                elif "pod_exit" == message["type"]:
+                    pod = message["pod"]
+                    self._pods.remove(pod)
                 else:
-                    pass
+                    raise ValueError("Invalid message")

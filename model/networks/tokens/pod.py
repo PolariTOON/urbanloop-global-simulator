@@ -2,6 +2,7 @@ from settings import simlog
 from .token import Token
 from .traveler import Traveler
 
+
 class Pod(Token):
     def __init__(self, env, track_or_switch, pod_speed, is_docked, position=None, travelers=None, **kwargs):
         super().__init__(env, **kwargs)
@@ -15,7 +16,7 @@ class Pod(Token):
         self._travelers = [Traveler(env, 0) for k in range(travelers["count"])]
         self._capacity = travelers["max"]
         self._priority = 0  # TODO
-        self._track_or_switch = track_or_switch  # TODO
+        self._track_or_switch = track_or_switch
         self._speed = pod_speed
         self._is_docked = is_docked
         self._on_beside = False
@@ -104,6 +105,7 @@ class Pod(Token):
         """
         distance_before_turn = 0
         time_to_discretize = None
+        place = None
         while True:
 
             # Si la capsule est dans un aiguillage est qu'elle est en train de se discrétiser
@@ -113,10 +115,11 @@ class Pod(Token):
                 if time_to_discretize["time"] <= 0:
                     self._speed = time_to_discretize["average_speed"]
                     time_to_discretize = None
-                    self.track_or_switch.write({
+                    yield from self.track_or_switch.write({
                         "author": self,
-                        "type": "end_discretized",
-                        "pod": self
+                        "type": "end_discretize",
+                        "pod": self,
+                        "place": place
                     })
 
             # La capsule avance
@@ -127,7 +130,8 @@ class Pod(Token):
             # capsule indique à la piste/l'aiguillage sur laquelle/lequel elle rentre
             if self._position > self._track_or_switch.length:
                 self._position -= self._track_or_switch.length
-                if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" or str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_in.SwitchIn'>":
+                if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" or str(
+                        type(self._track_or_switch)) == "<class 'model.networks.ways.switch_in.SwitchIn'>":
                     self._track_or_switch = self._track_or_switch.next.sections[0]
                 else:
                     self._track_or_switch = self._track_or_switch.next
@@ -169,9 +173,10 @@ class Pod(Token):
                 elif "discretize" == message["type"]:
                     discr_speed = message["speed"]
                     time_to_discretize = message["time"]
+                    place = message["place"]
                     self._speed = discr_speed
                 elif "turn" == message["type"]:
                     distance_before_turn = message["distance"]
                     self._turn = True
                 else:
-                    pass
+                    raise ValueError("Invalid message")

@@ -57,6 +57,10 @@ class SwitchOut(Switch):
         return dict
 
     def _is_route(self, pod):
+        """
+        :param pod: la capsule dont on veut savoir si elle doit être routée
+        :return: True si la capsule doit être aiguillée, False sinon
+        """
         for moving_pod in self._routing_table:
             if moving_pod["pod"] == pod and self in moving_pod["way"]:
                 return True
@@ -82,8 +86,20 @@ class SwitchOut(Switch):
                     # routage si besoin
                     routing = self._is_route(pod)
                     if routing:
-                        # TODO : Envoyer l'ordre de vitesse
-                        pass
+                        index = self.switch_in.last_index_of(None)
+                        if index == 0 or index == -1:
+                            # On ne peut pas insérer la capsule
+                            pass
+                        elif index == len(self.switch_in.discrete_places) - 1:
+                            # On insert la capsule sur la dernière place
+                            pass
+                        elif index == len(self.switch_in.discrete_places) - 2:
+                            # On insère la capsule sur l'avant dernière place
+                            pass
+                        else:
+                            # On procède au décalage pour insérer la capsule
+                            self.switch_in.backstep(index)
+                            # TODO : autoriser la voiture à s'insérer et lui dire de prendre la bonne vitesse une fois sur le pont
                 elif "pod_exit" == message["type"]:
                     pod = message["pod"]
                     self._pods.remove(pod)

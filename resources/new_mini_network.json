@@ -4,9 +4,9 @@
   "seed": 42,
   "margin_min": 2,
   "pod_size": 2,
-  "c1_length": 50,
+  "c1_length": 10,
   "saturation": 4.2,
-  "places_number": 15,
+  "places_number": 10,
   "view_box": {
       "x": 0,
       "y": 200,
@@ -26,16 +26,16 @@
         {"type": "sensor", "x": 450, "y": 380}
       ],
       "sections": [
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}}
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": [
-        {"position": 35, "speed": 70.70, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}}
+        {"position": 35, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}}
       ]
     },
     {
@@ -50,13 +50,13 @@
         {"type": "sensor", "x": 280, "y": 520}
       ],
       "sections": [
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}}
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": []
     },
@@ -72,21 +72,21 @@
         {"type": "sensor", "x": 280, "y": 350}
       ],
       "sections": [
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}},
-        {"speed": 70.70, "path": {"type": "line"}}
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": []
     }
   ],
   "bridges": [
-    {"name": "bridge 0", "section": {"speed": 70.70, "path": {"type": "line"}}, "pods": []},
-    {"name": "bridge 1", "section": {"speed": 70.70, "path": {"type": "line"}}, "pods": []},
-    {"name": "bridge 2", "section": {"speed": 70.70, "path": {"type": "line"}}, "pods": []},
-    {"name": "bridge 3", "section": {"speed": 70.70, "path": {"type": "line"}}, "pods": []}
+    {"name": "bridge 0", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
+    {"name": "bridge 1", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
+    {"name": "bridge 2", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
+    {"name": "bridge 3", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []}
   ]
 }

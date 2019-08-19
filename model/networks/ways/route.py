@@ -13,7 +13,7 @@ from math import inf
 
 class Route(Way):
     def __init__(self, env, id, margin_min, pod_size, steps=None, sections=None, **kwargs):
-        super().__init__(env, id, **kwargs)
+        super().__init__(env, id, pod_size, **kwargs)
         self._steps = steps or []  # [shed, capteur, station, ...]
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)
         self._previous = None
@@ -122,7 +122,7 @@ class Route(Way):
 
     @property
     def name(self):
-        return "ROUTE" + self.id
+        return "ROUTE"
 
     def min_xy(self, choice):
         """

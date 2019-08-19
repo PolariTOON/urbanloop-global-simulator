@@ -14,7 +14,7 @@ class Switch(Way):
         self._id_bridge = id_bridge
         self._rules = []
         self._margin = self.avg_speed * (margin_min + pod_size) / 8.33 - pod_size
-        self.saturation = saturation
+        self._saturation = saturation
 
         # Ajout des capsules
         for pod in pods:
@@ -37,6 +37,10 @@ class Switch(Way):
         return self._y
 
     @property
+    def saturation(self):
+        return self._saturation
+
+    @property
     def margin(self):
         return self._margin
 
@@ -54,7 +58,7 @@ class Switch(Way):
 
     @property
     def max_speed(self):
-        return 22.22  # en m/s
+        return 22.23  # en m/s
 
     @property
     def next(self):
@@ -67,10 +71,6 @@ class Switch(Way):
     @property
     def speed_loop(self):
         return self._previous.sections[-1].speed
-
-    @property
-    def max_speed(self):
-        return self.beside.sections[0].speed  # todo : faire en sorte que ce soit paramétrable dans la config, vitesse maximale autorisée pour les capsules sur le réseau
 
     def add_rule(self, rule):
         if self._rules.count(rule) == 0:

@@ -6,9 +6,10 @@ from ...node2 import Node
 
 
 class Way(Node):
-    def __init__(self, env, id, **kwargs):
+    def __init__(self, env, id, pod_size, **kwargs):
         super().__init__(env, id, **kwargs)
         self._parent = None
+        self._pod_size = pod_size
 
     def serialize(self):
         dict = super().serialize()
@@ -22,3 +23,7 @@ class Way(Node):
     @parent.setter
     def parent(self, value):
         self._parent = value
+
+    @property
+    def pod_size(self):
+        return self._pod_size

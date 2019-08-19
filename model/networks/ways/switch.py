@@ -1,13 +1,10 @@
-"""
-réuni des connexions pour former les switchs du réseau
-"""
 from ..tokens.pod import Pod
 from .way import Way
 
 
 class Switch(Way):
-    def __init__(self, env, id, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
-        super().__init__(env, id, **kwargs)
+    def __init__(self, env, id, margin_min, pod_size, saturation, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
+        super().__init__(env, id, pod_size, **kwargs)
         self._x = x or 0
         self._y = y or 0
         self._previous = previous
@@ -16,8 +13,8 @@ class Switch(Way):
         self._pods = []
         self._id_bridge = id_bridge
         self._rules = []
-        self._margin = 2
-        self._pod_size = 2
+        self._margin = self.avg_speed * (margin_min + pod_size) / 8.33 - pod_size
+        self.saturation = saturation
 
         # Ajout des capsules
         for pod in pods:
@@ -40,8 +37,24 @@ class Switch(Way):
         return self._y
 
     @property
+    def margin(self):
+        return self._margin
+
+    @property
+    def place_size(self):
+        return self.pod_size + self.margin
+
+    @property
     def beside(self):
         return self._beside
+
+    @property
+    def avg_speed(self):
+        return self._previous.sections[-1].speed
+
+    @property
+    def max_speed(self):
+        return 22.22  # en m/s
 
     @property
     def next(self):
@@ -52,16 +65,12 @@ class Switch(Way):
         return self._previous
 
     @property
-    def average_speed(self):
-        return self._beside.sections[0].speed
+    def speed_loop(self):
+        return self._previous.sections[-1].speed
 
     @property
-    def limit_speed(self):
-        return 22.7
-
-    @property
-    def d_min(self):
-        return self._pod_size + self._margin
+    def max_speed(self):
+        return self.beside.sections[0].speed  # todo : faire en sorte que ce soit paramétrable dans la config, vitesse maximale autorisée pour les capsules sur le réseau
 
     def add_rule(self, rule):
         if self._rules.count(rule) == 0:

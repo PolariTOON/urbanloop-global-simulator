@@ -5,11 +5,10 @@ from .switch import Switch
 
 
 class SwitchOut(Switch):
-    def __init__(self, env, id, **kwargs):
-        super().__init__(env, id, **kwargs)
+    def __init__(self, env, id, margin_min, pod_size, saturation, c1_length, **kwargs):
+        super().__init__(env, id, margin_min, pod_size, saturation, **kwargs)
         self._switch_in = None
-        self._c1_to_insert = 50
-        self._insert_to_end = 101
+        self._routing_table = None
         # Liaison de la route et des sections du pont
         self._beside.previous = self
         self._beside.sections[0].previous = self
@@ -18,6 +17,8 @@ class SwitchOut(Switch):
             self._switch_in = self._beside.sections[-1].next
             self._switch_in._switch_out = self
             self._beside.sections[-1].next.switch_in = self
+
+        self._c1_length = c1_length
 
     @property
     def switch_in(self):
@@ -28,12 +29,24 @@ class SwitchOut(Switch):
         self._switch_in = value
 
     @property
+    def c1_length(self):
+        return self._c1_length
+
+    @property
+    def routing_table(self):
+        return self._routing_table
+
+    @routing_table.setter
+    def routing_table(self, value):
+        self._routing_table = value
+
+    @property
     def name(self):
         return "switchOut"
 
     @property
     def length(self):
-        return self._c1_to_insert + self._insert_to_end
+        return 0
 
     def serialize(self):
         dict = super().serialize()
@@ -42,6 +55,12 @@ class SwitchOut(Switch):
             "type": "switch_out"
         })
         return dict
+
+    def _is_route(self, pod):
+        for moving_pod in self._routing_table:
+            if moving_pod["pod"] == pod and self in moving_pod["way"]:
+                return True
+        return False
 
     def update(self):
         while True:
@@ -54,53 +73,16 @@ class SwitchOut(Switch):
                 elif "pod_entry" in message["type"]:
                     pod = message["pod"]
                     self._pods.append(pod)
-                    if pod.track_or_switch != self:  # petite correction (j'espere temporaire!!)
-                        pod.track_or_switch = self
                     track = pod.track_or_switch.previous.sections[-1]
                     yield from track.write({
                         "author": self,
                         "type": "pod_exit",
                         "pod": pod
                     })
-                    yield from self.parent.write({
-                        "author": self,
-                        "type": "routing",
-                        "pod": pod
-                    })
-                elif "pod_passing" == message["type"]:
-                    pass
-                elif "insert" == message["type"]:
-                    pod = message["pod"]
-                    pods_discretized = self._switch_in.pods_discretized
-                    if None in pods_discretized:
-                        index_to_see = int((self._c1_to_insert - pod.position + self._beside.length) / self.d_min)  # décalage de place à faire sur le temps qu'il va s'écouler entre maintenant et le moment où la capsule sera potentiellement insérée
-                        if pods_discretized[self._switch_in.index_to_insert + 1 - index_to_see] is None or pods_discretized[self._switch_in.index_to_insert - index_to_see] is None:
-                            yield from pod.write({
-                                "author": self,
-                                "type": "turn",
-                                "distance": self._c1_to_insert - pod.position
-                            })
-                        else:
-                            for index in range(len(pods_discretized) - 2, 0, -1):
-                                place = pods_discretized[index]
-                                if place is not None:
-                                    l_shift = self.d_min
-                                    d_discr = self.average_speed * l_shift / (self.limit_speed - self.average_speed)
-                                    discr_speed = self.average_speed * (d_discr + l_shift) / d_discr
-                                    time_to_discretize = {"time": d_discr / discr_speed, "average_speed": self.average_speed}
-                                    yield from place.write({
-                                        "author": self,
-                                        "type": "discretize",
-                                        "speed": discr_speed,
-                                        "time": time_to_discretize,
-                                        "place": place + 1
-                                    })
-                                else:  # On donne un ordre de vitesse à la capsule pour qu'elle rejoigne une place de discrétisation
-                                    yield from pod.write({
-                                        "author": self,
-                                        "type": "turn"
-                                    })
-                    else:  # la capsule n'est pas aiguillée et refait un tour de boucle
+                    # routage si besoin
+                    routing = self._is_route(pod)
+                    if routing:
+                        # TODO : Envoyer l'ordre de vitesse
                         pass
                 elif "pod_exit" == message["type"]:
                     pod = message["pod"]

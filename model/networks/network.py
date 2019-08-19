@@ -16,14 +16,16 @@ from stats.stats_recorder import StatsRecorder
 
 
 class Network(Node):
-    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, **kwargs):
+    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, margin_min=None, pod_size=None, c1_length=None, saturation=None, places_number=None, **kwargs):
         super().__init__(env, id, **kwargs)
+        self._margin_min = margin_min or 2
+        self._pod_size = pod_size or 2
         self._bridges = bridges or []
         self._loops = loops or []
         self._switches = switches or []
         self._routes = routes or []
         self._view_box = view_box or {}
-        self._init_graph_from_json(env)
+        self._init_graph_from_json(env, c1_length, saturation, places_number)
         self._init_parent_of_children()
         self._rules = []
         self._recorder = StatsRecorder(0)  # TODO : Gérer les stats
@@ -38,6 +40,10 @@ class Network(Node):
         for pod in self.pods:
             if pod.speed > 0:
                 self._moving_pods.append({"pod": pod, "way": shorter_way_tracks(pod.track_or_switch, pod.destination)})
+        # Initialisation des tables de routage des aiguillages
+        for switch in self._switches:
+            if isinstance(switch, SwitchOut):
+                switch.routing_table = self._moving_pods
 
     @property
     def pods(self):
@@ -126,7 +132,7 @@ class Network(Node):
         })
         return dict
 
-    def _init_graph_from_json(self, env):
+    def _init_graph_from_json(self, env, c1_length, saturation, places_number):
         """
         Création du model à partir du dictionnaire obtenu à partir du fichier json
         :return: (void) Le réseau est construit
@@ -181,7 +187,7 @@ class Network(Node):
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
-                new_route = Route(env, len(self._routes), **routes[
+                new_route = Route(env, len(self._routes), self._margin_min, self._pod_size, **routes[
                     route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
@@ -191,7 +197,7 @@ class Network(Node):
         for p in range(len(self._bridges)):
             steps = []
             sections = [self._bridges[p]["section"]]
-            new_route = Route(env, l + p, **{
+            new_route = Route(env, l + p, self._margin_min, self._pod_size, **{
                 "steps": steps,
                 "sections": sections
             })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
@@ -217,9 +223,9 @@ class Network(Node):
                 switch["next"] = self._routes[id_switch]  # loop_out
                 switch["beside"] = self._routes[l + switch["id_bridge"]]  # route_bridge
                 if switch["type"] == "switch_in":
-                    new_switch = SwitchIn(env, id_switch, **switch)
+                    new_switch = SwitchIn(env, id_switch, self._margin_min, self._pod_size, saturation, places_number, **switch)
                 else:
-                    new_switch = SwitchOut(env, id_switch, **switch)
+                    new_switch = SwitchOut(env, id_switch, self._margin_min, self._pod_size, saturation, c1_length, **switch)
                 self._switches.append(new_switch)
                 self._loops[b]["switches"][s] = new_switch
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
@@ -586,12 +592,23 @@ class Network(Node):
                 for switch in self._switches:
                     switch.add_rule(rule)
 
+    def remove_pod_from_dico(self, pod):
+        for moving_pod in self._moving_pods:
+            if moving_pod["pod"] == pod:
+                self._moving_pods.remove(moving_pod)
+        raise ValueError("Pod not in the routing table")
+
     def get_dico_from_pod(self, pod):
         for index in range(len(self._moving_pods)):
             dico_pod = self._moving_pods[index]
             if dico_pod["pod"] == pod:
                 return dico_pod
         raise ValueError("The specified pod is not in the moving_pods attribute of the network")
+
+    def update_routing(self):
+        for switch in self._switches:
+            if isinstance(switch, SwitchOut):
+                switch.routing_table = self._moving_pods
 
     def update(self):
         while True:
@@ -601,24 +618,10 @@ class Network(Node):
                     print(self.name, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
-                elif "routing" == message["type"]:
-                    pod = message["pod"]
-                    switch_out = message["author"]
-                    dico_pod = self.get_dico_from_pod(pod)
-                    if switch_out in dico_pod["way"]:
-                        yield from switch_out.write({
-                            "author": self,
-                            "type": "insert",
-                            "pod": pod
-                        })
-                    else:
-                        yield from switch_out.write({
-                            "author": self,
-                            "type": "pod_passing",
-                            "pod": pod
-                        })
                 elif "docked" == message["type"]:
-                    pass
+                    pod = message["pod"]
+                    self.remove_pod_from_dico(pod)
+                    self.update_routing()
                 else:
                     raise ValueError("Invalid message")
 

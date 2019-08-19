@@ -2,7 +2,7 @@
 2eme possibilité de noeud
 Une route est à la fois un noeud du graphe subdivisé et un graphe divisé en sections, stations, garages séparés par des capteurs
 """
-
+from model.networks.ways.switch import Switch
 from .way import Way
 from .tracks.section import Section
 from .tracks.sensor import Sensor
@@ -12,7 +12,7 @@ from math import inf
 
 
 class Route(Way):
-    def __init__(self, env, id, steps=None, sections=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, steps=None, sections=None, **kwargs):
         super().__init__(env, id, **kwargs)
         self._steps = steps or []  # [shed, capteur, station, ...]
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)
@@ -23,7 +23,7 @@ class Route(Way):
         #  Etape 42 : On instancie les pistes mais pas les liaisons de la premiere et de la dernière section
         for section_index in range(len(self._sections)):
             section = self._sections[section_index]
-            section = Section(env, section_index, **section)
+            section = Section(env, section_index, margin_min, pod_size, **section)
             self._sections[section_index] = section
         for step_index in range(len(self._steps)):
             step = self._steps[step_index]
@@ -122,7 +122,7 @@ class Route(Way):
 
     @property
     def name(self):
-        return "ROUTE"
+        return "ROUTE" + self.id
 
     def min_xy(self, choice):
         """
@@ -186,7 +186,10 @@ class Route(Way):
                     break
                 elif "pod_entry" == message["type"]:
                     pod = message["pod"]
-                    track = pod.track_or_switch.previous
+                    if isinstance(pod.track_or_switch, Switch):
+                        track = pod.track_or_switch.previous.sections[-1]
+                    else:
+                        track = pod.track_or_switch.previous
                     yield from track.write({
                         "author": self,
                         "type": "pod_exit",
@@ -199,7 +202,5 @@ class Route(Way):
                         "type": "docked",
                         "pod": pod
                     })
-                elif "pod_exit" == message["type"]:
-                    pass
                 else:
                     raise ValueError("Invalid message")

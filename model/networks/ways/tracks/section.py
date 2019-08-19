@@ -1,14 +1,10 @@
-"""
-Possibilité de noeud du sous-graphe désignant une section de route
-"""
-
 from math import hypot, nan
 from ...tokens.pod import Pod
 from .track import Track
 
 
 class Section(Track):
-    def __init__(self, env, id, speed=None, path=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, speed=None, path=None, **kwargs):
         super().__init__(env, id, **kwargs)
         speed = speed or 0
         path = path or {
@@ -21,6 +17,7 @@ class Section(Track):
         self._previous = None
         self._next = None
         self._pods = []
+        self._margin = self._speed * (margin_min + pod_size) / 8.33 - pod_size  # 8.33 m/s = 30 km/h est la vitesse des plus petites boucles
 
     @property
     def speed(self):

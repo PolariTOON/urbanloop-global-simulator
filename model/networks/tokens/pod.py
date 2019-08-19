@@ -103,25 +103,7 @@ class Pod(Token):
         Fonction qui gère le processus "pod", à chaque tour d'événement simpy les actions sont exécutées
         :return: void
         """
-        distance_before_turn = 0
-        time_to_discretize = None
-        place = None
         while True:
-
-            # Si la capsule est dans un aiguillage est qu'elle est en train de se discrétiser
-            # on met à jour le vitesse si elle s'est placée après le bon temps
-            if time_to_discretize is not None:
-                time_to_discretize["time"] -= self.env.sim_tick
-                if time_to_discretize["time"] <= 0:
-                    self._speed = time_to_discretize["average_speed"]
-                    time_to_discretize = None
-                    yield from self.track_or_switch.write({
-                        "author": self,
-                        "type": "end_discretize",
-                        "pod": self,
-                        "place": place
-                    })
-
             # La capsule avance
             if not self._is_docked and self._speed != 0:
                 self._position += self._speed * self.env.sim_tick
@@ -140,19 +122,7 @@ class Pod(Token):
                     "type": "pod_entry",
                     "pod": self
                 })
-            # Gestion de si la voiture tourne à un aiguillage
-            if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" and self._turn:
-                distance_before_turn -= self._speed * self.env.sim_tick
-                if distance_before_turn <= 0:
-                    self._track_or_switch = self._track_or_switch.beside.sections[0]
-                    self._position = -distance_before_turn
-                    distance_before_turn = 0
-                    self._on_beside = True
-                    yield from self._track_or_switch.write({
-                        "author": self,
-                        "type": "pod_entry",
-                        "pod": self
-                    })
+
             # Gestion des messages reçus
             while True:
                 message = yield from self.read()
@@ -165,18 +135,8 @@ class Pod(Token):
                 elif "docked" == message["type"]:
                     self._speed = 0
                     self._is_docked = True
-                elif "ack" == message["type"]:
-                    pass
                 elif "set_track_or_bridge" == message["type"]:
                     track_or_switch = message["track_or_switch"]
                     self._track_or_switch = track_or_switch
-                elif "discretize" == message["type"]:
-                    discr_speed = message["speed"]
-                    time_to_discretize = message["time"]
-                    place = message["place"]
-                    self._speed = discr_speed
-                elif "turn" == message["type"]:
-                    distance_before_turn = message["distance"]
-                    self._turn = True
                 else:
                     raise ValueError("Invalid message")

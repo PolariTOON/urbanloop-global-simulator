@@ -1,24 +1,37 @@
 import {state} from "./state.js";
-import {init} from "./menu.js";
-(async () => {
-    const integer = /^(?:0|[1-9]\d*)$/;
-    const url = new URL(location);
-    let networkIndex = url.searchParams.get("id");
-    let network = null;
-    if (networkIndex !== null && networkIndex.match(integer)) {
-        network = await (await fetch(`/networks/${networkIndex}/`, {
-            method: "GET"
-        })).json();
-    } else {
-        do {
-            networkIndex = String(Math.random()).slice(2);
-            network = await (await fetch(`/networks/${networkIndex}/`, {
-                method: "GET"
-            })).json();
-        } while (network !== null);
-        url.searchParams.set("id", networkIndex);
-        history.replaceState(null, "", url);
+import "./menu.js";
+import "./network.js";
+
+let requestAnimationFrameId = 0;
+
+state.addEventListener("play", async (event) => {
+    if (requestAnimationFrameId !== 0) {
+        return;
     }
-    state.networkIndex = networkIndex;
-    init(network);
-}) ();
+    requestAnimationFrameId = requestAnimationFrame(() => {
+        state.update();
+        requestAnimationFrameId = 0;
+    });
+});
+
+state.addEventListener("pause", async (event) => {
+    if (requestAnimationFrameId === 0) {
+        return;
+    }
+    cancelAnimationFrame(requestAnimationFrameId);
+    requestAnimationFrameId = 0;
+});
+
+state.addEventListener("update", async (event) => {
+    if (requestAnimationFrameId !== 0) {
+        return;
+    }
+    requestAnimationFrameId = requestAnimationFrame(() => {
+        state.update();
+        requestAnimationFrameId = 0;
+    });
+});
+
+state.reload();
+
+// TODO: ajouter un timeout pour diminuer la fréquence de rafraichissement

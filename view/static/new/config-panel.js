@@ -1,3 +1,4 @@
+import {state} from "./state.js";
 let saveConfigButton = document.getElementById('config-save-button');
 let resetConfigButton = document.getElementById('config-reset-button');
 let fulfillPeriod = document.getElementById('conf-capsule-3');
@@ -5,7 +6,7 @@ let duration = document.getElementById('conf-simulation-2');
 let endlessCheckBox = document.getElementById('conf-simulation-1');
 let refillCheckBox = document.getElementById('conf-capsule-2');
 
-export async function updateConfigPanel() {
+state.addEventListener("update", async (event) => {
     const configJSON = await (await fetch('/config/')).json(); //TODO : requête config
     document.getElementById('conf-travelers-0').value = configJSON['travelers_per_day'];
     document.getElementById('conf-travelers-1').value = configJSON['trip_limit'];
@@ -35,7 +36,7 @@ export async function updateConfigPanel() {
 
     duration.disabled = ['true', 'True'].includes(configJSON['endless']);
     fulfillPeriod.disabled = ['false, False'].includes(configJSON['station_refill']);
-}
+});
 
 refillCheckBox.onclick = () => {
     fulfillPeriod.disabled = !refillCheckBox.checked;

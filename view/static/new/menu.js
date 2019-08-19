@@ -1,4 +1,3 @@
-import {load, unload} from "./network.js";
 import {state} from "./state.js";
 const uploadButton = document.getElementById("upload-button").control;
 const downloadButton = document.getElementById("download-button");
@@ -43,20 +42,20 @@ export function updateTimeFromJSON(timeJSON) {
         }
     }
 }
-export async function init(network) {
-    if (network !== null) {
-        uploadButton.disabled = true;
-        downloadButton.download = `network-${state.networkIndex}.json`;
-        downloadButton.href = `/networks/${state.networkIndex}/`;
-        // createButton.disabled = true;
-        deleteButton.disabled = false;
-        playButton.disabled = network.running;
-        pauseButton.disabled = !network.running;
-        // decelerateButton.disabled = false;
-        // accelerateButton.disabled = false;
-        load(network);
-        return;
-    }
+
+state.addEventListener("load", (event) => {
+    uploadButton.disabled = true;
+    downloadButton.download = `network-${state.networkIndex}.json`;
+    downloadButton.href = `/networks/${state.networkIndex}/`;
+    // createButton.disabled = true;
+    deleteButton.disabled = false;
+    playButton.disabled = true;
+    pauseButton.disabled = true;
+    // decelerateButton.disabled = false;
+    // accelerateButton.disabled = false;
+});
+
+state.addEventListener("unload", (event) => {
     uploadButton.disabled = false;
     downloadButton.download = "";
     downloadButton.removeAttribute("href");
@@ -66,66 +65,50 @@ export async function init(network) {
     pauseButton.disabled = true;
     // decelerateButton.disabled = true;
     // accelerateButton.disabled = true;
-    unload();
-}
-async function play() {
+});
+
+state.addEventListener("play", (event) => {
     playButton.disabled = true;
     pauseButton.disabled = false;
-}
-async function pause() {
+});
+
+state.addEventListener("pause", (event) => {
     playButton.disabled = false;
     pauseButton.disabled = true;
-}
-uploadButton.addEventListener("input", async () => {
+});
+
+uploadButton.addEventListener("input", async (event) => {
     const {files} = uploadButton;
     if (files.length !== 1) {
         return;
     }
     try {
-        const input = JSON.stringify(await new Response(files.item(0)).json()); // TODO: effectuer des contrôles sémantiques
-        const output = await (await fetch(`/networks/${state.networkIndex}/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json;charset=utf-8"
-            },
-            body: input
-        })).json();
-        init(output);
+        const input = await new Response(files.item(0)).json(); // TODO: effectuer des contrôles sémantiques
+        state.load(input);
     } catch {} // TODO
 });
-createButton.addEventListener("click", async () => {
-    const output = null; // TODO
-    init(output);
+
+createButton.addEventListener("click", async (event) => {
+    const input = null; // TODO
+    state.load(input);
 });
-deleteButton.addEventListener("click", async () => {
-    const output = await (await fetch(`/networks/${state.networkIndex}/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json;charset=utf-8"
-        },
-        body: "null"
-    })).json();
-    init(output);
+
+deleteButton.addEventListener("click", async (event) => {
+    state.unload();
 });
-playButton.addEventListener("click", async () => {
-    fetch(`/networks/${state.networkIndex}/clock/play/`, {
-        method: "POST"
-    });
-    play();
+
+playButton.addEventListener("click", async (event) => {
+    state.play();
 });
-pauseButton.addEventListener("click", async () => {
-    fetch(`/networks/${state.networkIndex}/clock/pause/`, {
-        method: "POST"
-    });
-    pause()
+
+pauseButton.addEventListener("click", async (event) => {
+    state.pause();
 });
-decelerateButton.addEventListener("click", async () => {
-    fetch(`/networks/${state.networkIndex}/clock/decelerate/`, {
-        method: "POST"
-    });
+
+decelerateButton.addEventListener("click", async (event) => {
+    state.decelerate();
 });
-accelerateButton.addEventListener("click", async () => {
-    fetch(`/networks/${state.networkIndex}/clock/accelerate/`, {
-        method: "POST"
-    });
+
+accelerateButton.addEventListener("click", async (event) => {
+    state.accelerate();
 });

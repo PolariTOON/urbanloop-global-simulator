@@ -1,17 +1,11 @@
 import {Bridge} from "./bridge.js";
 import {Entity} from "./entity.js";
-import {updateDataPanel} from "./data-panel.js";
 import {Loop} from "./loop.js";
 import {state} from "./state.js";
-import {updateViewPanel} from "./view-panel.js";
 const {Layer, Stage} = Konva;
 
 const zoomIntensity = 0.8;
 const minScale = 0.01;
-
-let updateLoop = -1;
-
-let running = false;
 
 const article = document.querySelector("main > article");
 export const stage = new Stage({
@@ -19,7 +13,7 @@ export const stage = new Stage({
     draggable: true
 });
 export const heading = document.createElement("h2");
-heading.textContent = "Réseau non défini"; // TODO
+heading.textContent = "Undefined network"; // TODO
 const firstParagraph = document.createElement("p");
 export const datetimeView = document.createElement("label");
 datetimeView.innerHTML = "Date: <output>Day - ---:--:--</output></label>";
@@ -52,7 +46,8 @@ function getBarycenter() {
     return {x: sumX / loopNumber, y: sumY / loopNumber};
 }
 
-export async function load(networkJSON) {
+state.addEventListener("load", async (event) => {
+    const networkJSON = event.detail;
     stage.add(networkLayer);
     stage.add(infoLayer);
     // On ajoute les boucles
@@ -77,10 +72,9 @@ export async function load(networkJSON) {
     resize();
     networkLayer.batchDraw();
     infoLayer.batchDraw();
-    // startUpdateLoop(); // TODO
-}
+});
 
-export async function unload() {
+state.addEventListener("unload", async (event) => {
     networkLayer.destroyChildren();
     infoLayer.destroyChildren();
     networkLayer.remove();
@@ -90,8 +84,7 @@ export async function unload() {
     state.selectedObject = null;
     state.viewBox = null;
     state.origin = null;
-    // stopUpdateLoop(); // TODO
-}
+});
 
 function resize() {
     const container = stage.container();
@@ -160,51 +153,36 @@ function setCursor(cursor) {
     document.body.style.cursor = cursor;
 }
 
-function updateNetworkScene() {
+state.addEventListener("update", (event) => {
     networkLayer.batchDraw();
     infoLayer.batchDraw();
-}
+});
 
-function startUpdateLoop() {
-    updateLoop = setInterval(() => {
-        updateDataPanel();
-        updateViewPanel();
-        if (running) {
-            updateNetworkScene();
-        }
-    }, 32); // 1000/32 = 31 fps
-}
-
-function stopUpdateLoop() {
-    clearInterval(updateLoop);
-    updateLoop = -1;
-}
-
-window.addEventListener("resize", (event) => {
+window.addEventListener("resize", async (event) => {
     event.preventDefault();
     resize();
     networkLayer.batchDraw();
     infoLayer.batchDraw();
 });
 
-stage.on("dragstart", (event) => {
+stage.on("dragstart", async (event) => {
     event.evt.preventDefault();
     setCursor("move");
 });
 
-stage.on("dragend", (event) => {
+stage.on("dragend", async (event) => {
     event.evt.preventDefault();
     setCursor("auto");
 });
 
-stage.on("wheel", (event) => {
+stage.on("wheel", async (event) => {
     event.evt.preventDefault();
     zoom(event.evt.deltaY);
     networkLayer.batchDraw();
     infoLayer.batchDraw();
 });
 
-stage.on("mouseover", (event) => {
+stage.on("mouseover", async (event) => {
     event.evt.preventDefault();
     let shape = event.target;
     while (shape !== null && !(shape instanceof Entity)) {
@@ -220,7 +198,7 @@ stage.on("mouseover", (event) => {
     }
 });
 
-stage.on("mouseout", (event) => {
+stage.on("mouseout", async (event) => {
     event.evt.preventDefault();
     let shape = event.target;
     while (shape !== null && !(shape instanceof Entity)) {
@@ -236,7 +214,7 @@ stage.on("mouseout", (event) => {
     }
 });
 
-stage.on("mousedown", (event) => {
+stage.on("mousedown", async (event) => {
     event.evt.preventDefault();
     let shape = event.target;
     while (shape !== null && !(shape instanceof Entity)) {

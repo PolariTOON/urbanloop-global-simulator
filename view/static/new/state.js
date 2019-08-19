@@ -1,6 +1,161 @@
-export const state = {
-    objects: [],
-    selectedObject: null,
-    viewBox: null,
-    origin: null
-};
+async function getJSON(url) {
+    const fetchInit = {
+        method: "GET",
+    };
+    return (await fetch(url, fetchInit)).json();
+}
+
+async function postJSON(url, content) {
+    const fetchInit = {
+        method: "POST",
+    };
+    if (typeof content !== "undefined") {
+        fetchInit.headers = {
+            "Content-Type": "application/json;charset=utf-8"
+        };
+        fetchInit.body = JSON.stringify(content);
+    }
+    return (await fetch(url, fetchInit)).json();
+}
+
+class State extends EventTarget {
+    constructor() {
+        super();
+        this._networkIndex = "";
+        this._loaded = false;
+        this._running = false;
+        this._objects = [];
+        this._selectedObject = null;
+        this._viewBox = null;
+        this._origin = null;
+    }
+    get networkIndex() {
+        return this._networkIndex;
+    }
+    get objects() {
+        return this._objects;
+    }
+    set selectedObject(value) {
+        this._selectedObject = value;
+    }
+    get selectedObject() {
+        return this._selectedObject;
+    }
+    set viewBox(value) {
+        this._viewBox = value;
+    }
+    get viewBox() {
+        return this._viewBox;
+    }
+    set origin(value) {
+        this._origin = value;
+    }
+    get origin() {
+        return this._origin;
+    }
+    _load(detail) {
+        if (this._loaded || detail === null) {
+            return;
+        }
+        this.dispatchEvent(new CustomEvent("load", {detail}));
+        this._loaded = true;
+    }
+    _unload() {
+        if (!this._loaded) {
+            return;
+        }
+        state.dispatchEvent(new CustomEvent("unload"));
+        this._loaded = false;
+    }
+    _update(detail) {
+        if (!this._loaded || !this._running) {
+            return;
+        }
+        state.dispatchEvent(new CustomEvent("update", {detail}));
+    }
+    _play() {
+        if (!this._loaded || this._running) {
+            return;
+        }
+        this.dispatchEvent(new CustomEvent("play"));
+        this._running = true;
+    }
+    _pause() {
+        if (!this._loaded || !this._running) {
+            return;
+        }
+        state.dispatchEvent(new CustomEvent("pause"));
+        this._running = false;
+    }
+    async reload() {
+        const integer = /^(?:0|[1-9]\d*)$/;
+        const url = new URL(location);
+        let networkIndex = url.searchParams.get("id");
+        let network = null;
+        if (networkIndex !== null && networkIndex.match(integer)) {
+            network = await getJSON(`/networks/${networkIndex}/`);
+        } else {
+            do {
+                networkIndex = String(Math.random()).slice(2);
+                network = await getJSON(`/networks/${networkIndex}/`);
+            } while (network !== null);
+            url.searchParams.set("id", networkIndex);
+            history.replaceState(null, "", url);
+        }
+        this._networkIndex = networkIndex;
+        this._unload();
+        this._load(network);
+        this._play();
+    }
+    async load(input) {
+        const output = await postJSON(`/networks/${this._networkIndex}/`, input);
+        if (output === null) {
+            return;
+        }
+        this._unload();
+        this._load(output);
+        this._play();
+    }
+    async unload() {
+        const output = await postJSON(`/networks/${this._networkIndex}/`, null);
+        if (output !== null) {
+            return;
+        }
+        this._pause();
+        this._unload();
+    }
+    async update() {
+        const output = await getJSON(`/networks/${this._networkIndex}/`);
+        this._update(output);
+    }
+    async play() {
+        const output = await postJSON(`/networks/${this._networkIndex}/clock/play/`);
+        if (!output) {
+            return;
+        }
+        this._play();
+    }
+    async pause() {
+        const output = await postJSON(`/networks/${this._networkIndex}/clock/pause/`);
+        if (!output) {
+            return;
+        }
+        this._pause();
+    }
+    async decelerate() {
+        const output = await postJSON(`/networks/${this._networkIndex}/clock/decelerate/`);
+        if (!output) {
+            return;
+        }
+        this._decelerate();
+    }
+    async accelerate() {
+        const output = await postJSON(`/networks/${this._networkIndex}/clock/accelerate/`);
+        if (!output) {
+            return;
+        }
+        this._accelerate();
+    }
+}
+
+export const state = new State();

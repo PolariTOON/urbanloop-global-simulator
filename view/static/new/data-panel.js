@@ -10,7 +10,7 @@ import {Sensor} from "./sensor.js";
 
 let dataTab = document.getElementById("data-tab");
 
-export function updateDataPanel() {
+state.addEventListener("update", async (event) => {
     let data = "";
     if (state.selectedObject instanceof Loop) {
         data += `<p>Loop: ${state.selectedObject.json["name"]}</p>`;
@@ -64,4 +64,4 @@ export function updateDataPanel() {
         data += "<p>Nothing selected.</p>";
     }
     dataTab.innerHTML = data;
-}
+});

@@ -18,28 +18,44 @@ async function postJSON(url, content) {
     return (await fetch(url, fetchInit)).json();
 }
 
-class State extends EventTarget {
+class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     constructor() {
         super();
         this._networkIndex = "";
         this._loaded = false;
         this._running = false;
-        this._objects = [];
-        this._selectedObject = null;
+        this._loops = [];
+        this._bridges = [];
+        this._labels = [];
+        this._nodes = [];
+        this._pods = new Map();
+        this._selectedEntity = null;
         this._viewBox = null;
         this._origin = null;
     }
     get networkIndex() {
         return this._networkIndex;
     }
-    get objects() {
-        return this._objects;
+    get loops() {
+        return this._loops;
     }
-    set selectedObject(value) {
-        this._selectedObject = value;
+    get bridges() {
+        return this._bridges;
     }
-    get selectedObject() {
-        return this._selectedObject;
+    get labels() {
+        return this._labels;
+    }
+    get nodes() {
+        return this._nodes;
+    }
+    get pods() {
+        return this._pods;
+    }
+    set selectedEntity(value) {
+        this._selectedEntity = value;
+    }
+    get selectedEntity() {
+        return this._selectedEntity;
     }
     set viewBox(value) {
         this._viewBox = value;
@@ -105,7 +121,9 @@ class State extends EventTarget {
         this._networkIndex = networkIndex;
         this._unload();
         this._load(network);
-        this._play();
+        if (network.running) {
+            this._play();
+        }
     }
     async load(input) {
         const output = await postJSON(`/networks/${this._networkIndex}/`, input);
@@ -114,7 +132,9 @@ class State extends EventTarget {
         }
         this._unload();
         this._load(output);
-        this._play();
+        if (output.running) {
+            this._play();
+        }
     }
     async unload() {
         const output = await postJSON(`/networks/${this._networkIndex}/`, null);
@@ -126,6 +146,9 @@ class State extends EventTarget {
     }
     async update() {
         const output = await getJSON(`/networks/${this._networkIndex}/`);
+        if (output === null) {
+            return;
+        }
         this._update(output);
     }
     async play() {

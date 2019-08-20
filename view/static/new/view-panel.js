@@ -12,7 +12,7 @@ let viewTab = document.getElementById("view-tab");
 
 
 function updateViewLoop() {
-    let actualLoop = state.selectedObject;
+    let actualLoop = state.selectedEntity;
     viewTab.innerHTML = `<strong>Vue de la boucle : ${actualLoop.json["name"]}</strong><div id='view-object' class='container'></div>`;
 
     let stageView = new Stage({
@@ -39,7 +39,7 @@ function updateViewLoop() {
 }
 
 function updateViewSwitch() {
-    let actualSwitch = state.selectedObject;
+    let actualSwitch = state.selectedEntity;
     viewTab.innerHTML = `<strong>Vue de l'aiguillage : ${actualSwitch.json["my_loop_name"]} -> ${actualSwitch.json["other_loop_name"]}</strong><div id='view-object' class='container'></div>`;
 
     let stageView = new Stage({
@@ -84,36 +84,36 @@ function updateViewSwitch() {
 }
 
 function updateViewStation() {
-    let actualStation = state.selectedObject;
+    let actualStation = state.selectedEntity;
     viewTab.innerHTML = `<strong>Vue de la station : ${actualStation.json["name"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 function updateViewShed() {
-    let actualShed = state.selectedObject;
+    let actualShed = state.selectedEntity;
     viewTab.innerHTML = `<strong>Vue du dépôt n°${actualShed.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 function updateViewPod() {
-    let actualPod = state.selectedObject;
+    let actualPod = state.selectedEntity;
     viewTab.innerHTML = `<strong>Vue de la capsule n°${actualPod.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 function updateViewSensor() {
-    let actualSensor = state.selectedObject;
+    let actualSensor = state.selectedEntity;
     viewTab.innerHTML = `<strong>Vue du capteur n°${actualSensor.json["id"]}</strong><div id='view-object' class='container'></div>`;
 }
 
 export async function updateViewPanel() {
-    if (state.selectedObject instanceof Loop)
+    if (state.selectedEntity instanceof Loop)
         updateViewLoop();
-    else if (state.selectedObject instanceof Switch)
+    else if (state.selectedEntity instanceof Switch)
         updateViewSwitch();
-    else if (state.selectedObject instanceof Station)
+    else if (state.selectedEntity instanceof Station)
         updateViewStation();
-    else if (state.selectedObject instanceof Shed)
+    else if (state.selectedEntity instanceof Shed)
         updateViewShed();
-    else if (state.selectedObject instanceof Pod)
+    else if (state.selectedEntity instanceof Pod)
         updateViewPod();
-    else if (state.selectedObject instanceof Sensor)
+    else if (state.selectedEntity instanceof Sensor)
         updateViewSensor();
 }

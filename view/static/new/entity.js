@@ -30,14 +30,25 @@ export class Entity extends Group {
             fill: "white"
         }));
         infoLayer.add(this._hint);
-        state.objects.push(this._hint)
+        state.labels.push(this._hint);
     }
     showHint() {
-        this._hint.show();
+        return this._hint.show();
     }
     hideHint() {
-        this._hint.hide();
+        return this._hint.hide();
+    }
+    scaleHint(...args) {
+        return this._hint.scale(...args);
+    }
+    destroyHint(...args) {
+        return this._hint.destroy(...args);
     }
     select() {}
     unselect() {}
+    update(options) {
+        const {x, y} = options;
+        const xy = {x, y};
+        this._hint.position(xy);
+    }
 }

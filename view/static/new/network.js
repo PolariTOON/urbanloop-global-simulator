@@ -8,51 +8,28 @@ const zoomIntensity = 0.8;
 const minScale = 0.01;
 
 const article = document.querySelector("main > article");
-export const stage = new Stage({
+const stage = new Stage({
     container: article,
     draggable: true
 });
-export const heading = document.createElement("h2");
+const heading = document.createElement("h2");
 heading.textContent = "Undefined network"; // TODO
 const firstParagraph = document.createElement("p");
-export const datetimeView = document.createElement("label");
+const datetimeView = document.createElement("label");
 datetimeView.innerHTML = "Date: <output>Day - ---:--:--</output></label>";
 firstParagraph.append(datetimeView);
 const secondParagraph = document.createElement("p");
-export const speedView = document.createElement("label");
+const speedView = document.createElement("label");
 speedView.innerHTML = "Speed: <output>&times;-</output></label>";
 secondParagraph.append(speedView);
 article.prepend(heading, firstParagraph, secondParagraph);
-export const networkLayer = new Layer();
-export const infoLayer = new Layer();
-
-function getBarycenter() {
-    let loopNumber = 0;
-    let sumX = 0;
-    let sumY = 0;
-
-    state.objects.forEach(object => {
-        if (object instanceof Loop) {
-            loopNumber += 1;
-            sumX += object.averageX;
-            sumY += object.averageY;
-        }
-    });
-
-    if (loopNumber === 0) {
-        return {x: 0, y: 0};
-    }
-
-    return {x: sumX / loopNumber, y: sumY / loopNumber};
-}
+const networkLayer = new Layer();
+const infoLayer = new Layer();
 
 state.addEventListener("load", async (event) => {
     const networkJSON = event.detail;
     stage.add(networkLayer);
     stage.add(infoLayer);
-    // On ajoute les boucles
-    const loops = [];
-    const bridges = [];
     const viewBox = networkJSON["view_box"];
     const {x, y, width, height} = viewBox;
     const [offsetX, offsetY, zoom] = [0, 0, 1];
@@ -60,14 +37,13 @@ state.addEventListener("load", async (event) => {
     state.origin = {offsetX, offsetY, zoom};
     for (const json of networkJSON["loops"]) {
         const loop = new Loop(json, networkLayer, infoLayer);
-        loops.push(loop);
+        state.loops.push(loop);
     }
-    // On ajoute les ponts
     for (const json of networkJSON["bridges"]) {
-        const switchIn = loops[json["switch_in"]["loop"]].elements[json["switch_in"]["element"]];
-        const switchOut = loops[json["switch_out"]["loop"]].elements[json["switch_out"]["element"]];
+        const switchIn = state.loops[json["switch_in"]["loop"]].elements[json["switch_in"]["element"]];
+        const switchOut = state.loops[json["switch_out"]["loop"]].elements[json["switch_out"]["element"]];
         const bridge = new Bridge(json, switchIn, switchOut, networkJSON["loops"], networkLayer, infoLayer);
-        bridges.push(bridge);
+        state.bridges.push(bridge);
     }
     resize();
     networkLayer.batchDraw();
@@ -80,10 +56,48 @@ state.addEventListener("unload", async (event) => {
     networkLayer.remove();
     infoLayer.remove();
     transform(0, 0, 1, 1);
-    state.objects.length = 0;
-    state.selectedObject = null;
+    state.labels.length = 0;
+    state.nodes.length = 0;
+    state.pods.length = 0;
+    state.selectedEntity = null;
     state.viewBox = null;
     state.origin = null;
+});
+
+state.addEventListener("update", (event) => {
+    const networkJSON = event.detail;
+    for (let i = 0, li = state.loops.length; i < li; i++) {
+        state.loops[i].update(networkJSON["loops"][i], networkLayer, infoLayer);
+    }
+    for (let i = 0, li = state.bridges.length; i < li; i++) {
+        state.bridges[i].update(networkJSON["bridges"][i], networkJSON["loops"], networkLayer, infoLayer);
+    }
+    const invertedScaleX = 1 / stage.scaleX();
+    const invertedScaleY = 1 / stage.scaleY();
+    for (const [id, pod] of state.pods.entries()) {
+        if (pod.keepFlag === 0) {
+            if (pod === state.selectedEntity) {
+                state.selectedEntity = null;
+            }
+            pod.destroy();
+            pod.destroyHint();
+            state.pods.delete(id);
+        } else {
+            if (pod.keepFlag === 2) {
+                pod.scale({
+                    x: invertedScaleX,
+                    y: invertedScaleY,
+                });
+                pod.scaleHint({
+                    x: invertedScaleX,
+                    y: invertedScaleY,
+                });
+            }
+            pod.keepFlag = 0;
+        }
+    }
+    networkLayer.batchDraw();
+    infoLayer.batchDraw();
 });
 
 function resize() {
@@ -112,7 +126,7 @@ function resize() {
     state.origin = {offsetX, offsetY, zoom};
     stage.size({
         width: offsetWidth,
-        height: offsetHeight
+        height: offsetHeight,
     });
     transform(translateX, translateY, scaleX, scaleY);
 }
@@ -141,8 +155,8 @@ function transform(translateX, translateY, scaleX, scaleY) {
     });
     const invertedScaleX = 1 / scaleX;
     const invertedScaleY = 1 / scaleY;
-    for (const object of state.objects) {
-        object.scale({
+    for (const entity of [...state.labels, ...state.nodes, ...state.pods.values()]) {
+        entity.scale({
             x: invertedScaleX,
             y: invertedScaleY,
         });
@@ -150,13 +164,8 @@ function transform(translateX, translateY, scaleX, scaleY) {
 }
 
 function setCursor(cursor) {
-    document.body.style.cursor = cursor;
+    document.documentElement.style.cursor = cursor;
 }
-
-state.addEventListener("update", (event) => {
-    networkLayer.batchDraw();
-    infoLayer.batchDraw();
-});
 
 window.addEventListener("resize", async (event) => {
     event.preventDefault();
@@ -188,14 +197,12 @@ stage.on("mouseover", async (event) => {
     while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
-    if (shape === null) {
+    if (shape === null || shape === state.selectedEntity) {
         return;
     }
+    shape.showHint();
+    infoLayer.batchDraw();
     setCursor("pointer");
-    if (shape !== state.selectedObject) {
-        shape.showHint();
-        infoLayer.batchDraw();
-    }
 });
 
 stage.on("mouseout", async (event) => {
@@ -204,35 +211,34 @@ stage.on("mouseout", async (event) => {
     while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
-    if (shape === null) {
+    if (shape === null || shape === state.selectedEntity) {
         return;
     }
+    shape.hideHint();
+    infoLayer.batchDraw();
     setCursor("auto");
-    if (shape !== state.selectedObject) {
-        shape.hideHint();
-        infoLayer.batchDraw();
-    }
 });
 
-stage.on("mousedown", async (event) => {
+stage.on("click", async (event) => {
     event.evt.preventDefault();
     let shape = event.target;
     while (shape !== null && !(shape instanceof Entity)) {
         shape = shape.getParent();
     }
-    if (shape === state.selectedObject) {
+    if (shape === state.selectedEntity) {
         return;
     }
-    if (state.selectedObject !== null) {
-        state.selectedObject.hideHint();
-        state.selectedObject.unselect();
-        state.selectedObject = null;
+    if (state.selectedEntity !== null) {
+        state.selectedEntity.hideHint();
+        state.selectedEntity.unselect();
+        state.selectedEntity = null;
     }
     if (shape !== null) {
         shape.showHint();
         shape.select();
-        state.selectedObject = shape;
+        state.selectedEntity = shape;
     }
     networkLayer.batchDraw();
     infoLayer.batchDraw();
+    setCursor("auto");
 });

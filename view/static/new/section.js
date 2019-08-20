@@ -50,16 +50,19 @@ export class Section extends Entity {
         this.path.stroke(this.loopOrBridge ? loopColor : bridgeColor);
     }
     scale(...args) {
-        super.scale(...args);
+        const that = super.scale(...args);
+        if (that !== this) {
+            return that;
+        }
         const {x, y} = super.scale();
         const scale = (x + y) / 2;
         super.scale({
             x: 1,
             y: 1,
         });
-        this.path.strokeWidth(strokeWidth * scale)
-        this.path.pointerLength(pointerLength * scale)
-        this.path.pointerWidth(pointerWidth * scale)
+        this.path.strokeWidth(strokeWidth * scale);
+        this.path.pointerLength(pointerLength * scale);
+        this.path.pointerWidth(pointerWidth * scale);
         return {
             x: scale,
             y: scale,

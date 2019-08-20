@@ -21,7 +21,8 @@ function distanceBetween(beginElement, endElement, path) {
 function xyFromPosition(json, lineJSON, loopsJSON){
     let d = 0;
     let path;
-    let xy;
+    let x;
+    let y;
     let beginElement, endElement;
     if (loopsJSON){
         d = json["position"];
@@ -32,7 +33,8 @@ function xyFromPosition(json, lineJSON, loopsJSON){
         beginElement = loopsJSON[loopBeginElement]["elements"][beginElementIndex];
         endElement = loopsJSON[loopEndElement]["elements"][endElementIndex];
         path = lineJSON["section"]["path"];
-        xy = [beginElement["x"], beginElement["y"]];
+        x = beginElement["x"];
+        y = beginElement["y"];
     } else {
         const loopSize = lineJSON["elements"].length;
         let index = 0;
@@ -53,26 +55,25 @@ function xyFromPosition(json, lineJSON, loopsJSON){
         beginElement = lineJSON["elements"][index];
         endElement = lineJSON["elements"][(index+1)%loopSize];
         path = lineJSON["sections"][index]["path"];
-        xy = [lineJSON["elements"][index]["x"], lineJSON["elements"][index]["y"]];
+        x = lineJSON["elements"][index]["x"];
+        y = lineJSON["elements"][index]["y"];
     }
     const D = distanceBetween(beginElement, endElement, path);
-    switch (path["type"]){
-            case "line":
-            default:
-                const coeff = d / D;
-                xy[0] += coeff * (endElement["x"] - beginElement["x"]);
-                xy[1] += coeff * (endElement["y"] - beginElement["y"]);
+    switch (path["type"]) {
+        case "line":
+        default: {
+            const coeff = d / D;
+            x += coeff * (endElement["x"] - beginElement["x"]);
+            y += coeff * (endElement["y"] - beginElement["y"]);
         }
-    return xy;
-
+    }
+    return {x, y};
 }
 
 export class Pod extends Entity {
-    constructor(json, lineJSON, isDocked, loopsJSON, infoLayer) {
+    constructor(json, lineJSON, loopsJSON, infoLayer) {
         const name = json["name"];
-        const xy = xyFromPosition(json, lineJSON, loopsJSON);
-        const x = xy[0];
-        const y = xy[1];
+        const {x, y} = xyFromPosition(json, lineJSON, loopsJSON);
         const podWidth = 5;
         const label = "Pod : " + json["name"] + " | Capacity : " + json["travelers"]["max"];
         super({
@@ -81,10 +82,11 @@ export class Pod extends Entity {
             x,
             y,
             offsetX: x,
-            offsetY: y
+            offsetY: y,
         }, infoLayer);
+        this.updateCount = 0;
         this.travelerNumber = json["travelers"]["count"];
-        this.isDocked = isDocked;
+        this.keepFlag = 0;
         this.innerCircle = new Circle({
             x,
             y,
@@ -111,5 +113,14 @@ export class Pod extends Entity {
             this.innerCircle.fill(podInnerEmptyColor);
             this.outerCircle.fill(podOuterEmptyColor);
         }
+    }
+    update(json, lineJSON, loopsJSON) {
+        const xy = xyFromPosition(json, lineJSON, loopsJSON);
+        super.update(xy);
+        this.position(xy);
+        this.offset(xy);
+        this.innerCircle.position(xy);
+        this.outerCircle.position(xy);
+        this.outerCircle.position(xy);
     }
 }

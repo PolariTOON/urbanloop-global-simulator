@@ -11,12 +11,28 @@ export class Bridge {
         this.x = x;
         this.y = y;
         const section = new Section(json["section"], switchOut, switchIn, false, infoLayer);
+        this.section = section;
         networkLayer.add(section);
-        state.objects.push(section);
+        state.nodes.push(section);
         for (const pod of json["pods"]) {
-            const p = new Pod(pod, json, false, loopsJSON, infoLayer);
+            const p = new Pod(pod, json, loopsJSON, infoLayer);
             networkLayer.add(p);
-            state.objects.push(p);
+            state.pods.set(pod["id"], p);
+        }
+    }
+    update(json, loopsJSON, networkLayer, infoLayer) {
+        // this.section.update(json["section"]);
+        for (const pod of json["pods"]) {
+            if (state.pods.has(pod["id"])) {
+                const p = state.pods.get(pod["id"]);
+                p.update(pod, json, null);
+                p.keepFlag = 1;
+            } else {
+                const p = new Pod(pod, json, loopsJSON, infoLayer);
+                p.keepFlag = 2;
+                networkLayer.add(p);
+                state.pods.set(pod["id"], p);
+            }
         }
     }
 }

@@ -46,7 +46,7 @@ class SwitchOut(Switch):
 
     @property
     def length(self):
-        return 0
+        return self._c1_length + 10
 
     def serialize(self):
         dict = super().serialize()
@@ -67,14 +67,19 @@ class SwitchOut(Switch):
         return False
 
     def update(self):
+        """
+        Gère le processus d'aiguillage sortant, à chaque tour d'événement simpy les actions sont exécutées
+        :return: void
+        """
         while True:
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
                 if message is None:
                     break
                 elif "pod_entry" in message["type"]:
+                    # Entrée d'une capsule, il faut prévenir la section précédente que la capsule est sortie
                     pod = message["pod"]
                     self._pods.append(pod)
                     track = pod.track_or_switch.previous.sections[-1]
@@ -92,16 +97,39 @@ class SwitchOut(Switch):
                             pass
                         elif index == len(self.switch_in.discrete_places) - 1:
                             # On insert la capsule sur la dernière place
-                            pass
+                            speed = self.beside.length / (self._switch_in.finalisation_length/self.switch_in.avg_speed - self._c1_length/self.avg_speed)
+                            yield from pod.write({
+                                "author": self,
+                                "type": "insert",
+                                "speed": speed,
+                                "length_before_turn": self._c1_length
+                            })
                         elif index == len(self.switch_in.discrete_places) - 2:
                             # On insère la capsule sur l'avant dernière place
-                            pass
+                            speed = self.beside.length / ((self._switch_in.finalisation_length - self.place_size)/self.switch_in.avg_speed - self._c1_length/self.avg_speed)
+                            yield from pod.write({
+                                "author": self,
+                                "type": "insert",
+                                "speed": speed,
+                                "length_before_turn": self._c1_length
+                            })
                         else:
                             # On procède au décalage pour insérer la capsule
                             self.switch_in.backstep(index)
-                            # TODO : autoriser la voiture à s'insérer et lui dire de prendre la bonne vitesse une fois sur le pont
+                            # On envoie un message indiquant que la voiture doit aller sur le pont et y prendre une vitesse
+                            # La voiture s'insère alors sur l'avant dernière place
+                            speed = self.beside.length / ((self._switch_in.finalisation_length - self.place_size)/self.switch_in.avg_speed - self._c1_length/self.avg_speed)
+                            yield from pod.write({
+                                "author": self,
+                                "type": "insert",
+                                "speed": speed,
+                                "length_before_turn": self._c1_length
+                            })
                 elif "pod_exit" == message["type"]:
                     pod = message["pod"]
                     self._pods.remove(pod)
+                elif "update_routing" == message["type"]:
+                    new_table = message["table"]
+                    self._routing_table = new_table
                 else:
                     raise ValueError("Invalid message")

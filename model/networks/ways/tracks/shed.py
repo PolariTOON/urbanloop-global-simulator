@@ -52,7 +52,7 @@ class Shed(Step):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

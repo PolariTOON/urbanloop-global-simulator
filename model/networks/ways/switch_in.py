@@ -17,6 +17,16 @@ class SwitchIn(Switch):
             self._switch_out._switch_in = self
             self._beside.sections[0].previous.switch_in = self
         self._places_number = places_number
+        self._discretize_length = None
+        self._set_up_length = None
+        self._finalisation_length = None
+        self._discrete_places = None
+        self._step = None
+        self._min_time = None
+        self._max_time = None
+        self._pod_to_add = None
+        self._cursor = 0
+        self._first_place = 0
 
     @property
     def switch_out(self):
@@ -35,8 +45,16 @@ class SwitchIn(Switch):
         return "switchIn"
 
     @property
+    def c2_length(self):
+        return self._discretize_length + self._set_up_length + self._finalisation_length
+
+    @property
     def length(self):
-        return 0
+        return self.c2_length + 10
+
+    @property
+    def finalisation_length(self):
+        return self._finalisation_length
 
     def serialize(self):
         dict = super().serialize()
@@ -57,31 +75,30 @@ class SwitchIn(Switch):
                 index = i
         return index
 
-    def full_decel(self, t, length):
-        diff = t % self._step
+    def full_decel(self, length):
+        diff = self._step
         time = length / self.avg_speed
         return length / (time + diff)
 
-    def backstep(self, first_place):
+    def backstep(self, begin):
         """
         Envoie des ordres de vitesses aux capsules sur des places pour les décaler et
-        ainsi permettre une insertion.
+        ainsi permettre une insertion. On commence le décalage à l'indice begin.
         :return: void
         """
-        for index in range(first_place, len(self._discrete_places) - 2):
+        for index in range(self._first_place + begin - self._places_number, self._first_place - 2):
             # On décale les capsules à partir de la première place libre
             if self._discrete_places[index] is not None:
                 pod = self._discrete_places[index]
-                t = self.env.now
-                speed = self.full_decel(t, self.beside.length + self.switch_out.c1_length)
+                length = (1 + self._cursor % 1) * self.place_size
+                speed = (1 - (self._cursor % 1)) * self.place_size / self.avg_speed
                 if self._discrete_places[index] is not None:
-                    duration = (self.beside.length + self.switch_out.c1_length) / speed
                     yield from pod.write({
                         "author": self,
                         "type": "speed_a_while",
                         "speed": speed,
-                        "pod": pod,
-                        "duration": duration
+                        "length_before_restore": length,
+                        "speed_restore": self.avg_speed
                     })
                 self._discrete_places[index] = self._discrete_places[index + 1]
 
@@ -93,16 +110,23 @@ class SwitchIn(Switch):
         # Variables liées à la discrétisation
         self._discrete_places = [None for place in range(self._places_number)]
         self._step = self.place_size / self.avg_speed
-        self._min_time = self.place_size / self.avg_speed
-        self._max_time = self._min_time * self.saturation
         while True:
+            self._cursor = (self._cursor - self.avg_speed * self.env.sim_tick / self.place_size) % self._places_number
+            if int(self._cursor) != self._first_place:
+                # Le curseur a dépassé une nouvelle place, on avance le rouage
+                # pod_to_add est None si pas de capsule à insérer dans le tableau
+                # Si une capsule etait dans la dernière place alors elle disparaît
+                self._discrete_places[self._first_place] = self._pod_to_add
+                self._pod_to_add = None
+            self._first_place = int(self._cursor)
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
                 if message is None:
                     break
                 elif "pod_entry" in message["type"]:
+                    # Notification à la section précédente que la capsule n'y est plus
                     pod = message["pod"]
                     self._pods.append(pod)
                     track = pod.track_or_switch.previous.sections[-1]
@@ -110,6 +134,36 @@ class SwitchIn(Switch):
                         "author": self,
                         "type": "pod_exit",
                         "pod": pod
+                    })
+
+                    # Discrétisation de la capsule
+                    print("DISCRETISATION")
+                    time_to_discretize = (1 - (self._cursor % 1)) * self.place_size / self.avg_speed
+                    speed = self._discretize_length / time_to_discretize
+                    self._pod_to_add = pod
+                    yield from pod.write({
+                        "author": self,
+                        "type": "speed_a_while",
+                        "length_before_restore": self._discretize_length,
+                        "speed": speed,
+                        "speed_restore": self.avg_speed
+                    })
+                elif "pod_entry_from_bridge" == message["type"]:
+                    print("HEHO")
+                    # notification au pont que la capsule n'y est plus
+                    pod = message["pod"]
+                    self._pods.append(pod)
+                    track = pod.track_or_switch.beside.sections[-1]
+                    print("TRACK ", track)
+                    yield from track.write({
+                        "author": self,
+                        "type": "pod_exit",
+                        "pod": pod
+                    })
+                    yield from pod.write({
+                        "author": self,
+                        "type": "speed",
+                        "speed": self.avg_speed
                     })
                 elif "pod_exit" == message["type"]:
                     pod = message["pod"]

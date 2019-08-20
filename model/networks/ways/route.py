@@ -12,18 +12,19 @@ from math import inf
 
 
 class Route(Way):
-    def __init__(self, env, id, margin_min, pod_size, steps=None, sections=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, is_bridge, steps=None, sections=None, **kwargs):
         super().__init__(env, id, pod_size, **kwargs)
         self._steps = steps or []  # [shed, capteur, station, ...]
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)
         self._previous = None
         self._next = None
+        self._is_bridge = is_bridge
         self._weight = 0
 
         #  Etape 42 : On instancie les pistes mais pas les liaisons de la premiere et de la dernière section
         for section_index in range(len(self._sections)):
             section = self._sections[section_index]
-            section = Section(env, section_index, margin_min, pod_size, **section)
+            section = Section(env, section_index, margin_min, pod_size, self._is_bridge, **section)
             self._sections[section_index] = section
         for step_index in range(len(self._steps)):
             step = self._steps[step_index]
@@ -181,10 +182,11 @@ class Route(Way):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print("Route ||", message["type"], "||", message["author"].name)
+                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:
+                    # La route prévient la bonne piste / l'aiguillage qu'une capsule est sortie
                     pod = message["pod"]
                     if isinstance(pod.track_or_switch, Switch):
                         track = pod.track_or_switch.previous.sections[-1]
@@ -196,6 +198,7 @@ class Route(Way):
                         "pod": pod
                     })
                 elif "docked" == message["type"]:
+                    # La route remonte l'information d'un stationnement au réseau
                     pod = message["pod"]
                     yield from self._parent.write({
                         "author": self,

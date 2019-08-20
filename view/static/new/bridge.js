@@ -25,7 +25,7 @@ export class Bridge {
         for (const pod of json["pods"]) {
             if (state.pods.has(pod["id"])) {
                 const p = state.pods.get(pod["id"]);
-                p.update(pod, json, null);
+                p.update(pod, json, loopsJSON);
                 p.keepFlag = 1;
             } else {
                 const p = new Pod(pod, json, loopsJSON, infoLayer);

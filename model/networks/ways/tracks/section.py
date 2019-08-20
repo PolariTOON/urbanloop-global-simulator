@@ -4,13 +4,14 @@ from .track import Track
 
 
 class Section(Track):
-    def __init__(self, env, id, margin_min, pod_size, speed=None, path=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, is_bridge, speed=None, path=None, **kwargs):
         super().__init__(env, id, **kwargs)
         speed = speed or 0
         path = path or {
             "type": "line"
         }
         path["type"] = path["type"] or "line"
+        self._is_bridge = is_bridge
         self._speed = speed
         self._path_type = path["type"]
         self._length = nan
@@ -24,8 +25,12 @@ class Section(Track):
         return self._speed
 
     @property
+    def is_bridge(self):
+        return self._is_bridge
+
+    @property
     def name(self):
-        return "section: %s -> %s" % (self._previous.name, self._next.name)
+        return "%s -> %s" % (self._previous.name, self._next.name)
 
     @property
     def length(self):
@@ -70,13 +75,16 @@ class Section(Track):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"])
+                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
                 if message is None:
                     break
                 elif "pod_exit" == message["type"]:
+                    # Une capsule n'est plus dans la section
                     pod = message["pod"]
                     self._pods.remove(pod)
                 elif "pod_entry" == message["type"]:
+                    # Une capsule entre dans la section : il faut lui donner la bonne vitesse
+                    # et il faut notifier le parent pour qu'il prévienne la piste/l'aiguillage précédente
                     pod = message["pod"]
                     self._pods.append(pod)
                     yield from self._parent.write({
@@ -88,6 +96,16 @@ class Section(Track):
                         "author": self,
                         "type": "speed",
                         "speed": self._speed
+                    })
+                elif "pod_entry_bridge" == message["type"]:
+                    # Une capsule entre sur le pont, il faut simplement prévenir le parent car
+                    # une vitesse a déjà été donnée
+                    pod = message["pod"]
+                    self._pods.append(pod)
+                    yield from self._parent.write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": pod
                     })
                 else:
                     raise ValueError("Invalid message")

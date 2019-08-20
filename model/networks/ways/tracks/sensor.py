@@ -24,14 +24,14 @@ class Sensor(Step):
 
     @property
     def name(self):
-        return "sensor"
+        return "SENSOR"
 
     def update(self):
         while True:
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:  # Un capsule ne s'arrête pas devant un capteur donc il passe directement l'info du passage à son suivant

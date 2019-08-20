@@ -187,7 +187,7 @@ class Network(Node):
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
-                new_route = Route(env, len(self._routes), self._margin_min, self._pod_size, **routes[
+                new_route = Route(env, len(self._routes), self._margin_min, self._pod_size, False, **routes[
                     route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
@@ -197,7 +197,7 @@ class Network(Node):
         for p in range(len(self._bridges)):
             steps = []
             sections = [self._bridges[p]["section"]]
-            new_route = Route(env, l + p, self._margin_min, self._pod_size, **{
+            new_route = Route(env, l + p, self._margin_min, self._pod_size, True, **{
                 "steps": steps,
                 "sections": sections
             })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
@@ -606,11 +606,23 @@ class Network(Node):
         raise ValueError("The specified pod is not in the moving_pods attribute of the network")
 
     def update_routing(self):
+        """
+        Envoie aux aiguillages sortant une nouvelle table de routage
+        :return: void
+        """
         for switch in self._switches:
             if isinstance(switch, SwitchOut):
-                switch.routing_table = self._moving_pods
+                yield from switch.write({
+                    "author": self,
+                    "type": "update_routing",
+                    "table": self._moving_pods
+                })
 
     def update(self):
+        """
+        Gestion du processus du réseau à chaque boucle d'événement simpy
+        :return: void
+        """
         while True:
             while True:
                 message = yield from self.read()
@@ -619,8 +631,10 @@ class Network(Node):
                 if message is None:
                     break
                 elif "docked" == message["type"]:
+                    # Si une capsule stationne on met à jour la table de routage
                     pod = message["pod"]
                     self.remove_pod_from_dico(pod)
+                    # TODO : mise à jour des poids
                     self.update_routing()
                 else:
                     raise ValueError("Invalid message")

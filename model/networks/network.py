@@ -16,7 +16,7 @@ from stats.stats_recorder import StatsRecorder
 
 
 class Network(Node):
-    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, margin_min=None, pod_size=None, c1_length=None, saturation=None, places_number=None, **kwargs):
+    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, margin_min=None, pod_size=None, max_speed=None, places_number=None, **kwargs):
         super().__init__(env, id, **kwargs)
         self._margin_min = margin_min or 2
         self._pod_size = pod_size or 2
@@ -25,7 +25,7 @@ class Network(Node):
         self._switches = switches or []
         self._routes = routes or []
         self._view_box = view_box or {}
-        self._init_graph_from_json(env, c1_length, saturation, places_number)
+        self._init_graph_from_json(env, max_speed, places_number)
         self._init_parent_of_children()
         self._rules = []
         self._recorder = StatsRecorder(0)  # TODO : Gérer les stats
@@ -132,7 +132,7 @@ class Network(Node):
         })
         return dict
 
-    def _init_graph_from_json(self, env, c1_length, saturation, places_number):
+    def _init_graph_from_json(self, env, max_speed, places_number):
         """
         Création du model à partir du dictionnaire obtenu à partir du fichier json
         :return: (void) Le réseau est construit
@@ -223,9 +223,9 @@ class Network(Node):
                 switch["next"] = self._routes[id_switch]  # loop_out
                 switch["beside"] = self._routes[l + switch["id_bridge"]]  # route_bridge
                 if switch["type"] == "switch_in":
-                    new_switch = SwitchIn(env, id_switch, self._margin_min, self._pod_size, saturation, places_number, **switch)
+                    new_switch = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number, **switch)
                 else:
-                    new_switch = SwitchOut(env, id_switch, self._margin_min, self._pod_size, saturation, c1_length, **switch)
+                    new_switch = SwitchOut(env, id_switch, self._margin_min, self._pod_size, max_speed, **switch)
                 self._switches.append(new_switch)
                 self._loops[b]["switches"][s] = new_switch
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
@@ -623,7 +623,14 @@ class Network(Node):
         Gestion du processus du réseau à chaque boucle d'événement simpy
         :return: void
         """
+        update_routing = False
+        pod_to_update = None
         while True:
+            if update_routing:
+                self.remove_pod_from_dico(pod_to_update)
+                # TODO : mise à jour des poids
+                self.update_routing()
+                update_routing = False
             while True:
                 message = yield from self.read()
                 if message is not None:
@@ -632,10 +639,8 @@ class Network(Node):
                     break
                 elif "docked" == message["type"]:
                     # Si une capsule stationne on met à jour la table de routage
-                    pod = message["pod"]
-                    self.remove_pod_from_dico(pod)
-                    # TODO : mise à jour des poids
-                    self.update_routing()
+                    pod_to_update = message["pod"]
+                    update_routing = True
                 else:
                     raise ValueError("Invalid message")
 

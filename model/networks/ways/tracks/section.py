@@ -24,6 +24,10 @@ class Section(Track):
     def speed(self):
         return self._speed
 
+    @speed.setter
+    def speed(self, value):
+        self._speed = value
+
     @property
     def is_bridge(self):
         return self._is_bridge
@@ -97,16 +101,6 @@ class Section(Track):
                         "type": "speed",
                         "speed": self._speed
                     })
-                elif "pod_entry_bridge" == message["type"]:
-                    # Une capsule entre sur le pont, il faut simplement prévenir le parent car
-                    # une vitesse a déjà été donnée
-                    pod = message["pod"]
-                    self._pods.append(pod)
-                    yield from self._parent.write({
-                        "author": self,
-                        "type": "pod_entry",
-                        "pod": pod
-                    })
                 else:
                     raise ValueError("Invalid message")
 
@@ -126,9 +120,9 @@ class Section(Track):
         pods = self._pods
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
-                self._pods.insert(k, Pod(env, self, 0, True, **pod))
+                self._pods.insert(k, Pod(env, self, self._speed, **pod))
                 return
-        self._pods.append(Pod(env, self, pod["speed"], False, **pod))
+        self._pods.append(Pod(env, self, self._speed, **pod))
 
     def get_coordinates_of_position(self, position):
         previous = self._previous

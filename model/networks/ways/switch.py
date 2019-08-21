@@ -3,7 +3,7 @@ from .way import Way
 
 
 class Switch(Way):
-    def __init__(self, env, id, margin_min, pod_size, saturation, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, max_speed, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
         super().__init__(env, id, pod_size, **kwargs)
         self._x = x or 0
         self._y = y or 0
@@ -14,11 +14,11 @@ class Switch(Way):
         self._id_bridge = id_bridge
         self._rules = []
         self._margin = self.avg_speed * (margin_min + pod_size) / 8.33 - pod_size
-        self._saturation = saturation
+        self._max_speed = max_speed
 
         # Ajout des capsules
         for pod in pods:
-            self._pods.append(Pod(env, self, pod["speed"], False, **pod))
+            self._pods.append(Pod(env, self, self.avg_speed, **pod))
 
         # Liaison des routes et sections de la boucle à l'aiguillage
         # Route précédente
@@ -58,7 +58,7 @@ class Switch(Way):
 
     @property
     def max_speed(self):
-        return 22.23  # en m/s
+        return self._max_speed  # en m/s
 
     @property
     def next(self):

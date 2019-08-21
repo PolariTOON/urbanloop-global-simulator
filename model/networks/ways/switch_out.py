@@ -5,8 +5,8 @@ from .switch import Switch
 
 
 class SwitchOut(Switch):
-    def __init__(self, env, id, margin_min, pod_size, saturation, c1_length, **kwargs):
-        super().__init__(env, id, margin_min, pod_size, saturation, **kwargs)
+    def __init__(self, env, id, margin_min, pod_size, max_speed, **kwargs):
+        super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
         self._switch_in = None
         self._routing_table = None
         # Liaison de la route et des sections du pont
@@ -17,8 +17,7 @@ class SwitchOut(Switch):
             self._switch_in = self._beside.sections[-1].next
             self._switch_in._switch_out = self
             self._beside.sections[-1].next.switch_in = self
-
-        self._c1_length = c1_length
+        self._c1_length = None
 
     @property
     def switch_in(self):
@@ -47,6 +46,9 @@ class SwitchOut(Switch):
     @property
     def length(self):
         return self._c1_length + 10
+
+    def set_c1_length(self):
+        self._c1_length = self._switch_in.finalisation_length * self.avg_speed / self._switch_in.avg_speed - self._beside.length * self.avg_speed / self._beside.sections[0].speed
 
     def serialize(self):
         dict = super().serialize()
@@ -78,7 +80,7 @@ class SwitchOut(Switch):
                     print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
                 if message is None:
                     break
-                elif "pod_entry" in message["type"]:
+                elif "pod_entry" == message["type"]:
                     # Entrée d'une capsule, il faut prévenir la section précédente que la capsule est sortie
                     pod = message["pod"]
                     self._pods.append(pod)
@@ -92,37 +94,25 @@ class SwitchOut(Switch):
                     routing = self._is_route(pod)
                     if routing:
                         index = self.switch_in.last_index_of(None)
-                        if index == 0 or index == -1:
+                        first_place = self._switch_in.first_place
+                        if index == first_place or index == -1:
                             # On ne peut pas insérer la capsule
                             pass
-                        elif index == len(self.switch_in.discrete_places) - 1:
+                        elif index == first_place - 1:
                             # On insert la capsule sur la dernière place
-                            speed = self.beside.length / (self._switch_in.finalisation_length/self.switch_in.avg_speed - self._c1_length/self.avg_speed)
                             yield from pod.write({
                                 "author": self,
                                 "type": "insert",
-                                "speed": speed,
-                                "length_before_turn": self._c1_length
-                            })
-                        elif index == len(self.switch_in.discrete_places) - 2:
-                            # On insère la capsule sur l'avant dernière place
-                            speed = self.beside.length / ((self._switch_in.finalisation_length - self.place_size)/self.switch_in.avg_speed - self._c1_length/self.avg_speed)
-                            yield from pod.write({
-                                "author": self,
-                                "type": "insert",
-                                "speed": speed,
                                 "length_before_turn": self._c1_length
                             })
                         else:
                             # On procède au décalage pour insérer la capsule
                             self.switch_in.backstep(index)
-                            # On envoie un message indiquant que la voiture doit aller sur le pont et y prendre une vitesse
-                            # La voiture s'insère alors sur l'avant dernière place
-                            speed = self.beside.length / ((self._switch_in.finalisation_length - self.place_size)/self.switch_in.avg_speed - self._c1_length/self.avg_speed)
+                            # On envoie un message indiquant que la voiture doit aller sur le pont
+                            # La voiture s'insère alors sur la dernière place
                             yield from pod.write({
                                 "author": self,
                                 "type": "insert",
-                                "speed": speed,
                                 "length_before_turn": self._c1_length
                             })
                 elif "pod_exit" == message["type"]:

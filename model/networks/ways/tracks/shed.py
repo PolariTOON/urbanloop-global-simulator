@@ -21,7 +21,7 @@ class Shed(Step):
         }
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
-        self._pods = [Pod(env, self, 0, True) for k in range(pods["count"])]
+        self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
 
@@ -73,7 +73,7 @@ class Shed(Step):
                             "type": "docked",
                             "pod": pod
                         })
-                elif "pod_exit" in message["type"]:
+                elif "pod_exit" == message["type"]:
                     pass
                 else:
                     raise ValueError("Invalid message")

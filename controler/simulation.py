@@ -29,7 +29,7 @@ class Simulation:
         # Etape 3 : chargement du modèle
         self._controler = Network(self._env, id, **kwargs)
         self._env.sim_tick = 0.05  # Duration of a tick todo tristan : en lien avec les vitesses des capsules
-        self._env.current_tick = 0
+        self._current_tick = 0
         self._visualized_tick_duration = 0.05
         self._sim_tick_variations = []
         self._start_hour = None
@@ -53,7 +53,7 @@ class Simulation:
         """
         if (seconds / self._env.sim_tick) < 1 or seconds < 1:
             return True
-        return self._env.current_tick % (seconds / self._env.sim_tick) == 0
+        return self._current_tick % (seconds / self._env.sim_tick) == 0
 
     def tick(self):
         """
@@ -61,7 +61,7 @@ class Simulation:
         The tick_event updateData the current_tick.
         It should be used to frequency process
         """
-        self._env.current_tick += 1
+        self._current_tick += 1
         yield self._tick_event.succeed()
         self._tick_event = self._env.event()
 
@@ -87,7 +87,7 @@ class Simulation:
                 if self._modulo_on_seconds(1):
                     self._env.process(self.generate_travelers())
                 # Etape 5 : Complétion des stations
-                if self._station_refill and self._env.current_tick != 0 and self._modulo_on_seconds(1):
+                if self._station_refill and self._current_tick != 0 and self._modulo_on_seconds(1):
                     self._controler.fill_and_full_stations()
                 # Etape 6 : gestion des collisions
                 #  self.collision() TODO : GESTION DES COLLISIONS
@@ -157,8 +157,8 @@ class Simulation:
         :return: The total simulated time, in seconds. This function takes
         into account the sim_tick variation.
         """
-        if tick is None or tick > self._env.current_tick:
-            tick = self._env.current_tick
+        if tick is None or tick > self._current_tick:
+            tick = self._current_tick
 
         if not self._sim_tick_variations:
             # Empty case
@@ -194,11 +194,11 @@ class Simulation:
         if self._sim_tick_variations:
             # Not empty case
             start_tick = self._sim_tick_variations[-1][0] + self._sim_tick_variations[-1][1]
-            tick_duration = self._env.current_tick - start_tick
+            tick_duration = self._current_tick - start_tick
             self._sim_tick_variations.append((start_tick, tick_duration, self._env.sim_tick))
         else:
             # Empty case
-            self._sim_tick_variations.append((0, self._env.current_tick, self._env.sim_tick))
+            self._sim_tick_variations.append((0, self._current_tick, self._env.sim_tick))
 
         self._env.sim_tick = value
         simlog.warn("Changing _sim_tick. One tick equals now %f seconds" % self._env.sim_tick)

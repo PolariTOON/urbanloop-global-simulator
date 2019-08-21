@@ -5,8 +5,8 @@ from .switch import Switch
 
 
 class SwitchIn(Switch):
-    def __init__(self, env, id, margin_min, pod_size, saturation, places_number, **kwargs):
-        super().__init__(env, id, margin_min, pod_size, saturation, **kwargs)
+    def __init__(self, env, id, margin_min, pod_size, max_speed, places_number, **kwargs):
+        super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
         self._switch_out = None
         # Liaison de la route et des sections du pont
         self._beside.next = self
@@ -45,6 +45,10 @@ class SwitchIn(Switch):
         return "switchIn"
 
     @property
+    def first_place(self):
+        return self._first_place
+
+    @property
     def c2_length(self):
         return self._discretize_length + self._set_up_length + self._finalisation_length
 
@@ -70,7 +74,7 @@ class SwitchIn(Switch):
         :return: l'indice le plus grand où apparaît value dans discrete_places, -1 si value n'apparaît pas
         """
         index = -1
-        for i in range(len(self._discrete_places)):
+        for i in range(self._first_place - self._places_number, self._first_place - 1):
             if self._discrete_places[i] == value:
                 index = i
         return index
@@ -104,12 +108,16 @@ class SwitchIn(Switch):
 
     def update(self):
         # Les distances importantes sur la boucle où l'on peut s'inserer
-        self._discretize_length = self.place_size * self.avg_speed / self.max_speed
+        self._discretize_length = self.place_size * self.max_speed / (self.max_speed - self.avg_speed)
         self._set_up_length = self._places_number * self.place_size
-        self._finalisation_length = self.beside.length + self.switch_out.c1_length
+        self._finalisation_length = self._places_number * self._places_number * self.max_speed / self.avg_speed
+        # Maj de la vitesse du pont
+        section = self.beside.sections[0]
+        section.speed = max(section.speed, self.avg_speed * section.length / self._finalisation_length)
         # Variables liées à la discrétisation
         self._discrete_places = [None for place in range(self._places_number)]
         self._step = self.place_size / self.avg_speed
+        self._switch_out.set_c1_length()
         while True:
             self._cursor = (self._cursor - self.avg_speed * self.env.sim_tick / self.place_size) % self._places_number
             if int(self._cursor) != self._first_place:
@@ -125,7 +133,7 @@ class SwitchIn(Switch):
                     print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
                 if message is None:
                     break
-                elif "pod_entry" in message["type"]:
+                elif "pod_entry" == message["type"]:
                     # Notification à la section précédente que la capsule n'y est plus
                     pod = message["pod"]
                     self._pods.append(pod)
@@ -137,8 +145,8 @@ class SwitchIn(Switch):
                     })
 
                     # Discrétisation de la capsule
-                    print("DISCRETISATION")
-                    time_to_discretize = (1 - (self._cursor % 1)) * self.place_size / self.avg_speed
+                    x = (self._cursor % 1) * self.place_size
+                    time_to_discretize = (self.place_size - x) / self.avg_speed
                     speed = self._discretize_length / time_to_discretize
                     self._pod_to_add = pod
                     yield from pod.write({
@@ -149,12 +157,10 @@ class SwitchIn(Switch):
                         "speed_restore": self.avg_speed
                     })
                 elif "pod_entry_from_bridge" == message["type"]:
-                    print("HEHO")
                     # notification au pont que la capsule n'y est plus
                     pod = message["pod"]
                     self._pods.append(pod)
                     track = pod.track_or_switch.beside.sections[-1]
-                    print("TRACK ", track)
                     yield from track.write({
                         "author": self,
                         "type": "pod_exit",

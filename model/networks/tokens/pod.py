@@ -4,7 +4,7 @@ from .traveler import Traveler
 
 
 class Pod(Token):
-    def __init__(self, env, track_or_switch, pod_speed, is_docked, position=None, travelers=None, **kwargs):
+    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, **kwargs):
         super().__init__(env, **kwargs)
         self._position = position or 0
         travelers = travelers or {
@@ -18,11 +18,9 @@ class Pod(Token):
         self._priority = 0  # TODO
         self._track_or_switch = track_or_switch
         self._speed = pod_speed
-        self._is_docked = is_docked
         self._on_beside = False
         self._turn = False
         self._length_before_turn = None
-        self._speed_bridge = None
         self._length_before_restore = None
         self._speed_restore = None
 
@@ -33,14 +31,6 @@ class Pod(Token):
     @position.setter
     def position(self, value):
         self._position = value
-
-    @property
-    def is_docked(self):
-        return self._is_docked
-
-    @is_docked.setter
-    def is_docked(self, value):
-        self._is_docked = value
 
     @property
     def travelers(self):
@@ -119,21 +109,19 @@ class Pod(Token):
                     self._speed_restore = None
 
             # La capsule avance
-            if not self._is_docked and self._speed != 0:
+            if self._speed != 0:
                 self._position += self._speed * self.env.sim_tick
 
             # La capsule s'insère et tourne
-            if self._turn and self._position >= self._length_before_turn:
+            if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" and self._turn and self._position >= self._length_before_turn:
                 self.position -= self._length_before_turn
                 self._track_or_switch = self._track_or_switch.beside.sections[0]
-                self._speed = self._speed_bridge
                 yield from self._track_or_switch.write({
                     "author": self,
-                    "type": "pod_entry_bridge",
+                    "type": "pod_entry",
                     "pod": self
                 })
                 self._turn = False
-                self._speed_bridge = None
                 self._length_before_turn = None
 
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
@@ -176,12 +164,10 @@ class Pod(Token):
                 elif "docked" == message["type"]:
                     # Ordre d'arrêt dans un dépôt ou une gare
                     self._speed = 0
-                    self._is_docked = True
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner
-                    # une vitesse à prendre sur le pont et une distance avant le pont sont données
+                    # une distance avant le pont est donnée
                     self._turn = True
-                    self._speed_bridge = message["speed"]
                     self._length_before_turn = message["length_before_turn"]
                 elif "speed_a_while" == message["type"]:
                     # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer

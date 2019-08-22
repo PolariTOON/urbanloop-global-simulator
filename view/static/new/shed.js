@@ -1,58 +1,87 @@
 import {Entity} from "./entity.js";
-const {Rect} = Konva;
+const {RegularPolygon} = Konva;
 
-const shedColor = 'rgb(40, 40, 40)';
-const shedSelectedColor = 'rgb(255, 200, 20)';
+const shadowColor = "#333"
+const outerColor = "#f03";
+const innerColor = "#fff";
+const selectedOuterColor = "#0fc";
 
 export class Shed extends Entity {
+    // __outerShape;
+    // __innerShape;
+    // __podCount;
+    // __podMax;
     constructor(json, infoLayer) {
+        const outerShape = new RegularPolygon({
+            lineJoin: "round",
+            lineCap: "round",
+            sides: 4,
+            radius: 20,
+            strokeWidth: 1,
+            stroke: shadowColor,
+        });
+        const innerShape = new RegularPolygon({
+            listening: false,
+            lineJoin: "round",
+            lineCap: "round",
+            sides: 4,
+            radius: 13,
+            strokeWidth: 1,
+            fill: innerColor,
+            stroke: shadowColor,
+        });
+        super(infoLayer);
+        super.add(outerShape);
+        super.add(innerShape);
+        this.__outerShape = outerShape;
+        this.__innerShape = innerShape;
+        this.update(json);
+        this.unselect();
+    }
+    set _x(value) {
+        super._x = value;
+        this.__outerShape.x(value);
+        this.__innerShape.x(value);
+    }
+    get _x() {
+        return super._x;
+    }
+    set _y(value) {
+        super._y = value;
+        this.__outerShape.y(value);
+        this.__innerShape.y(value);
+    }
+    get _y() {
+        return super._y;
+    }
+    set _podCount(value) {
+        this.__podCount = value;
+    }
+    get _podCount() {
+        return this.__podCount;
+    }
+    set _podMax(value) {
+        this.__podMax = value;
+    }
+    get _podMax() {
+        return this.__podMax;
+    }
+    select() {
+        this.__outerShape.fill(selectedOuterColor);
+    }
+    unselect() {
+        this.__outerShape.fill(outerColor);
+    }
+    update(json) {
         const name = json["name"];
         const x = json["x"];
         const y = json["y"];
-        const shedRadius = 12;
-        const shedWidth = 4;
-        const semiWidth = Math.floor(shedWidth / 2);
-        const innerSize = 2 * (shedRadius - semiWidth);
-        const outerSize = 2 * (shedRadius + semiWidth);
-        const label = 'Shed : ' + json['name'] + ' | Capacity : ' + json['pods']["max"];
-        super({
-            name,
-            label,
-            x,
-            y,
-            offsetX: x,
-            offsetY: y
-        }, infoLayer);
-        this.innerRectangle = new Rect({
-            x: x,
-            y: y,
-            width: innerSize,
-            height: innerSize,
-            offsetX: innerSize / 2,
-            offsetY: innerSize / 2,
-            fill: 'white',
-            stroke: 'black',
-            strokeWidth: 0.3,
-        });
-        this.outerRectangle = new Rect({
-            x: x,
-            y: y,
-            width: outerSize,
-            height: outerSize,
-            offsetX: outerSize / 2,
-            offsetY: outerSize / 2,
-            fill: shedColor,
-            stroke: 'black',
-            strokeWidth: 0.3,
-        });
-        this.add(this.outerRectangle);
-        this.add(this.innerRectangle);
-        this.unselect();
-    }
-    select() {
-        this.outerRectangle.fill(shedSelectedColor);
-    }
-    unselect() {
-        this.outerRectangle.fill(shedColor);
+        const podCount = json["pods"]["count"];
+        const podMax = json["pods"]["max"];
+        this._name = name;
+        this._x = x;
+        this._y = y;
+        this._podCount = podCount;
+        this._podMax = podMax;
     }
 }

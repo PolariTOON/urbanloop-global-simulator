@@ -1,41 +1,71 @@
 import {Entity} from "./entity.js";
 const {Star} = Konva;
 
-const sensorColor = 'rgb(40,158,0)';
-const sensorSelectedColor = 'rgb(255, 200, 20)';
+const shadowColor = "#333"
+const outerColor = "#f03";
+const innerColor = "#fff";
+const selectedOuterColor = "#0fc";
 
 export class Sensor extends Entity {
+    // __outerShape;
+    // __innerShape;
     constructor(json, infoLayer) {
+        const outerShape = new Star({
+            lineJoin: "round",
+            lineCap: "round",
+            numPoints: 5,
+            outerRadius: 20,
+            innerRadius: 10,
+            strokeWidth: 1,
+            stroke: shadowColor,
+        });
+        const innerShape = new Star({
+            listening: false,
+            lineJoin: "round",
+            lineCap: "round",
+            numPoints: 5,
+            outerRadius: 10,
+            innerRadius: 5,
+            strokeWidth: 1,
+            fill: innerColor,
+            stroke: shadowColor,
+        });
+        super(infoLayer);
+        super.add(outerShape);
+        super.add(innerShape);
+        this.__outerShape = outerShape;
+        this.__innerShape = innerShape;
+        this.update(json);
+        this.unselect();
+    }
+    set _x(value) {
+        super._x = value;
+        this.__outerShape.x(value);
+        this.__innerShape.x(value);
+    }
+    get _x() {
+        return super._x;
+    }
+    set _y(value) {
+        super._y = value;
+        this.__outerShape.y(value);
+        this.__innerShape.y(value);
+    }
+    get _y() {
+        return super._y;
+    }
+    select() {
+        this.__outerShape.fill(selectedOuterColor);
+    }
+    unselect() {
+        this.__outerShape.fill(outerColor);
+    }
+    update(json) {
         const name = json["name"];
         const x = json["x"];
         const y = json["y"];
-        const sensorRadius = 18;
-        const label = name;
-        super({
-            name,
-            label,
-            x,
-            y,
-            offsetX: x,
-            offsetY: y
-        }, infoLayer);
-        this.star = new Star({
-            x,
-            y,
-            numPoints: 5,
-            innerRadius: sensorRadius / 2,
-            outerRadius: sensorRadius,
-            fill: sensorColor,
-            stroke: 'black',
-            strokeWidth: 0.3
-        });
-        this.add(this.star);
-        this.unselect();
-    }
-    select() {
-        this.star.fill(sensorSelectedColor);
-    }
-    unselect() {
-        this.star.fill(sensorColor);
+        this._name = name;
+        this._x = x;
+        this._y = y;
     }
 }

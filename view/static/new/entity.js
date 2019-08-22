@@ -1,54 +1,66 @@
-import {state} from "./state.js";
-const {Group, Label, Tag, Text} = Konva;
+import {Hint} from "./hint.js";
+const {Group} = Konva;
 export class Entity extends Group {
-    constructor(options, infoLayer) {
-        super(options);
-        const {label, x, y} = options;
-        this._hint = new Label({
-            x,
-            y,
-            opacity: 0.75,
-            visible: false,
-            listening: false
-        });
-        this._hint.add(new Tag({
-            fill: "black",
-            pointerDirection: "down",
-            pointerWidth: 10,
-            pointerHeight: 10,
-            lineJoin: "round",
-            shadowColor: "black",
-            shadowBlur: 10,
-            shadowOffset: 10,
-            shadowOpacity: 0.2
-        }));
-        this._hint.add(new Text({
-            text: label,
-            fontFamily: "sans-serif",
-            fontSize: 18,
-            padding: 5,
-            fill: "white"
-        }));
-        infoLayer.add(this._hint);
-        state.labels.push(this._hint);
+    // __hint;
+    // __name;
+    // __x;
+    // __y;
+    constructor(infoLayer) {
+        const hint = new Hint();
+        super();
+        infoLayer.add(hint);
+        this.__hint = hint;
     }
-    showHint() {
-        return this._hint.show();
+    set _name(value) {
+        super.name(value);
+        this.__name = value;
+        this.__hint._name = value;
     }
-    hideHint() {
-        return this._hint.hide();
+    get _name() {
+        return this.__name;
     }
-    scaleHint(...args) {
-        return this._hint.scale(...args);
+    set _x(value) {
+        super.x(value);
+        super.offsetX(value);
+        this.__x = value;
+        this.__hint._x = value;
     }
-    destroyHint(...args) {
-        return this._hint.destroy(...args);
+    get _x() {
+        return this.__x;
+    }
+    set _y(value) {
+        super.y(value);
+        super.offsetY(value);
+        this.__y = value;
+        this.__hint._y = value;
+    }
+    get _y() {
+        return this.__y;
     }
     select() {}
     unselect() {}
-    update(options) {
-        const {x, y} = options;
-        const xy = {x, y};
-        this._hint.position(xy);
+    update() {}
+    scale(...args) {
+        const that = super.scale(...args);
+        if (that !== this) {
+            return that;
+        }
+        const {x, y} = super.scale();
+        this.__hint.scale({
+            x,
+            y,
+        });
+        return that;
+    }
+    destroy() {
+        const that = super.destroy();
+        this.__hint.destroy();
+        return that;
+    }
+    showHint(...args) {
+        return this.__hint.show(...args);
+    }
+    hideHint(...args) {
+        return this.__hint.hide(...args);
     }
 }

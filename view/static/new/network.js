@@ -80,15 +80,10 @@ state.addEventListener("update", (event) => {
                 state.selectedEntity = null;
             }
             pod.destroy();
-            pod.destroyHint();
             state.pods.delete(id);
         } else {
             if (pod.keepFlag === 2) {
                 pod.scale({
-                    x: invertedScaleX,
-                    y: invertedScaleY,
-                });
-                pod.scaleHint({
                     x: invertedScaleX,
                     y: invertedScaleY,
                 });

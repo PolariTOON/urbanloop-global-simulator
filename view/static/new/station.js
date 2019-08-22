@@ -1,80 +1,123 @@
 import {Entity} from "./entity.js";
-const {Circle, Rect} = Konva;
+const {RegularPolygon} = Konva;
 
-const stationColor = "rgb(40, 40, 200)";
-const stationSelectedColor = "rgb(255, 200, 20)";
+const shadowColor = "#333"
+const outerColor = "#f03";
+const innerColor = "#fff";
+const selectedOuterColor = "#0fc";
 
 export class Station extends Entity {
+    // __outerShape;
+    // __innerShape;
+    // __podCount;
+    // __podMax;
+    // __travelerCount;
+    // __travelerAllTimeCount;
+    // __travelerAverageWaitingTime;
+    // __stationType;
     constructor(json, infoLayer) {
+        const outerShape = new RegularPolygon({
+            lineJoin: "round",
+            lineCap: "round",
+            sides: 3,
+            radius: 20,
+            strokeWidth: 1,
+            stroke: shadowColor,
+        });
+        const innerShape = new RegularPolygon({
+            listening: false,
+            lineJoin: "round",
+            lineCap: "round",
+            sides: 3,
+            radius: 10,
+            strokeWidth: 1,
+            fill: innerColor,
+            stroke: shadowColor,
+        });
+        super(infoLayer);
+        super.add(outerShape);
+        super.add(innerShape);
+        this.__outerShape = outerShape;
+        this.__innerShape = innerShape;
+        this.update(json);
+        this.unselect();
+    }
+    set _x(value) {
+        super._x = value;
+        this.__outerShape.x(value);
+        this.__innerShape.x(value);
+    }
+    get _x() {
+        return super._x;
+    }
+    set _y(value) {
+        super._y = value;
+        this.__outerShape.y(value);
+        this.__innerShape.y(value);
+    }
+    get _y() {
+        return super._y;
+    }
+    set _podCount(value) {
+        this.__podCount = value;
+    }
+    get _podCount() {
+        return this.__podCount;
+    }
+    set _podMax(value) {
+        this.__podMax = value;
+    }
+    get _podMax() {
+        return this.__podMax;
+    }
+    set _travelerCount(value) {
+        this.__travelerCount = value;
+    }
+    get _travelerCount() {
+        return this.__travelerCount;
+    }
+    set _travelerAllTimeCount(value) {
+        this.__travelerAllTimeCount = value;
+    }
+    get _travelerAllTimeCount() {
+        return this.__travelerAllTimeCount;
+    }
+    set _travelerAverageWaitingTime(value) {
+        this.__travelerAverageWaitingTime = value;
+    }
+    get _travelerAverageWaitingTime() {
+        return this.__travelerAverageWaitingTime;
+    }
+    set _stationType(value) {
+        this.__stationType = value;
+    }
+    get _stationType() {
+        return this.__stationType;
+    }
+    select() {
+        this.__outerShape.fill(selectedOuterColor);
+    }
+    unselect() {
+        this.__outerShape.fill(outerColor);
+    }
+    update(json) {
         const name = json["name"];
         const x = json["x"];
         const y = json["y"];
-        const stationRadius = 12;
-        const stationWidth = 4;
-        const dockSize = 24;
-        const semiWidth = Math.floor(stationWidth / 2);
-        const label = "Station : " + json["name"] + " | Capacity : " + json["pods"]["max"];
-        super({
-            name,
-            label,
-            x,
-            y,
-            offsetX: x,
-            offsetY: y
-        }, infoLayer);
-        this.capacity = json["capacity"];
-        this.stationRadius = stationRadius;
-        this.dockSize = dockSize;
-        this.innerCircle = new Circle({
-            x,
-            y,
-            radius: stationRadius - semiWidth,
-            fill: "white",
-            stroke: "black",
-            strokeWidth: 0.3,
-        });
-        this.outerCircle = new Circle({
-            x,
-            y,
-            radius: stationRadius + semiWidth,
-            fill: stationColor,
-            stroke: "black",
-            strokeWidth: 0.3,
-        });
-        this.dockList = [];
-        for (let i = 0; i < this.capacity; i++) {
-            let dockRect = new Rect({
-                x: x + 10 * stationRadius + (6 * i + 2) * dockSize,
-                y: y,
-                width: dockSize,
-                height: dockSize,
-                fill: "white",
-                stroke: "black",
-                strokeWidth: 1,
-            });
-            dockRect.offsetX(dockRect.width() / 2);
-            dockRect.offsetY(dockRect.height() / 2);
-            this.dockList.push(dockRect);
-        }
-        this.add(this.outerCircle);
-        this.add(this.innerCircle);
-        for (const dock of this.dockList) {
-            this.add(dock);
-        }
-        this.unselect();
-    }
-    select() {
-        this.outerCircle.fill(stationSelectedColor);
-
-        this.dockList.forEach(dock => {
-            dock.show();
-        });
-    }
-    unselect() {
-        this.outerCircle.fill(stationColor);
-
-        this.dockList.forEach(dock => {
-            dock.hide();
-        });
+        const podCount = json["pods"]["count"];
+        const podMax = json["pods"]["max"];
+        const travelerCount = json["travelers"]["count"];
+        const travelerAllTimeCount = json["travelers"]["all_time_count"];
+        const travelerAverageWaitingTime = json["travelers"]["average_waiting_time"];
+        const stationType = json["station_type"];
+        this._name = name;
+        this._x = x;
+        this._y = y;
+        this._podCount = podCount;
+        this._podMax = podMax;
+        this._travelerCount = travelerCount;
+        this._travelerAllTimeCount = travelerAllTimeCount;
+        this._travelerAverageWaitingTime = travelerAverageWaitingTime;
+        this._stationType = stationType;
     }
 }

@@ -7,6 +7,8 @@ import {Section} from "./section.js";
 import {Pod} from "./pod.js";
 const {Text} = Konva;
 
+const textColor = "#333";
+
 function averagePoint(elements) {
     let x = 0;
     let y = 0;
@@ -85,10 +87,10 @@ export class Loop {
             x,
             y,
             text: name,
-            fontFamily: "Georgia, serif",
-            fontSize: 20,
+            fontFamily: "Georgia, Times, serif",
             fontVariant: "small-caps",
-            fill: "black",
+            fontSize: 20,
+            fill: textColor,
         });
         this._text.offsetX(this._text.width() / 2);
         this._text.offsetY(this._text.height() / 2);
@@ -97,12 +99,12 @@ export class Loop {
         state.labels.push(this._text);
     }
     update(json, networkLayer, infoLayer) {
-        // for (let i = 0, li = this.elements.length; i < li; i++) {
-        //     this.elements[i].update(json["elements"][i]);
-        // }
-        // for (let i = 0, li = this.sections.length; i < li; i++) {
-        //     this.sections[i].update(json["sections"][i]);
-        // }
+        for (let i = 0, li = this.elements.length; i < li; i++) {
+            this.elements[i].update(json["elements"][i]);
+        }
+        for (let i = 0, li = this.sections.length; i < li; i++) {
+            this.sections[i].update(json["sections"][i]);
+        }
         for (const pod of json["pods"]) {
             if (state.pods.has(pod["id"])) {
                 const p = state.pods.get(pod["id"]);

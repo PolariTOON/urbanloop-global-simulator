@@ -1,19 +1,20 @@
 import {Entity} from "./entity.js";
 const {Circle} = Konva;
 
-const podInnerEmptyColor = 'rgb(173, 72, 45)';
-const podOuterEmptyColor = 'rgb(255, 100, 63)';
-const podInnerAboardColor = 'rgb(96, 167, 27)';
-const podOuterAboardColor = 'rgb(128, 214, 30)';
-const podInnerSelectedColor = 'rgb(255, 200, 20)';
-const podOuterSelectedColor = 'rgb(255, 234, 87)';
+const shadowColor = "#333"
+const outerColor = "#fc0";
+const innerColor = "#fff";
+const selectedOuterColor = "#0fc";
+const fullInnerColor = "#333";
 
 function distanceBetween(beginElement, endElement, path) {
     let d = 0;
     switch (path["type"]) {
         case "line":
-        default:
+        default: {
             d = Math.hypot(beginElement["x"] - endElement["x"], beginElement["y"] - endElement["y"]);
+            break;
+        }
     }
     return d;
 }
@@ -47,9 +48,9 @@ function xyFromPosition(json, lineJSON, loopsJSON){
             if (d + distanceToNext < json["position"]){
                 d += distanceToNext;
                 ++index;
-            }
-            else
+            } else {
                 break;
+            }
         }
         d = json["position"] - d;
         beginElement = lineJSON["elements"][index];
@@ -65,62 +66,98 @@ function xyFromPosition(json, lineJSON, loopsJSON){
             const coeff = d / D;
             x += coeff * (endElement["x"] - beginElement["x"]);
             y += coeff * (endElement["y"] - beginElement["y"]);
+            break;
         }
     }
     return {x, y};
 }
 
 export class Pod extends Entity {
+    // __outerShape;
+    // __innerShape;
+    // __travelerCount;
+    // __travelerMax;
+    // __keepFlag;
     constructor(json, lineJSON, loopsJSON, infoLayer) {
-        const name = json["name"];
-        const {x, y} = xyFromPosition(json, lineJSON, loopsJSON);
-        const podWidth = 5;
-        const label = "Pod : " + json["name"] + " | Capacity : " + json["travelers"]["max"];
-        super({
-            name,
-            label,
-            x,
-            y,
-            offsetX: x,
-            offsetY: y,
-        }, infoLayer);
-        this.updateCount = 0;
-        this.travelerNumber = json["travelers"]["count"];
-        this.keepFlag = 0;
-        this.innerCircle = new Circle({
-            x,
-            y,
-            radius: podWidth - Math.sqrt(podWidth),
+        const outerShape = new Circle({
+            lineJoin: "round",
+            lineCap: "round",
+            radius: 10,
+            strokeWidth: 1,
+            stroke: shadowColor,
         });
-        this.outerCircle = new Circle({
-            x,
-            y,
-            radius: podWidth,
+        const innerShape = new Circle({
+            listening: false,
+            lineJoin: "round",
+            lineCap: "round",
+            radius: 5,
+            strokeWidth: 1,
+            stroke: shadowColor,
         });
-        this.add(this.outerCircle);
-        this.add(this.innerCircle);
+        const keepFlag = 0;
+        super(infoLayer);
+        super.add(outerShape);
+        super.add(innerShape);
+        this.__outerShape = outerShape;
+        this.__innerShape = innerShape;
+        this.update(json, lineJSON, loopsJSON);
+        this._keepFlag = keepFlag;
         this.unselect();
     }
-    select() {
-        this.innerCircle.fill(podInnerSelectedColor);
-        this.outerCircle.fill(podOuterSelectedColor);
+    set _x(value) {
+        super._x = value;
+        this.__outerShape.x(value);
+        this.__innerShape.x(value);
     }
-    unselect() {
-        if (this.travelerNumber > 0) {
-            this.innerCircle.fill(podInnerAboardColor);
-            this.outerCircle.fill(podOuterAboardColor);
+    get _x() {
+        return super._x;
+    }
+    set _y(value) {
+        super._y = value;
+        this.__outerShape.y(value);
+        this.__innerShape.y(value);
+    }
+    get _y() {
+        return super._y;
+    }
+    set _travelerCount(value) {
+        this.__travelerCount = value;
+        if (value === 0) {
+            this.__innerShape.fill(innerColor);
         } else {
-            this.innerCircle.fill(podInnerEmptyColor);
-            this.outerCircle.fill(podOuterEmptyColor);
+            this.__innerShape.fill(fullInnerColor);
         }
     }
+    get _travelerCount() {
+        return this.__travelerCount;
+    }
+    set _travelerMax(value) {
+        this.__travelerMax = value;
+    }
+    get _travelerMax() {
+        return this.__travelerMax;
+    }
+    set _keepFlag(value) {
+        this.__keepFlag = value;
+    }
+    get _keepFlag() {
+        return this.__keepFlag;
+    }
+    select() {
+        this.__outerShape.fill(selectedOuterColor);
+    }
+    unselect() {
+        this.__outerShape.fill(outerColor);
+    }
     update(json, lineJSON, loopsJSON) {
-        const xy = xyFromPosition(json, lineJSON, loopsJSON);
-        super.update(xy);
-        this.position(xy);
-        this.offset(xy);
-        this.innerCircle.position(xy);
-        this.outerCircle.position(xy);
-        this.outerCircle.position(xy);
+        const name = json["name"];
+        const {x, y} = xyFromPosition(json, lineJSON, loopsJSON);
+        const travelerCount = json["travelers"]["count"];
+        const travelerMax = json["travelers"]["max"];
+        this._name = name;
+        this._x = x;
+        this._y = y;
+        this._travelerCount = travelerCount;
+        this._travelerMax = travelerMax;
     }
 }

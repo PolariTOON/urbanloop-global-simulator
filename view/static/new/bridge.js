@@ -21,7 +21,7 @@ export class Bridge {
         }
     }
     update(json, loopsJSON, networkLayer, infoLayer) {
-        // this.section.update(json["section"]);
+        this.section.update(json["section"]);
         for (const pod of json["pods"]) {
             if (state.pods.has(pod["id"])) {
                 const p = state.pods.get(pod["id"]);

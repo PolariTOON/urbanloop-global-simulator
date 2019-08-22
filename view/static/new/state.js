@@ -70,16 +70,21 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         return this._origin;
     }
     _load(detail) {
+        this._unload();
         if (this._loaded || detail === null) {
             return;
         }
         this.dispatchEvent(new CustomEvent("load", {detail}));
         this._loaded = true;
+        if (detail.running) {
+            this._play();
+        }
     }
     _unload() {
         if (!this._loaded) {
             return;
         }
+        this._pause();
         state.dispatchEvent(new CustomEvent("unload"));
         this._loaded = false;
     }
@@ -108,40 +113,34 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         const url = new URL(location);
         let networkIndex = url.searchParams.get("id");
         let network = null;
-        if (networkIndex !== null && networkIndex.match(integer)) {
+        if (networkIndex !== null && networkIndex.match(integer) && Number(networkIndex) <= Number.MAX_SAFE_INTEGER) {
             network = await getJSON(`/networks/${networkIndex}/`);
         } else {
             do {
-                networkIndex = String(Math.random()).slice(2);
+                networkIndex = String(Math.random() * (Number.MAX_SAFE_INTEGER + 1));
                 network = await getJSON(`/networks/${networkIndex}/`);
             } while (network !== null);
             url.searchParams.set("id", networkIndex);
             history.replaceState(null, "", url);
         }
         this._networkIndex = networkIndex;
-        this._unload();
-        this._load(network);
-        if (network.running) {
-            this._play();
+        if (network === null) {
+            return;
         }
+        this._load(network);
     }
     async load(input) {
         const output = await postJSON(`/networks/${this._networkIndex}/`, input);
         if (output === null) {
             return;
         }
-        this._unload();
         this._load(output);
-        if (output.running) {
-            this._play();
-        }
     }
     async unload() {
         const output = await postJSON(`/networks/${this._networkIndex}/`, null);
         if (output !== null) {
             return;
         }
-        this._pause();
         this._unload();
     }
     async update() {

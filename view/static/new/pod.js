@@ -7,74 +7,65 @@ const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
 const fullInnerColor = "#333";
 
-function distanceBetween(beginElement, endElement, path) {
+function calcLength(startElement, endElement, path) {
     let d = 0;
     switch (path["type"]) {
         case "line":
         default: {
-            d = Math.hypot(beginElement["x"] - endElement["x"], beginElement["y"] - endElement["y"]);
+            d += Math.hypot(startElement["x"] - endElement["x"], startElement["y"] - endElement["y"]);
             break;
         }
     }
     return d;
 }
 
-function xyFromPosition(json, lineJSON, loopsJSON){
-    let d = 0;
+function calcPosition(json, lineJSON, loopsJSON){
+    let startElement;
+    let endElement;
     let path;
-    let x;
-    let y;
-    let beginElement, endElement;
-    if (loopsJSON){
-        d = json["position"];
-        const loopBeginElement = lineJSON["switch_out"]["loop"];
+    let length;
+    let position = json["position"];
+    if (loopsJSON) {
+        const loopStartElement = lineJSON["switch_out"]["loop"];
         const loopEndElement = lineJSON["switch_in"]["loop"];
-        const beginElementIndex = lineJSON["switch_out"]["element"];
+        const startElementIndex = lineJSON["switch_out"]["element"];
         const endElementIndex = lineJSON["switch_in"]["element"];
-        beginElement = loopsJSON[loopBeginElement]["elements"][beginElementIndex];
+        startElement = loopsJSON[loopStartElement]["elements"][startElementIndex];
         endElement = loopsJSON[loopEndElement]["elements"][endElementIndex];
         path = lineJSON["section"]["path"];
-        x = beginElement["x"];
-        y = beginElement["y"];
+        length = calcLength(startElement, endElement, path);
     } else {
-        const loopSize = lineJSON["elements"].length;
         let index = 0;
-        let distanceToNext = 0;
-        while (d < json["position"]){
-            beginElement = lineJSON["elements"][index];
-            endElement = lineJSON["elements"][(index+1)%loopSize];
+        while (true) {
+            startElement = lineJSON["elements"][index];
+            endElement = lineJSON["elements"][(index + 1) % lineJSON["elements"].length];
             path = lineJSON["sections"][index]["path"];
-            distanceToNext = distanceBetween(beginElement, endElement, path);
-            if (d + distanceToNext < json["position"]){
-                d += distanceToNext;
-                ++index;
-            } else {
+            length = calcLength(startElement, endElement, path);
+            if (position < length) {
                 break;
             }
+            position -= length;
+            index++;
         }
-        d = json["position"] - d;
-        beginElement = lineJSON["elements"][index];
-        endElement = lineJSON["elements"][(index+1)%loopSize];
-        path = lineJSON["sections"][index]["path"];
-        x = lineJSON["elements"][index]["x"];
-        y = lineJSON["elements"][index]["y"];
     }
-    const D = distanceBetween(beginElement, endElement, path);
+    let x = startElement["x"];
+    let y = startElement["y"];
     switch (path["type"]) {
         case "line":
         default: {
-            const coeff = d / D;
-            x += coeff * (endElement["x"] - beginElement["x"]);
-            y += coeff * (endElement["y"] - beginElement["y"]);
+            const ratio = position / length;
+            x += (endElement["x"] - startElement["x"]) * ratio;
+            y += (endElement["y"] - startElement["y"]) * ratio;
             break;
         }
     }
-    return {x, y};
+    return {x, y, position};
 }
 
 export class Pod extends Entity {
     // __outerShape;
     // __innerShape;
+    // __position;
     // __travelerCount;
     // __travelerMax;
     // __keepFlag;
@@ -120,6 +111,12 @@ export class Pod extends Entity {
     get _y() {
         return super._y;
     }
+    set _position(value) {
+        this.__position = value;
+    }
+    get _position() {
+        return this.__position;
+    }
     set _travelerCount(value) {
         this.__travelerCount = value;
         if (value === 0) {
@@ -151,12 +148,13 @@ export class Pod extends Entity {
     }
     update(json, lineJSON, loopsJSON) {
         const name = json["name"];
-        const {x, y} = xyFromPosition(json, lineJSON, loopsJSON);
+        const {x, y, position} = calcPosition(json, lineJSON, loopsJSON);
         const travelerCount = json["travelers"]["count"];
         const travelerMax = json["travelers"]["max"];
         this._name = name;
         this._x = x;
         this._y = y;
+        this._position = position;
         this._travelerCount = travelerCount;
         this._travelerMax = travelerMax;
     }

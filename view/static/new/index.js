@@ -1,6 +1,7 @@
 import {state} from "./state.js";
 import "./menu.js";
 import "./network.js";
+import "./data-panel.js";
 
 let requestAnimationFrameId = 0;
 

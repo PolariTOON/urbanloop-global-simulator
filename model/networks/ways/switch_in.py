@@ -90,21 +90,22 @@ class SwitchIn(Switch):
         ainsi permettre une insertion. On commence le décalage à l'indice begin.
         :return: void
         """
+        x = (self._cursor % 1) * self.place_size
+        time_to_shift = (self.place_size - x) / self.avg_speed
+        speed = self.place_size / time_to_shift
         for index in range(self._first_place + begin - self._places_number, self._first_place - 2):
             # On décale les capsules à partir de la première place libre
             if self._discrete_places[index] is not None:
                 pod = self._discrete_places[index]
-                length = (1 + self._cursor % 1) * self.place_size
-                speed = (1 - (self._cursor % 1)) * self.place_size / self.avg_speed
-                if self._discrete_places[index] is not None:
-                    yield from pod.write({
-                        "author": self,
-                        "type": "speed_a_while",
-                        "speed": speed,
-                        "length_before_restore": length,
-                        "speed_restore": self.avg_speed
-                    })
-                self._discrete_places[index] = self._discrete_places[index + 1]
+                yield from pod.write({
+                    "author": self,
+                    "type": "speed_a_while",
+                    "speed": speed,
+                    "length_before_restore": self.place_size,
+                    "speed_restore": self.avg_speed
+                })
+            self._discrete_places[index] = self._discrete_places[index + 1]
+        self._discrete_places[self._first_place - 1] = None
 
     def update(self):
         # Les distances importantes sur la boucle où l'on peut s'inserer
@@ -130,7 +131,7 @@ class SwitchIn(Switch):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
+                    print(self.name, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

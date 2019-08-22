@@ -77,7 +77,7 @@ class SwitchOut(Switch):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
+                    print(self.name, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

@@ -138,6 +138,9 @@ class Pod(Token):
                         bridge_to_switch = True
                         self._position += self._track_or_switch.next.c2_length
                     self._track_or_switch = self._track_or_switch.next
+                    if self._track_or_switch == self.destination:
+                        self._speed = 0
+                        print("DOCKED")
                 if bridge_to_switch:
                     yield from self._track_or_switch.write({
                         "author": self,
@@ -155,15 +158,12 @@ class Pod(Token):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, self.id, "||", message["type"], "||", message["author"].name, message["author"].id)
+                    print(self.name, "||", message["type"], "||", message["author"].name)
                 if message is None:
                     break
                 elif "speed" == message["type"]:
                     # Ordre de changement de vitesse
                     self._speed = message["speed"]
-                elif "docked" == message["type"]:
-                    # Ordre d'arrêt dans un dépôt ou une gare
-                    self._speed = 0
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner
                     # une distance avant le pont est donnée

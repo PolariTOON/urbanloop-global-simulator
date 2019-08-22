@@ -596,6 +596,7 @@ class Network(Node):
         for moving_pod in self._moving_pods:
             if moving_pod["pod"] == pod:
                 self._moving_pods.remove(moving_pod)
+                return
         raise ValueError("Pod not in the routing table")
 
     def get_dico_from_pod(self, pod):
@@ -623,14 +624,7 @@ class Network(Node):
         Gestion du processus du réseau à chaque boucle d'événement simpy
         :return: void
         """
-        update_routing = False
-        pod_to_update = None
         while True:
-            if update_routing:
-                self.remove_pod_from_dico(pod_to_update)
-                # TODO : mise à jour des poids
-                self.update_routing()
-                update_routing = False
             while True:
                 message = yield from self.read()
                 if message is not None:
@@ -640,7 +634,9 @@ class Network(Node):
                 elif "docked" == message["type"]:
                     # Si une capsule stationne on met à jour la table de routage
                     pod_to_update = message["pod"]
-                    update_routing = True
+                    self.remove_pod_from_dico(pod_to_update)
+                    # TODO : mise à jour des poids
+                    self.update_routing()
                 else:
                     raise ValueError("Invalid message")
 

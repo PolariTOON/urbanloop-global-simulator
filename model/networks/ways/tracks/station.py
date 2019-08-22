@@ -95,6 +95,10 @@ class Station(Step):
                     # la capsule va se garer dans la station
                     if pod.destination == self:
                         self._pods.append(pod)
+                        yield from pod.write({
+                            "author": self,
+                            "type": "docked"
+                        })
                         yield from self.parent.write({
                             "author": self,
                             "type": "docked",

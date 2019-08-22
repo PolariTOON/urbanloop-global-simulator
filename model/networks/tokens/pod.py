@@ -112,7 +112,7 @@ class Pod(Token):
             if self._speed != 0:
                 self._position += self._speed * self.env.sim_tick
 
-            # La capsule s'insère et tourne
+            # La capsule s'insère et tourne si elle en a reçu l'ordre
             if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" and self._turn and self._position >= self._length_before_turn:
                 self.position -= self._length_before_turn
                 self._track_or_switch = self._track_or_switch.beside.sections[0]
@@ -134,13 +134,11 @@ class Pod(Token):
                     self._track_or_switch = self._track_or_switch.next.sections[0]
                 else:
                     if str(type(self._track_or_switch)) == "<class 'model.networks.ways.tracks.section.Section'>" and self._track_or_switch.is_bridge:
-                        # la capsule va entrer sur l'aiguillage entrant par un pont
+                        # la capsule va entrer sur un aiguillage entrant par un pont
                         bridge_to_switch = True
                         self._position += self._track_or_switch.next.c2_length
                     self._track_or_switch = self._track_or_switch.next
-                    if self._track_or_switch == self.destination:
-                        self._speed = 0
-                        print("DOCKED")
+
                 if bridge_to_switch:
                     yield from self._track_or_switch.write({
                         "author": self,
@@ -164,6 +162,9 @@ class Pod(Token):
                 elif "speed" == message["type"]:
                     # Ordre de changement de vitesse
                     self._speed = message["speed"]
+                elif "docked" == message["type"]:
+                    # La capsule s'arrête dans une gare ou un dépôt
+                    self._speed = 0
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner
                     # une distance avant le pont est donnée

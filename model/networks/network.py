@@ -606,7 +606,7 @@ class Network(Node):
                 return dico_pod
         raise ValueError("The specified pod is not in the moving_pods attribute of the network")
 
-    def update_routing(self):
+    def _update_routing(self):
         """
         Envoie aux aiguillages sortant une nouvelle table de routage
         :return: void
@@ -636,7 +636,7 @@ class Network(Node):
                     pod_to_update = message["pod"]
                     self.remove_pod_from_dico(pod_to_update)
                     # TODO : mise à jour des poids
-                    self.update_routing()
+                    yield from self._update_routing()
                 else:
                     raise ValueError("Invalid message")
 

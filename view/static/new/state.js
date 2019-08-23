@@ -26,7 +26,6 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         this._running = false;
         this._loops = [];
         this._bridges = [];
-        this._labels = [];
         this._nodes = [];
         this._pods = new Map();
         this._selectedEntity = null;
@@ -41,9 +40,6 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     }
     get bridges() {
         return this._bridges;
-    }
-    get labels() {
-        return this._labels;
     }
     get nodes() {
         return this._nodes;

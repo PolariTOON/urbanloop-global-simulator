@@ -11,7 +11,7 @@ export class Shed extends Entity {
     // __innerShape;
     // __podCount;
     // __podMax;
-    constructor(json, infoLayer) {
+    constructor(infoLayer) {
         const outerShape = new RegularPolygon({
             lineJoin: "round",
             lineCap: "round",
@@ -35,7 +35,6 @@ export class Shed extends Entity {
         super.add(innerShape);
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
-        this.update(json);
         this.unselect();
     }
     set _x(value) {

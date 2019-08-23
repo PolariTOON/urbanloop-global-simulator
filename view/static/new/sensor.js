@@ -9,7 +9,7 @@ const selectedOuterColor = "#0fc";
 export class Sensor extends Entity {
     // __outerShape;
     // __innerShape;
-    constructor(json, infoLayer) {
+    constructor(infoLayer) {
         const outerShape = new Star({
             lineJoin: "round",
             lineCap: "round",
@@ -35,7 +35,6 @@ export class Sensor extends Entity {
         super.add(innerShape);
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
-        this.update(json);
         this.unselect();
     }
     set _x(value) {

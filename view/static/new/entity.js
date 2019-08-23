@@ -1,5 +1,6 @@
 import {Hint} from "./hint.js";
 const {Group} = Konva;
+
 export class Entity extends Group {
     // __hint;
     // __name;

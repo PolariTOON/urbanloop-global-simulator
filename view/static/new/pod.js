@@ -68,8 +68,10 @@ export class Pod extends Entity {
     // __position;
     // __travelerCount;
     // __travelerMax;
+    // __source; // TODO
+    // __destination; // TODO
     // __keepFlag;
-    constructor(json, lineJSON, loopsJSON, infoLayer) {
+    constructor(infoLayer) {
         const outerShape = new Circle({
             lineJoin: "round",
             lineCap: "round",
@@ -91,7 +93,6 @@ export class Pod extends Entity {
         super.add(innerShape);
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
-        this.update(json, lineJSON, loopsJSON);
         this._keepFlag = keepFlag;
         this.unselect();
     }

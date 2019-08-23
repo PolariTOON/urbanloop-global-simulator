@@ -1,13 +1,10 @@
 import {state} from "./state.js";
-import {Station} from "./station.js";
-import {Shed} from "./shed.js";
-import {Sensor} from "./sensor.js";
-import {Switch} from "./switch.js";
+import {Line} from "./line.js";
 import {Section} from "./section.js";
-import {Pod} from "./pod.js";
-const {Text} = Konva;
-
-const textColor = "#333";
+import {Sensor} from "./sensor.js";
+import {Shed} from "./shed.js";
+import {Station} from "./station.js";
+import {Switch} from "./switch.js";
 
 function averagePoint(elements) {
     let x = 0;
@@ -21,101 +18,75 @@ function averagePoint(elements) {
     return {x, y};
 }
 
-export class Loop {
+export class Loop extends Line {
+    // __elements;
+    // __sections;
     constructor(json, networkLayer, infoLayer) {
-        const name = json["name"];
-        const {x, y} = averagePoint(json["elements"]);
-        this.name = name;
-        this.x = x;
-        this.y = y;
-        this.elements = [];
-        this.sections = [];
-
-        // On ajoute les éléments
-        for (const elt of json["elements"]) {
-            switch (elt["type"]){
+        const elements = [];
+        const sections = [];
+        for (let i = 0, li = json["elements"].length; i < li; i++) {
+            let element;
+            switch (json["elements"][i]["type"]) {
                 case "station": {
-                    const station = new Station(elt, infoLayer);
-                    this.elements.push(station);
-                    networkLayer.add(station);
-                    state.nodes.push(station);
+                    element = new Station(infoLayer);
                     break;
                 }
                 case "shed": {
-                    const shed = new Shed(elt, infoLayer);
-                    this.elements.push(shed);
-                    networkLayer.add(shed);
-                    state.nodes.push(shed);
+                    element = new Shed(infoLayer);
                     break;
                 }
                 case "sensor": {
-                    const sensor = new Sensor(elt, infoLayer);
-                    this.elements.push(sensor);
-                    networkLayer.add(sensor);
-                    state.nodes.push(sensor);
+                    element = new Sensor(infoLayer);
                     break;
                 }
                 case "switch_in":
                 case "switch_out": {
-                    const sw = new Switch(elt, infoLayer);
-                    this.elements.push(sw);
-                    networkLayer.add(sw);
-                    state.nodes.push(sw);
+                    element = new Switch(infoLayer);
                     break;
                 }
             }
+            elements.push(element);
+            networkLayer.add(element);
+            state.nodes.push(element);
         }
-
-        // On ajoute les sections
         for (let i = 0, li = json["sections"].length; i < li; i++) {
-            const beginElement = this.elements[i];
-            const endElement = this.elements[(i + 1) % li];
-            const section = new Section(json["sections"][i], beginElement, endElement, true, infoLayer);
-            this.sections.push(section);
+            const pathType = json["sections"][i]["path"]["type"];
+            const beginElement = elements[i];
+            const endElement = elements[(i + 1) % li];
+            const loopOrBridge = true;
+            const section = new Section(pathType, beginElement, endElement, loopOrBridge, infoLayer);
+            sections.push(section);
             networkLayer.add(section);
             state.nodes.push(section);
         }
-
-        // On ajoute les capsules déjà présente sur les sections
-        for (const pod of json["pods"]) {
-            const p = new Pod(pod, json, null, infoLayer);
-            networkLayer.add(p);
-            state.pods.set(pod["id"], p);
-        }
-
-        this._text = new Text({
-            x,
-            y,
-            text: name,
-            fontFamily: "Georgia, Times, serif",
-            fontVariant: "small-caps",
-            fontSize: 20,
-            fill: textColor,
-        });
-        this._text.offsetX(this._text.width() / 2);
-        this._text.offsetY(this._text.height() / 2);
-
-        infoLayer.add(this._text);
-        state.labels.push(this._text);
+        super(infoLayer);
+        this.__elements = elements;
+        this.__sections = sections;
+    }
+    set _elements(value) {
+        this.__elements = value;
+    }
+    get _elements() {
+        return this.__elements;
+    }
+    set _sections(value) {
+        this.__sections = value;
+    }
+    get _sections() {
+        return this.__sections;
     }
     update(json, networkLayer, infoLayer) {
-        for (let i = 0, li = this.elements.length; i < li; i++) {
-            this.elements[i].update(json["elements"][i]);
+        const name = json["name"];
+        const {x, y} = averagePoint(json["elements"]);
+        this._name = name;
+        this._x = x;
+        this._y = y;
+        for (let i = 0, li = this.__elements.length; i < li; i++) {
+            this.__elements[i].update(json["elements"][i]);
         }
-        for (let i = 0, li = this.sections.length; i < li; i++) {
-            this.sections[i].update(json["sections"][i]);
+        for (let i = 0, li = this.__sections.length; i < li; i++) {
+            this.__sections[i].update(json["sections"][i]);
         }
-        for (const pod of json["pods"]) {
-            if (state.pods.has(pod["id"])) {
-                const p = state.pods.get(pod["id"]);
-                p.update(pod, json, null);
-                p.keepFlag = 1;
-            } else {
-                const p = new Pod(pod, json, null, infoLayer);
-                p.keepFlag = 2;
-                networkLayer.add(p);
-                state.pods.set(pod["id"], p);
-            }
-        }
+        super.update(json, null, networkLayer, infoLayer);
     }
 }

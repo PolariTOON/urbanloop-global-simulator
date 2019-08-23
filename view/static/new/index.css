@@ -105,8 +105,6 @@ menu > li {
 menu > li > a[download],
 menu > li > label {
     display: inline-block;
-    width: 4rem;
-    height: 4rem;
     margin: 0 !important; /* TODO: retirer quand Bootstrap le sera */
     cursor: default;
     font-size: 0;
@@ -126,7 +124,6 @@ menu > li > label > input {
     height: 3.6rem;
     margin: .2rem;
     padding: 0 0 0 3.2rem;
-    padding-left: 3.2rem;
     border: .2rem solid transparent;
     border-radius: .4rem;
     background-repeat: no-repeat;

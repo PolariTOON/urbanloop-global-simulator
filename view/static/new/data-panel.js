@@ -12,6 +12,8 @@ function serialize() {
     const data = `\
 ${state.selectedEntity !== null ? `\
 <dl>
+    <dt>Type</dt>
+    <dd>${state.selectedEntity.constructor.name}</dd>
     <dt>Name</dt>
     <dd>${state.selectedEntity._name}</dd>
     <dt>Coordinates (in m)</dt>
@@ -22,7 +24,7 @@ ${state.selectedEntity instanceof Pod ? `\
     <dt>Travelers</dt>
     <dd>${state.selectedEntity._travelerCount} / ${state.selectedEntity._travelerMax}</dd>
 ` : state.selectedEntity instanceof Section ? `\
-    <dt>Speed</dt>
+    <dt>Speed in (m / s)</dt>
     <dd>${state.selectedEntity._speed}</dd>
 ` : state.selectedEntity instanceof Sensor ? `\
 ` : state.selectedEntity instanceof Shed ? `\
@@ -34,7 +36,7 @@ ${state.selectedEntity instanceof Pod ? `\
     <dt>Pods</dt>
     <dd>${state.selectedEntity._podCount} / ${state.selectedEntity._podMax}</dd>
     <dt>Travelers</dt>
-    <dd>${state.selectedEntity._travelerCount} (${state.selectedEntity._travelerMax} since simulation start)</dd>
+    <dd>${state.selectedEntity._travelerCount} (${state.selectedEntity._travelerAllTimeCount} since simulation start)</dd>
     <dt>Average waiting duration (in s)</dt>
     <dd>${state.selectedEntity._travelerAverageWaitingTime}</dd>
 ` : state.selectedEntity instanceof Switch ? `\

@@ -17,14 +17,15 @@ const bridgeDashMargin = 10;
 export class Section extends Entity {
     // __outerPath;
     // __innerPath;
+    // __pathType;
     // __startElement;
     // __endElement;
     // __loopOrBridge;
     // __speed;
-    constructor(json, startElement, endElement, loopOrBridge, infoLayer) {
+    constructor(pathType, startElement, endElement, loopOrBridge, infoLayer) {
         let outerPath;
         let innerPath;
-        switch (json["path"]["type"]) {
+        switch (pathType) {
             case "line":
             default: {
                 outerPath = new Arrow({
@@ -62,10 +63,10 @@ export class Section extends Entity {
         super.add(innerPath);
         this.__outerPath = outerPath;
         this.__innerPath = innerPath;
+        this.__pathType = pathType;
         this.__startElement = startElement;
         this.__endElement = endElement;
         this.__loopOrBridge = loopOrBridge;
-        this.update(json);
         this.unselect();
     }
     set _x(value) {

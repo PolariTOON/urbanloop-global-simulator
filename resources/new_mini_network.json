@@ -89,9 +89,9 @@
     }
   ],
   "bridges": [
-    {"name": "bridge 0", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
-    {"name": "bridge 1", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
-    {"name": "bridge 2", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
-    {"name": "bridge 3", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []}
+    {"name": "Laxou - Nancy", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
+    {"name": "Nancy - Villers-les-Nancy", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
+    {"name": "Nancy - Laxou", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
+    {"name": "Villers-les-Nancy - Laxou", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []}
   ]
 }

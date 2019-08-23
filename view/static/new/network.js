@@ -35,15 +35,22 @@ state.addEventListener("load", async (event) => {
     const [offsetX, offsetY, zoom] = [0, 0, 1];
     state.viewBox = {x, y, width, height};
     state.origin = {offsetX, offsetY, zoom};
-    for (const json of networkJSON["loops"]) {
+    const loopsJSON = networkJSON["loops"];
+    for (const json of loopsJSON) {
         const loop = new Loop(json, networkLayer, infoLayer);
+        loop.update(json, networkLayer, infoLayer);
         state.loops.push(loop);
     }
-    for (const json of networkJSON["bridges"]) {
-        const switchIn = state.loops[json["switch_in"]["loop"]].elements[json["switch_in"]["element"]];
-        const switchOut = state.loops[json["switch_out"]["loop"]].elements[json["switch_out"]["element"]];
-        const bridge = new Bridge(json, switchIn, switchOut, networkJSON["loops"], networkLayer, infoLayer);
+    const bridgesJSON = networkJSON["bridges"];
+    for (const json of bridgesJSON) {
+        const switchOut = state.loops[json["switch_out"]["loop"]]._elements[json["switch_out"]["element"]];
+        const switchIn = state.loops[json["switch_in"]["loop"]]._elements[json["switch_in"]["element"]];
+        const bridge = new Bridge(json, switchOut, switchIn, networkLayer, infoLayer);
+        bridge.update(json, loopsJSON, networkLayer, infoLayer);
         state.bridges.push(bridge);
+    }
+    for (const [id, pod] of state.pods.entries()) {
+        pod._keepFlag = 0;
     }
     resize();
     networkLayer.batchDraw();
@@ -56,9 +63,10 @@ state.addEventListener("unload", async (event) => {
     networkLayer.remove();
     infoLayer.remove();
     transform(0, 0, 1, 1);
-    state.labels.length = 0;
+    state.loops.length = 0;
+    state.bridges.length = 0;
     state.nodes.length = 0;
-    state.pods.length = 0;
+    state.pods.clear();
     state.selectedEntity = null;
     state.viewBox = null;
     state.origin = null;
@@ -66,29 +74,33 @@ state.addEventListener("unload", async (event) => {
 
 state.addEventListener("update", (event) => {
     const networkJSON = event.detail;
-    for (let i = 0, li = state.loops.length; i < li; i++) {
-        state.loops[i].update(networkJSON["loops"][i], networkLayer, infoLayer);
+    const loopsJSON = networkJSON["loops"];
+    for (let i = 0, li = loopsJSON.length; i < li; i++) {
+        const json = loopsJSON[i];
+        state.loops[i].update(json, networkLayer, infoLayer);
     }
-    for (let i = 0, li = state.bridges.length; i < li; i++) {
-        state.bridges[i].update(networkJSON["bridges"][i], networkJSON["loops"], networkLayer, infoLayer);
+    const bridgesJSON = networkJSON["bridges"];
+    for (let i = 0, li = bridgesJSON.length; i < li; i++) {
+        const json = bridgesJSON[i];
+        state.bridges[i].update(json, loopsJSON, networkLayer, infoLayer);
     }
     const invertedScaleX = 1 / stage.scaleX();
     const invertedScaleY = 1 / stage.scaleY();
     for (const [id, pod] of state.pods.entries()) {
-        if (pod.keepFlag === 0) {
+        if (pod._keepFlag === 0) {
             if (pod === state.selectedEntity) {
                 state.selectedEntity = null;
             }
             pod.destroy();
             state.pods.delete(id);
         } else {
-            if (pod.keepFlag === 2) {
+            if (pod._keepFlag === 2) {
                 pod.scale({
                     x: invertedScaleX,
                     y: invertedScaleY,
                 });
             }
-            pod.keepFlag = 0;
+            pod._keepFlag = 0;
         }
     }
     networkLayer.batchDraw();
@@ -150,7 +162,7 @@ function transform(translateX, translateY, scaleX, scaleY) {
     });
     const invertedScaleX = 1 / scaleX;
     const invertedScaleY = 1 / scaleY;
-    for (const entity of [...state.labels, ...state.nodes, ...state.pods.values()]) {
+    for (const entity of [...state.loops, ...state.bridges, ...state.nodes, ...state.pods.values()]) {
         entity.scale({
             x: invertedScaleX,
             y: invertedScaleY,

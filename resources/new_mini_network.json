@@ -34,7 +34,9 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": [
-        {"position": 235, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}}
+        {"position": 235, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 300, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 3}, "travelers": {"count": 0, "max": 0}},
+        {"position": 0, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 3}, "travelers": {"count": 0, "max": 0}}
       ]
     },
     {

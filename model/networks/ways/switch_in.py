@@ -148,14 +148,15 @@ class SwitchIn(Switch):
                     # Discrétisation de la capsule
                     x = (self._cursor % 1) * self.place_size
                     time_to_discretize = (self.place_size - x) / self.speed
-                    speed = self._discretize_length / time_to_discretize
+                    d = self._discretize_length - pod.position
+                    speed = d / time_to_discretize
                     self._pod_to_add = pod
                     yield from pod.write({
                         "author": self,
                         "type": "speed_a_while",
                         "length_before_restore": self._discretize_length,
                         "speed": speed,
-                        "speed_restore": self.speed
+                        "speed_restore": d
                     })
                 elif "pod_entry_from_bridge" == message["type"]:
                     # notification au pont que la capsule n'y est plus

@@ -28,6 +28,10 @@ class Step(Track):
         return self._previous
 
     @property
+    def speed(self):
+        return self._next.speed
+
+    @property
     def next(self):
         return self._next
 

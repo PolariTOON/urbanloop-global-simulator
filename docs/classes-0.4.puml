@@ -1,0 +1,81 @@
+@startuml
+
+class Main
+class ConsoleApp
+class WebApp
+package controler {
+	class Simulation
+	class Converter
+	class Probability
+}
+package model {
+	class Node
+	package networks {
+		class Network
+		package ways {
+			class Way
+			class Switch
+			class SwitchIn
+			class SwitchOut
+			class Route
+			package tracks {
+				class Track
+				class Step
+				class Sensor
+				class Station
+				class Shed
+				class Section
+			}
+		}
+		package lines {
+			class Line
+			class Bridge
+			class Loop
+		}
+	}
+	package tokens {
+		class Token
+		class Capsule
+		class Traveler
+	}
+}
+
+Main "0"--"1" ConsoleApp
+Main "0"--"1" WebApp
+ConsoleApp "0"--"1" Simulation
+WebApp "0"--"1..*" Simulation
+Simulation "0"--"1" Converter
+Simulation "0"--"1" Probability
+Simulation "0"--"1" Network
+Node <|-- Network
+Node <|-- Way
+Node <|-- Track
+Node "0"--"0..*" Capsule
+Network "0"*--"0..*" Way
+Network "0"*--"0..*" Line
+Way <|-- Switch
+Way <|-- Route
+Switch <|-- SwitchIn
+Switch <|-- SwitchOut
+SwitchIn "0"--"3" Route
+SwitchIn "1"--"1" SwitchOut
+SwitchOut "0"--"3" Route
+Route "0"--"2" Switch
+Route "0"*--"0..*" Track
+Track <|-- Step
+Track <|-- Section
+Step <|-- Sensor
+Step <|-- Station
+Step <|-- Shed
+Station "0"--"0..*" Traveler
+Line <|-- Bridge
+Line <|-- Loop
+Bridge "0"--"1" Route
+Bridge "0"--"2" Switch
+Loop "0"--"2..*" Switch
+Loop "0"--"1..*" Route
+Token <|-- Capsule
+Token <|-- Traveler
+Capsule "0"--"0..*" Traveler
+
+@enduml

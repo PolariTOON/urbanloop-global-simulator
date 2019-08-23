@@ -37,6 +37,10 @@ class SwitchIn(Switch):
         self._switch_out = value
 
     @property
+    def cursor(self):
+        return self._cursor
+
+    @property
     def discrete_places(self):
         return self._discrete_places
 
@@ -49,12 +53,8 @@ class SwitchIn(Switch):
         return self._first_place
 
     @property
-    def c2_length(self):
-        return self._discretize_length + self._set_up_length + self._finalisation_length
-
-    @property
     def length(self):
-        return self.c2_length + 10
+        return self._discretize_length + self._set_up_length + self._finalisation_length
 
     @property
     def finalisation_length(self):
@@ -81,7 +81,7 @@ class SwitchIn(Switch):
 
     def full_decel(self, length):
         diff = self._step
-        time = length / self.avg_speed
+        time = length / self.speed
         return length / (time + diff)
 
     def backstep(self, begin):
@@ -91,7 +91,7 @@ class SwitchIn(Switch):
         :return: void
         """
         x = (self._cursor % 1) * self.place_size
-        time_to_shift = (self.place_size - x) / self.avg_speed
+        time_to_shift = (self.place_size - x) / self.speed
         speed = self.place_size / time_to_shift
         for index in range(self._first_place + begin - self._places_number, self._first_place - 2):
             # On décale les capsules à partir de la première place libre
@@ -102,25 +102,25 @@ class SwitchIn(Switch):
                     "type": "speed_a_while",
                     "speed": speed,
                     "length_before_restore": self.place_size,
-                    "speed_restore": self.avg_speed
+                    "speed_restore": self.speed
                 })
             self._discrete_places[index] = self._discrete_places[index + 1]
         self._discrete_places[self._first_place - 1] = None
 
     def update(self):
         # Les distances importantes sur la boucle où l'on peut s'inserer
-        self._discretize_length = self.place_size * self.max_speed / (self.max_speed - self.avg_speed)
+        self._discretize_length = self.place_size * self.max_speed / (self.max_speed - self.speed)
         self._set_up_length = self._places_number * self.place_size
-        self._finalisation_length = self._places_number * self._places_number * self.max_speed / self.avg_speed
+        self._finalisation_length = self._places_number * self._places_number * self.max_speed / self.speed
         # Maj de la vitesse du pont
         section = self.beside.sections[0]
-        section.speed = max(section.speed, self.avg_speed * section.length / self._finalisation_length)
+        section.speed = max(section.speed, self.speed * section.length / self._finalisation_length)
         # Variables liées à la discrétisation
         self._discrete_places = [None for place in range(self._places_number)]
-        self._step = self.place_size / self.avg_speed
+        self._step = self.place_size / self.speed
         self._switch_out.set_c1_length()
         while True:
-            self._cursor = (self._cursor - self.avg_speed * self.env.sim_tick / self.place_size) % self._places_number
+            self._cursor = (self._cursor - self.speed * self.env.sim_tick / self.place_size) % self._places_number
             if int(self._cursor) != self._first_place:
                 # Le curseur a dépassé une nouvelle place, on avance le rouage
                 # pod_to_add est None si pas de capsule à insérer dans le tableau
@@ -147,7 +147,7 @@ class SwitchIn(Switch):
 
                     # Discrétisation de la capsule
                     x = (self._cursor % 1) * self.place_size
-                    time_to_discretize = (self.place_size - x) / self.avg_speed
+                    time_to_discretize = (self.place_size - x) / self.speed
                     speed = self._discretize_length / time_to_discretize
                     self._pod_to_add = pod
                     yield from pod.write({
@@ -155,12 +155,11 @@ class SwitchIn(Switch):
                         "type": "speed_a_while",
                         "length_before_restore": self._discretize_length,
                         "speed": speed,
-                        "speed_restore": self.avg_speed
+                        "speed_restore": self.speed
                     })
                 elif "pod_entry_from_bridge" == message["type"]:
                     # notification au pont que la capsule n'y est plus
                     pod = message["pod"]
-                    self._pods.append(pod)
                     track = pod.track_or_switch.beside.sections[-1]
                     yield from track.write({
                         "author": self,
@@ -169,11 +168,11 @@ class SwitchIn(Switch):
                     })
                     yield from pod.write({
                         "author": self,
-                        "type": "speed",
-                        "speed": self.avg_speed
+                        "type": "passing_from_switch"
                     })
                 elif "pod_exit" == message["type"]:
                     pod = message["pod"]
-                    self._pods.remove(pod)
+                    if pod in self.pods:
+                        self.pods.remove(pod)
                 else:
                     raise ValueError("Invalid message")

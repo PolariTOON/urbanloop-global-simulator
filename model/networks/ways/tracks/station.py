@@ -104,6 +104,11 @@ class Station(Step):
                             "type": "docked",
                             "pod": pod
                         })
+                    else:
+                        yield from pod.write({
+                            "author": self,
+                            "type": "passing"
+                        })
                 elif "pod_exit" == message["type"]:
                     pass
                 else:

@@ -625,6 +625,8 @@ class Network(Node):
         :return: void
         """
         while True:
+            if self.env.now % 15 == 0:
+                self._update_routing()
             while True:
                 message = yield from self.read()
                 if message is not None:

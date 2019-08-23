@@ -41,6 +41,10 @@ class Sensor(Step):
                         "type": "pod_entry",
                         "pod": pod
                     })
+                    yield from pod.write({
+                        "author": self,
+                        "type": "passing"
+                    })
                 elif "pod_exit" == message["type"]:
                     pass
                 else:

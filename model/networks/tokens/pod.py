@@ -105,8 +105,9 @@ class Pod(Token):
                     self._length_before_restore -= self._speed * self.env.sim_tick
                 else:
                     self._length_before_restore = None
-                    self._speed = self._speed_restore
-                    self._speed_restore = None
+                    if self._speed_restore is not None:
+                        self._speed = self._speed_restore
+                        self._speed_restore = None
 
             # La capsule avance
             if self._speed != 0:
@@ -126,19 +127,20 @@ class Pod(Token):
 
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
             # capsule indique à la piste/l'aiguillage sur laquelle/lequel elle rentre
-            if self._position > self._track_or_switch.length:
+            if self._position > self._track_or_switch.length and self._speed != 0:
                 bridge_to_switch = False
                 self._position -= self._track_or_switch.length
+                t = self._position / self._speed
                 if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" or str(
                         type(self._track_or_switch)) == "<class 'model.networks.ways.switch_in.SwitchIn'>":
                     self._track_or_switch = self._track_or_switch.next.sections[0]
                 else:
-                    if str(type(self._track_or_switch)) == "<class 'model.networks.ways.tracks.section.Section'>" and self._track_or_switch.is_bridge:
-                        # la capsule va entrer sur un aiguillage entrant par un pont
-                        bridge_to_switch = True
-                        self._position += self._track_or_switch.next.c2_length
+                    if str(type(self._track_or_switch)) == "<class 'model.networks.ways.tracks.section.Section'>":
+                        if self._track_or_switch.is_bridge:
+                            # la capsule va entrer sur un aiguillage entrant par un pont
+                            bridge_to_switch = True
                     self._track_or_switch = self._track_or_switch.next
-
+                self._position = t * self._track_or_switch.speed
                 if bridge_to_switch:
                     yield from self._track_or_switch.write({
                         "author": self,
@@ -162,6 +164,20 @@ class Pod(Token):
                 elif "speed" == message["type"]:
                     # Ordre de changement de vitesse
                     self._speed = message["speed"]
+                elif "passing" == message["type"]:
+                    self._track_or_switch = self._track_or_switch.next
+                    yield from self._track_or_switch.write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": self
+                    })
+                elif "passing_from_switch" == message["type"]:
+                    self._track_or_switch = self._track_or_switch.next.sections[0]
+                    yield from self._track_or_switch.write({
+                        "author": self,
+                        "type": "pod_entry",
+                        "pod": self
+                    })
                 elif "docked" == message["type"]:
                     # La capsule s'arrête dans une gare ou un dépôt
                     self._speed = 0

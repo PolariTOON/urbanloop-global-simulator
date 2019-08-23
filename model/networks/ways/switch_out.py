@@ -17,7 +17,7 @@ class SwitchOut(Switch):
             self._switch_in = self._beside.sections[-1].next
             self._switch_in._switch_out = self
             self._beside.sections[-1].next.switch_in = self
-        self._c1_length = None
+        self._length = None
 
     @property
     def switch_in(self):
@@ -28,8 +28,8 @@ class SwitchOut(Switch):
         self._switch_in = value
 
     @property
-    def c1_length(self):
-        return self._c1_length
+    def length(self):
+        return self._length
 
     @property
     def routing_table(self):
@@ -43,12 +43,8 @@ class SwitchOut(Switch):
     def name(self):
         return "switchOut"
 
-    @property
-    def length(self):
-        return self._c1_length + 10
-
     def set_c1_length(self):
-        self._c1_length = self._switch_in.finalisation_length * self.avg_speed / self._switch_in.avg_speed - self._beside.length * self.avg_speed / self._beside.sections[0].speed
+        self._length = self._switch_in.finalisation_length * self.speed / self._switch_in.speed - self._beside.length * self.speed / self._beside.sections[0].speed
 
     def serialize(self):
         dict = super().serialize()
@@ -64,7 +60,7 @@ class SwitchOut(Switch):
         :return: True si la capsule doit être aiguillée, False sinon
         """
         for moving_pod in self._routing_table:
-            if moving_pod["pod"] == pod and self in moving_pod["way"]:
+            if moving_pod["pod"] == pod and self._switch_in in moving_pod["way"]:
                 return True
         return False
 
@@ -90,6 +86,18 @@ class SwitchOut(Switch):
                         "type": "pod_exit",
                         "pod": pod
                     })
+                    # Régulation pour tomber sur une place si insertion
+                    d = self._length - pod.position
+                    x = self._switch_in.cursor
+                    t = d / self.speed + (self._beside.length - x) / self._switch_in.speed
+                    speed = d / t
+                    yield from pod.write({
+                        "author": self,
+                        "type": "speed_a_while",
+                        "speed": speed,
+                        "length_before_restore": d,
+                        "speed_restore": None
+                    })
                     # routage si besoin
                     routing = self._is_route(pod)
                     if routing:
@@ -103,7 +111,7 @@ class SwitchOut(Switch):
                             yield from pod.write({
                                 "author": self,
                                 "type": "insert",
-                                "length_before_turn": self._c1_length
+                                "length_before_turn": self._length
                             })
                         else:
                             # On procède au décalage pour insérer la capsule
@@ -113,7 +121,7 @@ class SwitchOut(Switch):
                             yield from pod.write({
                                 "author": self,
                                 "type": "insert",
-                                "length_before_turn": self._c1_length
+                                "length_before_turn": self._length
                             })
                 elif "pod_exit" == message["type"]:
                     pod = message["pod"]

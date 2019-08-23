@@ -187,11 +187,12 @@ class Route(Way):
                     break
                 elif "pod_entry" == message["type"]:
                     # La route prévient la bonne piste / l'aiguillage qu'une capsule est sortie
+                    new_track = message["author"]
                     pod = message["pod"]
-                    if isinstance(pod.track_or_switch, Switch):
-                        track = pod.track_or_switch.previous.sections[-1]
+                    if isinstance(new_track, Switch):
+                        track = new_track.previous.sections[-1]
                     else:
-                        track = pod.track_or_switch.previous
+                        track = new_track.previous
                     yield from track.write({
                         "author": self,
                         "type": "pod_exit",

@@ -13,12 +13,12 @@ class Switch(Way):
         self._pods = []
         self._id_bridge = id_bridge
         self._rules = []
-        self._margin = self.avg_speed * (margin_min + pod_size) / 8.33 - pod_size
+        self._margin = self.speed * (margin_min + pod_size) / 8.33 - pod_size
         self._max_speed = max_speed
 
         # Ajout des capsules
         for pod in pods:
-            self._pods.append(Pod(env, self, self.avg_speed, **pod))
+            self._pods.append(Pod(env, self, self.speed, **pod))
 
         # Liaison des routes et sections de la boucle à l'aiguillage
         # Route précédente
@@ -37,10 +37,6 @@ class Switch(Way):
         return self._y
 
     @property
-    def saturation(self):
-        return self._saturation
-
-    @property
     def margin(self):
         return self._margin
 
@@ -53,8 +49,8 @@ class Switch(Way):
         return self._beside
 
     @property
-    def avg_speed(self):
-        return self._previous.sections[-1].speed
+    def speed(self):
+        return self._next.sections[0].speed
 
     @property
     def max_speed(self):

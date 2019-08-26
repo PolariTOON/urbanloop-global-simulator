@@ -10,7 +10,7 @@ class Switch(Way):
         self._previous = previous
         self._next = next
         self._beside = beside
-        self._pods = []
+        self._pods = pods or []
         self._id_bridge = id_bridge
         self._rules = []
         self._margin = self.speed * (margin_min + pod_size) / 8.33 - pod_size
@@ -18,7 +18,8 @@ class Switch(Way):
 
         # Ajout des capsules
         for pod in pods:
-            self._pods.append(Pod(env, self, self.speed, **pod))
+            speed = pod["speed"]
+            self._pods.append(Pod(env, self, speed, **pod))
 
         # Liaison des routes et sections de la boucle à l'aiguillage
         # Route précédente

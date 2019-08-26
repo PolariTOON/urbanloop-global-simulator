@@ -1,11 +1,8 @@
-"""
-réuni des connexions pour former les switchs du réseau
-"""
 from .switch import Switch
 
 
 class SwitchIn(Switch):
-    def __init__(self, env, id, margin_min, pod_size, max_speed, places_number, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, max_speed, places_number, cursor=None, discrete_places=None, **kwargs):
         super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
         self._switch_out = None
         # Liaison de la route et des sections du pont
@@ -20,13 +17,10 @@ class SwitchIn(Switch):
         self._discretize_length = None
         self._set_up_length = None
         self._finalisation_length = None
-        self._discrete_places = None
-        self._step = None
-        self._min_time = None
-        self._max_time = None
+        self._discrete_places = discrete_places or None
         self._pod_to_add = None
-        self._cursor = 0
-        self._first_place = 0
+        self._cursor = cursor or 0
+        self._first_place = int(self._cursor)
 
     @property
     def switch_out(self):
@@ -64,7 +58,10 @@ class SwitchIn(Switch):
         dict = super().serialize()
         dict.update({
             "name": self.name,
-            "type": "switch_in"
+            "type": "switch_in",
+            "cursor": self._cursor,
+            "discrete_places": self._discrete_places,
+            "length": self.length
         })
         return dict
 
@@ -78,11 +75,6 @@ class SwitchIn(Switch):
             if self._discrete_places[i] == value:
                 index = i
         return index
-
-    def full_decel(self, length):
-        diff = self._step
-        time = length / self.speed
-        return length / (time + diff)
 
     def backstep(self, begin):
         """
@@ -117,7 +109,6 @@ class SwitchIn(Switch):
         section.speed = max(section.speed, self.speed * section.length / self._finalisation_length)
         # Variables liées à la discrétisation
         self._discrete_places = [None for place in range(self._places_number)]
-        self._step = self.place_size / self.speed
         self._switch_out.set_c1_length()
         while True:
             self._cursor = (self._cursor - self.speed * self.env.sim_tick / self.place_size) % self._places_number
@@ -131,7 +122,7 @@ class SwitchIn(Switch):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

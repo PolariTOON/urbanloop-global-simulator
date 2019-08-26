@@ -4,7 +4,7 @@ from .traveler import Traveler
 
 
 class Pod(Token):
-    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, **kwargs):
+    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, length_before_turn=None, turn=None, **kwargs):
         super().__init__(env, **kwargs)
         self._position = position or 0
         travelers = travelers or {
@@ -18,11 +18,10 @@ class Pod(Token):
         self._priority = 0  # TODO
         self._track_or_switch = track_or_switch
         self._speed = pod_speed
-        self._on_beside = False
-        self._turn = False
-        self._length_before_turn = None
-        self._length_before_restore = None
-        self._speed_restore = None
+        self._turn = turn or False
+        self._length_before_turn = length_before_turn or None
+        self._length_before_restore = length_before_restore or None
+        self._speed_restore = speed_restore or None
 
     @property
     def position(self):
@@ -68,14 +67,6 @@ class Pod(Token):
     def speed(self, value):
         self._speed = value
 
-    @property
-    def on_beside(self):
-        return self._on_beside
-
-    @on_beside.setter
-    def on_beside(self, value):
-        self._on_beside = value
-
     def serialize(self):
         dict = super().serialize()
         dict.update({
@@ -85,7 +76,11 @@ class Pod(Token):
             "travelers": {
                 "count": len(self._travelers),
                 "max": self._capacity
-            }
+            },
+            "speed_restore": self._speed_restore,
+            "length_before_restore": self._length_before_restore,
+            "length_before_turn": self._length_before_turn,
+            "speed": self._speed
         })
         return dict
 
@@ -158,7 +153,7 @@ class Pod(Token):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "speed" == message["type"]:

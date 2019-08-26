@@ -1,6 +1,3 @@
-"""
-Cette classe permet de gérer le code lié à un lancement d'une simulation avec interface graphique
-"""
 from asyncio import get_running_loop, run, run_coroutine_threadsafe, sleep
 from flask import Flask, jsonify, request
 from flask.json import load, loads
@@ -323,5 +320,6 @@ async def _get_section(simulations, network_index, route_index, section_index):
 def run_app(port):
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
     print("Static loading of the new json file (http://127.0.0.1:%d/new/)" % port)
+    print("Log format : receiver  --  author  --  message type")
     Thread(target=lambda: run(_run_simulations())).start()
     _app.run(port=port)

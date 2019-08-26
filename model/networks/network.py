@@ -625,19 +625,20 @@ class Network(Node):
         :return: void
         """
         while True:
-            if self.env.now % 15 == 0:
-                self._update_routing()
+            print("-------------------------------------------------------------")
+            print("     Tick n°", self.env.now, " | Réseau :", self.name, "     ")
+            print("-------------------------------------------------------------")
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "docked" == message["type"]:
                     # Si une capsule stationne on met à jour la table de routage
                     pod_to_update = message["pod"]
                     self.remove_pod_from_dico(pod_to_update)
-                    # TODO : mise à jour des poids
+                    # TODO : mise à jour des poids ?
                     yield from self._update_routing()
                 else:
                     raise ValueError("Invalid message")

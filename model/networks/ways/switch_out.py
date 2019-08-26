@@ -1,6 +1,3 @@
-"""
-réuni des connexions pour former les switchs du réseau
-"""
 from .switch import Switch
 
 
@@ -50,7 +47,8 @@ class SwitchOut(Switch):
         dict = super().serialize()
         dict.update({
             "name": self.name,
-            "type": "switch_out"
+            "type": "switch_out",
+            "length": self.length
         })
         return dict
 
@@ -73,7 +71,7 @@ class SwitchOut(Switch):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

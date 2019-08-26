@@ -79,7 +79,7 @@ class Section(Track):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "pod_exit" == message["type"]:
@@ -118,9 +118,10 @@ class Section(Track):
     def insert_pod(self, **pod):
         env = self._env
         pods = self._pods
+        speed = pod["speed"]
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
-                self._pods.insert(k, Pod(env, self, self._speed, **pod))
+                self._pods.insert(k, Pod(env, self, speed, **pod))
                 return
         self._pods.append(Pod(env, self, self._speed, **pod))
 

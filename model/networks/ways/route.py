@@ -1,7 +1,3 @@
-"""
-2eme possibilité de noeud
-Une route est à la fois un noeud du graphe subdivisé et un graphe divisé en sections, stations, garages séparés par des capteurs
-"""
 from model.networks.ways.switch import Switch
 from .way import Way
 from .tracks.section import Section
@@ -182,7 +178,7 @@ class Route(Way):
             while True:
                 message = yield from self.read()
                 if message is not None:
-                    print(self.name, "||", message["type"], "||", message["author"].name)
+                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

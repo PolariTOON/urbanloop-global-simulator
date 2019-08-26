@@ -7,6 +7,10 @@ class Traveler(Token):
         waiting_time = waiting_time or 0
         self._waiting_time = waiting_time
 
+    @property
+    def name(self):
+        return super().name or "Traveler %d" % self.id
+
     def serialize(self):
         dict = super().serialize()
         dict.update({})

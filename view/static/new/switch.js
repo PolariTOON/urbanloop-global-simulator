@@ -1,4 +1,6 @@
+import {state} from "./state.js";
 import {Entity} from "./entity.js";
+import {Pod} from "./pod.js";
 const {Circle} = Konva;
 
 const shadowColor = "#333"
@@ -9,7 +11,9 @@ const selectedOuterColor = "#0fc";
 export class Switch extends Entity {
     // __outerShape;
     // __innerShape;
-    constructor(infoLayer) {
+    // __speed;
+    // __length;
+    constructor(hintsLayer) {
         const outerShape = new Circle({
             lineJoin: "round",
             lineCap: "round",
@@ -26,7 +30,7 @@ export class Switch extends Entity {
             fill: innerColor,
             stroke: shadowColor,
         });
-        super(infoLayer);
+        super(hintsLayer);
         super.add(outerShape);
         super.add(innerShape);
         this.__outerShape = outerShape;
@@ -49,18 +53,47 @@ export class Switch extends Entity {
     get _y() {
         return super._y;
     }
+    set _speed(value) {
+        this.__speed = value;
+    }
+    get _speed() {
+        return this.__speed;
+    }
+    set _length(value) {
+        this.__length = value;
+    }
+    get _length() {
+        return this.__length;
+    }
     select() {
         this.__outerShape.fill(selectedOuterColor);
     }
     unselect() {
         this.__outerShape.fill(outerColor);
     }
-    update(json) {
+    update(json, podsLayer, hintsLayer) {
         const name = json["name"];
         const x = json["x"];
         const y = json["y"];
+        const speed = json["speed"];
+        const length = json["length"];
         this._name = name;
         this._x = x;
         this._y = y;
+        this._speed = speed;
+        this._length = length;
+        for (const p of json["pods"]) {
+            let pod;
+            if (state.pods.has(p["id"])) {
+                pod = state.pods.get(p["id"]);
+                pod._keepFlag = 1;
+            } else {
+                pod = new Pod(hintsLayer);
+                podsLayer.add(pod);
+                state.pods.set(p["id"], pod);
+                pod._keepFlag = 2;
+            }
+            pod.update(p, null, json);
+        }
     }
 }

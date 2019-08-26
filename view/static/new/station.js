@@ -15,7 +15,7 @@ export class Station extends Entity {
     // __travelerAllTimeCount;
     // __travelerAverageWaitingTime;
     // __stationType;
-    constructor(infoLayer) {
+    constructor(hintsLayer) {
         const outerShape = new RegularPolygon({
             lineJoin: "round",
             lineCap: "round",
@@ -34,7 +34,7 @@ export class Station extends Entity {
             fill: innerColor,
             stroke: shadowColor,
         });
-        super(infoLayer);
+        super(hintsLayer);
         super.add(outerShape);
         super.add(innerShape);
         this.__outerShape = outerShape;

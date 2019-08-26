@@ -23,7 +23,7 @@ export class Legend extends Label {
         this.__text.offsetY(this.__text.height() / 2);
     }
     get _name() {
-        return this._text.text();
+        return this.__text.text();
     }
     set _x(value) {
         super.x(value);

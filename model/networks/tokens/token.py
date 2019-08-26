@@ -3,10 +3,15 @@ from ...entity import Entity
 
 
 class Token(Entity):
-    def __init__(self, env, source=None, destination=None, **kwargs):
+    def __init__(self, env, name=None, source=None, destination=None, **kwargs):
         super().__init__(env, uuid4().hex, **kwargs)
+        self._name = name or ""
         self._source = source or None
         self._destination = destination or None
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def source(self):

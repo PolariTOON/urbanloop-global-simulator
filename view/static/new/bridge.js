@@ -6,11 +6,11 @@ export class Bridge extends Line {
     // __switchOut;
     // __switchIn;
     // __section;
-    constructor(json, switchOut, switchIn, networkLayer, infoLayer) {
-        const section = new Section(json["section"]["path"]["type"], switchOut, switchIn, false, infoLayer);
-        networkLayer.add(section);
+    constructor(json, switchOut, switchIn, legendsLayer, sectionsLayer, hintsLayer) {
+        const section = new Section(json["section"]["path"]["type"], switchOut, switchIn, false, hintsLayer);
+        sectionsLayer.add(section);
         state.nodes.push(section);
-        super(infoLayer);
+        super(legendsLayer);
         this.__switchOut = switchOut;
         this.__switchIn = switchIn;
         this.__section = section;
@@ -33,7 +33,7 @@ export class Bridge extends Line {
     get _section() {
         return this.__section;
     }
-    update(json, loopsJSON, networkLayer, infoLayer) {
+    update(json, loopsJSON, podsLayer, hintsLayer) {
         const name = json["name"];
         const x = (this.__switchOut.x() + this.__switchIn.x()) / 2;
         const y = (this.__switchOut.y() + this.__switchIn.y()) / 2;
@@ -41,6 +41,6 @@ export class Bridge extends Line {
         this._x = x;
         this._y = y;
         this.__section.update(json["section"]);
-        super.update(json, loopsJSON, networkLayer, infoLayer);
+        super.update(json, loopsJSON, podsLayer, hintsLayer);
     }
 }

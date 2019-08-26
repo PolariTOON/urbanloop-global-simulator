@@ -13,5 +13,5 @@ class Line:
 
     def serialize(self):
         return {
-            "name": self._name
+            "name": self.name
         }

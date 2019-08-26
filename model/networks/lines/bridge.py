@@ -35,10 +35,21 @@ class Bridge(Line):
         section = section.serialize()
         dict = super().serialize()
         dict.update({
-            "name": self.name,
             "section": section,
             "pods": pods,
-            "switch_in": self._switch_in,
-            "switch_out": self._switch_out
+            "switch_out": self.switch_out,
+            "switch_in": self.switch_in
         })
         return dict
+
+    @property
+    def name(self):
+        return super().name or "Bridge %d" % self.id
+
+    @property
+    def switch_out(self):
+        return self._switch_out
+
+    @property
+    def switch_in(self):
+        return self._switch_in

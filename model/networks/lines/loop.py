@@ -20,6 +20,10 @@ class Loop(Line):
         self._switches = switches
 
     @property
+    def name(self):
+        return super().name or "Loop %d" % self.id
+
+    @property
     def routes(self):
         return self._routes
 
@@ -98,8 +102,8 @@ class Loop(Line):
         elements = []
         sections = []
         pods = []
-        switches = self._switches
-        routes = self._routes
+        switches = self.switches
+        routes = self.routes
         length = 0
         for way_index in range(len(switches)):
             switch = switches[way_index]

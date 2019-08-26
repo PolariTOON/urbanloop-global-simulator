@@ -27,7 +27,7 @@ class Simulation:
         self._state = state
         self._running = running
         # Etape 3 : chargement du modèle
-        self._controler = Network(self._env, id, **kwargs)
+        self._network = Network(self._env, id, **kwargs)
         self._env.sim_tick = 0.05  # Duration of a tick todo tristan : en lien avec les vitesses des capsules
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
@@ -78,7 +78,7 @@ class Simulation:
                 if loop_sleep_boolean:
                     tick_start_time = time.perf_counter()  # temps de la boucle
                 # Etape 1 : génération de statistiques
-                # self._controler.travel_stats()  # TODO : génération des statistiques
+                # self._network.travel_stats()  # TODO : génération des statistiques
                 # Etape 2 : Passage au tick suivant
                 self._env.process(self.tick())
                 # Etape 3 : Monter des voyageurs en attente dans les capsules
@@ -88,7 +88,7 @@ class Simulation:
                     self._env.process(self.generate_travelers())
                 # Etape 5 : Complétion des stations
                 if self._station_refill and self._current_tick != 0 and self._modulo_on_seconds(1):
-                    self._controler.fill_and_full_stations()
+                    self._network.fill_and_full_stations()
                 # Etape 6 : gestion des collisions
                 #  self.collision() TODO : GESTION DES COLLISIONS
                 yield self._env.timeout(1)
@@ -258,7 +258,7 @@ class Simulation:
         seconds = self.now_to_seconds()
         hour = converter.seconds_to_floor_hour(seconds)
         traveler_number = probability.generate_traveler_poisson(self._config["TRAVELER"]["travelers_per_day"], hour)
-        self._controler.generate_travelers(traveler_limit, traveler_number, seconds, self._probability)
+        self._network.generate_travelers(traveler_limit, traveler_number, seconds, self._probability)
         yield self._env.timeout(floor(self.get_tick_per_second() / traveler_number))
 
     def now_to_seconds(self):
@@ -271,7 +271,7 @@ class Simulation:
         return self._start_hour * 3600 + self.get_simulated_time()
 
     def ascend_travelers(self):
-        yield self._env.process(self._controler.ascend_travelers(self._env, self.now_to_seconds(), self._probability, self._config, self.get_tick_per_second()))
+        yield self._env.process(self._network.ascend_travelers(self._env, self.now_to_seconds(), self._probability, self._config, self.get_tick_per_second()))
 
     @property
     def running(self):
@@ -289,7 +289,7 @@ class Simulation:
             self._state = random()
 
     def serialize(self):
-        dict = self._controler.serialize()
+        dict = self._network.serialize()
         state = self._state
         running = self._running
         dict.update({

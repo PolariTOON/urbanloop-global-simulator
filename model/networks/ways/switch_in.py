@@ -14,9 +14,9 @@ class SwitchIn(Switch):
             self._switch_out._switch_in = self
             self._beside.sections[0].previous.switch_in = self
         self._places_number = places_number
-        self._discretize_length = None
-        self._set_up_length = None
-        self._finalisation_length = None
+        self._discretize_length = 0
+        self._set_up_length = 0
+        self._finalisation_length = 0
         self._discrete_places = discrete_places or [None for a in range(places_number)]
         self._pod_to_add = None
         self._cursor = cursor or 0
@@ -40,7 +40,7 @@ class SwitchIn(Switch):
 
     @property
     def name(self):
-        return "switchIn"
+        return super().name or "Switch \"in\" %d" % self.id
 
     @property
     def first_place(self):
@@ -57,10 +57,9 @@ class SwitchIn(Switch):
     def serialize(self):
         dict = super().serialize()
         dict.update({
-            "name": self.name,
             "type": "switch_in",
-            "cursor": self._cursor,
-            "discrete_places": [place and place.serialize() for place in self._discrete_places],
+            "cursor": self.cursor,
+            "discrete_places": [place and place.serialize() for place in self.discrete_places],
             "length": self.length
         })
         return dict

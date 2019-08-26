@@ -8,10 +8,10 @@ export class Line extends Group {
     // __name;
     // __x;
     // __y;
-    constructor(infoLayer) {
+    constructor(legendsLayer) {
         const text = new Legend();
         super();
-        infoLayer.add(text);
+        legendsLayer.add(text);
         this.__legend = text;
     }
     set _name(value) {
@@ -39,15 +39,15 @@ export class Line extends Group {
     get _y() {
         return this.__y;
     }
-    update(json, loopsJSON, networkLayer, infoLayer) {
+    update(json, loopsJSON, podsLayer, hintsLayer) {
         for (const p of json["pods"]) {
             let pod;
             if (state.pods.has(p["id"])) {
                 pod = state.pods.get(p["id"]);
                 pod._keepFlag = 1;
             } else {
-                pod = new Pod(infoLayer);
-                networkLayer.add(pod);
+                pod = new Pod(hintsLayer);
+                podsLayer.add(pod);
                 state.pods.set(p["id"], pod);
                 pod._keepFlag = 2;
             }

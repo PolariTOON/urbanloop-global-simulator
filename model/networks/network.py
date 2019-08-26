@@ -46,6 +46,10 @@ class Network(Node):
                 switch.routing_table = self._moving_pods
 
     @property
+    def name(self):
+        return super().name or "Network %d" % self.id
+
+    @property
     def pods(self):
         pods = []
         for route in self._routes:

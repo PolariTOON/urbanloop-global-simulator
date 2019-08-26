@@ -6,10 +6,10 @@ export class Entity extends Group {
     // __name;
     // __x;
     // __y;
-    constructor(infoLayer) {
+    constructor(hintsLayer) {
         const hint = new Hint();
         super();
-        infoLayer.add(hint);
+        hintsLayer.add(hint);
         this.__hint = hint;
     }
     set _name(value) {

@@ -24,8 +24,10 @@ ${state.selectedEntity instanceof Pod ? `\
     <dt>Travelers</dt>
     <dd>${state.selectedEntity._travelerCount} / ${state.selectedEntity._travelerMax}</dd>
 ` : state.selectedEntity instanceof Section ? `\
-    <dt>Speed in (m / s)</dt>
+    <dt>Speed (in m / s)</dt>
     <dd>${state.selectedEntity._speed}</dd>
+    <dt>Length (in m)</dt>
+    <dd>${state.selectedEntity._length}</dd>
 ` : state.selectedEntity instanceof Sensor ? `\
 ` : state.selectedEntity instanceof Shed ? `\
     <dt>Pods</dt>
@@ -40,6 +42,10 @@ ${state.selectedEntity instanceof Pod ? `\
     <dt>Average waiting duration (in s)</dt>
     <dd>${state.selectedEntity._travelerAverageWaitingTime}</dd>
 ` : state.selectedEntity instanceof Switch ? `\
+    <dt>Speed (in m / s)</dt>
+    <dd>${state.selectedEntity._speed}</dd>
+    <dt>Length (in m)</dt>
+    <dd>${state.selectedEntity._length}</dd>
 ` : `\
 `}
 </dl>

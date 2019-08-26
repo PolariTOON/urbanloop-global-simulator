@@ -21,45 +21,47 @@ function averagePoint(elements) {
 export class Loop extends Line {
     // __elements;
     // __sections;
-    constructor(json, networkLayer, infoLayer) {
+    constructor(json, legendsLayer, elementsLayer, sectionsLayer, hintsLayer) {
         const elements = [];
         const sections = [];
-        for (let i = 0, li = json["elements"].length; i < li; i++) {
+        const elementsJSON = json["elements"];
+        const sectionsJSON = json["sections"];
+        for (let i = 0, li = elementsJSON.length; i < li; i++) {
             let element;
-            switch (json["elements"][i]["type"]) {
+            switch (elementsJSON[i]["type"]) {
                 case "station": {
-                    element = new Station(infoLayer);
+                    element = new Station(hintsLayer);
                     break;
                 }
                 case "shed": {
-                    element = new Shed(infoLayer);
+                    element = new Shed(hintsLayer);
                     break;
                 }
                 case "sensor": {
-                    element = new Sensor(infoLayer);
+                    element = new Sensor(hintsLayer);
                     break;
                 }
                 case "switch_in":
                 case "switch_out": {
-                    element = new Switch(infoLayer);
+                    element = new Switch(hintsLayer);
                     break;
                 }
             }
             elements.push(element);
-            networkLayer.add(element);
+            elementsLayer.add(element);
             state.nodes.push(element);
         }
-        for (let i = 0, li = json["sections"].length; i < li; i++) {
-            const pathType = json["sections"][i]["path"]["type"];
+        for (let i = 0, li = sectionsJSON.length; i < li; i++) {
+            const pathType = sectionsJSON[i]["path"]["type"];
             const beginElement = elements[i];
             const endElement = elements[(i + 1) % li];
             const loopOrBridge = true;
-            const section = new Section(pathType, beginElement, endElement, loopOrBridge, infoLayer);
+            const section = new Section(pathType, beginElement, endElement, loopOrBridge, hintsLayer);
             sections.push(section);
-            networkLayer.add(section);
+            sectionsLayer.add(section);
             state.nodes.push(section);
         }
-        super(infoLayer);
+        super(legendsLayer);
         this.__elements = elements;
         this.__sections = sections;
     }
@@ -75,18 +77,24 @@ export class Loop extends Line {
     get _sections() {
         return this.__sections;
     }
-    update(json, networkLayer, infoLayer) {
+    update(json, podsLayer, hintsLayer) {
         const name = json["name"];
         const {x, y} = averagePoint(json["elements"]);
         this._name = name;
         this._x = x;
         this._y = y;
-        for (let i = 0, li = this.__elements.length; i < li; i++) {
-            this.__elements[i].update(json["elements"][i]);
+        const elementsJSON = json["elements"];
+        const sectionsJSON = json["sections"];
+        for (let i = 0, li = elementsJSON.length; i < li; i++) {
+            if (this.__elements[i] instanceof Switch) {
+                this.__elements[i].update(elementsJSON[i], podsLayer, hintsLayer);
+            } else {
+                this.__elements[i].update(elementsJSON[i]);
+            }
         }
-        for (let i = 0, li = this.__sections.length; i < li; i++) {
-            this.__sections[i].update(json["sections"][i]);
+        for (let i = 0, li = sectionsJSON.length; i < li; i++) {
+            this.__sections[i].update(sectionsJSON[i]);
         }
-        super.update(json, null, networkLayer, infoLayer);
+        super.update(json, null, podsLayer, hintsLayer);
     }
 }

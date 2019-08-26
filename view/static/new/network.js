@@ -2,7 +2,7 @@ import {Bridge} from "./bridge.js";
 import {Entity} from "./entity.js";
 import {Loop} from "./loop.js";
 import {state} from "./state.js";
-const {Layer, Stage} = Konva;
+const {Group, Layer, Stage} = Konva;
 
 const zoomIntensity = 0.8;
 const minScale = 0.01;
@@ -12,6 +12,18 @@ const stage = new Stage({
     container: article,
     draggable: true
 });
+const layer = new Layer();
+stage.add(layer);
+const legendsLayer = new Group();
+layer.add(legendsLayer);
+const elementsLayer = new Group();
+layer.add(elementsLayer);
+const sectionsLayer = new Group();
+layer.add(sectionsLayer);
+const podsLayer = new Group();
+layer.add(podsLayer);
+const hintsLayer = new Group();
+layer.add(hintsLayer);
 const heading = document.createElement("h2");
 heading.textContent = "Undefined network"; // TODO
 const firstParagraph = document.createElement("p");
@@ -23,45 +35,41 @@ const speedView = document.createElement("label");
 speedView.innerHTML = "Speed: <output>&times;-</output></label>";
 secondParagraph.append(speedView);
 article.prepend(heading, firstParagraph, secondParagraph);
-const networkLayer = new Layer();
-const infoLayer = new Layer();
 
 state.addEventListener("load", async (event) => {
     const networkJSON = event.detail;
-    stage.add(networkLayer);
-    stage.add(infoLayer);
     const viewBox = networkJSON["view_box"];
     const {x, y, width, height} = viewBox;
     const [offsetX, offsetY, zoom] = [0, 0, 1];
     state.viewBox = {x, y, width, height};
     state.origin = {offsetX, offsetY, zoom};
     const loopsJSON = networkJSON["loops"];
+    const bridgesJSON = networkJSON["bridges"];
     for (const json of loopsJSON) {
-        const loop = new Loop(json, networkLayer, infoLayer);
-        loop.update(json, networkLayer, infoLayer);
+        const loop = new Loop(json, legendsLayer, elementsLayer, sectionsLayer, hintsLayer);
+        loop.update(json, podsLayer, hintsLayer);
         state.loops.push(loop);
     }
-    const bridgesJSON = networkJSON["bridges"];
     for (const json of bridgesJSON) {
         const switchOut = state.loops[json["switch_out"]["loop"]]._elements[json["switch_out"]["element"]];
         const switchIn = state.loops[json["switch_in"]["loop"]]._elements[json["switch_in"]["element"]];
-        const bridge = new Bridge(json, switchOut, switchIn, networkLayer, infoLayer);
-        bridge.update(json, loopsJSON, networkLayer, infoLayer);
+        const bridge = new Bridge(json, switchOut, switchIn, legendsLayer, sectionsLayer, hintsLayer);
+        bridge.update(json, loopsJSON, podsLayer, hintsLayer);
         state.bridges.push(bridge);
     }
     for (const [id, pod] of state.pods.entries()) {
         pod._keepFlag = 0;
     }
     resize();
-    networkLayer.batchDraw();
-    infoLayer.batchDraw();
+    layer.batchDraw();
 });
 
 state.addEventListener("unload", async (event) => {
-    networkLayer.destroyChildren();
-    infoLayer.destroyChildren();
-    networkLayer.remove();
-    infoLayer.remove();
+    legendsLayer.destroyChildren();
+    elementsLayer.destroyChildren();
+    sectionsLayer.destroyChildren();
+    podsLayer.destroyChildren();
+    hintsLayer.destroyChildren();
     transform(0, 0, 1, 1);
     state.loops.length = 0;
     state.bridges.length = 0;
@@ -75,14 +83,14 @@ state.addEventListener("unload", async (event) => {
 state.addEventListener("update", (event) => {
     const networkJSON = event.detail;
     const loopsJSON = networkJSON["loops"];
+    const bridgesJSON = networkJSON["bridges"];
     for (let i = 0, li = loopsJSON.length; i < li; i++) {
         const json = loopsJSON[i];
-        state.loops[i].update(json, networkLayer, infoLayer);
+        state.loops[i].update(json, podsLayer, hintsLayer);
     }
-    const bridgesJSON = networkJSON["bridges"];
     for (let i = 0, li = bridgesJSON.length; i < li; i++) {
         const json = bridgesJSON[i];
-        state.bridges[i].update(json, loopsJSON, networkLayer, infoLayer);
+        state.bridges[i].update(json, loopsJSON, podsLayer, hintsLayer);
     }
     const invertedScaleX = 1 / stage.scaleX();
     const invertedScaleY = 1 / stage.scaleY();
@@ -103,8 +111,7 @@ state.addEventListener("update", (event) => {
             pod._keepFlag = 0;
         }
     }
-    networkLayer.batchDraw();
-    infoLayer.batchDraw();
+    layer.batchDraw();
 });
 
 function resize() {
@@ -177,8 +184,7 @@ function setCursor(cursor) {
 window.addEventListener("resize", async (event) => {
     event.preventDefault();
     resize();
-    networkLayer.batchDraw();
-    infoLayer.batchDraw();
+    layer.batchDraw();
 });
 
 stage.on("dragstart", async (event) => {
@@ -194,8 +200,7 @@ stage.on("dragend", async (event) => {
 stage.on("wheel", async (event) => {
     event.evt.preventDefault();
     zoom(event.evt.deltaY);
-    networkLayer.batchDraw();
-    infoLayer.batchDraw();
+    layer.batchDraw();
 });
 
 stage.on("mouseover", async (event) => {
@@ -208,7 +213,7 @@ stage.on("mouseover", async (event) => {
         return;
     }
     shape.showHint();
-    infoLayer.batchDraw();
+    layer.batchDraw();
     setCursor("pointer");
 });
 
@@ -222,7 +227,7 @@ stage.on("mouseout", async (event) => {
         return;
     }
     shape.hideHint();
-    infoLayer.batchDraw();
+    layer.batchDraw();
     setCursor("auto");
 });
 
@@ -245,7 +250,6 @@ stage.on("click", async (event) => {
         shape.select();
         state.selectedEntity = shape;
     }
-    networkLayer.batchDraw();
-    infoLayer.batchDraw();
+    layer.batchDraw();
     setCursor("auto");
 });

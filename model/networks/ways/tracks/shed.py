@@ -30,14 +30,18 @@ class Shed(Step):
         dict.update({
             "type": "shed",
             "pods": {
-                "count": len(self._pods),
-                "max": self._capacity
+                "count": len(self.pods),
+                "max": self.capacity
             }
         })
         return dict
 
     def to_element_of_loop(self):
         return self._element_of_loop
+
+    @property
+    def name(self):
+        return super().name or "Shed %d" % self.id
 
     @property
     def pods(self):
@@ -82,4 +86,3 @@ class Shed(Step):
                     pass
                 else:
                     raise ValueError("Invalid message")
-

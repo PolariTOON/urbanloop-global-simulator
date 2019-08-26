@@ -38,8 +38,8 @@ class Step(Track):
     def serialize(self):
         dict = super().serialize()
         dict.update({
-            "x": self._x,
-            "y": self._y
+            "x": self.x,
+            "y": self.y
         })
         return dict
 

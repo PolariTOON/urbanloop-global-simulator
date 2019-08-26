@@ -22,7 +22,8 @@ export class Section extends Entity {
     // __endElement;
     // __loopOrBridge;
     // __speed;
-    constructor(pathType, startElement, endElement, loopOrBridge, infoLayer) {
+    // __length;
+    constructor(pathType, startElement, endElement, loopOrBridge, hintsLayer) {
         let outerPath;
         let innerPath;
         switch (pathType) {
@@ -58,7 +59,7 @@ export class Section extends Entity {
                 break;
             }
         }
-        super(infoLayer);
+        super(hintsLayer);
         super.add(outerPath);
         super.add(innerPath);
         this.__outerPath = outerPath;
@@ -94,6 +95,12 @@ export class Section extends Entity {
     }
     get _speed() {
         return this.__speed;
+    }
+    set _length(value) {
+        this.__length = value;
+    }
+    get _length() {
+        return this.__length;
     }
     select() {
         this.__innerPath.fill(selectedPathColor);
@@ -139,6 +146,7 @@ export class Section extends Entity {
         const x = (this.__startElement._x + this.__endElement._x) / 2;
         const y = (this.__startElement._y + this.__endElement._y) / 2;
         const speed = json["speed"];
+        const length = json["length"];
         this.__outerPath.points([
             this.__startElement._x,
             this.__startElement._y,
@@ -155,5 +163,6 @@ export class Section extends Entity {
         this._x = x;
         this._y = y;
         this._speed = speed;
+        this._length = length;
     }
 }

@@ -77,13 +77,18 @@ class Switch(Way):
         dict = super().serialize()
         dict.update({
             "type": "switch",
-            "pods": [pod.serialize() for pod in self._pods],
-            "x": self._x,
-            "y": self._y,
-            "id_bridge": self._id_bridge
+            "pods": [pod.serialize() for pod in self.pods],
+            "x": self.x,
+            "y": self.y,
+            "id_bridge": self.id_bridge,
+            "speed": self.speed
         })
         return dict
 
     @property
     def pods(self):
         return self._pods
+
+    @property
+    def id_bridge(self):
+        return self._id_bridge

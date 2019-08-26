@@ -284,37 +284,37 @@ async def _pause_clock(simulations, network_index):
 @_app.route("/networks/<int:network_index>/bridges/<int:bridge_index>/", methods=["GET"])
 @_synchronize()
 async def _get_bridge(simulations, network_index, bridge_index):
-    return simulations[network_index]._controler._network.bridges[bridge_index].serialize()
+    return simulations[network_index]._network.bridges[bridge_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/loops/<int:loop_index>/", methods=["GET"])
 @_synchronize()
 async def _get_loop(simulations, network_index, loop_index):
-    return simulations[network_index]._controler._network.loops[loop_index].serialize()
+    return simulations[network_index]._network.loops[loop_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/switches/<int:switch_index>/", methods=["GET"])
 @_synchronize()
 async def _get_switch(simulations, network_index, switch_index):
-    return simulations[network_index]._controler._network.switches[switch_index].serialize()
+    return simulations[network_index]._network.switches[switch_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/routes/<int:route_index>/", methods=["GET"])
 @_synchronize()
 async def _get_route(simulations, network_index, route_index):
-    return simulations[network_index]._controler._network.routes[route_index].serialize()
+    return simulations[network_index]._network.routes[route_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/routes/<int:route_index>/steps/<int:step_index>/", methods=["GET"])
 @_synchronize()
 async def _get_step(simulations, network_index, route_index, step_index):
-    return simulations[network_index]._controler._network.routes[route_index].steps[step_index].serialize()
+    return simulations[network_index]._network.routes[route_index].steps[step_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/routes/<int:route_index>/sections/<int:section_index>/", methods=["GET"])
 @_synchronize()
 async def _get_section(simulations, network_index, route_index, section_index):
-    return simulations[network_index]._controler._network.routes[route_index].sections[section_index].serialize()
+    return simulations[network_index]._network.routes[route_index].sections[section_index].serialize()
 
 
 def run_app(port):

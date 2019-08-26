@@ -40,6 +40,10 @@ class Pod(Token):
         self._travelers = value
 
     @property
+    def capacity(self):
+        return self._capacity
+
+    @property
     def priority(self):
         return self._priority
 
@@ -57,7 +61,7 @@ class Pod(Token):
 
     @property
     def name(self):
-        return "POD %s" % self.id
+        return super().name or "Pod %s" % self.id
 
     @property
     def speed(self):
@@ -67,20 +71,32 @@ class Pod(Token):
     def speed(self, value):
         self._speed = value
 
+    @property
+    def speed_restore(self):
+        return self._speed_restore
+
+    @property
+    def length_before_restore(self):
+        return self._length_before_restore
+
+    @property
+    def length_before_turn(self):
+        return self._length_before_turn
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
             "id": self.id,
             "name": self.name,
-            "position": self._position,
+            "position": self.position,
             "travelers": {
-                "count": len(self._travelers),
-                "max": self._capacity
+                "count": len(self.travelers),
+                "max": self.capacity
             },
-            "speed_restore": self._speed_restore,
-            "length_before_restore": self._length_before_restore,
-            "length_before_turn": self._length_before_turn,
-            "speed": self._speed
+            "speed_restore": self.speed_restore,
+            "length_before_restore": self.length_before_restore,
+            "length_before_turn": self.length_before_turn,
+            "speed": self.speed
         })
         return dict
 

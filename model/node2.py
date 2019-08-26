@@ -7,10 +7,6 @@ class Node(Entity):
         self._name = name or ""
 
     @property
-    def id(self):
-        return self._id
-
-    @property
     def name(self):
         return self._name
 
@@ -21,6 +17,6 @@ class Node(Entity):
     def serialize(self):
         dict = super().serialize()
         dict.update({
-            "name": self._name
+            "name": self.name
         })
         return dict

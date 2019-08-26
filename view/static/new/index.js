@@ -5,7 +5,7 @@ import "./data-panel.js";
 
 let requestAnimationFrameId = 0;
 
-state.addEventListener("play", async (event) => {
+state.addEventListener("play", (event) => {
     if (requestAnimationFrameId !== 0) {
         return;
     }
@@ -15,7 +15,7 @@ state.addEventListener("play", async (event) => {
     });
 });
 
-state.addEventListener("pause", async (event) => {
+state.addEventListener("pause", (event) => {
     if (requestAnimationFrameId === 0) {
         return;
     }
@@ -23,7 +23,7 @@ state.addEventListener("pause", async (event) => {
     requestAnimationFrameId = 0;
 });
 
-state.addEventListener("update", async (event) => {
+state.addEventListener("update", (event) => {
     if (requestAnimationFrameId !== 0) {
         return;
     }

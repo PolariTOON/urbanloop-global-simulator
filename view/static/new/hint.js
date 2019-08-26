@@ -39,7 +39,7 @@ export class Hint extends Label {
         this.__text.text(value);
     }
     get _name() {
-        return this._text.text();
+        return this.__text.text();
     }
     set _x(value) {
         super.x(value);

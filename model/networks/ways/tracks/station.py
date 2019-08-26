@@ -28,7 +28,8 @@ class Station(Step):
         }
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
-        self._average_waiting_time = travelers["average_waiting_time"]
+        self._average_waiting_time = travelers["average_waiting_time"] or 0
+        self._all_time_count = travelers["all_time_count"] or 0
         self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._capacity = pods["max"]
         if travelers["count"]:
@@ -43,19 +44,32 @@ class Station(Step):
         dict.update({
             "type": "station",
             "pods": {
-                "count": len(self._pods),
-                "max": self._capacity
+                "count": len(self.pods),
+                "max": self.capacity
             },
             "travelers": {
-                "count": len(self._travelers),
-                "average_waiting_time": self._average_waiting_time
+                "count": len(self.travelers),
+                "average_waiting_time": self.average_waiting_time,
+                "all_time_count": self.all_time_count
             },
-            "station_type": self._station_type
+            "station_type": self.type
         })
         return dict
 
     def to_element_of_loop(self):
         return self._element_of_loop
+
+    @property
+    def name(self):
+        return super().name or "Station %d" % self.id
+
+    @property
+    def average_waiting_time(self):
+        return self._average_waiting_time
+
+    @property
+    def all_time_count(self):
+        return self._all_time_count
 
     @property
     def pods(self):

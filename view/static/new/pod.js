@@ -19,13 +19,20 @@ function calcLength(startElement, endElement, path) {
     return d;
 }
 
-function calcPosition(json, lineJSON, loopsJSON){
+function calcPositionInSwitch(json, switchJSON) {
+    const x = switchJSON["x"];
+    const y = switchJSON["y"];
+    const position = json["position"];
+    return {x, y, position};
+}
+
+function calcPositionInSection(json, lineJSON, loopsJSON) {
     let startElement;
     let endElement;
     let path;
     let length;
     let position = json["position"];
-    if (loopsJSON) {
+    if (loopsJSON !== null) {
         const loopStartElement = lineJSON["switch_out"]["loop"];
         const loopEndElement = lineJSON["switch_in"]["loop"];
         const startElementIndex = lineJSON["switch_out"]["element"];
@@ -62,6 +69,14 @@ function calcPosition(json, lineJSON, loopsJSON){
     return {x, y, position};
 }
 
+function calcPosition(json, json2, json3) {
+    if (json2 !== null) {
+        return calcPositionInSection(json, json2, json3);
+    } else {
+        return calcPositionInSwitch(json, json3);
+    }
+}
+
 export class Pod extends Entity {
     // __outerShape;
     // __innerShape;
@@ -71,7 +86,7 @@ export class Pod extends Entity {
     // __source; // TODO
     // __destination; // TODO
     // __keepFlag;
-    constructor(infoLayer) {
+    constructor(hintsLayer) {
         const outerShape = new Circle({
             lineJoin: "round",
             lineCap: "round",
@@ -88,7 +103,7 @@ export class Pod extends Entity {
             stroke: shadowColor,
         });
         const keepFlag = 0;
-        super(infoLayer);
+        super(hintsLayer);
         super.add(outerShape);
         super.add(innerShape);
         this.__outerShape = outerShape;
@@ -147,16 +162,19 @@ export class Pod extends Entity {
     unselect() {
         this.__outerShape.fill(outerColor);
     }
-    update(json, lineJSON, loopsJSON) {
+    update(json, json2, json3) {
         const name = json["name"];
-        const {x, y, position} = calcPosition(json, lineJSON, loopsJSON);
+        const {x, y, position} = calcPosition(json, json2, json3);
         const travelerCount = json["travelers"]["count"];
         const travelerMax = json["travelers"]["max"];
+        // const source = json["source"]
         this._name = name;
         this._x = x;
         this._y = y;
         this._position = position;
         this._travelerCount = travelerCount;
         this._travelerMax = travelerMax;
+        // this._source = source;
+        // this._destination = source;
     }
 }

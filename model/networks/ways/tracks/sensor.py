@@ -13,8 +13,7 @@ class Sensor(Step):
     def serialize(self):
         dict = super().serialize()
         dict.update({
-            "type": "sensor",
-            "name": self.name
+            "type": "sensor"
         })
         return dict
 
@@ -24,7 +23,7 @@ class Sensor(Step):
 
     @property
     def name(self):
-        return "SENSOR"
+        return super().name or "Sensor %d" % self.id
 
     def update(self):
         while True:

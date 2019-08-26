@@ -38,7 +38,7 @@ class SwitchOut(Switch):
 
     @property
     def name(self):
-        return "switchOut"
+        return super().name or "Switch \"out\" %d" % self.id
 
     def set_c1_length(self):
         self._length = self._switch_in.finalisation_length * self.speed / self._switch_in.speed - self._beside.length * self.speed / self._beside.sections[0].speed
@@ -46,7 +46,6 @@ class SwitchOut(Switch):
     def serialize(self):
         dict = super().serialize()
         dict.update({
-            "name": self.name,
             "type": "switch_out",
             "length": self.length
         })

@@ -1,6 +1,6 @@
 {
   "name": "mini",
-  "running": true,
+  "running": false,
   "seed": 50,
   "margin_min": 2,
   "max_speed": 30,
@@ -17,9 +17,9 @@
       "name": "Nancy",
       "elements": [
         {"type": "switch_in", "x": 434, "y": 324, "id_bridge": 0, "pods": []},
-        {"type": "station", "name": "Gare", "x": 500, "y": 290, "pods": {"max": 4, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0}},
-        {"type": "station", "name": "Stanislas", "x": 580, "y": 370, "pods": {"max": 4, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0}},
-        {"type": "station", "name": "Campus_ARTEM", "x": 527, "y": 445, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0}},
+        {"type": "station", "name": "Gare", "x": 500, "y": 290, "pods": {"max": 4, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Stanislas", "x": 580, "y": 370, "pods": {"max": 4, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Campus_ARTEM", "x": 527, "y": 445, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "switch_out", "x": 486, "y": 449, "id_bridge": 1, "pods": []},
         {"type": "switch_out", "x": 430, "y": 410, "id_bridge": 2, "pods": []},
         {"type": "sensor", "x": 450, "y": 380}
@@ -43,9 +43,9 @@
       "name": "Villers-les-Nancy",
       "elements": [
         {"type": "switch_in", "x": 396, "y": 544, "id_bridge": 1, "pods": []},
-        {"type": "station", "name": "Velodrome", "x": 411, "y": 600, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0}},
-        {"type": "station", "name": "Telecom Nancy", "x": 371, "y": 685, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0}},
-        {"type": "station", "name": "Eglise", "x": 222, "y": 688, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0}},
+        {"type": "station", "name": "Velodrome", "x": 411, "y": 600, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Telecom Nancy", "x": 371, "y": 685, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Eglise", "x": 222, "y": 688, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "shed", "name": "Jean-paul", "x": 189, "y": 600, "pods": {"max": 50, "count": 50}},
         {"type": "switch_out", "x": 215, "y": 529, "id_bridge": 3, "pods": []},
         {"type": "sensor", "x": 280, "y": 520}
@@ -68,8 +68,8 @@
       "elements": [
         {"type": "switch_in", "x": 222, "y": 474, "id_bridge": 2, "pods": []},
         {"type": "switch_in", "x": 78, "y": 474, "id_bridge": 3, "pods": []},
-        {"type": "station", "name": "Auchan", "x": 7, "y": 350, "pods": {"max": 3, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0}},
-        {"type": "station", "name": "Sapiniere", "x": 101, "y": 215, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0}},
+        {"type": "station", "name": "Auchan", "x": 7, "y": 350, "pods": {"max": 3, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Sapiniere", "x": 101, "y": 215, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "shed", "name": "Marie-Jeanne", "x": 175, "y": 209, "pods": {"max": 100, "count": 100}},
         {"type": "switch_out", "x": 260, "y": 258, "id_bridge": 0, "pods": []},
         {"type": "sensor", "x": 280, "y": 350}

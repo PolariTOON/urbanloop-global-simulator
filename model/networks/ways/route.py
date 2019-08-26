@@ -119,7 +119,7 @@ class Route(Way):
 
     @property
     def name(self):
-        return "ROUTE"
+        return super().name or "Route %d" % self.id
 
     def min_xy(self, choice):
         """

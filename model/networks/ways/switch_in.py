@@ -17,7 +17,7 @@ class SwitchIn(Switch):
         self._discretize_length = None
         self._set_up_length = None
         self._finalisation_length = None
-        self._discrete_places = discrete_places or None
+        self._discrete_places = discrete_places or [None for a in range(places_number)]
         self._pod_to_add = None
         self._cursor = cursor or 0
         self._first_place = int(self._cursor)
@@ -60,7 +60,7 @@ class SwitchIn(Switch):
             "name": self.name,
             "type": "switch_in",
             "cursor": self._cursor,
-            "discrete_places": self._discrete_places,
+            "discrete_places": [place and place.serialize() for place in self._discrete_places],
             "length": self.length
         })
         return dict
@@ -108,7 +108,12 @@ class SwitchIn(Switch):
         section = self.beside.sections[0]
         section.speed = max(section.speed, self.speed * section.length / self._finalisation_length)
         # Variables liées à la discrétisation
-        self._discrete_places = [None for place in range(self._places_number)]
+        for k in range(self._places_number):
+            place = self._discrete_places[k]
+            if place:
+                for pod in self._pods:
+                    if pod.id == place["id"]:
+                        self._discrete_places[k] = pod
         self._switch_out.set_c1_length()
         while True:
             self._cursor = (self._cursor - self.speed * self.env.sim_tick / self.place_size) % self._places_number

@@ -3,7 +3,7 @@ import {Entity} from "./entity.js";
 import {Pod} from "./pod.js";
 const {Circle} = Konva;
 
-const shadowColor = "#333"
+const shadowColor = "#333";
 const outerColor = "#03f";
 const innerColor = "#fff";
 const selectedOuterColor = "#0fc";

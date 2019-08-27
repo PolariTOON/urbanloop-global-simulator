@@ -16,8 +16,9 @@ from stats.stats_recorder import StatsRecorder
 
 
 class Network(Node):
-    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, margin_min=None, pod_size=None, max_speed=None, places_number=None, **kwargs):
+    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, margin_min=None, pod_size=None, max_speed=None, places_number=None, dynamic_routing=None, **kwargs):
         super().__init__(env, id, **kwargs)
+        self._dynamic_routing = dynamic_routing or False
         self._margin_min = margin_min or 2
         self._pod_size = pod_size or 2
         self._bridges = bridges or []
@@ -27,7 +28,6 @@ class Network(Node):
         self._view_box = view_box or {}
         self._init_graph_from_json(env, max_speed, places_number)
         self._init_parent_of_children()
-        self._rules = []
         self._recorder = StatsRecorder(0)  # TODO : Gérer les stats
         self._timers = [-1] * len(self.pods)  # TODO : Gérer les timers des capsules (temps de trajets)
         self._tab_depart = []  # TODO : Gérer les stats
@@ -35,15 +35,29 @@ class Network(Node):
         self._tab_depart_voy = []  # TODO : Gérer les stats
         self._tab_temps_voy = []  # TODO : Gérer les stats
         self._init_weights()
-        # Initialisation des chemins des capsules
-        self._moving_pods = []
-        for pod in self.pods:
-            if pod.speed > 0:
-                self._moving_pods.append({"pod": pod, "way": shorter_way_tracks(pod.track_or_switch, pod.destination)})
+        # Initialisation de la table de routage de chaque aiguillage
+        # C'est une liste de ditcionnaire de la forme {"switch": s, "table": t}
+        # où t contient les destinations pour lesquelles il faut tourner en s1
+        self._routing_table = []
+        for s1 in self._switches:
+            if isinstance(s1, SwitchOut):
+                table = []
+                for s2 in self._switches:
+                    if isinstance(s2, SwitchOut):
+                        way = shorter_way(s1, s2)
+                        for index in range(len(way) - 1):
+                            s = way[index]
+                            if s.next.next in way:
+                                route = s.next
+                            else:
+                                route = s.beside
+                            for step in route.steps:
+                                table.append(step)
+                self._routing_table.append({"switch": s1, "table": table})
         # Initialisation des tables de routage des aiguillages
         for switch in self._switches:
             if isinstance(switch, SwitchOut):
-                switch.routing_table = self._moving_pods
+                switch.routing_table = self._get_switch_table(switch)
 
     @property
     def name(self):
@@ -56,10 +70,6 @@ class Network(Node):
             for pod in route.pods:
                 pods.append(pod)
         return pods
-
-    @property
-    def moving_pods(self):
-        return self._moving_pods
 
     @property
     def bridges(self):
@@ -431,58 +441,6 @@ class Network(Node):
             source.travelers.append(0)
             # self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : STATS A GERER
 
-    def init_rules(self):
-        """
-        Initialise les règles liées au réseau, les règles sont propres à des aiguillages
-        :return: (void)
-        """
-
-        def create_rules(elt, switches, rules):
-            unvisited_switches = switches  # copie de tous les switchs
-            while len(unvisited_switches) > 0:  # Tant qu'on a des switchs non visités
-                for switch in unvisited_switches:
-                    chemin = shorter_way(switch, elt)  # Calcul du plus court chemin entre le switch et end_node
-                    for i in range(1, len(chemin)):
-                        # Si on a pas encore visité un noeud du chemin on lui associe une règle
-                        if unvisited_switches.count(chemin[i]) > 0:
-                            change_loop = chemin[i - 1].beside.next == chemin[i]  # On regarde si on a changé de boucle
-                            regle = Rule(chemin[i].elt.id, elt, None, None, change_loop)
-                            rules.append(regle)
-                            unvisited_switches.remove(chemin[i])
-
-        # On créé des règle entre les switch et les garages/stations
-
-        for shed in self.sheds:
-            create_rules(shed, self.switches, self._rules)
-
-        for station in self.stations:
-            create_rules(station, self.switches, self._rules)
-
-    def update_rules(self):
-        """
-        Met à jour les règles du réseau
-        :return: la liste des règles du réseau mise à jour
-        """
-        new_rules = []
-
-        def create_rules(elt, switches):
-            unvisited_switches = switches
-            while len(unvisited_switches) > 0:
-                for switch in unvisited_switches:
-                    switches_list = shorter_way(switch, elt)
-                    for i in range(1, len(switches_list)):
-                        if unvisited_switches.count(switches_list[i]) > 0:
-                            change_loop = switches_list[i - 1].beside.next == switches_list[i]
-                            new_rules.append(Rule(switches_list[i].elt.id, elt, None, None, change_loop))
-                            unvisited_switches.remove(switches_list[i])
-
-        for shed in self.sheds:
-            create_rules(shed, self.switches.copy())
-
-        for station in self.stations:
-            create_rules(station, self.switches.copy())
-        return new_rules
-
     def drain_pod_station(self, station):
         """
         Libère une capsule vide de la station si elle est à 3/4 pleine
@@ -558,70 +516,41 @@ class Network(Node):
             if len(shed.pods) > 0:
                 drain_pod_shed(shed, destination, prio)
 
-    def send_list_rules(self, r):
-        """
-        Envoie les règles aux aiguillages
-        :param r: liste de règle à envoyer aux aiguillages
-        :return: (void)
-        """
-        for rule in r:
-            if self._rules.count(rule) == 0:
-                self._rules.append(rule)
-                for switch in self._switches:
-                    switch.add_rule(rule)
-
-    def send_all_rules(self):
-        """
-        Envoie toutes les règles du réseau aux aiguillages
-        :return: (void)
-        """
-        for rule in self._rules:
-            for switch in self._switches:
-                switch.add_rule(rule)
-
-    def replace_rules(self, r):
-        """
-        Remplace les règles des aiguillages
-        :param r: liste de règle qui doivent remplacer les anciennes
-        :return:
-        """
-        for rule in self._rules:
-            if rule.priority is None:
-                for switch in self._switches:
-                    switch.remove_rule(rule)
-                self._rules.remove(rule)
-        for rule in r:
-            if self._rules.count(rule) == 0:
-                self._rules.append(rule)
-                for switch in self._switches:
-                    switch.add_rule(rule)
-
-    def remove_pod_from_dico(self, pod):
-        for moving_pod in self._moving_pods:
-            if moving_pod["pod"] == pod:
-                self._moving_pods.remove(moving_pod)
-                return
-        raise ValueError("Pod not in the routing table")
-
-    def get_dico_from_pod(self, pod):
-        for index in range(len(self._moving_pods)):
-            dico_pod = self._moving_pods[index]
-            if dico_pod["pod"] == pod:
-                return dico_pod
-        raise ValueError("The specified pod is not in the moving_pods attribute of the network")
-
     def _update_routing(self):
         """
         Envoie aux aiguillages sortant une nouvelle table de routage
         :return: void
         """
+        # Maj des tables
+        for s1 in self._switches:
+            if isinstance(s1, SwitchOut):
+                table = []
+                for s2 in self._switches:
+                    if isinstance(s2, SwitchOut):
+                        way = shorter_way(s1, s2)
+                        for index in range(len(way) - 1):
+                            s = way[index]
+                            if s.next.next in way:
+                                route = s.next
+                            else:
+                                route = s.beside
+                            for step in route.steps:
+                                table.append(step)
+                self._routing_table.append({"switch": s1, "table": table})
+        # Envoie des tables
         for switch in self._switches:
             if isinstance(switch, SwitchOut):
                 yield from switch.write({
                     "author": self,
                     "type": "update_routing",
-                    "table": self._moving_pods
+                    "table": self._get_switch_table(switch)
                 })
+
+    def _get_switch_table(self, switch):
+        for dico in self._routing_table:
+            if dico["switch"] == switch:
+                return dico["table"]
+        raise ValueError("Switch not in the routing table")
 
     def update(self):
         """
@@ -632,6 +561,9 @@ class Network(Node):
             print("-------------------------------------------------------------")
             print("     Tick n°", self.env.now, " | Réseau :", self.name, "     ")
             print("-------------------------------------------------------------")
+            if self._dynamic_routing and (self.env.now * self.env.sim_tick) % 30 == 0:
+                # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
+                yield from self._update_routing()
             while True:
                 message = yield from self.read()
                 if message is not None:
@@ -639,11 +571,8 @@ class Network(Node):
                 if message is None:
                     break
                 elif "docked" == message["type"]:
-                    # Si une capsule stationne on met à jour la table de routage
-                    pod_to_update = message["pod"]
-                    self.remove_pod_from_dico(pod_to_update)
-                    # TODO : mise à jour des poids ?
-                    yield from self._update_routing()
+                    # Une capsule stationne
+                    pass
                 else:
                     raise ValueError("Invalid message")
 
@@ -771,12 +700,12 @@ def shorter_way_tracks(start_track, destination_track):
     :param start_track: piste de départ
     :param destination_track: piste d'arrivée
     :return: liste d'aiguillages représentant le plus court chemin pour aller de star_switch à destination_switch
-    Si elle est vie alors les pistes sont sur la même route
+    Si elle est vide alors les pistes sont sur la même route
     """
-    if previous_switch(start_track) == previous_switch(destination_track):
+    if previous_switch_out(start_track) == previous_switch_out(destination_track):
         return []
     else:
-        return shorter_way(next_switch(start_track), previous_switch(destination_track))
+        return shorter_way(next_switch_out(start_track), previous_switch_out(destination_track))
 
 
 def shorter_way(start_switch, destination_switch):
@@ -849,49 +778,23 @@ def drain_pod_shed(shed, destination, prio):
         print("Une capsule part du dépôt %s vers la station %s" % (shed.name, destination.name))
 
 
-def next_switch(track):
+def next_switch_out(track):
     """
-    :param track: piste dont on veut connaître l'aiguillage suivant le plus proche
-    :return: L'aiguillage suivant le plus proche du track en entrée
+    :param track: piste dont on veut connaître l'aiguillage sortant suivant le plus proche
+    :return: L'aiguillage sortant suivant le plus proche du track en entrée
     """
     current = track
-    from model.networks.ways.switch import Switch
-    while not isinstance(current, Switch):
+    while not isinstance(current, SwitchOut):
         current = current.next
     return current
 
 
-def previous_switch(track):
+def previous_switch_out(track):
     """
-    :param track: piste dont on veut connaître le switch précédent le plus proche
-    :return: L'aiguillage précédent le plus proche du track en entrée
+    :param track: piste dont on veut connaître l'aiguillage sortant précédent le plus proche
+    :return: L'aiguillage sortant précédent le plus proche du track en entrée
     """
     current = track
-    from model.networks.ways.switch import Switch
-    while not isinstance(current, Switch):
+    while not isinstance(current, SwitchOut):
         current = current.previous
     return current
-
-
-class Rule:
-    """
-    Modélise les règles des aiguillages
-    """
-
-    def __init__(self, switch_id, destination=None, priority=None, empty=None, change=None):
-        self.destination = destination
-        self.priority = priority
-        self.empty = empty
-        self.switch_id = switch_id
-        self.change = change
-
-    def match(self, switch_id, destination=None, priority=None, empty=None):
-        """
-        :return: true if the rule matches
-        """
-        if switch_id == self.switch_id:
-            if (destination is not None and destination == self.destination) or self.destination is None:
-                if (priority is not None and priority == self.priority) or self.priority is None:
-                    if (empty is not None and empty == self.empty) or self.empty is None:
-                        return True
-        return False

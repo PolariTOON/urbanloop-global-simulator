@@ -28,7 +28,7 @@ class Simulation:
         self._running = running
         # Etape 3 : chargement du modèle
         self._network = Network(self._env, id, **kwargs)
-        self._env.sim_tick = 0.05  # Duration of a tick todo tristan : en lien avec les vitesses des capsules
+        self._env.sim_tick = 0.042  # Duration of a tick todo tristan : en lien avec les vitesses des capsules
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
         self._sim_tick_variations = []

@@ -126,7 +126,7 @@ class Pod(Token):
                 self._position += self._speed * self.env.sim_tick
 
             # La capsule s'insère et tourne si elle en a reçu l'ordre
-            if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" and self._turn and self._position >= self._length_before_turn:
+            if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._length_before_turn:
                 self.position -= self._length_before_turn
                 self._track_or_switch = self._track_or_switch.beside.sections[0]
                 yield from self._track_or_switch.write({
@@ -143,11 +143,10 @@ class Pod(Token):
                 bridge_to_switch = False
                 self._position -= self._track_or_switch.length
                 t = self._position / self._speed
-                if str(type(self._track_or_switch)) == "<class 'model.networks.ways.switch_out.SwitchOut'>" or str(
-                        type(self._track_or_switch)) == "<class 'model.networks.ways.switch_in.SwitchIn'>":
+                if type(self._track_or_switch).__name__ == "SwitchOut" or type(self._track_or_switch).__name__ == "SwitchIn":
                     self._track_or_switch = self._track_or_switch.next.sections[0]
                 else:
-                    if str(type(self._track_or_switch)) == "<class 'model.networks.ways.tracks.section.Section'>":
+                    if type(self._track_or_switch).__name__ == "Section":
                         if self._track_or_switch.is_bridge:
                             # la capsule va entrer sur un aiguillage entrant par un pont
                             bridge_to_switch = True

@@ -5,12 +5,13 @@ import time
 from math import floor
 from random import random, seed
 from simpy import Environment
-
-from controler import probability, converter
-from controler.probability import Probability
-from model.networks.network import Network
-from shutil import copyfile
 from settings import simlog
+from shutil import copyfile
+
+from model.entities.nodes.networks.network import Network
+
+from . import converter, probability
+from .probability import Probability
 
 
 class Simulation:

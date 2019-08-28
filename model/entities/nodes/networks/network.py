@@ -5,14 +5,15 @@ les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (
 from math import inf
 from random import choice, uniform, random
 
+from stats.stats_recorder import StatsRecorder
+
+from ....lines.bridge import Bridge
+from ....lines.loop import Loop
+from ..node import Node
 from .ways.tracks.station import station_types
-from ..node2 import Node
-from .lines.bridge import Bridge
-from .lines.loop import Loop
 from .ways.route import Route
 from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
-from stats.stats_recorder import StatsRecorder
 
 
 class Network(Node):
@@ -715,7 +716,6 @@ def shorter_way(start_switch, destination_switch):
     :param destination_switch: aiguillage d'arrivé
     :return: liste d'aiguillages représentant le plus court chemin pour aller de star_switch à destination_switch
     """
-    from model.networks.ways.switch_out import SwitchOut
     way = [(0, start_switch)]
     best_weight = {start_switch: 0}
     previouses = {}

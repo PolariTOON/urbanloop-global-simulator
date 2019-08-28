@@ -1,4 +1,4 @@
-from ..tokens.pod import Pod
+from ....tokens.pod import Pod
 from .way import Way
 
 

@@ -1,10 +1,11 @@
-from model.networks.ways.switch import Switch
-from .way import Way
+from math import inf
+
+from .switch import Switch
 from .tracks.section import Section
 from .tracks.sensor import Sensor
 from .tracks.shed import Shed
 from .tracks.station import Station
-from math import inf
+from .way import Way
 
 
 class Route(Way):

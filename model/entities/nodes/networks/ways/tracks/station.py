@@ -1,7 +1,7 @@
 """
 Type de noeud du sous-graphe correspondant à une station d"arrêt
 """
-from ...tokens.pod import Pod
+from .....tokens.pod import Pod
 from .step import Step
 
 station_types = {

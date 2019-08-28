@@ -1,5 +1,6 @@
 from uuid import uuid4
-from ...entity import Entity
+
+from ..entity import Entity
 
 
 class Token(Entity):

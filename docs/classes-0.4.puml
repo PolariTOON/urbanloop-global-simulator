@@ -9,34 +9,39 @@ package controler {
 	class Probability
 }
 package model {
-	class Node
-	package networks {
-		class Network
-		package ways {
-			class Way
-			class Switch
-			class SwitchIn
-			class SwitchOut
-			class Route
-			package tracks {
-				class Track
-				class Step
-				class Sensor
-				class Station
-				class Shed
-				class Section
+	package entities {
+		class Entity
+		package nodes {
+			class Node
+			package networks {
+				class Network
+				package ways {
+					class Way
+					class Switch
+					class SwitchIn
+					class SwitchOut
+					class Route
+					package tracks {
+						class Track
+						class Step
+						class Sensor
+						class Station
+						class Shed
+						class Section
+					}
+				}
 			}
 		}
-		package lines {
-			class Line
-			class Bridge
-			class Loop
+		package tokens {
+			class Token
+			class Traveler
+			class Pod
 		}
 	}
-	package tokens {
-		class Token
-		class Capsule
-		class Traveler
+	package lines {
+		class Line
+		class Bridge
+		class Loop
 	}
 }
 
@@ -45,22 +50,22 @@ Main "0"--"1" WebApp
 ConsoleApp "0"--"1" Simulation
 WebApp "0"--"1..*" Simulation
 Simulation "0"--"1" Converter
+Simulation "0"*--"1" Network
 Simulation "0"--"1" Probability
-Simulation "0"--"1" Network
+Entity <|-- Node
+Entity <|-- Token
 Node <|-- Network
 Node <|-- Way
 Node <|-- Track
-Node "0"--"0..*" Capsule
+Node "0"--"0..*" Pod
 Network "0"*--"0..*" Way
 Network "0"*--"0..*" Line
 Way <|-- Switch
 Way <|-- Route
 Switch <|-- SwitchIn
 Switch <|-- SwitchOut
-SwitchIn "0"--"3" Route
+Switch "2"--"3" Route
 SwitchIn "1"--"1" SwitchOut
-SwitchOut "0"--"3" Route
-Route "0"--"2" Switch
 Route "0"*--"0..*" Track
 Track <|-- Step
 Track <|-- Section
@@ -68,14 +73,14 @@ Step <|-- Sensor
 Step <|-- Station
 Step <|-- Shed
 Station "0"--"0..*" Traveler
-Line <|-- Bridge
+Token <|-- Pod
+Token <|-- Traveler
+Pod "0"--"0..*" Traveler
 Line <|-- Loop
+Line <|-- Bridge
+Loop "0"--"2..*" Switch
+Loop "0"--"2..*" Route
 Bridge "0"--"1" Route
 Bridge "0"--"2" Switch
-Loop "0"--"2..*" Switch
-Loop "0"--"1..*" Route
-Token <|-- Capsule
-Token <|-- Traveler
-Capsule "0"--"0..*" Traveler
 
 @enduml

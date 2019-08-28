@@ -1,7 +1,6 @@
 """
 Ce fichier contient des fonctions utilitaires sur le temps de la simulation
 """
-
 from math import floor
 
 

@@ -1,4 +1,5 @@
 from settings import simlog
+
 from .token import Token
 from .traveler import Traveler
 

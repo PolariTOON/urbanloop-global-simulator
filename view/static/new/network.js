@@ -25,19 +25,31 @@ layer.add(podsLayer);
 const hintsLayer = new Group();
 layer.add(hintsLayer);
 const heading = document.createElement("h2");
-heading.textContent = "Undefined network"; // TODO
+heading.textContent = "Undefined network";
 const firstParagraph = document.createElement("p");
 const datetimeView = document.createElement("label");
-datetimeView.innerHTML = "Date: <output>Day - ---:--:--</output></label>";
+datetimeView.innerHTML = "Date: <output>Day - --:--:--</output>";
 firstParagraph.append(datetimeView);
 const secondParagraph = document.createElement("p");
 const speedView = document.createElement("label");
-speedView.innerHTML = "Speed: <output>&times;-</output></label>";
+speedView.innerHTML = "Speed: <output>&times;-</output>";
 secondParagraph.append(speedView);
 article.prepend(heading, firstParagraph, secondParagraph);
 
 state.addEventListener("load", async (event) => {
     const networkJSON = event.detail;
+    const name = networkJSON["name"];
+    heading.textContent = name;
+    let datetime = Math.floor(networkJSON["time"]);
+    const seconds = datetime % 60;
+    datetime = (datetime - seconds) / 60;
+    const minutes = datetime % 60;
+    datetime = (datetime - minutes) / 60;
+    const hours = datetime % 24;
+    datetime = (datetime - hours) / 24;
+    const days = datetime;
+    datetimeView.control.textContent = `Day ${days + 1} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    speedView.control.innerHTML = `&times;-`; // TODO
     const viewBox = networkJSON["view_box"];
     const {x, y, width, height} = viewBox;
     const [offsetX, offsetY, zoom] = [0, 0, 1];
@@ -65,6 +77,9 @@ state.addEventListener("load", async (event) => {
 });
 
 state.addEventListener("unload", async (event) => {
+    heading.textContent = "Undefined network";
+    datetimeView.control.textContent = "Day - --:--:--";
+    speedView.control.innerHTML = "&times;-";
     legendsLayer.destroyChildren();
     elementsLayer.destroyChildren();
     sectionsLayer.destroyChildren();
@@ -82,6 +97,18 @@ state.addEventListener("unload", async (event) => {
 
 state.addEventListener("update", (event) => {
     const networkJSON = event.detail;
+    const name = networkJSON["name"];
+    heading.textContent = name;
+    let datetime = Math.floor(networkJSON["time"]);
+    const seconds = datetime % 60;
+    datetime = (datetime - seconds) / 60;
+    const minutes = datetime % 60;
+    datetime = (datetime - minutes) / 60;
+    const hours = datetime % 24;
+    datetime = (datetime - hours) / 24;
+    const days = datetime;
+    datetimeView.control.textContent = `Day ${days + 1} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    speedView.control.innerHTML = `&times;-`; // TODO
     const loopsJSON = networkJSON["loops"];
     const bridgesJSON = networkJSON["bridges"];
     for (let i = 0, li = loopsJSON.length; i < li; i++) {

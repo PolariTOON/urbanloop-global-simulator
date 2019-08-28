@@ -1,7 +1,8 @@
 {
-  "name": "mini",
+  "name": "Mini network",
+  "time": 28800,
+  "state": 42,
   "running": false,
-  "seed": 42,
   "margin_min": 2,
   "max_speed": 30,
   "pod_size": 2,

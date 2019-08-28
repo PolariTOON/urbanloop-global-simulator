@@ -16,15 +16,16 @@ from .probability import Probability
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, state=None, running=None, **kwargs):
+    def __init__(self, id, time = None, state=None, running=None, **kwargs):
         # Etape 1 : chargement de la configuration de la simulation et du modèle probabiliste
-        state = state or (seed(), random())[1]
+        state = state or (seed(), random() * 2 ** 53)[1]
         running = running or False
         self._config = configparser.ConfigParser()
         self._config.read('resources/config.ini')
-        self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
+        self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])  # TODO: déplacer vers le fichier JSON d'un réseau
         # Etape 2 : Initialisation de simPy
         self._env = Environment()
+        self._time = time
         self._state = state
         self._running = running
         # Etape 3 : chargement du modèle
@@ -273,6 +274,14 @@ class Simulation:
         yield self._env.process(self._network.ascend_travelers(self._env, self.now_to_seconds(), self._probability, self._config, self.get_tick_per_second()))
 
     @property
+    def time(self):
+        return self._time
+
+    @property
+    def state(self):
+        return self._state
+
+    @property
     def running(self):
         return self._running
 
@@ -282,17 +291,17 @@ class Simulation:
 
     def update(self):
         if self._running:
+            self._time += 1  # TODO: à calculer
             seed(self._state)
             until = floor(self._env.now) + 1
             self._env.run(until=until)
-            self._state = random()
+            self._state = random() * 2 ** 53
 
     def serialize(self):
         dict = self._network.serialize()
-        state = self._state
-        running = self._running
         dict.update({
-            "state": state,
-            "running": running
+            "time": self.time,
+            "state": self.state,
+            "running": self.running
         })
         return dict

@@ -79,6 +79,7 @@ main > article > p {
 }
 main > article > h2 {
     margin-bottom: auto;
+    font-weight: bold !important; /* TODO: retirer quand Bootstrap le sera */
 }
 main > article > p > label {
     margin: 0;

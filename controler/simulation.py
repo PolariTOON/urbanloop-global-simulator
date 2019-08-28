@@ -90,8 +90,6 @@ class Simulation:
                 # Etape 5 : Complétion des stations
                 if self._station_refill and self._current_tick != 0 and self._modulo_on_seconds(1):
                     self._network.fill_and_full_stations()
-                # Etape 6 : gestion des collisions
-                #  self.collision() TODO : GESTION DES COLLISIONS
                 yield self._env.timeout(1)
                 # Etape 7 : Gestion de la fin de la simulation
                 if loop_sleep_boolean:

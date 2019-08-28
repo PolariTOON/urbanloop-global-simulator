@@ -83,7 +83,7 @@ class SwitchIn(Switch):
         """
         x = (self._cursor % 1) * self.place_size
         time_to_shift = (self.place_size - x) / self.speed
-        speed = self.place_size / time_to_shift
+        speed = self.place_size / time_to_shift  # TODO : après le calcul à mettre à jour
         for index in range(self._first_place + begin - self._places_number, self._first_place - 2):
             # On décale les capsules à partir de la première place libre
             if self._discrete_places[index] is not None:
@@ -139,11 +139,10 @@ class SwitchIn(Switch):
                         "type": "pod_exit",
                         "pod": pod
                     })
-
                     # Discrétisation de la capsule
                     x = (self._cursor % 1) * self.place_size
-                    time_to_discretize = (self.place_size - x) / self.speed
                     d = self._discretize_length - pod.position
+                    time_to_discretize = (int((self._discretize_length - (self.place_size - x))/self.place_size)*self.place_size + self.place_size-x) / self.speed
                     speed = d / time_to_discretize
                     self._pod_to_add = pod
                     yield from pod.write({
@@ -151,7 +150,7 @@ class SwitchIn(Switch):
                         "type": "speed_a_while",
                         "length_before_restore": self._discretize_length,
                         "speed": speed,
-                        "speed_restore": d
+                        "speed_restore": self.speed
                     })
                 elif "pod_entry_from_bridge" == message["type"]:
                     # notification au pont que la capsule n'y est plus

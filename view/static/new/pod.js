@@ -85,6 +85,7 @@ export class Pod extends Entity {
     // __travelerMax;
     // __source; // TODO
     // __destination; // TODO
+    // __speed;
     // __keepFlag;
     constructor(hintsLayer) {
         const outerShape = new Circle({
@@ -150,6 +151,12 @@ export class Pod extends Entity {
     get _travelerMax() {
         return this.__travelerMax;
     }
+    get _speed(){
+        return this.__speed;
+    }
+    set _speed(value){
+        this.__speed = value;
+    }
     set _keepFlag(value) {
         this.__keepFlag = value;
     }
@@ -164,6 +171,7 @@ export class Pod extends Entity {
     }
     update(json, json2, json3) {
         const name = json["name"];
+        const speed = json["speed"];
         const {x, y, position} = calcPosition(json, json2, json3);
         const travelerCount = json["travelers"]["count"];
         const travelerMax = json["travelers"]["max"];
@@ -174,6 +182,7 @@ export class Pod extends Entity {
         this._position = position;
         this._travelerCount = travelerCount;
         this._travelerMax = travelerMax;
+        this._speed = speed;
         // this._source = source;
         // this._destination = source;
     }

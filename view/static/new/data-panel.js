@@ -21,6 +21,8 @@ ${state.selectedEntity !== null ? `\
 ${state.selectedEntity instanceof Pod ? `\
     <dt>Position (in m)</dt>
     <dd>${state.selectedEntity._position}</dd>
+    <dt>Speed (in m / s)</dt>
+    <dd>${state.selectedEntity._speed}</dd>
     <dt>Travelers</dt>
     <dd>${state.selectedEntity._travelerCount} / ${state.selectedEntity._travelerMax}</dd>
 ` : state.selectedEntity instanceof Section ? `\

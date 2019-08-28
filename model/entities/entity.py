@@ -1,7 +1,7 @@
 from math import floor
+from random import random
 from simpy.events import Process, Timeout
 from simpy.resources.store import Store, StoreGet, StorePut
-from random import random
 
 
 class Entity:

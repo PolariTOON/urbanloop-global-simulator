@@ -1,7 +1,6 @@
 """
 Classe abstraite représentant les noeuds des sous-graphes du réseau
 """
-
 from .track import Track
 
 

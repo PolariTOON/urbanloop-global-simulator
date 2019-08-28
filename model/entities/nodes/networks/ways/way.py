@@ -1,8 +1,7 @@
 """
 Classe abstraite liée à un noeud du meta-graphe représentant le réseau dans sa globalité
 """
-
-from ...node2 import Node
+from ...node import Node
 
 
 class Way(Node):

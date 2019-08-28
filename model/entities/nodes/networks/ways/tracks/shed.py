@@ -1,8 +1,7 @@
 """
 Type de noeud du sous-graphe du réseau qui représente un garage où sont stocker des pods
 """
-
-from ...tokens.pod import Pod
+from .....tokens.pod import Pod
 from .step import Step
 
 

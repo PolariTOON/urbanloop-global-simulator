@@ -1,9 +1,9 @@
 """
 Réunis des routes pour former les boucles du réseau
 """
+from math import inf
 
 from .line import Line
-from math import inf
 
 
 class Loop(Line):

@@ -26,13 +26,13 @@
         {"type": "sensor", "x": 450, "y": 380}
       ],
       "sections": [
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}}
+        {"speed": 8.33, "path": {"type": "line"}},
+        {"speed": 8.33, "path": {"type": "line"}},
+        {"speed": 8.33, "path": {"type": "line"}},
+        {"speed": 8.33, "path": {"type": "line"}},
+        {"speed": 8.33, "path": {"type": "line"}},
+        {"speed": 8.33, "path": {"type": "line"}},
+        {"speed": 8.33, "path": {"type": "line"}}
       ],
       "pods": [
         {"position": 235, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}},
@@ -52,16 +52,16 @@
         {"type": "sensor", "x": 280, "y": 520}
       ],
       "sections": [
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}},
-        {"speed": 22.22, "path": {"type": "line"}}
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}}
       ],
       "pods": [
-        {"position": 235, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}}
+        {"position": 235, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 1, "max": 1}}
       ]
     },
     {
@@ -85,14 +85,14 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "pods": [
-        {"position": 200, "speed": 22.22, "source": {"loop": 2, "element": 4}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}}
+        {"position": 0, "speed": 22.22, "source": {"loop": 0, "element": 2}, "destination": {"loop": 2, "element": 3}, "travelers": {"count": 0, "max": 0}}
       ]
     }
   ],
   "bridges": [
-    {"name": "Laxou - Nancy", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
-    {"name": "Nancy - Villers-les-Nancy", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
-    {"name": "Nancy - Laxou", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []},
-    {"name": "Villers-les-Nancy - Laxou", "section": {"speed": 22.22, "path": {"type": "line"}}, "pods": []}
+    {"name": "Laxou - Nancy", "section": {"speed": 15.28, "path": {"type": "line"}}, "pods": []},
+    {"name": "Nancy - Villers-les-Nancy", "section": {"speed": 12.5, "path": {"type": "line"}}, "pods": []},
+    {"name": "Nancy - Laxou", "section": {"speed": 15.28, "path": {"type": "line"}}, "pods": []},
+    {"name": "Villers-les-Nancy - Laxou", "section": {"speed": 19.44, "path": {"type": "line"}}, "pods": []}
   ]
 }

@@ -8,11 +8,11 @@ let viewObject = document.getElementById("view-object");
 const notImplemented = document.createElement("strong");
 notImplemented.append("Not Implemented");
 
-const width = window.innerWidth;
-const height = window.innerHeight;
-const size = 150;
-const sizeOut = 160;
-const sizeIn = 300;
+const width = 360; // largeur du canva
+const height = 200; // hauteur du canva
+const size = 150; // hauteur de l'aiguillage = distance C1C2
+const sizeOut = 160; // longueur de la ligne du switchOut
+const sizeIn = 300; // longueur de la ligne du switchIn
 const margin = 30;
 const xC1 = margin;
 const yC1 = margin;
@@ -52,13 +52,9 @@ let bridge = new Line({
   stroke: 'black',
   strokeWidth: 3
 });
-let pod = new Circle({
-  radius: 4,
-  fill: 'red',
-  stroke: 'black',
-  strokeWidth: 1
-});
-let pods = [];
+let podsOut = [];
+let podsIn = [];
+let podsBridge = [];
 
 stage.add(layer);
 layer.add(groupLines);
@@ -67,17 +63,102 @@ groupLines.add(switchIn);
 groupLines.add(switchOut);
 groupLines.add(bridge);
 
-function updateViewSwitch(switchInJSON, switchOutJSON, bridgeJSON) { // TODO
-    console.log(switchOutJSON, switchInJSON, bridgeJSON);
-    // for (const pod of pods){
-    //     const pos = pod["position"];
-    //     const p =
-    // }
+function getPodFromName(list, name){
+    for (const e of list){
+        if (e["name"] === name)
+            return e["pod"];
+    }
+    return null;
+}
+
+function removeExtraPods(pods, newPods){
+    for (const dicoPod of pods){
+        const p = getPodFromName(newPods, dicoPod["name"]);
+        if (p === null){
+            dicoPod["pod"].destroy();
+        }
+    }
+}
+
+function updatePodsSwitch(jsonFile, pods){
+    const length = jsonFile["length"];
+    let x = 0;
+    let y = 0;
+    let newPods = [];
+    for (const pod of jsonFile["pods"]){
+        const pos = pod["position"];
+        if (jsonFile["type"] === "switch_out"){
+            x = margin + pos * sizeOut / length;
+            y = margin;
+        } else {
+            x = margin + pos * sizeIn / length;
+            y = size;
+        }
+        const p = getPodFromName(pods, pod["name"]);
+        if (p === null){
+            const newPod = new Circle({
+          x: x,
+          y: y,
+          radius: 4,
+          fill: 'red',
+          stroke: 'black',
+          strokeWidth: 1
+        });
+            groupPods.add(newPod);
+            newPods.push({"name": pod["name"], "pod": newPod});
+        } else {
+            p.x(x);
+            p.y(y);
+            newPods.push({"name": pod["name"], "pod": p})
+        }
+    }
+    removeExtraPods(pods, newPods);
+    if (jsonFile["type"] === "switch_out"){
+            podsOut = newPods;
+        } else {
+            podsIn = newPods;
+        }
+}
+
+function updatePodsBridge(jsonFile, pods) {
+    const length = jsonFile["section"]["length"];
+    let newPods = [];
+    for (const pod of jsonFile["pods"]){
+        const pos = pod["position"];
+        const ratio = pos / length;
+        const x = xM1 + (xM2 - xM1) * ratio;
+        const y = yM1 + (yM2 - yM1) * ratio;
+        const p = getPodFromName(pods, pod["name"]);
+        if (p === null){
+            const newPod = new Circle({
+          x: x,
+          y: y,
+          radius: 4,
+          fill: 'red',
+          stroke: 'black',
+          strokeWidth: 1
+        });
+            groupPods.add(newPod);
+            newPods.push({"name": pod["name"], "pod": newPod});
+        } else {
+            p.x(x);
+            p.y(y);
+            newPods.push({"name": pod["name"], "pod": p})
+        }
+    }
+    removeExtraPods(pods, newPods);
+    podsBridge = newPods
+}
+
+function updateViewSwitch(switchInJSON, switchOutJSON, bridgeJSON) {
+    updatePodsSwitch(switchOutJSON, podsOut);
+    updatePodsBridge(bridgeJSON, podsBridge);
+    updatePodsSwitch(switchInJSON, podsIn);
     layer.batchDraw();
 }
 
 function updateViewOther() {
-    viewTab.removeChild(viewObject);
+    viewObject.remove();
     viewTab.append(notImplemented);
 }
 
@@ -89,7 +170,7 @@ state.addEventListener("update", (event) => {
     let bridgeJSON = null;
     let id_bridge = null;
     if (selected instanceof Switch){
-        viewTab.removeChild(notImplemented);
+        notImplemented.remove();
         viewTab.append(viewObject);
         b1: for (const loop of networkJSON["loops"]){
             for (const elt of loop["elements"]){

@@ -16,7 +16,7 @@ from .probability import Probability
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, time = None, state=None, running=None, **kwargs):
+    def __init__(self, id, sim_tick, time=None, state=None, running=None, **kwargs):
         # Etape 1 : chargement de la configuration de la simulation et du modèle probabiliste
         state = state or (seed(), random() * 2 ** 53)[1]
         running = running or False
@@ -30,10 +30,10 @@ class Simulation:
         self._running = running
         # Etape 3 : chargement du modèle
         self._network = Network(self._env, id, **kwargs)
-        self._env.sim_tick = 0.042  # Duration of a tick todo tristan : en lien avec les vitesses des capsules
+        self._env.sim_tick = sim_tick  # Duration of a tick todo tristan : en lien avec les vitesses des capsules
+        self._env.time = time
         self._current_tick = 0
         self._visualized_tick_duration = 0.05
-        self._sim_tick_variations = []
         self._start_hour = None
         self._station_refill = True  # Todo : à déplacer dans station
         self._fulfill_period = int(self._config['CAPSULE']['fulfill_period'])
@@ -291,7 +291,8 @@ class Simulation:
 
     def update(self):
         if self._running:
-            self._time += 1  # TODO: à calculer
+            self._env.time += self._env.sim_tick  # TODO: à calculer
+            self._time = self._env.time
             seed(self._state)
             until = floor(self._env.now) + 1
             self._env.run(until=until)

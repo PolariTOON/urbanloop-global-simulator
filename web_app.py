@@ -14,26 +14,18 @@ _app = Flask(__name__, static_url_path="", static_folder="view/static", template
 _app.logger.setLevel(ERROR)
 getLogger("werkzeug").setLevel(ERROR)
 sim_thread = None
+sim_tick = 0.042 # TODO: calculer selon la vitesse et la précision de la simulation, ainsi que l'occupation du serveur
 
 _loop = None
 _simulations = {}
-
-
-def _load_new_mini_network():  # TODO: retirer
-    global _simulations
-    with open("resources/new_mini_network.json") as file:
-        kwargs = load(file)
-        _simulations[0] = Simulation(0, **kwargs)
 
 
 async def _run_simulations():
     global _loop
     global _simulations
     _loop = get_running_loop()
-    _load_new_mini_network()
     while True:
-        await sleep(
-            .042)  # TODO: calculer selon la vitesse et la précision de la simulation, ainsi que l'occupation du serveur
+        await sleep(sim_tick)
         for key in _simulations:
             simulation = _simulations[key]
             simulation.update()
@@ -244,7 +236,7 @@ def restore_config():
 @_synchronize("network_item")
 async def _post_network(simulations, network_index, network_item):
     if network_item is not None:
-        simulation = Simulation(network_index, **network_item)
+        simulation = Simulation(network_index, sim_tick, **network_item)
         simulations[network_index] = simulation
         return simulation.serialize()
     if network_index in simulations:

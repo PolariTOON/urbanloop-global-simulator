@@ -204,5 +204,11 @@ class Pod(Token):
                     self._speed = message["speed"]
                     self._length_before_restore = message["length_before_restore"]
                     self._speed_restore = message["speed_restore"]
+                elif "departure" == message["type"]:
+                    # La capsule part d'un dépôt ou d'une gare
+                    destination = message["destination"]
+                    self._destination = destination
+                    self._source = self._track_or_switch
+                    self._speed = self._track_or_switch.next.speed
                 else:
                     raise ValueError("Invalid message")

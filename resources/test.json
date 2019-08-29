@@ -1,0 +1,55 @@
+{
+  "name": "Mini network",
+  "time": 28800,
+  "state": 42,
+  "running": false,
+  "margin_min": 2,
+  "max_speed": 30,
+  "pod_size": 2,
+  "places_number": 10,
+  "dynamic_routing": false,
+  "view_box": {
+      "x": 0,
+      "y": 200,
+      "width": 600,
+      "height": 500
+  },
+  "loops": [
+    {
+      "name": "Villers-les-Nancy",
+      "elements": [
+        {"type": "switch_in", "x": 340, "y": 400, "id_bridge": 0, "pods": []},
+        {"type": "station", "name": "Velodrome", "x": 390, "y": 500, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Gare", "x": 320, "y": 500, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "switch_out", "x": 215, "y": 450, "id_bridge": 1, "pods": []}
+      ],
+      "sections": [
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}},
+        {"speed": 16.67, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Laxou",
+      "elements": [
+        {"type": "switch_in", "x": 150, "y": 420, "id_bridge": 1, "pods": []},
+        {"type": "shed", "name": "Marie-Jeanne", "x": 150, "y": 300, "pods": {"max": 100, "count": 100}},
+        {"type": "shed", "name": "Jean-Paul", "x": 200, "y": 300, "pods": {"max": 100, "count": 100}},
+        {"type": "switch_out", "x": 300, "y": 350, "id_bridge": 0, "pods": []}
+      ],
+      "sections": [
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}}
+      ],
+      "pods": []
+    }
+  ],
+  "bridges": [
+    {"name": "Laxou - Villers-les-Nancy", "section": {"speed": 19.44, "path": {"type": "line"}}, "pods": []},
+    {"name": "Villers-les-Nancy - Laxou", "section": {"speed": 19.44, "path": {"type": "line"}}, "pods": []}
+  ]
+}

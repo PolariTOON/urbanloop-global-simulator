@@ -574,6 +574,17 @@ class Network(Node):
                 elif "docked" == message["type"]:
                     # Une capsule stationne
                     pass
+                elif "refill" == message["type"]:
+                    # On demande à un dépôt d'envoyer une capsule à la station qui le demande
+                    sheds = self.sheds
+                    if sheds:
+                        station = message["station"]
+                        shed = choice(sheds)
+                        yield from shed.write({
+                            "author": self,
+                            "type": "refill",
+                            "station": station
+                        })
                 else:
                     raise ValueError("Invalid message")
 

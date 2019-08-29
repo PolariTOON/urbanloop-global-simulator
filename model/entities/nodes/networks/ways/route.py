@@ -203,5 +203,12 @@ class Route(Way):
                         "type": "docked",
                         "pod": pod
                     })
+                elif "refill" == message["type"]:
+                    station = message["station"]
+                    yield from self.parent.write({
+                        "author": self,
+                        "type": "refill",
+                        "station": station
+                    })
                 else:
                     raise ValueError("Invalid message")

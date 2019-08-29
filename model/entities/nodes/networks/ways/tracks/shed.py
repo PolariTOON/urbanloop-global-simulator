@@ -23,6 +23,7 @@ class Shed(Step):
         self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
+        self._departure_pods = []
 
     def serialize(self):
         dict = super().serialize()
@@ -52,6 +53,16 @@ class Shed(Step):
 
     def update(self):
         while True:
+            if self._departure_pods\
+                    and int((self.env.time - 1) % (self.next.margin / self.next.speed)) == 0:
+                dico = self._departure_pods.pop(0)
+                pod = dico["pod"]
+                destination = dico["destination"]
+                yield from pod.write({
+                    "author": self,
+                    "type": "departure",
+                    "destination": destination
+                })
             while True:
                 message = yield from self.read()
                 if message is not None:
@@ -83,5 +94,10 @@ class Shed(Step):
                         })
                 elif "pod_exit" == message["type"]:
                     pass
+                elif "refill" == message["type"]:
+                    station = message["station"]
+                    pod = self._pods[0]
+                    self._pods.remove(pod)
+                    self._departure_pods.append({"pod": pod, "destination": station})
                 else:
                     raise ValueError("Invalid message")

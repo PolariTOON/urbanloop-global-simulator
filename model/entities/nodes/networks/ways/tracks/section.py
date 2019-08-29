@@ -79,6 +79,10 @@ class Section(Track):
     def weight(self):
         return self._length / self._speed
 
+    @property
+    def margin(self):
+        return self._margin
+
     def update(self):
         while True:
             while True:

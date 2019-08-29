@@ -44,8 +44,9 @@ def _synchronize(key=None):
                 kwargs[key] = request.get_json()
             try:
                 result = run_coroutine_threadsafe(coroutine(_simulations, *args, **kwargs), _loop).result()
-            except Exception:
+            except Exception as e:
                 result = None
+                print(e)
             return jsonify(result)
 
         return routine

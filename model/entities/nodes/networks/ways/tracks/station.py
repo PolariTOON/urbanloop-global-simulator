@@ -92,7 +92,16 @@ class Station(Step):
         return self._capacity
 
     def update(self):
+        refill = False
         while True:
+            if len(self._pods) < self._capacity / 3 and not refill:
+                # Re-approvisionnement des capsules
+                refill = True
+                yield from self.parent.write({
+                    "author": self,
+                    "type": "refill",
+                    "station": self
+                })
             while True:
                 message = yield from self.read()
                 if message is not None:
@@ -106,9 +115,10 @@ class Station(Step):
                         "type": "pod_entry",
                         "pod": pod
                     })
-                    # la capsule va se garer dans la station
-                    if pod.destination == self:
+                    # la capsule va se garer dans la station s'il y a de la place
+                    if pod.destination == self and len(self._pods) < self._capacity:
                         self._pods.append(pod)
+                        refill = False
                         yield from pod.write({
                             "author": self,
                             "type": "docked"

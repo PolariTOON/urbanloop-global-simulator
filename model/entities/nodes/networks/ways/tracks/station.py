@@ -1,6 +1,3 @@
-"""
-Type de noeud du sous-graphe correspondant à une station d"arrêt
-"""
 from .....tokens.pod import Pod
 from .step import Step
 
@@ -12,7 +9,9 @@ station_types = {
 
 
 class Station(Step):
-    def __init__(self, env, id, pods=None, travelers=None, station_type=None, element_of_loop=None, **kwargs):
+    """ Classe modélisant une gare, y est géré lé départ des capsules, le réapprovisionnement, la génération des voyageurs et leur montée
+    dans les capsules, les échanges de messages avec les autres éléments du réseau"""
+    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, station_type=None, element_of_loop=None, **kwargs):
         super().__init__(env, id, **kwargs)
         pods = pods or {
             "count": 0,
@@ -38,8 +37,14 @@ class Station(Step):
             self._travelers = []
         self._station_type = station_type
         self._element_of_loop = element_of_loop
+        if departure_pods:
+            for dico in departure_pods:
+                p = dico["pod"]
+                dico["pod"] = Pod(env, self, 0, p)
+        self._departure_pods = departure_pods or []
 
     def serialize(self):
+        """Permet la serialisation des informations"""
         dict = super().serialize()
         dict.update({
             "type": "station",
@@ -52,19 +57,24 @@ class Station(Step):
                 "average_waiting_time": self.average_waiting_time,
                 "all_time_count": self.all_time_count
             },
-            "station_type": self.type
+            "station_type": self.type,
+            "departure_pods": [{"pod": dico["pod"].serialize(), "destination": dico["destination"]} for dico in
+                               self._departure_pods]
         })
         return dict
 
     def to_element_of_loop(self):
+        """Numéro de la gare parmis les éléments de la boucle"""
         return self._element_of_loop
 
     @property
     def name(self):
+        """Nom de la gare"""
         return super().name or "Station %d" % self.id
 
     @property
     def average_waiting_time(self):
+        """Temps d'attente moyen des voyageurs dans la gare"""
         return self._average_waiting_time
 
     @property
@@ -73,10 +83,12 @@ class Station(Step):
 
     @property
     def pods(self):
+        """Liste contenant les capsules arrêtée dans la station"""
         return self._pods
 
     @property
     def travelers(self):
+        """Liste modélisant les voyageurs en attente, elle contient leur temps d'attente"""
         return self._travelers
 
     @travelers.setter
@@ -85,6 +97,10 @@ class Station(Step):
 
     @property
     def type(self):
+        """type de la station
+        0 : ville
+        1 : résidentiel
+        2 : activité"""
         return self._station_type
 
     @property
@@ -92,6 +108,7 @@ class Station(Step):
         return self._capacity
 
     def update(self):
+        """Fonction gérant le processus gare"""
         refill = False
         while True:
             if len(self._pods) < self._capacity / 3 and not refill:
@@ -101,6 +118,15 @@ class Station(Step):
                     "author": self,
                     "type": "refill",
                     "station": self
+                })
+            if self._departure_pods and int((self.env.time - 1) % (self.next.margin / self.next.speed)) == 0:
+                dico = self._departure_pods.pop(0)
+                pod = dico["pod"]
+                destination = dico["destination"]
+                yield from pod.write({
+                    "author": self,
+                    "type": "departure",
+                    "destination": destination
                 })
             while True:
                 message = yield from self.read()

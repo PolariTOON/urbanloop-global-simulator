@@ -1,12 +1,12 @@
 {
   "name": "Mini network",
   "time": 28800,
-  "state": 42,
+  "state": 56565,
   "running": false,
   "margin_min": 2,
   "max_speed": 30,
   "pod_size": 2,
-  "places_number": 10,
+  "places_number": 5,
   "dynamic_routing": false,
   "view_box": {
       "x": 0,

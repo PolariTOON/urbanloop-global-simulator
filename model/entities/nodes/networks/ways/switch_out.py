@@ -41,7 +41,9 @@ class SwitchOut(Switch):
         return super().name or "Switch \"out\" %d" % self.id
 
     def set_c1_length(self):
-        self._length = self._switch_in.finalisation_length * self.speed / self._switch_in.speed - self._beside.length * self.speed / self._beside.sections[0].speed
+        self._length = self._switch_in.finalisation_length * self.speed / self._switch_in.speed - self._beside.sections[0].length * self.speed / self._beside.sections[0].speed
+        if self._beside.length > self._switch_in.finalisation_length * self.max_speed / self._switch_in.speed:
+            print("\u001b[31mLA LONGUEUR DU PONT", self._beside.sections[0].name, "NE RESPECTE PAS LES NORMES DU RESEAU, elle est superieur à :", self._switch_in.finalisation_length * self.max_speed / self._switch_in.speed, "mètres\u001b[0m")
 
     def serialize(self):
         dict = super().serialize()

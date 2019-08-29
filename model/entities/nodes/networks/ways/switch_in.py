@@ -99,6 +99,7 @@ class SwitchIn(Switch):
         self._discrete_places[self._first_place - 1] = None
 
     def update(self):
+        """Fonction modélisant le processus aiguillage entrant"""
         # Les distances importantes sur la boucle où l'on peut s'inserer
         self._discretize_length = self.place_size * self.max_speed / (self.max_speed - self.speed)
         self._set_up_length = self._places_number * self.place_size
@@ -106,14 +107,13 @@ class SwitchIn(Switch):
         # Maj de la vitesse du pont
         section = self.beside.sections[0]
         section.speed = max(section.speed, self.speed * section.length / self._finalisation_length)
-        # Variables liées à la discrétisation
+        self._switch_out.set_c1_length()
         for k in range(self._places_number):
             place = self._discrete_places[k]
             if place:
                 for pod in self._pods:
                     if pod.id == place["id"]:
                         self._discrete_places[k] = pod
-        self._switch_out.set_c1_length()
         while True:
             self._cursor = (self._cursor - self.speed * self.env.sim_tick / self.place_size) % self._places_number
             if int(self._cursor) != self._first_place:

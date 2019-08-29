@@ -463,60 +463,6 @@ class Network(Node):
             pod.start_trip()  # TODO : le voyage d'une capsule
             print("Station %s : capsule draînée vers le dépôt %s" % (station.name, pod.destination.name))
 
-    def fill_and_full_stations(self):
-        """
-        Appel le controleur pour completer la station. On considère que la station est en situation critique si il ne
-        reste aucune capsule disponible. La demande est alors effectué avec une priorité maximale(1). La capsule vide
-        sera donc autant prioritaire qu'une capsule pleine. Si il reste au moins une capsule alors la demande est
-        effectué avec une priorité faible
-        """
-        for station in self.stations:
-            if len(station.pods) <= max(1, int(station.capacity / 4)):
-                # quasi vide --> station à compléter
-                print("Station %s almost empty (caps_numb = %d)." % (station.name, len(station.pods)))
-                if not station.pods:
-                    self.refill(10, station)
-                elif not station.capsule_arriving:
-                    self.refill(6, station)
-            if len(station.pods) >= min(station.capacity - 1, int(3 * station.capacity / 4)) and len(station.pods) > 1:
-                # quasi pleine --> station à vider
-                print("Station %s almost full (caps_numb = %d, waiting travelers = %d)." % (
-                    station.name, station.estimated_capsules_number(), station.traveler_queue.qsize()))
-                self.drain_pod_station(station)
-
-    def refill(self, prio, destination):
-        """
-        Réapprovisionne une station qui en effectue la demande
-        :param prio: Priorité de la demande (10 si critique) OBLIGATOIRE
-        :param destination: Station qui effectue la demande OBLIGATOIRE
-        """
-        shed = random.choice(self.sheds)  # TODO : à remplacer par le dépôt le plus proche
-        if prio == 10:
-            test = False
-            for pod in self.pods:
-                if len(
-                        pod.travelers) == 0 and pod.priority <= 6 and not pod.travelers:  # TODO: mémoriser les capsules vides
-                    test = True
-                    print("source:", type(pod.track), "||| destination:", destination.name)
-                    trajet = shorter_way_tracks(pod.track, destination)
-                    for i in range(len(trajet) - 1):
-                        new_rules = []
-                        change = trajet[i].beside.next == trajet[i + 1]
-                        r = Rule(trajet[i].id, priority=10, empty=True, change=change)
-                        new_rules.append(r)
-                        self.send_list_rules(new_rules)
-                if test:
-                    break
-            if test:
-                if len(shed.pods) > 0:
-                    drain_pod_shed(shed, destination, prio)
-            else:
-                if len(shed.pods) > 1:
-                    drain_pod_shed(shed, destination, prio)
-        else:
-            if len(shed.pods) > 0:
-                drain_pod_shed(shed, destination, prio)
-
     def _update_routing(self):
         """
         Envoie aux aiguillages sortant une nouvelle table de routage

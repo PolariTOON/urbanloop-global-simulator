@@ -119,7 +119,7 @@ class Network(Node):
                 max_y = loop.y_max
         width = max_x - min_x
         height = max_y - min_y
-        return {"x": 0, "y": 0, "width": width, "height": height}  # TODO: x et y à revoir
+        return {"x": 0, "y": 0, "width": width, "height": height}
 
     def get_random_free_shed(self):
         free_sheds = [shed for route in self._routes for shed in route.sheds if len(shed.pods) < shed.capacity]

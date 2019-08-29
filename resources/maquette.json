@@ -1,0 +1,53 @@
+{
+  "name": "Maquette",
+  "time": 28800,
+  "state": 42,
+  "running": false,
+  "margin_min": 1,
+  "max_speed": 10,
+  "pod_size":1 ,
+  "places_number": 3,
+  "dynamic_routing": false,
+  "view_box": {
+      "x": 0,
+      "y": 0,
+      "width": 400,
+      "height": 600
+  },
+  "loops": [
+    {
+      "name": "Boucle 1",
+      "elements": [
+        {"type": "switch_in", "x": 250, "y": 200, "id_bridge": 0, "pods": []},
+        {"type": "station", "name": "Gare b1", "x": 100, "y": 100, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "switch_out", "x": 150, "y": 200, "id_bridge": 1, "pods": []}
+      ],
+      "sections": [
+        {"speed": 7, "path": {"type": "line"}},
+        {"speed": 7, "path": {"type": "line"}},
+        {"speed": 7, "path": {"type": "line"}}
+      ],
+      "pods": [
+        {"position": 0, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}}
+      ]
+    },
+    {
+      "name": "Boucle 2",
+      "elements": [
+        {"type": "switch_in", "x": 150, "y": 250, "id_bridge": 1, "pods": []},
+        {"type": "switch_out", "x": 250, "y": 250, "id_bridge": 0, "pods": []},
+        {"type": "station", "name": "Gare b2", "x": 200, "y": 350, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "sections": [
+        {"speed": 5, "path": {"type": "line"}},
+        {"speed": 5, "path": {"type": "line"}},
+        {"speed": 5, "path": {"type": "line"}}
+      ],
+      "pods": []
+    }
+  ],
+  "bridges": [
+    {"name": "B1 - B2", "section": {"speed": 6, "path": {"type": "line"}}, "pods": []},
+    {"name": "B2 - B1", "section": {"speed": 6, "path": {"type": "line"}}, "pods": []}
+  ]
+}

@@ -3,22 +3,24 @@ Cette classe gère un réseau entier, c'est le niveau meta-graph du réseau
 les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (pour relier les boucles)
 """
 from math import inf
-from random import choice, uniform, random
+from random import choice
 
 from ....lines.bridge import Bridge
 from ....lines.loop import Loop
 from ..node import Node
-from .ways.tracks.station import station_types
 from .ways.route import Route
 from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
 
+
 # TODO : Gérer les timers des capsules (temps de trajets)
 # TODO : Gérer les stats
+# TODO : drain des capsules superflues dans les gares
 
 
 class Network(Node):
-    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, margin_min=None, pod_size=None, max_speed=None, places_number=None, dynamic_routing=None, **kwargs):
+    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, margin_min=None,
+                 pod_size=None, max_speed=None, places_number=None, dynamic_routing=None, **kwargs):
         super().__init__(env, id, **kwargs)
         self._dynamic_routing = dynamic_routing or False
         self._margin_min = margin_min or 2
@@ -115,21 +117,6 @@ class Network(Node):
         width = max_x - min_x
         height = max_y - min_y
         return {"x": 0, "y": 0, "width": width, "height": height}
-
-    def get_random_free_shed(self):
-        free_sheds = [shed for route in self._routes for shed in route.sheds if len(shed.pods) < shed.capacity]
-        return choice(free_sheds)
-
-    def get_random_station_from_type(self, station_type, departure_station=None):
-        """
-        If departure_station is None, it means that you are looking for
-        a random departure_station. Otherwise, it means that you are
-        looking for a destination_station and this station can't be the
-        same as the departure_station
-        """
-        stations = [station for route in self._routes for station in route.stations if
-                    station.type == station_type and (departure_station is None or station != departure_station)]
-        return choice(stations)
 
     def serialize(self):
         bridges = [bridge.serialize() for bridge in self._bridges]
@@ -233,7 +220,8 @@ class Network(Node):
                 switch["next"] = self._routes[id_switch]  # loop_out
                 switch["beside"] = self._routes[l + switch["id_bridge"]]  # route_bridge
                 if switch["type"] == "switch_in":
-                    new_switch = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number, **switch)
+                    new_switch = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number,
+                                          **switch)
                 else:
                     new_switch = SwitchOut(env, id_switch, self._margin_min, self._pod_size, max_speed, **switch)
                 self._switches.append(new_switch)
@@ -296,29 +284,6 @@ class Network(Node):
                 elt += 1
         raise ValueError("Element's index out of range")
 
-    def select_random_station(self, second, probability, departure_station=None):
-        """
-        If departure_station is None, it means that you are looking for
-        a random departure_station. Otherwise, it means that you are
-        looking for a destination_station.
-        """
-        is_arrival = departure_station is not None
-        city_prob = probability.station_probability(station_types["city"], second, is_arrival=is_arrival)
-        residential_prob = probability.station_probability(station_types["residential"], second,
-                                                           is_arrival=is_arrival) + city_prob
-        activity_prob = probability.station_probability(station_types["activity"], second,
-                                                        is_arrival=is_arrival) + residential_prob
-        prob = uniform(0, 1)
-
-        if prob < city_prob:
-            return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
-        elif prob < residential_prob:
-            return self.get_random_station_from_type(station_types["residential"], departure_station=departure_station)
-        elif prob < activity_prob:
-            return self.get_random_station_from_type(station_types["activity"], departure_station=departure_station)
-        else:
-            return self.get_random_station_from_type(station_types["city"], departure_station=departure_station)
-
     def _init_weights(self):
         # Initialisation des poids des routes
         for route in self._routes:
@@ -326,71 +291,6 @@ class Network(Node):
             for section in route.sections:
                 weight += section.weight
             route.weight = weight
-
-    def ascend_travelers(self, _env, second, probability, config, frequency):
-        """
-        Fait monter des voyageurs dans les capsules des stations, fonction appelée à chaque tick
-        :param _env: environement simpy de la simulation
-        :param second: temps simulé (= correspondant au temps réel) en seconde
-        :param probability: instance de la classe probability propre à la simulation
-        :param config: dictionnaire contenant la configuration du réseau
-        :param frequency: nombre de ticks par seconde
-        :return: déclenche des événements de monté de voyageurs dans les capsules des stations
-        """
-        trip_limit = int(config["TRAVELER"]["trip_limit"])
-        for station in self.stations:
-            if station.travelers and station.pods and (trip_limit > 0 or trip_limit == -1):
-                if trip_limit != -1:
-                    trip_limit -= 1
-                if station.pods:
-                    return
-
-                station.travelers.pop(0)
-                pod = station.pods[-1]
-                destination = self.select_random_station(second, probability, departure_station=station)
-                pod.add_traveler(destination)
-                # sim_loop.recorder.add_waiting_time_traveler(traveler.get_waiting_seconds(), traveler) TODO : STATS A GENERER
-                yield _env.process(
-                    ascent_event(station, pod, _env, config["TRAVELER"]["ascent_descent_duration"], frequency))
-
-    def generate_travelers(self, traveler_limit, traveler_number, second, probability):
-        """
-        Génère un certain nombre de voyageurs répartis aléatoirement dans les stations
-        :param traveler_limit: nombre maximum de voyageurs dans le réseau
-        :param traveler_number: nombre de voyageurs à générer
-        :param second: temps simulé (= correspondant au temps réel) en seconde
-        :param probability: instance de la classe probability propre à la simulation
-        :return: (void) génère un certain nombre de voyageurs
-        """
-        if not (traveler_limit > 0 or traveler_limit == -1):
-            return
-        for a_traveler in range(traveler_number):
-            if traveler_limit != -1:
-                traveler_limit -= 1
-            source = self.select_random_station(second, probability)
-            source.travelers.append(0)
-            # self.temps_moy_voy_stat(self.id, sim_loop.get_simulated_time())  # TODO : STATS A GERER
-
-    def drain_pod_station(self, station):
-        """
-        Libère une capsule vide de la station si elle est à 3/4 pleine
-        La capsule est redirigée vers un dépôt
-        :param station: station à draîner
-        :return: void
-        """
-        qsize = len(station.pods)
-        if qsize < int(3 * station.capacity / 4):
-            return
-        pod = station.pods[0]
-        if not pod.travelers:
-            station.pods.remove(pod)
-            pod.destination = self.get_random_free_shed()  # TODO : Prendre le dépôt le plus proche
-            pod.priority = -1  # TODO : priorité à mettre à jour
-            pod.travelers = None
-            pod.source = station
-            pod.position = 0
-            pod.start_trip()  # TODO : le voyage d'une capsule
-            print("Station %s : capsule draînée vers le dépôt %s" % (station.name, pod.destination.name))
 
     def _update_routing(self):
         """
@@ -484,108 +384,6 @@ def _init_pod_of_line(line, pod):
     raise ValueError("Element's position out of range")
 
 
-def ascent_event(station, pod, _env, ascent_descent_duration, frequency):
-    """
-    Evénement de monter d'un voyageur dans une capsule
-    :param station: station dans laquelle un voyageur monte dans une capsule
-    :param pod: capsule dans laquelle un voyageur monte
-    :param _env: environnement simpy de la simulation
-    :param ascent_descent_duration: temps moyen de monté et descente d'un voyageur dans/depuis une capsule
-    :param frequency: nombre de ticks par seconde
-    :return: Fait remonter l'événement de monté d'un voyageur dans une capsule
-    """
-    ascent_timeout = _env.timeout(random_ascent_descent_duration(ascent_descent_duration, frequency))
-    ascent_timeout.callbacks.append(lambda event: ascent_event_callback(station, pod))
-    yield ascent_timeout
-
-
-def random_ascent_descent_duration(ascent_descent_duration, frequency):
-    """
-    :return: A value between [|time-2, time+2|]. time is the defined duration (in the config file)
-    for ascent and descent events.
-    """
-    random_seconds = random.randrange(ascent_descent_duration - 2, ascent_descent_duration + 2, 1)
-    return random_seconds * frequency
-
-
-def ascent_event_callback(station, pod):
-    """
-    Déclenche les fonctions qui modélisent la montée d'un voyageur dans une capsule
-    C'est-à-dire le retrait de la capsule depuis la station dont elle part et le départ de la capsule
-    :param station:
-    :param pod:
-    :return:
-    """
-    station.pods.remove(pod)
-    pod.start_trip()  # TODO : départ d'une capsule
-
-
-def update_weight(switch1, switch2, travel_time):
-    """
-    Met à jour le poids de la route reliant switch1 à switch2 qu'une capsule vient de parcourir
-    S'ils ne sont pas reliés alors ne fait rien
-    :param travel_time: temps mis par la capsule pour parcourir la route
-    :param switch1: switch précédent la route empruntée par la capsule
-    :param switch2: switch suivant la route empruntée par la capsule
-    :return: boolean indiquant si il y a congestion
-    """
-    if switch1.next.next == switch2:
-        route = switch1.next
-    elif switch1.beside.next == switch2:
-        route = switch1.beside
-    else:
-        return False
-    route.weight = 0.875 * route.weight + 0.125 * travel_time
-    return route.weight > 3 * route.expected_weight
-
-
-def no_more_congestion(previous_switch, current_switch):
-    """
-    :param previous_switch: aiguillage précédent
-    :param current_switch: aiguillage actuel
-    :return: boolean étant true s'il n'y a plus de congestion sur la route entre les deux aiguillages et false sinon
-    """
-    if previous_switch.next.next == current_switch:
-        route = previous_switch.next
-    elif previous_switch.beside.next == current_switch:
-        route = previous_switch.beside
-    else:
-        return True
-    return route.weight < 2 * route.expected_weight
-
-
-def disable_route(previous_switch, current_switch):
-    """
-    Rend impossible le passage par une route, ie met le poids de celle-ci à l'infini
-    :param previous_switch: aiguillage de début de route
-    :param current_switch: aiguillage de fin de route
-    """
-    if previous_switch.next.next == current_switch:
-        route = previous_switch.next
-    elif previous_switch.beside.next == current_switch:
-        route = previous_switch.beside
-    else:
-        return
-    route.weight = inf
-
-
-def get_time_max(previous_switch, current_switch):
-    """
-    Retourne le temps à partir duquel on considère une route comme coupée. On prend comme limite
-    10 * le temps de parcours en conditions normales
-    :param previous_switch: aiguillage précédent la route
-    :param current_switch: aiguillage suivant la route
-    :return: temps à partir duquel on considère une route comme coupée
-    """
-    if previous_switch.next.next == current_switch:
-        route = previous_switch.next
-    elif previous_switch.beside.next == current_switch:
-        route = previous_switch.beside
-    else:
-        return -1
-    return 10 * route.expected_weight
-
-
 def shorter_way_tracks(start_track, destination_track):
     """
     Lance le calcul du plus court chemin si nécéssaire (i.e si les pistes sont sur des routes différentes)
@@ -645,30 +443,6 @@ def shorter_way(start_switch, destination_switch):
     return way
 
 
-def drain_pod_shed(shed, destination, prio):
-    """
-    Libère une capsule vide du dépôt
-    La capsule est redirigée vers une station
-    :param shed: le dépôt à draîner
-    :param destination: la station à alimenter
-    :return: void
-    """
-    qsize = len(shed.pods)
-    if qsize == 0:
-        print("Plus de capsules disponibles dans le dépôt", shed.name)
-        return
-    pod = shed.pods[0]
-    if not pod.travelers:
-        shed.pods.remove(pod)
-        pod.destination = destination
-        pod.priority = prio  # TODO : priorité à mettre à jour
-        pod.travelers = None
-        pod.source = shed
-        pod.position = 0
-        pod.start_trip()  # TODO
-        print("Une capsule part du dépôt %s vers la station %s" % (shed.name, destination.name))
-
-
 def next_switch_out(track):
     """
     :param track: piste dont on veut connaître l'aiguillage sortant suivant le plus proche
@@ -689,3 +463,74 @@ def previous_switch_out(track):
     while not isinstance(current, SwitchOut):
         current = current.previous
     return current
+
+
+def update_weight(switch1, switch2, travel_time):
+    """
+    Met à jour le poids de la route reliant switch1 à switch2 qu'une capsule vient de parcourir
+    S'ils ne sont pas reliés alors ne fait rien
+    :param travel_time: temps mis par la capsule pour parcourir la route
+    :param switch1: switch précédent la route empruntée par la capsule
+    :param switch2: switch suivant la route empruntée par la capsule
+    :return: boolean indiquant si il y a congestion
+    """
+    # TODO : à gérer lorsque les capsules se gare
+    if switch1.next.next == switch2:
+        route = switch1.next
+    elif switch1.beside.next == switch2:
+        route = switch1.beside
+    else:
+        return False
+    route.weight = 0.875 * route.weight + 0.125 * travel_time
+    return route.weight > 3 * route.expected_weight
+
+
+def no_more_congestion(previous_switch, current_switch):
+    """
+    :param previous_switch: aiguillage précédent
+    :param current_switch: aiguillage actuel
+    :return: boolean étant true s'il n'y a plus de congestion sur la route entre les deux aiguillages et false sinon
+    """
+    # TODO : liée à la congestion TCP si dans l'avenir c'est à remettre
+    if previous_switch.next.next == current_switch:
+        route = previous_switch.next
+    elif previous_switch.beside.next == current_switch:
+        route = previous_switch.beside
+    else:
+        return True
+    return route.weight < 2 * route.expected_weight
+
+
+def disable_route(previous_switch, current_switch):
+    """
+    Rend impossible le passage par une route, ie met le poids de celle-ci à l'infini
+    :param previous_switch: aiguillage de début de route
+    :param current_switch: aiguillage de fin de route
+    """
+    # TODO : peut etre utile pour une futur coupure de voie
+    if previous_switch.next.next == current_switch:
+        route = previous_switch.next
+    elif previous_switch.beside.next == current_switch:
+        route = previous_switch.beside
+    else:
+        return
+    route.weight = inf
+
+
+def get_time_max(previous_switch, current_switch):
+    """
+    Retourne le temps à partir duquel on considère une route comme coupée. On prend comme limite
+    10 * le temps de parcours en conditions normales
+    :param previous_switch: aiguillage précédent la route
+    :param current_switch: aiguillage suivant la route
+    :return: temps à partir duquel on considère une route comme coupée
+    """
+    # TODO : peut etre utile pour une futur coupure de voie
+    if previous_switch.next.next == current_switch:
+        route = previous_switch.next
+    elif previous_switch.beside.next == current_switch:
+        route = previous_switch.beside
+    else:
+        return -1
+    return 10 * route.expected_weight
+

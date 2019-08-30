@@ -85,7 +85,6 @@ class Pod(Token):
     def serialize(self):
         dict = super().serialize()
         dict.update({
-            "id": self.id,
             "name": self.name,
             "position": self.position,
             "travelers": {

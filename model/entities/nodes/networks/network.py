@@ -29,6 +29,8 @@ class Network(Node):
         self._loops = loops or []
         self._switches = switches or []
         self._routes = routes or []
+        self._max_speed = max_speed or 30
+        self._places_number = places_number or 5
         self._view_box = view_box or {}
         self._init_graph_from_json(env, max_speed, places_number)
         self._init_parent_of_children()
@@ -98,6 +100,26 @@ class Network(Node):
         return [station for route in self._routes for station in route.stations]
 
     @property
+    def margin_min(self):
+        return self._margin_min
+
+    @property
+    def max_speed(self):
+        return self._max_speed
+
+    @property
+    def pod_size(self):
+        return self._pod_size
+
+    @property
+    def places_number(self):
+        return self._places_number
+
+    @property
+    def dynamic_routing(self):
+        return self._dynamic_routing
+
+    @property
     def view_box(self):
         if self._view_box:
             return self._view_box
@@ -125,7 +147,12 @@ class Network(Node):
         dict.update({
             "loops": loops,
             "bridges": bridges,
-            "view_box": self.view_box
+            "view_box": self.view_box,
+            "margin_min": self.margin_min,
+            "max_speed": self.max_speed,
+            "pod_size": self.pod_size,
+            "places_number": self.places_number,
+            "dynamic_routing": self.dynamic_routing
         })
         return dict
 
@@ -135,6 +162,11 @@ class Network(Node):
         :return: (void) Le réseau est construit
         """
         #  Etape 1 : Récupérer les infos du json sous forme pratique
+        for bridge in self._bridges:
+            if "switch_in" in bridge:
+                del bridge["switch_in"]
+            if "switch_out" in bridge:
+                del bridge["switch_out"]
         for b in range(len(self._loops)):
             self._loops[b]["switches"] = []
             self._loops[b]["routes"] = []

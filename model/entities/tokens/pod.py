@@ -168,8 +168,6 @@ class Pod(Token):
             # Gestion des messages reçus
             while True:
                 message = yield from self.read()
-                if message is not None:
-                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "speed" == message["type"]:

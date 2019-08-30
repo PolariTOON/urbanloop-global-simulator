@@ -22,11 +22,12 @@ class Shed(Step):
         self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
-        if departure_pods:
-            for dico in departure_pods:
-                p = dico["pod"]
-                dico["pod"] = Pod(env, self, 0, p)
         self._departure_pods = departure_pods or []
+        for dico in self._departure_pods:
+            p = dico["pod"]
+            dest = self.find(dico["destination"])
+            dico["pod"] = Pod(env, self, 0, p)
+            dico["destination"] = self.find(dest)
 
     def serialize(self):
         """sérialise les informations du dépôt"""
@@ -37,7 +38,7 @@ class Shed(Step):
                 "count": len(self.pods),
                 "max": self.capacity
             },
-            "departure_pods": [{"pod": dico["pod"].serialize(), "destination": dico["destination"]} for dico in self._departure_pods]
+            "departure_pods": [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
         })
         return dict
 
@@ -75,8 +76,6 @@ class Shed(Step):
                 })
             while True:
                 message = yield from self.read()
-                if message is not None:
-                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

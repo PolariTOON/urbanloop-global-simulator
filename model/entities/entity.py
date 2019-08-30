@@ -5,9 +5,10 @@ from simpy.resources.store import Store, StoreGet, StorePut
 
 
 class Entity:
-    def __init__(self, env, id, **kwargs):
+    def __init__(self, env, id, name=None, **kwargs):
         self._env = env
         self._id = id
+        self._name = name or ""
         self._store = Store(env)
         Process(self._env, self.update())
 
@@ -18,6 +19,10 @@ class Entity:
     @property
     def id(self):
         return self._id
+
+    @property
+    def name(self):
+        return self._name
 
     def write(self, message):
         if message is None:
@@ -38,10 +43,13 @@ class Entity:
             getter.cancel()
             return None
         message = condition[getter]
+        print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
         return message
 
     def update(self):
         raise NotImplementedError()
 
     def serialize(self):
-        return {}
+        return {
+            "name": self.name
+        }

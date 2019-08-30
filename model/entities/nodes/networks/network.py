@@ -499,6 +499,13 @@ class Network(Node):
                 return dico["table"]
         raise ValueError("Switch not in the routing table")
 
+    def find(self, step):
+        for route in self._routes:
+            for s in route.steps:
+                if step["name"] == s.name:
+                    return s
+        raise ValueError("Step not in the network")
+
     def update(self):
         """
         Gestion du processus du réseau à chaque boucle d'événement simpy
@@ -506,15 +513,13 @@ class Network(Node):
         """
         while True:
             print("-------------------------------------------------------------")
-            print("     Tick n°", self.env.now, " | Réseau :", self.name, "     ")
+            print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
             print("-------------------------------------------------------------")
-            if self._dynamic_routing and (self.env.now * self.env.sim_tick) % 30 == 0:
+            if self._dynamic_routing and (int(self.env.now) * self.env.sim_tick) % 30 == 0:
                 # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
                 yield from self._update_routing()
             while True:
                 message = yield from self.read()
-                if message is not None:
-                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "docked" == message["type"]:

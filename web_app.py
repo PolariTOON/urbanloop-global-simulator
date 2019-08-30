@@ -46,7 +46,7 @@ def _synchronize(key=None):
                 result = run_coroutine_threadsafe(coroutine(_simulations, *args, **kwargs), _loop).result()
             except Exception as e:
                 result = None
-                print(e)
+                print("\u001b[31m", e, "\u001b[0m")
             return jsonify(result)
 
         return routine

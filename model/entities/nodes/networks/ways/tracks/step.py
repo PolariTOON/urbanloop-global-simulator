@@ -34,6 +34,9 @@ class Step(Track):
     def next(self):
         return self._next
 
+    def find(self, step):
+        return self.parent.find(step)
+
     def serialize(self):
         dict = super().serialize()
         dict.update({

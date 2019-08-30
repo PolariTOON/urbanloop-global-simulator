@@ -162,6 +162,9 @@ class Route(Way):
         })
         return dict
 
+    def find(self, step):
+        return self.parent.find(step)
+
     def init_parent_of_children(self):
         """
         Initialise le parent des pistes de la route comme étant la route
@@ -178,8 +181,6 @@ class Route(Way):
         while True:
             while True:
                 message = yield from self.read()
-                if message is not None:
-                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

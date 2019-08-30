@@ -37,11 +37,12 @@ class Station(Step):
             self._travelers = []
         self._station_type = station_type
         self._element_of_loop = element_of_loop
-        if departure_pods:
-            for dico in departure_pods:
-                p = dico["pod"]
-                dico["pod"] = Pod(env, self, 0, p)
         self._departure_pods = departure_pods or []
+        for dico in self._departure_pods:
+            p = dico["pod"]
+            dest = self.find(dico["destination"])
+            dico["pod"] = Pod(env, self, 0, p)
+            dico["destination"] = self.find(dest)
 
     def serialize(self):
         """Permet la serialisation des informations"""
@@ -111,14 +112,6 @@ class Station(Step):
         """Fonction gérant le processus gare"""
         refill = False
         while True:
-            if len(self._pods) < self._capacity / 3 and not refill:
-                # Re-approvisionnement des capsules
-                refill = True
-                yield from self.parent.write({
-                    "author": self,
-                    "type": "refill",
-                    "station": self
-                })
             if self._departure_pods and int((self.env.time - 1) % (self.next.margin / self.next.speed)) == 0:
                 dico = self._departure_pods.pop(0)
                 pod = dico["pod"]
@@ -128,10 +121,16 @@ class Station(Step):
                     "type": "departure",
                     "destination": destination
                 })
+            if len(self._pods) < self._capacity / 3 and not refill:
+                # Re-approvisionnement des capsules
+                refill = True
+                yield from self.parent.write({
+                    "author": self,
+                    "type": "refill",
+                    "station": self
+                })
             while True:
                 message = yield from self.read()
-                if message is not None:
-                    print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:

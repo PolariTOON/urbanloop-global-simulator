@@ -119,13 +119,10 @@ class Loop(Line):
                 for pod_index in range(len(section.pods)):
                     pod = section.pods[pod_index]
                     position = pod.position
-                    x, y = section.get_coordinates_of_position(position)
                     position += length
                     pod = pod.serialize()
                     pod.update({
-                        "position": position,
-                        "x": x,
-                        "y": y
+                        "position": position
                     })
                     pods.append(pod)
                 length += section.length

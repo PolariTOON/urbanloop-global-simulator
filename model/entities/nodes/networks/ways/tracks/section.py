@@ -131,12 +131,3 @@ class Section(Track):
                 self._pods.insert(k, Pod(env, self, speed, **pod))
                 return
         self._pods.append(Pod(env, self, self._speed, **pod))
-
-    def get_coordinates_of_position(self, position):
-        previous = self._previous
-        next = self._next
-        before = position / self._length
-        after = 1 - before
-        x = previous.x * after + next.x * before
-        y = previous.y * after + next.y * before
-        return x, y

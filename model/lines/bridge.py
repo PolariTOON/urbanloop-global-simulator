@@ -26,10 +26,6 @@ class Bridge(Line):
         for pod_index in range(len(section.pods)):
             pod = section.pods[pod_index]
             pod = pod.serialize()
-            pod.update({
-                "x": 0,  # TODO
-                "y": 0  # TODO
-            })
             pods.append(pod)
         section = section.serialize()
         dict = super().serialize()

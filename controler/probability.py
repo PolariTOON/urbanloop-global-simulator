@@ -4,7 +4,6 @@ import numpy as np
 import scipy.stats
 
 from model.entities.nodes.networks.ways.tracks import station
-from settings import simlog
 
 from . import converter
 
@@ -43,7 +42,7 @@ class Probability:
         :return: The probability to lead a traveler to the chosen station_type at the given time
         """
         if None in (self._city_percent, self._activity_and_residential_percent, self._activity_and_residential_fluctuation):
-            simlog.error("Converter hasn't been loaded")
+            print("Converter hasn't been loaded")
             return 0
         second = second % 86400
         gaussian_factor = 250 * (self._activity_and_residential_fluctuation / 100)

@@ -1,5 +1,3 @@
-from settings import simlog
-
 from .token import Token
 from .traveler import Traveler
 
@@ -16,7 +14,7 @@ class Pod(Token):
         travelers["max"] = travelers["max"] or 0
         self._travelers = [Traveler(env, 0) for k in range(travelers["count"])]
         self._capacity = travelers["max"]
-        self._priority = 0  # TODO
+        self._priority = 0  # TODO : à enlever
         self._track_or_switch = track_or_switch
         self._speed = pod_speed
         self._turn = turn or False
@@ -103,7 +101,7 @@ class Pod(Token):
 
     def add_traveler(self, traveler):
         self._travelers.append(traveler)
-        simlog.info("Traveler %s gets in capsule %d" % (traveler.id, self.id), traveler.source, self.destination)
+        print("Traveler %s gets in capsule %d" % (traveler.id, self.id), traveler.source, self.destination)
 
     def update(self):
         """

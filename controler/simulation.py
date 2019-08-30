@@ -5,7 +5,6 @@ import time
 from math import floor
 from random import random, seed
 from simpy import Environment
-from settings import simlog
 from shutil import copyfile
 
 from model.entities.nodes.networks.network import Network
@@ -188,7 +187,7 @@ class Simulation:
             value = self._env.sim_tick
 
         if value <= 0:
-            simlog.warn("The sim_tick needs to be greater than zero")
+            print("The sim_tick needs to be greater than zero")
             return
 
         if self._sim_tick_variations:
@@ -201,7 +200,7 @@ class Simulation:
             self._sim_tick_variations.append((0, self._current_tick, self._env.sim_tick))
 
         self._env.sim_tick = value
-        simlog.warn("Changing _sim_tick. One tick equals now %f seconds" % self._env.sim_tick)
+        print("Changing _sim_tick. One tick equals now %f seconds" % self._env.sim_tick)
 
     def get_initial_sim_tick(self):
         """

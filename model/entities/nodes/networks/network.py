@@ -5,8 +5,6 @@ les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (
 from math import inf
 from random import choice, uniform, random
 
-from stats.stats_recorder import StatsRecorder
-
 from ....lines.bridge import Bridge
 from ....lines.loop import Loop
 from ..node import Node
@@ -14,6 +12,9 @@ from .ways.tracks.station import station_types
 from .ways.route import Route
 from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
+
+# TODO : Gérer les timers des capsules (temps de trajets)
+# TODO : Gérer les stats
 
 
 class Network(Node):
@@ -29,12 +30,6 @@ class Network(Node):
         self._view_box = view_box or {}
         self._init_graph_from_json(env, max_speed, places_number)
         self._init_parent_of_children()
-        self._recorder = StatsRecorder(0)  # TODO : Gérer les stats
-        self._timers = [-1] * len(self.pods)  # TODO : Gérer les timers des capsules (temps de trajets)
-        self._tab_depart = []  # TODO : Gérer les stats
-        self._tab_temps = []  # TODO : Gérer les stats
-        self._tab_depart_voy = []  # TODO : Gérer les stats
-        self._tab_temps_voy = []  # TODO : Gérer les stats
         self._init_weights()
         # Initialisation de la table de routage de chaque aiguillage
         # C'est une liste de ditcionnaire de la forme {"switch": s, "table": t}
@@ -300,72 +295,6 @@ class Network(Node):
                     return steps[s]
                 elt += 1
         raise ValueError("Element's index out of range")
-
-    # TODO : gérer les stats
-    def travel_stats(self):
-        """
-        On obtient dans staats le temps moyen de trajet des capsules et dans staatsvoy le temps moyen
-        d'attentes des voyageurs
-        """
-        latest_stats_file = open("out/staats.txt", "a+")
-        buffer = str(self.temps_moy()) + ","
-        latest_stats_file.write(buffer)
-        latest_stats_file.close()
-        latest_stats_file = open("out/staatsvoy.txt", "a+")
-        buffer = str(self.temps_moy_voy()) + ","
-        latest_stats_file.write(buffer)
-        latest_stats_file.close()
-
-    # TODO : gérer les stats
-    def temps_moy_stat(self, id, temps):
-        test = True
-        for i in self._tab_depart:
-            if i[0] == id:
-                test = False
-                self._tab_temps.append(temps - i[1])
-                i[0] = -1
-        if test:
-            self._tab_depart.append([id, temps])
-
-    # TODO : gérer les stats
-    def temps_moy_voy_stat(self, id, temps):
-        test = True
-        for i in self._tab_depart_voy:
-            if i[0] == id:
-                test = False
-                self._tab_temps_voy.append(temps - i[1])
-                i[0] = -1
-        if test:
-            self._tab_depart_voy.append([id, temps])
-
-    # TODO : gérer les stats
-    def temps_moy_voy(self):
-        moy = 0
-        j = 0
-        for i in self._tab_temps_voy:
-            j += 1
-            moy += i
-        if j == 0:
-            return 0
-        else:
-            return moy / j
-
-    # TODO : gérer les stats
-    def temps_moy(self):
-        moy = 0
-        j = 0
-        for i in self._tab_temps:
-            j += 1
-            moy += i
-        if j == 0:
-            return 0
-        else:
-            return moy / j
-
-    # TODO : gérer les stats
-    def extract(self, simulated_time):
-        self._recorder.stop_listen(simulated_time)
-        self._recorder.extract()
 
     def select_random_station(self, second, probability, departure_station=None):
         """

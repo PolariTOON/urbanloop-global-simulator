@@ -165,28 +165,28 @@ dl > dd {
 }
 /*~~~~~~ #identifiers, .classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 a[download]#download-button::before {
-    background-image: url("./icons.svg#download");
+    background-image: url("icons.svg#download");
 }
 label#upload-button > input {
-    background-image: url("./icons.svg#upload");
+    background-image: url("icons.svg#upload");
 }
 label#create-button > input {
-    background-image: url("./icons.svg#create");
+    background-image: url("icons.svg#create");
 }
 label#delete-button > input {
-    background-image: url("./icons.svg#delete");
+    background-image: url("icons.svg#delete");
 }
 label#play-button > input {
-    background-image: url("./icons.svg#play");
+    background-image: url("icons.svg#play");
 }
 label#pause-button > input {
-    background-image: url("./icons.svg#pause");
+    background-image: url("icons.svg#pause");
 }
 label#accelerate-button > input {
-    background-image: url("./icons.svg#accelerate");
+    background-image: url("icons.svg#accelerate");
 }
 label#decelerate-button > input {
-    background-image: url("./icons.svg#decelerate");
+    background-image: url("icons.svg#decelerate");
 }
 
 .badge,

@@ -1,6 +1,3 @@
-"""
-Classe abstraite représentant les noeuds des sous-graphes du réseau
-"""
 from ....node import Node
 
 

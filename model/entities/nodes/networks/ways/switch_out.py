@@ -107,8 +107,7 @@ class SwitchOut(Switch):
                             # On insert la capsule sur la dernière place
                             yield from pod.write({
                                 "author": self,
-                                "type": "insert",
-                                "length_before_turn": self._length
+                                "type": "insert"
                             })
                         else:
                             # On procède au décalage pour insérer la capsule
@@ -117,8 +116,7 @@ class SwitchOut(Switch):
                             # La voiture s'insère alors sur la dernière place
                             yield from pod.write({
                                 "author": self,
-                                "type": "insert",
-                                "length_before_turn": self._length
+                                "type": "insert"
                             })
                 elif "pod_exit" == message["type"]:
                     pod = message["pod"]

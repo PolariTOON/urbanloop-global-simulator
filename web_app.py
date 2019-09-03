@@ -10,13 +10,14 @@ from controler.simulation import Simulation
 _app = Flask(__name__, static_url_path="", static_folder="view/static", template_folder="view/templates")
 _app.logger.setLevel(ERROR)
 getLogger("werkzeug").setLevel(ERROR)
-_sim_tick = 0.042 # TODO: calculer selon la vitesse et la précision de la simulation, ainsi que l'occupation du serveur
+_sim_tick = 0.042  # TODO: calculer selon la vitesse et la précision de la simulation, ainsi que l'occupation du serveur (actuellement à 24 images par secondes)
 
 _loop = None
 _simulations = {}
 
 
 async def _run_simulations():
+    """Lancement de simulations"""
     print("Log format : receiver  --  author  --  message type")
     global _sim_tick
     global _loop
@@ -30,6 +31,7 @@ async def _run_simulations():
 
 
 def _synchronize(key=None):
+    """Synchronisation du serveur flask avec simpy, NE PAS TOUCHER"""
     global _loop
     global _simulations
     if not isinstance(key, str):
@@ -54,6 +56,7 @@ def _synchronize(key=None):
 
 @_app.errorhandler(Exception)
 def send_error(error):
+    """Gestion d'une mauvaise requête"""
     global _app
     _app.logger.error(error)
     return "", 404
@@ -61,6 +64,7 @@ def send_error(error):
 
 @_app.route("/")
 def get_root():
+    """page de base de la vue"""
     global _app
     return _app.send_static_file("index.html")
 
@@ -68,6 +72,7 @@ def get_root():
 @_app.route("/networks/<int:network_index>/", methods=["POST"])
 @_synchronize("network_item")
 async def _post_network(simulations, network_index, network_item):
+    """Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json"""
     if network_item is not None:
         simulation = Simulation(network_index, _sim_tick, **network_item)
         simulations[network_index] = simulation
@@ -80,6 +85,7 @@ async def _post_network(simulations, network_index, network_item):
 @_app.route("/networks/<int:network_index>/", methods=["GET"])
 @_synchronize()
 async def _get_network(simulations, network_index):
+    """Requête get pour récupérer le fichier json d'un réseau depuis la vue"""
     if network_index in simulations:
         simulation = simulations[network_index]
         return simulation.serialize()
@@ -89,6 +95,7 @@ async def _get_network(simulations, network_index):
 @_app.route("/networks/<int:network_index>/clock/play/", methods=["POST"])
 @_synchronize()
 async def _play_clock(simulations, network_index):
+    """Requête post pour lancer la simulation depuis la vue"""
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.running = True
@@ -99,6 +106,7 @@ async def _play_clock(simulations, network_index):
 @_app.route("/networks/<int:network_index>/clock/pause/", methods=["POST"])
 @_synchronize()
 async def _pause_clock(simulations, network_index):
+    """Requête post pour mettre en pause la simulation depuis la vue"""
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.running = False
@@ -109,40 +117,47 @@ async def _pause_clock(simulations, network_index):
 @_app.route("/networks/<int:network_index>/bridges/<int:bridge_index>/", methods=["GET"])
 @_synchronize()
 async def _get_bridge(simulations, network_index, bridge_index):
+    """Requête get pour récupérer le fichier json d'un pont depuis la vue"""
     return simulations[network_index]._network.bridges[bridge_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/loops/<int:loop_index>/", methods=["GET"])
 @_synchronize()
 async def _get_loop(simulations, network_index, loop_index):
+    """Requête get pour récupérer le fichier json d'une boucle depuis la vue"""
     return simulations[network_index]._network.loops[loop_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/switches/<int:switch_index>/", methods=["GET"])
 @_synchronize()
 async def _get_switch(simulations, network_index, switch_index):
+    """Requêt get pour récupérer le fichier json d'un aiguillage depuis la vue"""
     return simulations[network_index]._network.switches[switch_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/routes/<int:route_index>/", methods=["GET"])
 @_synchronize()
 async def _get_route(simulations, network_index, route_index):
+    """Requête get pour récupérer le fichier json d'une route depuis la vue"""
     return simulations[network_index]._network.routes[route_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/routes/<int:route_index>/steps/<int:step_index>/", methods=["GET"])
 @_synchronize()
 async def _get_step(simulations, network_index, route_index, step_index):
+    """Requête get pour récupérer le fichier json d'une étape depuis la vue"""
     return simulations[network_index]._network.routes[route_index].steps[step_index].serialize()
 
 
 @_app.route("/networks/<int:network_index>/routes/<int:route_index>/sections/<int:section_index>/", methods=["GET"])
 @_synchronize()
 async def _get_section(simulations, network_index, route_index, section_index):
+    """Requête get pour récupérer le fichier json d'une section depuis la vue"""
     return simulations[network_index]._network.routes[route_index].sections[section_index].serialize()
 
 
 def run_app(port):
+    """Fonction permettant de lancer l'application"""
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
     Thread(target=lambda: run(_run_simulations())).start()
     _app.run(port=port)

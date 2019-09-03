@@ -3,7 +3,12 @@ from .traveler import Traveler
 
 
 class Pod(Token):
-    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, length_before_turn=None, turn=None, **kwargs):
+    """
+    Classe modélisant une capsule du réseau UrbanLoop, elle est autonome et reçoit
+    des ordres de vitesses qui peuvent être sur une certaine distance
+    au niveau des aiguillages
+    """
+    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, **kwargs):
         super().__init__(env, **kwargs)
         self._position = position or 0
         travelers = travelers or {
@@ -15,63 +20,82 @@ class Pod(Token):
         self._travelers = [Traveler(env, 0) for k in range(travelers["count"])]
         self._capacity = travelers["max"]
         self._track_or_switch = track_or_switch
+        self.source = self.source or self._track_or_switch or None
+        self.destination = self.destination or self._track_or_switch or None
         self._speed = pod_speed
         self._turn = turn or False
-        self._length_before_turn = length_before_turn or None
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
 
     @property
     def position(self):
+        """
+        Position de la capsule depuis le début de la section où elle se trouve
+        Si pas sur une section alors ça vaut 0
+        Si sur un aiguillage, alors comme il a une taille c'est != 0
+        """
         return self._position
 
     @position.setter
     def position(self, value):
+        """setter de l'attribut position"""
         self._position = value
 
     @property
     def travelers(self):
+        """Liste des voyageurs dans la capsule"""
         return self._travelers
 
     @travelers.setter
     def travelers(self, value):
+        """setter de l'attribut travelers"""
         self._travelers = value
 
     @property
     def capacity(self):
+        """nombre de voyageurs maximal dans la capsule"""
         return self._capacity
 
     @property
     def track_or_switch(self):
+        """setter de l'attribut capacity"""
         return self._track_or_switch
 
     @track_or_switch.setter
     def track_or_switch(self, value):
+        """piste (section ou étape) ou aiguillage où se trouve la capsule"""
         self._track_or_switch = value
 
     @property
     def name(self):
+        """nom de la capsule"""
         return super().name or "Pod %s" % self.id
 
     @property
     def speed(self):
+        """vitesse actuel de la capsule"""
         return self._speed
 
     @speed.setter
     def speed(self, value):
+        """setter de l'attribut speed"""
         self._speed = value
 
     @property
     def speed_restore(self):
+        """
+        vitesse à restaurer après avoir parcouru la distance length_before_restore
+        lors d'un ordre de vitesse sur une certaine distance
+        """
         return self._speed_restore
 
     @property
     def length_before_restore(self):
+        """
+        distance à parcourir avant de retrouver la vitesse speed_restore
+        lors d'un ordre de vitesse sur une certaine distance
+        """
         return self._length_before_restore
-
-    @property
-    def length_before_turn(self):
-        return self._length_before_turn
 
     def serialize(self):
         dict = super().serialize()
@@ -84,14 +108,11 @@ class Pod(Token):
             },
             "speed_restore": self.speed_restore,
             "length_before_restore": self.length_before_restore,
-            "length_before_turn": self.length_before_turn,
-            "speed": self.speed
+            "speed": self.speed,
+            "source": self.source,
+            "destination": self.destination
         })
         return dict
-
-    def add_traveler(self, traveler):
-        self._travelers.append(traveler)
-        print("Traveler %s gets in capsule %d" % (traveler.id, self.id), traveler.source, self.destination)
 
     def update(self):
         """
@@ -114,8 +135,8 @@ class Pod(Token):
                 self._position += self._speed * self.env.sim_tick
 
             # La capsule s'insère et tourne si elle en a reçu l'ordre
-            if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._length_before_turn:
-                self.position -= self._length_before_turn
+            if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._track_or_switch.length:
+                self.position -= self._track_or_switch.length
                 self._track_or_switch = self._track_or_switch.beside.sections[0]
                 yield from self._track_or_switch.write({
                     "author": self,
@@ -123,7 +144,6 @@ class Pod(Token):
                     "pod": self
                 })
                 self._turn = False
-                self._length_before_turn = None
 
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
             # capsule indique à la piste/l'aiguillage sur laquelle/lequel elle rentre
@@ -180,9 +200,7 @@ class Pod(Token):
                     self._speed = 0
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner
-                    # une distance avant le pont est donnée
                     self._turn = True
-                    self._length_before_turn = message["length_before_turn"]
                 elif "speed_a_while" == message["type"]:
                     # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
                     # Ou lors d'une discrétisation

@@ -32,13 +32,14 @@ class Shed(Step):
     def serialize(self):
         """sérialise les informations du dépôt"""
         dict = super().serialize()
+        departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
         dict.update({
             "type": "shed",
             "pods": {
                 "count": len(self.pods),
                 "max": self.capacity
             },
-            "departure_pods": [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
+            "departure_pods": departure_pods
         })
         return dict
 

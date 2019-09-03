@@ -32,7 +32,7 @@ class Station(Step):
         self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._capacity = pods["max"]
         if travelers["count"]:
-            self._travelers = [self._average_waiting_time in range(travelers["count"])]  # cette liste représente une file des voyageurs en attente, elle est remplie par le temps d'attente de chacun
+            self._travelers = [self._average_waiting_time in range(travelers["count"])]
         else:
             self._travelers = []
         self._station_type = station_type
@@ -47,6 +47,7 @@ class Station(Step):
     def serialize(self):
         """Permet la serialisation des informations"""
         dict = super().serialize()
+        departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"]} for dico in self._departure_pods]
         dict.update({
             "type": "station",
             "pods": {
@@ -59,8 +60,7 @@ class Station(Step):
                 "all_time_count": self.all_time_count
             },
             "station_type": self.type,
-            "departure_pods": [{"pod": dico["pod"].serialize(), "destination": dico["destination"]} for dico in
-                               self._departure_pods]
+            "departure_pods": departure_pods
         })
         return dict
 
@@ -94,6 +94,7 @@ class Station(Step):
 
     @travelers.setter
     def travelers(self, value):
+        """setter de l'attribut traveler"""
         self._travelers = value
 
     @property

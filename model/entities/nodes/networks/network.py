@@ -376,7 +376,7 @@ class Network(Node):
             print("-------------------------------------------------------------")
             print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
             print("-------------------------------------------------------------")
-            if self._dynamic_routing and int((int(self.env.now) * self.env.sim_tick)) % 30 == 0:
+            if self._dynamic_routing and int(int(self.env.now) % (30 / self.env.sim_tick)) == 0:
                 # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
                 yield from self._update_routing()
             while True:

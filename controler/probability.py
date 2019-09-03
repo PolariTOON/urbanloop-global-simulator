@@ -5,13 +5,13 @@ import scipy.stats
 
 from model.entities.nodes.networks.ways.tracks import station
 
-from . import converter
-
 
 class Probability:
     """
+    TODO : la génération de voyageur est à faire dans chaque gare en s'inspirant de la génération globale faite dans l'ancien simulateur
     Modélise la prbabilité d'apparition d'un voyageur dans une gare
     """
+
     def __init__(self, traveler, prob):
         self._city_percent = int(prob['city_percent'])
         self._activity_and_residential_percent = int(prob['activity_and_residential_percent'])
@@ -41,13 +41,14 @@ class Probability:
         :param is_arrival: If the station is a departure or destination station
         :return: The probability to lead a traveler to the chosen station_type at the given time
         """
-        if None in (self._city_percent, self._activity_and_residential_percent, self._activity_and_residential_fluctuation):
+        if None in (
+                self._city_percent, self._activity_and_residential_percent, self._activity_and_residential_fluctuation):
             print("Converter hasn't been loaded")
             return 0
         second = second % 86400
         gaussian_factor = 250 * (self._activity_and_residential_fluctuation / 100)
         result = 0
-        decimal_hour = converter.seconds_to_decimal_hour(second)
+        decimal_hour = round(second / 3600, 2)
         norm_mph = scipy.stats.norm.pdf(decimal_hour, self._morning_peak_hour, 1)
         norm_eph = scipy.stats.norm.pdf(decimal_hour, self._evening_peak_hour, 1)
         if station_type == station.station_types["city"]:
@@ -90,5 +91,6 @@ def generate_traveler_poisson(traveler_per_day, hour):
     peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]
     somme_coefficient = int(np.sum(peak_hours_coefficient))
     traveler_per_day = int(traveler_per_day)
-    traveler_lambda_per_hour = [traveler_per_day * coefficient / (3600 * somme_coefficient) for coefficient in peak_hours_coefficient]
+    traveler_lambda_per_hour = [traveler_per_day * coefficient / (3600 * somme_coefficient) for coefficient in
+                                peak_hours_coefficient]
     return max(np.random.poisson(traveler_lambda_per_hour[hour], 1)[0], 1)

@@ -14,7 +14,6 @@ class Pod(Token):
         travelers["max"] = travelers["max"] or 0
         self._travelers = [Traveler(env, 0) for k in range(travelers["count"])]
         self._capacity = travelers["max"]
-        self._priority = 0  # TODO : à enlever
         self._track_or_switch = track_or_switch
         self._speed = pod_speed
         self._turn = turn or False
@@ -41,14 +40,6 @@ class Pod(Token):
     @property
     def capacity(self):
         return self._capacity
-
-    @property
-    def priority(self):
-        return self._priority
-
-    @priority.setter
-    def priority(self, value):
-        self._priority = value
 
     @property
     def track_or_switch(self):

@@ -33,7 +33,20 @@
         {"speed": 16.67, "path": {"type": "line"}},
         {"speed": 16.67, "path": {"type": "line"}}
       ],
-      "pods": []
+      "pods": [
+        {"position": 0, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 10, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 20, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 30, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 40, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 50, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 60, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 70, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 80, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 90, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 95, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}}
+
+      ]
     },
     {
       "name": "Villers-les-Nancy",
@@ -55,7 +68,15 @@
         {"speed": 16.67, "path": {"type": "line"}},
         {"speed": 16.67, "path": {"type": "line"}}
       ],
-      "pods": []
+      "pods": [
+        {"position": 0, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 10, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 20, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 30, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 40, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}},
+        {"position": 50, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 2, "element": 2}, "travelers": {"count": 0, "max": 0}}
+
+      ]
     },
     {
       "name": "Laxou",

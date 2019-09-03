@@ -34,10 +34,10 @@
     {
       "name": "Laxou",
       "elements": [
-        {"type": "switch_in", "x": 150, "y": 420, "id_bridge": 1, "pods": []},
-        {"type": "shed", "name": "Marie-Jeanne", "x": 150, "y": 300, "pods": {"max": 100, "count": 100}},
-        {"type": "shed", "name": "Jean-Paul", "x": 200, "y": 300, "pods": {"max": 100, "count": 100}},
-        {"type": "switch_out", "x": 300, "y": 350, "id_bridge": 0, "pods": []}
+        {"type": "switch_in", "x": 210, "y": 440, "id_bridge": 1, "pods": []},
+        {"type": "shed", "name": "Marie-Jeanne", "x": 150, "y": 330, "pods": {"max": 100, "count": 100}},
+        {"type": "shed", "name": "Jean-Paul", "x": 200, "y": 320, "pods": {"max": 100, "count": 100}},
+        {"type": "switch_out", "x": 330, "y": 385, "id_bridge": 0, "pods": []}
       ],
       "sections": [
         {"speed": 22.22, "path": {"type": "line"}},

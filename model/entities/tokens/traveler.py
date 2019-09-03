@@ -4,8 +4,7 @@ from .token import Token
 class Traveler(Token):
     def __init__(self, env, waiting_time=None, **kwargs):
         super().__init__(env, **kwargs)
-        waiting_time = waiting_time or 0
-        self._waiting_time = waiting_time
+        self._waiting_time = waiting_time or 0
 
     @property
     def name(self):
@@ -13,7 +12,6 @@ class Traveler(Token):
 
     def serialize(self):
         dict = super().serialize()
-        dict.update({})
         return dict
 
     def update(self):

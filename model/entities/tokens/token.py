@@ -26,12 +26,13 @@ class Token(Entity):
         self._destination = value
 
     def serialize(self):
+        # TODO c'est ces arguments qu'il faut corriger pour l'affichage des capsules qui se téléporte, dans le modèle c'est correct sinon
         dict = super().serialize()
-        if self.source:
+        if self.source is not None:
             source = self.source.to_element_of_loop()
         else:
             source = 0
-        if self.destination:
+        if self.destination is not None:
             destination = self.destination.to_element_of_loop()
         else:
             destination = 0

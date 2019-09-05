@@ -60,11 +60,13 @@ class Station(Step):
                 "all_time_count": self.all_time_count
             },
             "station_type": self.type,
-            "departure_pods": departure_pods
+            "departure_pods": departure_pods,
+            "element_of_loop": self._element_of_loop
         })
         return dict
 
-    def to_element_of_loop(self):
+    @property
+    def element_of_loop(self):
         """Numéro de la gare parmis les éléments de la boucle"""
         return self._element_of_loop
 

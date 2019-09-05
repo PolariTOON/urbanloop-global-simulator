@@ -39,11 +39,13 @@ class Shed(Step):
                 "count": len(self.pods),
                 "max": self.capacity
             },
-            "departure_pods": departure_pods
+            "departure_pods": departure_pods,
+            "element_of_loop": self.element_of_loop
         })
         return dict
 
-    def to_element_of_loop(self):
+    @property
+    def element_of_loop(self):
         """Retourne le numéro du dépôt au sein des éléments de sa boucle"""
         return self._element_of_loop
 

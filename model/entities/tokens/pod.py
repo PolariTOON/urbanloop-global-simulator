@@ -109,8 +109,8 @@ class Pod(Token):
             "speed_restore": self.speed_restore,
             "length_before_restore": self.length_before_restore,
             "speed": self.speed,
-            "source": self.source,
-            "destination": self.destination
+            "source": self.source.element_of_loop,
+            "destination": self.destination.element_of_loop
         })
         return dict
 

@@ -163,6 +163,18 @@ export class Pod extends Entity {
     get _keepFlag() {
         return this.__keepFlag;
     }
+    get _source(){
+        return this.__source;
+    }
+    set _source(value){
+        this.__source = value
+    }
+    get _destination(){
+        return this.__destination;
+    }
+    set _destination(value){
+        this.__destination = value;
+    }
     select() {
         this.__outerShape.fill(selectedOuterColor);
     }
@@ -175,7 +187,8 @@ export class Pod extends Entity {
         const {x, y, position} = calcPosition(json, json2, json3);
         const travelerCount = json["travelers"]["count"];
         const travelerMax = json["travelers"]["max"];
-        // const source = json["source"]
+        const source = json["source"]["name"];
+        const destination = json["destination"]["name"];
         this._name = name;
         this._x = x;
         this._y = y;
@@ -183,7 +196,7 @@ export class Pod extends Entity {
         this._travelerCount = travelerCount;
         this._travelerMax = travelerMax;
         this._speed = speed;
-        // this._source = source;
-        // this._destination = source;
+        this._source = source;
+        this._destination = destination;
     }
 }

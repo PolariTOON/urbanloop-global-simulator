@@ -33,6 +33,7 @@ class Pod(Token):
         Position de la capsule depuis le début de la section où elle se trouve
         Si pas sur une section alors ça vaut 0
         Si sur un aiguillage, alors comme il a une taille c'est != 0
+        Attention, pour un fichier complet d'un d'un réseau on indique la position depuis le début de la boucle
         """
         return self._position
 

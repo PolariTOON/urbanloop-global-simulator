@@ -42,12 +42,15 @@ class Station(Step):
             p = dico["pod"]
             dest = self.find(dico["destination"])
             dico["pod"] = Pod(env, self, 0, p)
-            dico["destination"] = self.find(dest)
+            dico["destination"] = dest
 
     def serialize(self):
         """Permet la serialisation des informations"""
         dict = super().serialize()
         departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"]} for dico in self._departure_pods]
+        self.element_of_loop.update({
+            "name": self.name
+        })
         dict.update({
             "type": "station",
             "pods": {
@@ -61,7 +64,7 @@ class Station(Step):
             },
             "station_type": self.type,
             "departure_pods": departure_pods,
-            "element_of_loop": self._element_of_loop
+            "element_of_loop": self.element_of_loop
         })
         return dict
 

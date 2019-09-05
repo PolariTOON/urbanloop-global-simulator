@@ -72,7 +72,7 @@ class SwitchIn(Switch):
         index = -1
         for i in range(self._first_place - self._places_number, self._first_place - 1):
             if self._discrete_places[i] == value:
-                index = i
+                index = i % self._places_number
         return index
 
     def backstep(self, begin):

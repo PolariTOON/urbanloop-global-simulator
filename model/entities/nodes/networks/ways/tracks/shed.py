@@ -27,12 +27,15 @@ class Shed(Step):
             p = dico["pod"]
             dest = self.find(dico["destination"])
             dico["pod"] = Pod(env, self, 0, p)
-            dico["destination"] = self.find(dest)
+            dico["destination"] = dest
 
     def serialize(self):
         """sérialise les informations du dépôt"""
         dict = super().serialize()
         departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
+        self.element_of_loop.update({
+            "name": self.name
+        })
         dict.update({
             "type": "shed",
             "pods": {
@@ -108,8 +111,7 @@ class Shed(Step):
                     pass
                 elif "refill" == message["type"]:
                     station = message["station"]
-                    pod = self._pods[0]
-                    self._pods.remove(pod)
+                    pod = self._pods.pop(0)
                     self._departure_pods.append({"pod": pod, "destination": station})
                 else:
                     raise ValueError("Invalid message")

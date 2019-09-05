@@ -74,6 +74,8 @@ def get_root():
 async def _post_network(simulations, network_index, network_item):
     """Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json"""
     if network_item is not None:
+        if "id" in network_item:
+            del network_item["id"]
         simulation = Simulation(network_index, _sim_tick, **network_item)
         simulations[network_index] = simulation
         return simulation.serialize()

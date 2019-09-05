@@ -111,7 +111,12 @@ class Shed(Step):
                     pass
                 elif "refill" == message["type"]:
                     station = message["station"]
-                    pod = self._pods.pop(0)
-                    self._departure_pods.append({"pod": pod, "destination": station})
+                    test_refill = True
+                    for dico in self._departure_pods:
+                        if dico["destination"] == station:  # TODO : gérer un moyen de savoir si on a déjà réapprovisionné à l'initialisation/génération
+                            test_refill = False
+                    if test_refill:
+                        pod = self._pods.pop(0)
+                        self._departure_pods.append({"pod": pod, "destination": station})
                 else:
                     raise ValueError("Invalid message")

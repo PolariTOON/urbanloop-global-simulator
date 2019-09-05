@@ -128,6 +128,10 @@ class Section(Track):
         speed = pod["speed"]
         for k in range(len(pods)):
             if pods[k].position > pod["position"]:
+                if "id" in pod:
+                    del pod["id"]
                 self._pods.insert(k, Pod(env, self, speed, **pod))
                 return
+        if "id" in pod:
+            del pod["id"]
         self._pods.append(Pod(env, self, self._speed, **pod))

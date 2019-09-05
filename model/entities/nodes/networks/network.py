@@ -216,6 +216,8 @@ class Network(Node):
         for b in range(len(self._loops)):
             routes = self._loops[b]["routes"]
             for route in range(1, len(routes)):
+                if "id" in routes[route]:
+                    del routes[route]["id"]
                 new_route = Route(env, len(self._routes), self._margin_min, self._pod_size, False, **routes[
                     route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._routes.append(new_route)
@@ -251,6 +253,8 @@ class Network(Node):
                     (id_switch - first_switch - 1) % len(self._loops[b]["switches"]) + first_switch]  # loop_in
                 switch["next"] = self._routes[id_switch]  # loop_out
                 switch["beside"] = self._routes[l + switch["id_bridge"]]  # route_bridge
+                if "id" in switch:
+                    del switch["id"]
                 if switch["type"] == "switch_in":
                     new_switch = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number,
                                           **switch)
@@ -265,12 +269,16 @@ class Network(Node):
             switch_in = self._get_elt_of_loop(**bridge["switch_in"])
             bridge["switches"] = [switch_out, switch_in]
             self._init_pods_of_line(bridge)
+            if "id" in bridge:
+                del bridge["id"]
             self._bridges[p] = Bridge(p, **bridge)
         for b in range(len(self._loops)):
             loop = self._loops[b]
             self._init_pods_of_line(loop)
         for b in range(len(self._loops)):
             loop = self._loops[b]
+            if "id" in loop:
+                del loop["id"]
             self._loops[b] = Loop(b, **loop)
 
     def _init_parent_of_children(self):
@@ -290,7 +298,7 @@ class Network(Node):
             pod["destination"] = self._get_elt_of_loop(**pod["destination"])
             _init_pod_of_line(line, pod)
 
-    def _get_elt_of_loop(self, loop=None, element=None):
+    def _get_elt_of_loop(self, loop=None, element=None, **kwargs):
         """
         :param loop, element: numéro de la boucle et de l'élément s'y trouvant
         :return: l'objet instancié correspondant au numéro d'élément présent dans la boucle spécifiée

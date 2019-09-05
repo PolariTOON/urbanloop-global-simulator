@@ -21,10 +21,14 @@ class Route(Way):
         #  Etape 42 : On instancie les pistes mais pas les liaisons de la premiere et de la dernière section
         for section_index in range(len(self._sections)):
             section = self._sections[section_index]
+            if "id" in section:
+                del section["id"]
             section = Section(env, section_index, margin_min, pod_size, self._is_bridge, **section)
             self._sections[section_index] = section
         for step_index in range(len(self._steps)):
             step = self._steps[step_index]
+            if "id" in step:
+                del step["id"]
             step["previous"] = self._sections[step_index]
             step["next"] = self._sections[step_index + 1]
             if step["type"] == "sensor":

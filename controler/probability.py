@@ -1,7 +1,7 @@
-import random
-
-import numpy as np
-import scipy.stats
+from numpy import floor, sum
+from numpy.random import poisson
+from random import randrange
+from scipy.stats import norm
 
 from model.entities.nodes.networks.ways.tracks import station
 
@@ -20,7 +20,7 @@ class Probability:
         self._morning_peak_hour = int(traveler['morning_peak_hour'])
         self._evening_peak_hour = int(traveler['evening_peak_hour'])
         if self._activity_and_residential_fluctuation < 0 or self._activity_and_residential_fluctuation >= self._activity_and_residential_percent:
-            self._activity_and_residential_fluctuation = np.floor(self._activity_and_residential_percent / 2)
+            self._activity_and_residential_fluctuation = floor(self._activity_and_residential_percent / 2)
 
     def random_ascent_descent_duration(self, tick_per_second):
         """
@@ -28,7 +28,7 @@ class Probability:
         :return: A value between [|time-2, time+2|]. time is the defined duration (in the config file)
         for ascent and descent events.
         """
-        random_seconds = random.randrange(self._ascent_descent_duration - 2, self._ascent_descent_duration + 2, 1)
+        random_seconds = randrange(self._ascent_descent_duration - 2, self._ascent_descent_duration + 2, 1)
         return random_seconds * tick_per_second
 
     def station_probability(self, station_type, second, is_arrival=True):
@@ -49,8 +49,8 @@ class Probability:
         gaussian_factor = 250 * (self._activity_and_residential_fluctuation / 100)
         result = 0
         decimal_hour = round(second / 3600, 2)
-        norm_mph = scipy.stats.norm.pdf(decimal_hour, self._morning_peak_hour, 1)
-        norm_eph = scipy.stats.norm.pdf(decimal_hour, self._evening_peak_hour, 1)
+        norm_mph = norm.pdf(decimal_hour, self._morning_peak_hour, 1)
+        norm_eph = norm.pdf(decimal_hour, self._evening_peak_hour, 1)
         if station_type == station.station_types["city"]:
             result = self._city_percent
         if station_type == station.station_types["activity"]:
@@ -89,8 +89,8 @@ def generate_traveler_poisson(traveler_per_day, hour):
     :return: The number of traveler you would create at the given hour.
     """
     peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]
-    somme_coefficient = int(np.sum(peak_hours_coefficient))
+    somme_coefficient = int(sum(peak_hours_coefficient))
     traveler_per_day = int(traveler_per_day)
     traveler_lambda_per_hour = [traveler_per_day * coefficient / (3600 * somme_coefficient) for coefficient in
                                 peak_hours_coefficient]
-    return max(np.random.poisson(traveler_lambda_per_hour[hour], 1)[0], 1)
+    return max(poisson(traveler_lambda_per_hour[hour], 1)[0], 1)

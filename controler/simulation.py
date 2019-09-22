@@ -1,4 +1,4 @@
-import configparser
+from configparser import ConfigParser
 from math import floor
 from random import random, seed
 from simpy import Environment
@@ -13,7 +13,7 @@ class Simulation:
     def __init__(self, id, sim_tick, time=None, state=None, running=None, **kwargs):
         state = state or (seed(), random() * 2 ** 53)[1]
         running = running or False
-        self._config = configparser.ConfigParser()
+        self._config = ConfigParser()
         self._config.read('resources/config.ini')  # TODO : déplacer ce qui est nécessaire dans le json
         self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
         self._env = Environment()

@@ -2,7 +2,8 @@ import {state} from "./state.js";
 import "./menu.js";
 import "./network.js";
 import "./data-panel.js";
-import "./view-panel.js"
+import "./stats-panel.js"
+import "./views-panel.js"
 
 let requestAnimationFrameId = 0;
 

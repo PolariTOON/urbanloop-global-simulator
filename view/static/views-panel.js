@@ -3,13 +3,13 @@ import {Switch} from "./switch.js";
 
 const {Line, Group, Layer, Circle} = Konva;
 
-let viewTab = document.getElementById("view-tab");
-let viewObject = document.getElementById("view-object");
-const notImplemented = document.createElement("strong");
-notImplemented.append("Not Implemented");
+const viewsTab = document.getElementById("views-content");
+const viewsObject = document.createElement("div");
+const notImplemented = document.createElement("p");
+notImplemented.append("Not implemented");
 
-const width = 360; // largeur du canva
-const height = 200; // hauteur du canva
+const width = 360; // largeur du canvas
+const height = 200; // hauteur du canvas
 const size = 150; // hauteur de l'aiguillage = distance C1C2
 const sizeOut = 160; // longueur de la ligne du switchOut
 const sizeIn = 300; // longueur de la ligne du switchIn
@@ -24,7 +24,7 @@ const xM2 = margin + sizeIn;
 const yM2 = size;
 
 let stage = new Konva.Stage({
-    container: viewObject,
+    container: viewsObject,
     width: width,
     height: height
   });
@@ -158,8 +158,8 @@ function updateViewSwitch(switchInJSON, switchOutJSON, bridgeJSON) {
 }
 
 function updateViewOther() {
-    viewObject.remove();
-    viewTab.append(notImplemented);
+    viewsObject.remove();
+    viewsTab.append(notImplemented);
 }
 
 state.addEventListener("update", (event) => {
@@ -171,7 +171,7 @@ state.addEventListener("update", (event) => {
     let id_bridge = null;
     if (selected instanceof Switch){
         notImplemented.remove();
-        viewTab.append(viewObject);
+        viewsTab.append(viewsObject);
         b1: for (const loop of networkJSON["loops"]){
             for (const elt of loop["elements"]){
                 if (selected._name === elt["name"]){

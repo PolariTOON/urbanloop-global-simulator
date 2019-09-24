@@ -83,9 +83,9 @@ export class Pod extends Entity {
     // __position;
     // __travelerCount;
     // __travelerMax;
+    // __speed;
     // __source; // TODO
     // __destination; // TODO
-    // __speed;
     // __keepFlag;
     constructor(hintsLayer) {
         const outerShape = new Circle({

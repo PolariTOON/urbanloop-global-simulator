@@ -6,7 +6,7 @@ import {Shed} from "./shed.js";
 import {Station} from "./station.js";
 import {Switch} from "./switch.js";
 
-const dataTab = document.getElementById("data-tab");
+const dataTab = document.getElementById("data-content");
 
 function serialize() {
     const data = `\
@@ -56,7 +56,7 @@ ${state.selectedEntity instanceof Pod ? `\
 `}
 </dl>
 ` : `\
-<p>Nothing selected.</p>
+<p>Nothing selected</p>
 `}`;
     dataTab.innerHTML = data;
 }

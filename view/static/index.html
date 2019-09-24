@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <link type="text/css" rel="stylesheet" href="./index.css"/>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" defer=""></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" defer=""></script>
-    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" defer=""></script>
-    <script type="text/javascript" src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js" defer=""></script>
-    <script type="text/javascript" src="https://unpkg.com/konva@3.1.6/konva.min.js" defer=""></script>
-    <script type="module" src="./index.js"></script>
-    <title>UrbanLoop Simulator</title>
-</head>
+    <head>
+        <meta charset="utf-8"/>
+        <link type="text/css" rel="stylesheet" href="./index.css"/>
+        <script type="text/javascript" src="https://unpkg.com/konva@3.1.6/konva.min.js" defer=""></script>
+        <script type="module" src="./index.js"></script>
+        <title>UrbanLoop Simulator</title>
+    </head>
     <body>
         <header>
             <hgroup>
@@ -25,28 +20,36 @@
                     <li><label title="Delete" id="delete-button"><input type="button" value="" disabled=""/>Delete</label></li>
                 </menu>
                 <menu>
-                    <li><label title="Play" id="play-button" data-icon="&#9199;"><input type="button" value="" disabled=""/>Play</label></li>
-                    <li><label title="Pause" id="pause-button" data-icon="&#9199;"><input type="button" value="" disabled=""/>Pause</label></li>
-                    <li><label title="Decelerate" id="decelerate-button" data-icon="&#9193;"><input type="button" value="" disabled=""/>Decelerate</label></li>
-                    <li><label title="Accelerate" id="accelerate-button" data-icon="&#9194;"><input type="button" value="" disabled=""/>Accelerate</label></li>
+                    <li><label title="Play" id="play-button"><input type="button" value="" disabled=""/>Play</label></li>
+                    <li><label title="Pause" id="pause-button"><input type="button" value="" disabled=""/>Pause</label></li>
+                    <li><label title="Decelerate" id="decelerate-button"><input type="button" value="" disabled=""/>Decelerate</label></li>
+                    <li><label title="Accelerate" id="accelerate-button"><input type="button" value="" disabled=""/>Accelerate</label></li>
+                </menu>
+                <!-- <menu>
+                    <li><a>Data</a></li>
+                    <li><a>Statistics</a></li>
+                    <li><a>Views</a></li>
+                </menu> -->
+                <menu>
+                    <li><label title="Data" id="data-tab"><input type="radio" name="tab" value="data-panel"/>Data</label></li>
+                    <li><label title="Statistics" id="stats-tab"><input type="radio" name="tab" value="stats-panel"/>Statistics</label></li>
+                    <li><label title="Views" id="views-tab"><input type="radio" name="tab" value="views-panel"/>Views</label></li>
                 </menu>
             </nav>
         </header>
         <main>
             <article></article>
-            <aside>
-                <ul class="nav nav-tabs">
-                    <li class="nav-item active"><a class="nav-link" data-toggle="tab" href="#data-tab">Data</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#stats-tab">Statistics</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#view-tab">Views</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div id="data-tab" class="tab-pane fade in active show"></div>
-                    <div id="stats-tab" class="tab-pane fade"></div>
-                    <div id="view-tab" class="tab-pane fade">
-                        <div id="view-object" class="container"></div>
-                    </div>
-                </div>
+            <aside hidden="" id="data-panel">
+                <h2>Data</h2>
+                <div id="data-content"></div>
+            </aside>
+            <aside hidden="" id="stats-panel">
+                <h2>Statistics</h2>
+                <div id="stats-content"></div>
+            </aside>
+            <aside hidden="" id="views-panel">
+                <h2>Views</h2>
+                <div id="views-content"></div>
             </aside>
         </main>
     </body>

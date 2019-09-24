@@ -7,41 +7,9 @@ const playButton = document.getElementById("play-button").control;
 const pauseButton = document.getElementById("pause-button").control;
 const accelerateButton = document.getElementById("accelerate-button").control;
 const decelerateButton = document.getElementById("decelerate-button").control;
-let timerDiv = document.getElementById('timer-div');
-let speedDiv = document.getElementById('speed-div');
-
-export function updateTimeFromJSON(timeJSON) {
-    timerDiv.innerHTML = `Day ${timeJSON['day']}<br>${timeJSON['time']}`;
-    speedDiv.innerHTML = timeJSON['speed'];
-
-    if (timeJSON['decelerateJerky'] === 1) {
-        if (!accelerateButton.classList.contains("btn-warning")) {
-            accelerateButton.classList.remove("btn-light");
-            accelerateButton.classList.add("btn-warning");
-            accelerateButton.title = "Jerky Mode ! Simulation will be less accurate";
-        }
-    } else {
-        if (!accelerateButton.classList.contains("btn-light")) {
-            accelerateButton.classList.remove("btn-warning");
-            accelerateButton.classList.add("btn-light");
-            accelerateButton.removeAttribute("title");
-        }
-    }
-
-    if (timeJSON['accelerateJerky'] === 1) {
-        if (!decelerateButton.classList.contains("btn-warning")) {
-            decelerateButton.classList.remove("btn-light");
-            decelerateButton.classList.add("btn-warning");
-            decelerateButton.title = "Jerky Mode ! Simulation will be less accurate";
-        }
-    } else {
-        if (!decelerateButton.classList.contains("btn-light")) {
-            decelerateButton.classList.remove("btn-warning");
-            decelerateButton.classList.add("btn-light");
-            decelerateButton.removeAttribute("title");
-        }
-    }
-}
+const dataTab = document.getElementById("data-tab").control;
+const statsTab = document.getElementById("stats-tab").control;
+const viewsTab = document.getElementById("views-tab").control;
 
 state.addEventListener("load", (event) => {
     uploadButton.disabled = true;
@@ -112,3 +80,37 @@ decelerateButton.addEventListener("click", async (event) => {
 accelerateButton.addEventListener("click", async (event) => {
     state.accelerate();
 });
+
+let currentPanel = null;
+for (const tab of [dataTab, statsTab, viewsTab]) {
+    tab.addEventListener("click", async (event) => {
+        if (!tab.checked) {
+            return;
+        }
+        const oldPanel = currentPanel;
+        const newPanel = document.getElementById(tab.value);
+        if (oldPanel !== null) {
+            oldPanel.hidden = true;
+        }
+        if (newPanel === null || newPanel === oldPanel) {
+            tab.checked = false;
+            currentPanel = null;
+            state.resize();
+            return;
+        }
+        newPanel.hidden = false;
+        currentPanel = newPanel;
+        if (oldPanel === null) {
+            state.resize();
+        }
+    });
+    if (tab.checked) {
+        tab.click();
+    } else {
+        const panel = document.getElementById(tab.value);
+        panel.hidden = true;
+    }
+}
+if (currentPanel !== null) {
+    state.resize();
+}

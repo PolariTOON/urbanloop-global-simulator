@@ -52,6 +52,9 @@ header > nav > * {
     margin: 0;
     padding: 1rem;
 }
+header > nav > :last-child {
+    margin-left: auto;
+}
 /*~~~~~~ main ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 main {
     grid-template-columns: 1fr auto;
@@ -79,7 +82,6 @@ main > article > p {
 }
 main > article > h2 {
     margin-bottom: auto;
-    font-weight: bold !important; /* TODO: retirer quand Bootstrap le sera */
 }
 main > article > p > label {
     margin: 0;
@@ -89,15 +91,18 @@ main > article > .konvajs-content {
 }
 main > aside {
     z-index: 1;
-    width: 40rem;
-    padding: 0 !important; /* TODO: changer en 1rem lorsque l'apparté sera géré */
+    width: 38rem;
+    padding: 0;
     background-color: #fff;
     box-shadow: 0 0 .4rem #3333;
     overflow: auto;
 }
-main > aside > * {
-    margin: 0 !important; /* TODO: retirer quand Bootstrap le sera */
-    padding: 1rem !important; /* TODO: retirer quand Bootstrap le sera */
+main > aside[hidden] {
+    display: none;
+}
+main > aside > h2 {
+    margin: 0;
+    padding: 1rem;
 }
 /*~~~~~~ menu ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 menu > li {
@@ -106,7 +111,6 @@ menu > li {
 menu > li > a[download],
 menu > li > label {
     display: inline-block;
-    margin: 0 !important; /* TODO: retirer quand Bootstrap le sera */
     cursor: default;
     font-size: 0;
 }
@@ -145,7 +149,8 @@ menu > li > label:focus-within > input {
     background-color: #369;
 }
 menu > li > a[download]:active::before,
-menu > li > label:active > input {
+menu > li > label:active > input,
+menu > li > label > input:checked {
     box-shadow: inset 0 0 0 .2rem #fff;
 }
 menu > li > a[download]:not([href])::before,
@@ -153,15 +158,25 @@ menu > li > label > input:disabled {
     background-color: #ccc;
     box-shadow: none;
 }
+/*~~~~~~ p ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+p {
+    margin: 0;
+    padding: 1rem;
+}
 /*~~~~~~ dl ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 dl {
-    margin: 1rem;
+    margin: 0;
+    padding: 1rem;
 }
 dl > dt {
-    margin: 1rem 0 0 0;
+    margin: 0;
+    font-weight: bold;
 }
 dl > dd {
     margin: 0 0 0 2rem;
+}
+dl > dd + dt {
+    margin: 1rem 0 0 0;
 }
 /*~~~~~~ #identifiers, .classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 a[download]#download-button::before {
@@ -188,66 +203,12 @@ label#accelerate-button > input {
 label#decelerate-button > input {
     background-image: url("icons.svg#decelerate");
 }
-
-.badge,
-.btn {
-    font-size: inherit;
+label#data-tab > input {
+    background-image: url("icons.svg#data");
 }
-.nav.nav-tabs {
-    position: sticky;
-    top: 0;
-    background: #fff;
+label#stats-tab > input {
+    background-image: url("icons.svg#stats");
 }
-
-#config-form > fieldset {
-    margin: 2rem;
-}
-
-#config-btn-group,
-#config-network-btn-group {
-    display: flex;
-    justify-content: center;
-}
-
-#network-text {
-    display: flex;
-    justify-content: space-around;
-    min-height: 20px;
-    margin: 0;
-}
-
-.fa-star {
-    color: white;
-}
-
-.form-text-error {
-    font-size: 12px;
-    color: #bc0000;
-}
-
-.not-shown {
-    display: none;
-}
-
-.nav-tabs {
-    justify-content: space-around;
-}
-
-.nav-link {
-    color: black;
-    padding: .3rem .4rem;
-}
-
-.nav-link:hover {
-    color: #424242;
-    background-color: #ccc;
-    cursor: pointer;
-}
-
-#tab-content > p {
-    margin: 0;
-}
-
-#tab-content input {
-    height: inherit;
+label#views-tab > input {
+    background-image: url("icons.svg#views");
 }

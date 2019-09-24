@@ -104,6 +104,9 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         state.dispatchEvent(new CustomEvent("pause"));
         this._running = false;
     }
+    _resize() {
+        state.dispatchEvent(new CustomEvent("resize"));
+    }
     async reload() {
         const integer = /^(?:0|[1-9]\d*)$/;
         const url = new URL(location);
@@ -173,6 +176,9 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
             return;
         }
         this._accelerate();
+    }
+    async resize() {
+        this._resize();
     }
 }
 

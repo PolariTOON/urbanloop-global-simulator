@@ -141,6 +141,11 @@ state.addEventListener("update", (event) => {
     layer.batchDraw();
 });
 
+state.addEventListener("resize", async (event) => {
+    resize();
+    layer.batchDraw();
+});
+
 function resize() {
     const container = stage.container();
     const {offsetWidth, offsetHeight} = container;
@@ -210,8 +215,7 @@ function setCursor(cursor) {
 
 window.addEventListener("resize", async (event) => {
     event.preventDefault();
-    resize();
-    layer.batchDraw();
+    state.resize();
 });
 
 stage.on("dragstart", async (event) => {

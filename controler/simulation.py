@@ -10,7 +10,9 @@ from .probability import Probability
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, sim_tick, time=None, state=None, running=None, **kwargs):
+    def __init__(self, id, sim_tick, time=None, speed=None, state=None, running=None, **kwargs):
+        time = time or 0
+        speed = speed or 0
         state = state or (seed(), random() * 2 ** 53)[1]
         running = running or False
         self._config = ConfigParser()
@@ -18,6 +20,7 @@ class Simulation:
         self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
         self._env = Environment()
         self._time = time
+        self._speed = speed
         self._state = state
         self._running = running
         self._network = Network(self._env, id, **kwargs)
@@ -27,6 +30,10 @@ class Simulation:
     @property
     def time(self):
         return self._time
+
+    @property
+    def speed(self):
+        return self._speed
 
     @property
     def state(self):
@@ -53,6 +60,7 @@ class Simulation:
         dict = self._network.serialize()
         dict.update({
             "time": self.time,
+            "speed": self.speed,
             "state": self.state,
             "running": self.running
         })

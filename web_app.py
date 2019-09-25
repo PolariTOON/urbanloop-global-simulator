@@ -1,6 +1,7 @@
 from asyncio import get_running_loop, run, run_coroutine_threadsafe, sleep
 from flask import Flask, jsonify, request
 from functools import wraps
+from json import load
 from logging import ERROR, getLogger
 from threading import Thread
 
@@ -10,18 +11,28 @@ from controler.simulation import Simulation
 _app = Flask(__name__, static_url_path="", static_folder="view/static", template_folder="view/templates")
 _app.logger.setLevel(ERROR)
 getLogger("werkzeug").setLevel(ERROR)
-_sim_tick = 0.042  # TODO: calculer selon la vitesse et la précision de la simulation, ainsi que l'occupation du serveur (actuellement à 24 images par secondes)
 
+_sim_tick = 0  # IDEA: calculer selon la vitesse et la précision des simulations, ainsi que l'occupation du serveur (actuellement à 24 images par secondes)
 _loop = None
 _simulations = {}
 
 
-async def _run_simulations():
+async def _run_simulations(networks, tick):
     """Lancement de simulations"""
     print("Log format : receiver  --  author  --  message type")
     global _sim_tick
     global _loop
     global _simulations
+    _sim_tick = tick
+    for network_index in networks:
+        network_file = networks[network_index]
+        with open(network_file) as file:
+            network_item = load(file)
+        if network_item is not None:
+            if "id" in network_item:
+                del network_item["id"]
+            simulation = Simulation(network_index, _sim_tick, **network_item)
+            _simulations[network_index] = simulation
     _loop = get_running_loop()
     while True:
         await sleep(_sim_tick)
@@ -158,8 +169,8 @@ async def _get_section(simulations, network_index, route_index, section_index):
     return simulations[network_index]._network.routes[route_index].sections[section_index].serialize()
 
 
-def run_app(port):
+def run_app(port, networks, tick):
     """Fonction permettant de lancer l'application"""
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
-    Thread(target=lambda: run(_run_simulations())).start()
+    Thread(target=lambda: run(_run_simulations(networks, tick))).start()
     _app.run(port=port)

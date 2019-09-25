@@ -1,7 +1,7 @@
 """
 Cette classe permet de gérer le code lié à un lancement d'une simulation sans interface graphique
 """
-from asyncio import get_running_loop, run
+from asyncio import get_running_loop, run, sleep
 from json import load
 from threading import Thread
 
@@ -27,9 +27,11 @@ async def _run_simulations(networks, tick):
             if "id" in network_item:
                 del network_item["id"]
             simulation = Simulation(network_index, _sim_tick, **network_item)
+            simulation.running = True
             _simulations[network_index] = simulation
     _loop = get_running_loop()
     while True:
+        await sleep(_sim_tick)
         for key in _simulations:
             simulation = _simulations[key]
             simulation.update()

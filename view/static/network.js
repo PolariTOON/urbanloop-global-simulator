@@ -49,9 +49,9 @@ state.addEventListener("load", async (event) => {
     const hours = datetime % 24;
     datetime = (datetime - hours) / 24;
     const days = datetime;
-    datetimeView.control.textContent = `Day ${days + 1} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    datetimeView.control.value = `Day ${days + 1} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     const rate = networkJSON["rate"];
-    rateView.control.textContent = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
+    rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
     const viewBox = networkJSON["view_box"];
     const {x, y, width, height} = viewBox;
     const [offsetX, offsetY, zoom] = [0, 0, 1];
@@ -80,8 +80,8 @@ state.addEventListener("load", async (event) => {
 
 state.addEventListener("unload", async (event) => {
     heading.textContent = "Undefined network";
-    datetimeView.control.textContent = "Day - --:--:--";
-    rateView.control.textContent = "×-";
+    datetimeView.control.value = "Day - --:--:--";
+    rateView.control.value = "×-";
     legendsLayer.destroyChildren();
     elementsLayer.destroyChildren();
     sectionsLayer.destroyChildren();
@@ -110,9 +110,9 @@ state.addEventListener("update", (event) => {
     const hours = datetime % 24;
     datetime = (datetime - hours) / 24;
     const days = datetime;
-    datetimeView.control.textContent = `Day ${days + 1} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    datetimeView.control.value = `Day ${days + 1} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     const rate = networkJSON["rate"];
-    rateView.control.textContent = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
+    rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
     const loopsJSON = networkJSON["loops"];
     const bridgesJSON = networkJSON["bridges"];
     for (let i = 0, li = loopsJSON.length; i < li; i++) {
@@ -146,11 +146,11 @@ state.addEventListener("update", (event) => {
 });
 
 state.addEventListener("decelerate", (event) => {
-    rateView.control.textContent = `×${2 ** state.rate}${state.jerky ? ` (jerky)` : ``}`;
+    rateView.control.value = `×${2 ** state.rate}${state.jerky ? ` (jerky)` : ``}`;
 });
 
 state.addEventListener("accelerate", (event) => {
-    rateView.control.textContent = `×${2 ** state.rate}${state.jerky ? ` (jerky)` : ``}`;
+    rateView.control.value = `×${2 ** state.rate}${state.jerky ? ` (jerky)` : ``}`;
 });
 
 state.addEventListener("resize", async (event) => {

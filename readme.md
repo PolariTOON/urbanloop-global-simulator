@@ -60,6 +60,12 @@ Pour lancer le programme (après téléchargement des sources), exécuter la com
 $ python3.7 main.py -p
 ```
 
+Il est aussi possible de charger des réseaux dès le lancement comme ceci :
+
+```sh
+$ python3.7 main.py -p -n '{"0": "path/to/network0.json", "42": "path/to/network42.json"}'
+```
+
 Pour plus d'informations, utilisez la commande suivante :
 
 ```sh

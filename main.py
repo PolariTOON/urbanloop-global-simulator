@@ -31,7 +31,7 @@ def wave(value):
 
 
 argument_parser = ArgumentParser(description="Run the UrbanLoop simulator")
-argument_parser.add_argument("-n", "--networks", type=networks, default="{}", help="open the given networks or none by default")
+argument_parser.add_argument("-n", "--networks", type=networks, default="{}", help="load the given networks or none by default")
 argument_parser.add_argument("-p", "--port", type=port, default=-1, const=8090, nargs='?', help="run a web application on the given port or 8090 by default")
 argument_parser.add_argument("-w", "--wave", type=wave, default=.042, help="set the duration of each wave to the given value (in seconds) or .042 seconds by default")
 arguments = argument_parser.parse_args()

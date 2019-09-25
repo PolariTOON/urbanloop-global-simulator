@@ -7,18 +7,18 @@ from threading import Thread
 
 from controler.simulation import Simulation
 
-_sim_tick = 0  # IDEA: calculer selon la vitesse et la précision des simulations
+_wave = 0  # IDEA: calculer selon la vitesse et la précision des simulations
 _loop = None
 _simulations = {}
 
 
-async def _run_simulations(networks, tick):
+async def _run_simulations(networks, wave):
     """Lancement de simulations"""
     print("Log format : receiver  --  author  --  message type")
-    global _sim_tick
+    global _wave
     global _loop
     global _simulations
-    _sim_tick = tick
+    _wave = wave
     for network_index in networks:
         network_file = networks[network_index]
         with open(network_file) as file:
@@ -26,16 +26,16 @@ async def _run_simulations(networks, tick):
         if network_item is not None:
             if "id" in network_item:
                 del network_item["id"]
-            simulation = Simulation(network_index, _sim_tick, **network_item)
+            simulation = Simulation(network_index, _wave, **network_item)
             simulation.running = True
             _simulations[network_index] = simulation
     _loop = get_running_loop()
     while True:
-        await sleep(_sim_tick)
+        await sleep(_wave)
         for key in _simulations:
             simulation = _simulations[key]
             simulation.update()
 
 
-def run_app(networks, tick):
-    Thread(target=lambda: run(_run_simulations(networks, tick))).start()
+def run_app(networks, wave):
+    Thread(target=lambda: run(_run_simulations(networks, wave))).start()

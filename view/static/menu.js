@@ -19,8 +19,8 @@ state.addEventListener("load", (event) => {
     deleteButton.disabled = false;
     playButton.disabled = false;
     pauseButton.disabled = true;
-    // decelerateButton.disabled = false;
-    // accelerateButton.disabled = false;
+    decelerateButton.disabled = state.rate === 0;
+    accelerateButton.disabled = state.rate === state.maxRate;
 });
 
 state.addEventListener("unload", (event) => {
@@ -31,8 +31,8 @@ state.addEventListener("unload", (event) => {
     deleteButton.disabled = true;
     playButton.disabled = true;
     pauseButton.disabled = true;
-    // decelerateButton.disabled = true;
-    // accelerateButton.disabled = true;
+    decelerateButton.disabled = true;
+    accelerateButton.disabled = true;
 });
 
 state.addEventListener("play", (event) => {
@@ -43,6 +43,24 @@ state.addEventListener("play", (event) => {
 state.addEventListener("pause", (event) => {
     playButton.disabled = false;
     pauseButton.disabled = true;
+});
+
+state.addEventListener("decelerate", (event) => {
+    if (state.rate === 0) {
+        decelerateButton.disabled = true;
+    }
+    if (state.rate === state.maxRate - 1) {
+        accelerateButton.disabled = false;
+    }
+});
+
+state.addEventListener("accelerate", (event) => {
+    if (state.rate === 1) {
+        decelerateButton.disabled = false;
+    }
+    if (state.rate === state.maxRate) {
+        accelerateButton.disabled = true;
+    }
 });
 
 uploadButton.addEventListener("input", async (event) => {
@@ -80,6 +98,16 @@ decelerateButton.addEventListener("click", async (event) => {
 accelerateButton.addEventListener("click", async (event) => {
     state.accelerate();
 });
+
+uploadButton.disabled = false;
+downloadButton.download = "";
+downloadButton.removeAttribute("href");
+// createButton.disabled = false;
+deleteButton.disabled = true;
+playButton.disabled = true;
+pauseButton.disabled = true;
+decelerateButton.disabled = true;
+accelerateButton.disabled = true;
 
 let currentPanel = null;
 for (const tab of [dataTab, statsTab, viewsTab]) {

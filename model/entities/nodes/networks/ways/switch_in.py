@@ -115,7 +115,7 @@ class SwitchIn(Switch):
                     if pod.id == place["id"]:
                         self._discrete_places[k] = pod
         while True:
-            self._cursor = (self._cursor - self.speed * self.env.sim_tick / self.place_size) % self._places_number
+            self._cursor = (self._cursor - self.speed * self.env.tick / self.place_size) % self._places_number
             if int(self._cursor) != self._first_place:
                 # Le curseur a dépassé une nouvelle place, on avance le rouage
                 # pod_to_add est None si pas de capsule à insérer dans le tableau

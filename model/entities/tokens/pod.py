@@ -124,7 +124,7 @@ class Pod(Token):
             # Gestion du décalage et de la discrétisation : on reprend la vitesse moyenne après avoir parcouru la bonne distance
             if self._length_before_restore is not None:
                 if self._length_before_restore > 0:
-                    self._length_before_restore -= self._speed * self.env.sim_tick
+                    self._length_before_restore -= self._speed * self.env.tick
                 else:
                     self._length_before_restore = None
                     if self._speed_restore is not None:
@@ -133,7 +133,7 @@ class Pod(Token):
 
             # La capsule avance
             if self._speed != 0:
-                self._position += self._speed * self.env.sim_tick
+                self._position += self._speed * self.env.tick
 
             # La capsule s'insère et tourne si elle en a reçu l'ordre
             if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._track_or_switch.length:

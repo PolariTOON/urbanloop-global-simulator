@@ -12,18 +12,18 @@ _app = Flask(__name__, static_url_path="", static_folder="view/static", template
 _app.logger.setLevel(ERROR)
 getLogger("werkzeug").setLevel(ERROR)
 
-_sim_tick = 0  # IDEA: calculer selon la vitesse et la précision des simulations, ainsi que l'occupation du serveur (actuellement à 24 images par secondes)
+_wave = 0  # IDEA: calculer selon la vitesse et la précision des simulations, ainsi que l'occupation du serveur
 _loop = None
 _simulations = {}
 
 
-async def _run_simulations(networks, tick):
+async def _run_simulations(networks, wave):
     """Lancement de simulations"""
     print("Log format : receiver  --  author  --  message type")
-    global _sim_tick
+    global _wave
     global _loop
     global _simulations
-    _sim_tick = tick
+    _wave = wave
     for network_index in networks:
         network_file = networks[network_index]
         with open(network_file) as file:
@@ -31,11 +31,11 @@ async def _run_simulations(networks, tick):
         if network_item is not None:
             if "id" in network_item:
                 del network_item["id"]
-            simulation = Simulation(network_index, _sim_tick, **network_item)
+            simulation = Simulation(network_index, _wave, **network_item)
             _simulations[network_index] = simulation
     _loop = get_running_loop()
     while True:
-        await sleep(_sim_tick)
+        await sleep(_wave)
         for key in _simulations:
             simulation = _simulations[key]
             simulation.update()
@@ -87,7 +87,7 @@ async def _post_network(simulations, network_index, network_item):
     if network_item is not None:
         if "id" in network_item:
             del network_item["id"]
-        simulation = Simulation(network_index, _sim_tick, **network_item)
+        simulation = Simulation(network_index, _wave, **network_item)
         simulations[network_index] = simulation
         return simulation.serialize()
     if network_index in simulations:
@@ -123,6 +123,28 @@ async def _pause_clock(simulations, network_index):
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.running = False
+        return True
+    return False
+
+
+@_app.route("/networks/<int:network_index>/clock/decelerate/", methods=["POST"])
+@_synchronize()
+async def _decelerate_clock(simulations, network_index):
+    """Requête post pour décélerer la simulation depuis la vue"""
+    if network_index in simulations:
+        simulation = simulations[network_index]
+        simulation.rate -= 1
+        return True
+    return False
+
+
+@_app.route("/networks/<int:network_index>/clock/accelerate/", methods=["POST"])
+@_synchronize()
+async def _accelerate_clock(simulations, network_index):
+    """Requête post pour accélrer la simulation depuis la vue"""
+    if network_index in simulations:
+        simulation = simulations[network_index]
+        simulation.rate += 1
         return True
     return False
 
@@ -169,8 +191,8 @@ async def _get_section(simulations, network_index, route_index, section_index):
     return simulations[network_index]._network.routes[route_index].sections[section_index].serialize()
 
 
-def run_app(port, networks, tick):
+def run_app(port, networks, wave):
     """Fonction permettant de lancer l'application"""
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
-    Thread(target=lambda: run(_run_simulations(networks, tick))).start()
+    Thread(target=lambda: run(_run_simulations(networks, wave))).start()
     _app.run(port=port)

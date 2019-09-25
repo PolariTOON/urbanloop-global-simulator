@@ -24,6 +24,9 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         this._networkIndex = "";
         this._loaded = false;
         this._running = false;
+        this._rate = 0;
+        this._maxRate = 0;
+        this._jerky = 0;
         this._loops = [];
         this._bridges = [];
         this._nodes = [];
@@ -34,6 +37,15 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     }
     get networkIndex() {
         return this._networkIndex;
+    }
+    get rate() {
+        return this._rate;
+    }
+    get maxRate() {
+        return this._maxRate;
+    }
+    get jerky() {
+        return this._jerky;
     }
     get loops() {
         return this._loops;
@@ -70,6 +82,9 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         if (this._loaded || detail === null) {
             return;
         }
+        this._rate = detail["rate"];
+        this._maxRate = detail["max_rate"];
+        this._jerky = detail["jerky"];
         this.dispatchEvent(new CustomEvent("load", {detail}));
         this._loaded = true;
         if (detail.running) {
@@ -81,14 +96,20 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
             return;
         }
         this._pause();
-        state.dispatchEvent(new CustomEvent("unload"));
+        this._rate = 0;
+        this._maxRate = 0;
+        this._jerky = false;
+        this.dispatchEvent(new CustomEvent("unload"));
         this._loaded = false;
     }
     _update(detail) {
         if (!this._loaded || !this._running) {
             return;
         }
-        state.dispatchEvent(new CustomEvent("update", {detail}));
+        this._rate = detail["rate"];
+        this._maxRate = detail["max_rate"];
+        this._jerky = detail["jerky"];
+        this.dispatchEvent(new CustomEvent("update", {detail}));
     }
     _play() {
         if (!this._loaded || this._running) {
@@ -101,11 +122,25 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         if (!this._loaded || !this._running) {
             return;
         }
-        state.dispatchEvent(new CustomEvent("pause"));
+        this.dispatchEvent(new CustomEvent("pause"));
         this._running = false;
     }
+    _decelerate() {
+        if (!this._loaded) {
+            return;
+        }
+        this._rate = Math.max(this._rate - 1, 0);
+        this.dispatchEvent(new CustomEvent("decelerate"));
+    }
+    _accelerate() {
+        if (!this._loaded) {
+            return;
+        }
+        this._rate = Math.min(this._rate + 1, this._maxRate);
+        this.dispatchEvent(new CustomEvent("accelerate"));
+    }
     _resize() {
-        state.dispatchEvent(new CustomEvent("resize"));
+        this.dispatchEvent(new CustomEvent("resize"));
     }
     async reload() {
         const integer = /^(?:0|[1-9]\d*)$/;

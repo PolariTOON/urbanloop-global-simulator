@@ -2,6 +2,7 @@ from .step import Step
 
 
 class Sensor(Step):
+    """Classe modélisant un capteur additionnel au réseau, ce capteur sert à séparer une section en deux sections"""
     def __init__(self, env, id, **kwargs):
         super().__init__(env, id, **kwargs)
 

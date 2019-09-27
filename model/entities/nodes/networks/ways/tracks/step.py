@@ -2,6 +2,7 @@ from .track import Track
 
 
 class Step(Track):
+    """Classe modélisant une étape (gare, dépôt, capteur)"""
     def __init__(self, env, id, x=None, y=None, previous=None, next=None, **kwargs):
         super().__init__(env, id, **kwargs)
         self._x = x or 0

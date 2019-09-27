@@ -9,6 +9,9 @@ from .way import Way
 
 
 class Route(Way):
+    """Classe modélisant une route du réseau, c'est une entitée intermédiaire au même niveau que les aiguillages
+    Cette entité est aussi vue comme un sous graphe."""
+
     def __init__(self, env, id, margin_min, pod_size, is_bridge, steps=None, sections=None, **kwargs):
         super().__init__(env, id, pod_size, **kwargs)
         self._steps = steps or []  # [shed, capteur, station, ...]
@@ -43,10 +46,12 @@ class Route(Way):
 
     @property
     def sections(self):
+        """Sections au sein de la route"""
         return self._sections
 
     @property
     def previous(self):
+        """Route précédente au sein de la boucle"""
         return self._previous
 
     @previous.setter
@@ -55,6 +60,7 @@ class Route(Way):
 
     @property
     def next(self):
+        """Route suivante au sein de la boucle"""
         return self._next
 
     @next.setter
@@ -63,26 +69,32 @@ class Route(Way):
 
     @property
     def steps(self):
+        """Liste des étapes au sein de la route (gares, capteurs, dépôts)"""
         return self._steps
 
     @property
     def sensors(self):
+        """Liste des capteurs au sein de la route"""
         return [step for step in self._steps if isinstance(step, Sensor)]
 
     @property
     def sheds(self):
+        """Liste des dépôts au sein de la route"""
         return [step for step in self._steps if isinstance(step, Shed)]
 
     @property
     def stations(self):
+        """Liste des gares au sein de la route"""
         return [step for step in self._steps if isinstance(step, Station)]
 
     @property
     def pods(self):
+        """Liste des capsules au sein de la route"""
         return [pod for track in self._sections + self._steps for pod in track.pods]
 
     @property
     def length(self):
+        """Taille de la route"""
         length = 0
         for section in self._sections:
             length += section.length
@@ -106,6 +118,8 @@ class Route(Way):
             weight += section.weight
         return weight
 
+    # Les 4 propriétés suivantes servent au placement des entités dans la vue (c'est lié à la viewBox)
+
     @property
     def x_min(self):
         return self.min_xy(True)
@@ -124,6 +138,7 @@ class Route(Way):
 
     @property
     def name(self):
+        """Nom de la route"""
         return super().name or "Route %d" % self.id
 
     def min_xy(self, choice):
@@ -159,6 +174,7 @@ class Route(Way):
         return maxi
 
     def serialize(self):
+        """Sérialise les informations de la route pour les envoyer à la vue"""
         pods = [pod.serialize() for section in self._sections for pod in section.pods]
         dict = super().serialize()
         dict.update({
@@ -167,6 +183,7 @@ class Route(Way):
         return dict
 
     def find(self, step):
+        """Permet de trouver une étape dans la route par rapport à la boucle"""
         return self.parent.find(step)
 
     def init_parent_of_children(self):
@@ -182,6 +199,7 @@ class Route(Way):
                 step.parent = self
 
     def update(self):
+        """Fonction gérant le processus route"""
         while True:
             while True:
                 message = yield from self.read()

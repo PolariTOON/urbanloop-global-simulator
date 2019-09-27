@@ -5,6 +5,7 @@ from .track import Track
 
 
 class Section(Track):
+    """Classe modélisant une section du réseau"""
     def __init__(self, env, id, margin_min, pod_size, is_bridge, speed=None, path=None, **kwargs):
         super().__init__(env, id, **kwargs)
         speed = speed or 0

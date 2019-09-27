@@ -2,6 +2,7 @@ from ....node import Node
 
 
 class Track(Node):
+    """Classe mère appelée piste et désignant une section ou une étape"""
     def __init__(self, env, id, **kwargs):
         super().__init__(env, id, **kwargs)
         self._parent = None

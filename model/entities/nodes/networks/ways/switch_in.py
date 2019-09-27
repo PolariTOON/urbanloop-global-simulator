@@ -2,6 +2,8 @@ from .switch import Switch
 
 
 class SwitchIn(Switch):
+    """Cette classe modélise un aiguillage entrant
+    Elle gère une une partie de l'algorithme d'aiguillage (ce qui se passe sur sa portion)"""
     def __init__(self, env, id, margin_min, pod_size, max_speed, places_number, cursor=None, discrete_places=None, **kwargs):
         super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
         self._switch_out = None
@@ -24,6 +26,7 @@ class SwitchIn(Switch):
 
     @property
     def switch_out(self):
+        """Aiguillage sortant qui est lié à cet aiguillage entrant"""
         return self._switch_out
 
     @switch_out.setter
@@ -32,29 +35,38 @@ class SwitchIn(Switch):
 
     @property
     def cursor(self):
+        """Curseur désignant la première place du rouage"""
         return self._cursor
 
     @property
     def discrete_places(self):
+        """Tableau des places discrétisées
+        un curseur y est lié (cursor) et désigne la première place du rouage
+        C'est le curseur qui se déplace et pas les capsules"""
         return self._discrete_places
 
     @property
     def name(self):
+        """Nom utilisée dans l'interface et les logs pour l'aiguillage entrant"""
         return super().name or "Switch \"in\" %d" % self.id
 
     @property
     def first_place(self):
+        """Indice du tableau discrete_places repérant la première place du rouage des places discrétisées"""
         return self._first_place
 
     @property
     def length(self):
+        """Taille de l'aiguillage entrant"""
         return self._discretize_length + self._set_up_length + self._finalisation_length
 
     @property
     def finalisation_length(self):
+        """Distance de finalisation sur l'aiguillage entrant"""
         return self._finalisation_length
 
     def serialize(self):
+        """Sérialise les données et les envoie à la vue"""
         dict = super().serialize()
         dict.update({
             "type": "switch_in",
@@ -108,6 +120,7 @@ class SwitchIn(Switch):
         section = self.beside.sections[0]
         section.speed = max(section.speed, self.speed * section.length / self._finalisation_length)
         self._switch_out.set_c1_length()
+        # Initialisation des places discrétisées
         for k in range(self._places_number):
             place = self._discrete_places[k]
             if place:

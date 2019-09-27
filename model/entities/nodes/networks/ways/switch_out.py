@@ -2,6 +2,8 @@ from .switch import Switch
 
 
 class SwitchOut(Switch):
+    """Classe modélisant un aiguillage sortant
+    Elle gère une partie de l'algorithme d'aiguillage"""
     def __init__(self, env, id, margin_min, pod_size, max_speed, **kwargs):
         super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
         self._switch_in = None

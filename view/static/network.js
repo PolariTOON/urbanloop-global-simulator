@@ -27,13 +27,13 @@ layer.add(hintsLayer);
 const heading = document.createElement("h2");
 heading.textContent = "Undefined network";
 const firstParagraph = document.createElement("p");
-const datetimeView = document.createElement("label");
-datetimeView.innerHTML = "Date: <output>Day - --:--:--</output>";
-firstParagraph.append(datetimeView);
-const secondParagraph = document.createElement("p");
 const rateView = document.createElement("label");
 rateView.innerHTML = "Rate: <output>×-</output>";
-secondParagraph.append(rateView);
+firstParagraph.append(rateView);
+const secondParagraph = document.createElement("p");
+const dateView = document.createElement("label");
+dateView.innerHTML = "Date: <output>Day -, --:--:--</output>";
+secondParagraph.append(dateView);
 article.prepend(heading, firstParagraph, secondParagraph);
 
 state.addEventListener("load", async (event) => {
@@ -41,6 +41,8 @@ state.addEventListener("load", async (event) => {
     const name = networkJSON["name"];
     heading.textContent = name;
     const jerky = networkJSON["jerky"];
+    const rate = networkJSON["rate"];
+    rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
     let datetime = Math.floor(networkJSON["time"]);
     const seconds = datetime % 60;
     datetime = (datetime - seconds) / 60;
@@ -49,9 +51,7 @@ state.addEventListener("load", async (event) => {
     const hours = datetime % 24;
     datetime = (datetime - hours) / 24;
     const days = datetime;
-    datetimeView.control.value = `Day ${days + 1} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    const rate = networkJSON["rate"];
-    rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
+    dateView.control.value = `Day ${days + 1}, ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     const viewBox = networkJSON["view_box"];
     const {x, y, width, height} = viewBox;
     const [offsetX, offsetY, zoom] = [0, 0, 1];
@@ -80,8 +80,8 @@ state.addEventListener("load", async (event) => {
 
 state.addEventListener("unload", async (event) => {
     heading.textContent = "Undefined network";
-    datetimeView.control.value = "Day - --:--:--";
     rateView.control.value = "×-";
+    dateView.control.value = "Day -, --:--:--";
     legendsLayer.destroyChildren();
     elementsLayer.destroyChildren();
     sectionsLayer.destroyChildren();
@@ -102,6 +102,8 @@ state.addEventListener("update", (event) => {
     const name = networkJSON["name"];
     heading.textContent = name;
     const jerky = networkJSON["jerky"];
+    const rate = networkJSON["rate"];
+    rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
     let datetime = Math.floor(networkJSON["time"]);
     const seconds = datetime % 60;
     datetime = (datetime - seconds) / 60;
@@ -110,9 +112,7 @@ state.addEventListener("update", (event) => {
     const hours = datetime % 24;
     datetime = (datetime - hours) / 24;
     const days = datetime;
-    datetimeView.control.value = `Day ${days + 1} ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    const rate = networkJSON["rate"];
-    rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
+    dateView.control.value = `Day ${days + 1}, ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     const loopsJSON = networkJSON["loops"];
     const bridgesJSON = networkJSON["bridges"];
     for (let i = 0, li = loopsJSON.length; i < li; i++) {

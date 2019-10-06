@@ -7,16 +7,16 @@ from .line import Line
 
 
 class Loop(Line):
-    def __init__(self, id, routes=None, switches=None, **kwargs):
+    def __init__(self, id, roads=None, switches=None, **kwargs):
         """
         Instancie une boucle
         :param id: id de la boucle
-        :param routes: liste des routes de la boucle
+        :param roads: liste des routes de la boucle
         :param switches: liste des aiguillages de la boucle
         :param kwargs: dictionnaire comportant les informations du json
         """
         super().__init__(id, **kwargs)
-        self._routes = routes
+        self._roads = roads
         self._switches = switches
 
     @property
@@ -24,8 +24,8 @@ class Loop(Line):
         return super().name or "Loop %d" % self.id
 
     @property
-    def routes(self):
-        return self._routes
+    def roads(self):
+        return self._roads
 
     @property
     def switches(self):
@@ -50,7 +50,7 @@ class Loop(Line):
     @property
     def length(self):
         d = 0
-        for r in self._routes:
+        for r in self._roads:
             d += r.length
         return d
 
@@ -61,11 +61,11 @@ class Loop(Line):
         (utile pour récupérer les dimensions du réseau dans la vue)
         """
         mini = inf
-        for index in range(len(self._routes)):
+        for index in range(len(self._roads)):
             if choice:
-                temp = self._routes[index].x_min
+                temp = self._roads[index].x_min
             else:
-                temp = self._routes[index].y_min
+                temp = self._roads[index].y_min
             if temp < mini:
                 mini = temp
             if choice:
@@ -83,11 +83,11 @@ class Loop(Line):
         (utile pour récupérer les dimensions du réseau dans la vue)
         """
         maxi = 0
-        for index in range(len(self._routes)):
+        for index in range(len(self._roads)):
             if choice:
-                temp = self._routes[index].x_max
+                temp = self._roads[index].x_max
             else:
-                temp = self._routes[index].y_max
+                temp = self._roads[index].y_max
             if temp > maxi:
                 maxi = temp
             if choice:
@@ -103,19 +103,19 @@ class Loop(Line):
         sections = []
         pods = []
         switches = self.switches
-        routes = self.routes
+        roads = self.roads
         length = 0
         for way_index in range(len(switches)):
             switch = switches[way_index]
             switch = switch.serialize()
             elements.append(switch)
-            route = routes[way_index]
-            for step_index in range(len(route.steps)):
-                step = route.steps[step_index]
+            road = roads[way_index]
+            for step_index in range(len(road.steps)):
+                step = road.steps[step_index]
                 step = step.serialize()
                 elements.append(step)
-            for section_index in range(len(route.sections)):
-                section = route.sections[section_index]
+            for section_index in range(len(road.sections)):
+                section = road.sections[section_index]
                 for pod_index in range(len(section.pods)):
                     pod = section.pods[pod_index]
                     position = pod.position
@@ -138,8 +138,8 @@ class Loop(Line):
 
     def distance_between_steps(self, step1, step2):
         distance = None
-        for route in self._routes:
-            for step in route.steps:
+        for road in self._roads:
+            for step in road.steps:
                 if step == step1:
                     distance = 0
                 if distance is not None and step == step2:

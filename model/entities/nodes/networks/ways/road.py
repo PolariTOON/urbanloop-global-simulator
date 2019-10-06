@@ -8,7 +8,7 @@ from .tracks.station import Station
 from .way import Way
 
 
-class Route(Way):
+class Road(Way):
     """Classe modélisant une route du réseau, c'est une entitée intermédiaire au même niveau que les aiguillages
     Cette entité est aussi vue comme un sous graphe."""
 
@@ -139,7 +139,7 @@ class Route(Way):
     @property
     def name(self):
         """Nom de la route"""
-        return super().name or "Route %d" % self.id
+        return super().name or "Road %d" % self.id
 
     def min_xy(self, choice):
         """

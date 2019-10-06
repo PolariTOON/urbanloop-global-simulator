@@ -8,7 +8,7 @@ from random import choice
 from ....lines.bridge import Bridge
 from ....lines.loop import Loop
 from ..node import Node
-from .ways.route import Route
+from .ways.road import Road
 from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
 
@@ -19,7 +19,7 @@ from .ways.switch_out import SwitchOut
 
 
 class Network(Node):
-    def __init__(self, env, id, bridges=None, loops=None, switches=None, routes=None, view_box=None, margin_min=None,
+    def __init__(self, env, id, bridges=None, loops=None, switches=None, roads=None, view_box=None, margin_min=None,
                  pod_size=None, max_speed=None, places_number=None, dynamic_routing=None, **kwargs):
         super().__init__(env, id, **kwargs)
         self._dynamic_routing = dynamic_routing or False
@@ -28,7 +28,7 @@ class Network(Node):
         self._bridges = bridges or []
         self._loops = loops or []
         self._switches = switches or []
-        self._routes = routes or []
+        self._roads = roads or []
         self._max_speed = max_speed or 30
         self._places_number = places_number or 5
         self._view_box = view_box or {}
@@ -48,10 +48,10 @@ class Network(Node):
                         for index in range(len(way) - 1):
                             s = way[index]
                             if s.next.next in way:
-                                route = s.next
+                                road = s.next
                             else:
-                                route = s.beside
-                            for step in route.steps:
+                                road = s.beside
+                            for step in road.steps:
                                 table.append(step)
                 self._routing_table.append({"switch": s1, "table": table})
         # Initialisation des tables de routage des aiguillages
@@ -66,8 +66,8 @@ class Network(Node):
     @property
     def pods(self):
         pods = []
-        for route in self._routes:
-            for pod in route.pods:
+        for road in self._roads:
+            for pod in road.pods:
                 pods.append(pod)
         return pods
 
@@ -84,20 +84,20 @@ class Network(Node):
         return self._switches
 
     @property
-    def routes(self):
-        return self._routes
+    def roads(self):
+        return self._roads
 
     @property
     def sensors(self):
-        return [sensor for route in self._routes for sensor in route.sensors]
+        return [sensor for road in self._roads for sensor in road.sensors]
 
     @property
     def sheds(self):
-        return [shed for route in self._routes for shed in route.sheds]
+        return [shed for road in self._roads for shed in road.sheds]
 
     @property
     def stations(self):
-        return [station for route in self._routes for station in route.stations]
+        return [station for road in self._roads for station in road.stations]
 
     @property
     def margin_min(self):
@@ -169,11 +169,11 @@ class Network(Node):
                 del bridge["switch_out"]
         for b in range(len(self._loops)):
             self._loops[b]["switches"] = []
-            self._loops[b]["routes"] = []
+            self._loops[b]["roads"] = []
             steps = []
             sections = []
             elements = self._loops[b]["elements"]
-            routes = self._loops[b]["routes"]
+            roads = self._loops[b]["roads"]
             for node in range(len(elements)):
                 n = elements[node]
                 p = self._loops[b]["sections"][node]
@@ -194,7 +194,7 @@ class Network(Node):
                             "element": node
                         }
                     self._loops[b]["switches"].append(n)
-                    self._loops[b]["routes"].append({
+                    self._loops[b]["roads"].append({
                         "steps": steps,
                         "sections": sections
                     })
@@ -208,32 +208,32 @@ class Network(Node):
                         }
                     steps.append(n)  # important : on ajoute l'étape
                 sections.append(p)
-            routes.append({
+            roads.append({
                 "steps": steps,
                 "sections": sections
             })
         #  Etape 2 : Instanciation des routes
         for b in range(len(self._loops)):
-            routes = self._loops[b]["routes"]
-            for route in range(1, len(routes)):
-                if "id" in routes[route]:
-                    del routes[route]["id"]
-                new_route = Route(env, len(self._routes), self._margin_min, self._pod_size, False, **routes[
-                    route])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
-                self._routes.append(new_route)
+            roads = self._loops[b]["roads"]
+            for road in range(1, len(roads)):
+                if "id" in roads[road]:
+                    del roads[road]["id"]
+                new_road = Road(env, len(self._roads), self._margin_min, self._pod_size, False, **roads[
+                    road])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
+                self._roads.append(new_road)
                 #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
-                routes[route - 1] = new_route
-            routes.pop()
-        l = len(self._routes)  # nombre de routes du réseau internes aux boucles
+                roads[road - 1] = new_road
+            roads.pop()
+        l = len(self._roads)  # nombre de routes du réseau internes aux boucles
         for p in range(len(self._bridges)):
             steps = []
             sections = [self._bridges[p]["section"]]
-            new_route = Route(env, l + p, self._margin_min, self._pod_size, True, **{
+            new_road = Road(env, l + p, self._margin_min, self._pod_size, True, **{
                 "steps": steps,
                 "sections": sections
             })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
-            self._routes.append(new_route)
-            self._bridges[p]["routes"] = [new_route]  # On ajoute sa route au bridge
+            self._roads.append(new_road)
+            self._bridges[p]["roads"] = [new_road]  # On ajoute sa route au bridge
         #  Etape 3 : Instanciation des aiguillages, ajout de leurs capsules et liaison avec les routes
         for b in range(len(self._loops)):
             first_switch = len(self._switches)
@@ -249,10 +249,10 @@ class Network(Node):
                         pod["destination"] = self._get_elt_of_loop(**pod["destination"])
                 #  Routes et Id
                 id_switch = len(self._switches)
-                switch["previous"] = self._routes[
+                switch["previous"] = self._roads[
                     (id_switch - first_switch - 1) % len(self._loops[b]["switches"]) + first_switch]  # loop_in
-                switch["next"] = self._routes[id_switch]  # loop_out
-                switch["beside"] = self._routes[l + switch["id_bridge"]]  # route_bridge
+                switch["next"] = self._roads[id_switch]  # loop_out
+                switch["beside"] = self._roads[l + switch["id_bridge"]]  # road_bridge
                 if "id" in switch:
                     del switch["id"]
                 if switch["type"] == "switch_in":
@@ -288,9 +288,9 @@ class Network(Node):
         """
         for switch in self._switches:
             switch.parent = self
-        for route in self._routes:
-            route.parent = self
-            route.init_parent_of_children()
+        for road in self._roads:
+            road.parent = self
+            road.init_parent_of_children()
 
     def _init_pods_of_line(self, line):
         for pod in line["pods"]:
@@ -307,17 +307,17 @@ class Network(Node):
         if loop < 0 or loop > len(self._loops):
             raise ValueError("Loop's index out of range")
         loop = self._loops[loop]
-        routes = loop["routes"]
+        roads = loop["roads"]
         switches = loop["switches"]
         if element < 0:
             raise ValueError("Element's index out of range")
         elt = 0
         #  Recherche du noeud
-        for r in range(len(routes)):
+        for r in range(len(roads)):
             if elt == element:  # L'element est un switch
                 return switches[r]
             elt += 1
-            steps = routes[r].steps
+            steps = roads[r].steps
             for s in range(len(steps)):
                 if elt == element:  # L'element est une etape
                     return steps[s]
@@ -326,11 +326,11 @@ class Network(Node):
 
     def _init_weights(self):
         # Initialisation des poids des routes
-        for route in self._routes:
+        for road in self._roads:
             weight = 0
-            for section in route.sections:
+            for section in road.sections:
                 weight += section.weight
-            route.weight = weight
+            road.weight = weight
 
     def _update_routing(self):
         """
@@ -347,10 +347,10 @@ class Network(Node):
                         for index in range(len(way) - 1):
                             s = way[index]
                             if s.next.next in way:
-                                route = s.next
+                                road = s.next
                             else:
-                                route = s.beside
-                            for step in route.steps:
+                                road = s.beside
+                            for step in road.steps:
                                 table.append(step)
                 self._routing_table.append({"switch": s1, "table": table})
         # Envoie des tables
@@ -369,8 +369,8 @@ class Network(Node):
         raise ValueError("Switch not in the routing table")
 
     def find(self, step):
-        for route in self._routes:
-            for s in route.steps:
+        for road in self._roads:
+            for s in road.steps:
                 if step["name"] == s.name:
                     return s
         raise ValueError("Step not in the network")
@@ -413,8 +413,8 @@ def _init_pod_of_line(line, pod):
     position = pod["position"]
     if position < 0:
         raise ValueError("Element's position out of range")
-    for route in line["routes"]:
-        for section in route.sections:
+    for road in line["roads"]:
+        for section in road.sections:
             length = section.length
             if position < length:
                 pod["position"] = position
@@ -516,13 +516,13 @@ def update_weight(switch1, switch2, travel_time):
     """
     # TODO : à gérer lorsque les capsules se gare
     if switch1.next.next == switch2:
-        route = switch1.next
+        road = switch1.next
     elif switch1.beside.next == switch2:
-        route = switch1.beside
+        road = switch1.beside
     else:
         return False
-    route.weight = 0.875 * route.weight + 0.125 * travel_time
-    return route.weight > 3 * route.expected_weight
+    road.weight = 0.875 * road.weight + 0.125 * travel_time
+    return road.weight > 3 * road.expected_weight
 
 
 def no_more_congestion(previous_switch, current_switch):
@@ -533,15 +533,15 @@ def no_more_congestion(previous_switch, current_switch):
     """
     # TODO : liée à la congestion TCP si dans l'avenir c'est à remettre
     if previous_switch.next.next == current_switch:
-        route = previous_switch.next
+        road = previous_switch.next
     elif previous_switch.beside.next == current_switch:
-        route = previous_switch.beside
+        road = previous_switch.beside
     else:
         return True
-    return route.weight < 2 * route.expected_weight
+    return road.weight < 2 * road.expected_weight
 
 
-def disable_route(previous_switch, current_switch):
+def disable_road(previous_switch, current_switch):
     """
     Rend impossible le passage par une route, ie met le poids de celle-ci à l'infini
     :param previous_switch: aiguillage de début de route
@@ -549,12 +549,12 @@ def disable_route(previous_switch, current_switch):
     """
     # TODO : peut etre utile pour une futur coupure de voie
     if previous_switch.next.next == current_switch:
-        route = previous_switch.next
+        road = previous_switch.next
     elif previous_switch.beside.next == current_switch:
-        route = previous_switch.beside
+        road = previous_switch.beside
     else:
         return
-    route.weight = inf
+    road.weight = inf
 
 
 def get_time_max(previous_switch, current_switch):
@@ -567,9 +567,9 @@ def get_time_max(previous_switch, current_switch):
     """
     # TODO : peut etre utile pour une futur coupure de voie
     if previous_switch.next.next == current_switch:
-        route = previous_switch.next
+        road = previous_switch.next
     elif previous_switch.beside.next == current_switch:
-        route = previous_switch.beside
+        road = previous_switch.beside
     else:
         return -1
-    return 10 * route.expected_weight
+    return 10 * road.expected_weight

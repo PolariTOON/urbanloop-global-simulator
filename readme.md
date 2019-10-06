@@ -27,7 +27,7 @@ Le projet de ce dépôt s'inscrit dans le cadre scolaire d'un Projet Industriel 
 
 Le sujet du Projet Interdispiplinaire de Découverte de la Recherche est *Amélioration du système de routage du simulateur d’UrbanLoop grâce au paradigme SDN*.
 
-Les sujets des stages efféctués sur le simulateur sont :
+Les sujets des stages effectués sur le simulateur sont :
 * *Interfaçage du simulateur global du réseau UrbanLoop avec celui des postes d’aiguillage* ;
 * *Consolidation et extension du simulateur UrbanLoop*.
 

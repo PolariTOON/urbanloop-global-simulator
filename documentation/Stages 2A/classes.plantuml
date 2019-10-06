@@ -5,7 +5,6 @@ class ConsoleApp
 class WebApp
 package controler {
 	class Simulation
-	class Converter
 	class Probability
 }
 package model {
@@ -20,7 +19,7 @@ package model {
 					class Switch
 					class SwitchIn
 					class SwitchOut
-					class Route
+					class Road
 					package tracks {
 						class Track
 						class Step
@@ -49,7 +48,6 @@ Main "0"--"1" ConsoleApp
 Main "0"--"1" WebApp
 ConsoleApp "0"--"1" Simulation
 WebApp "0"--"1..*" Simulation
-Simulation "0"--"1" Converter
 Simulation "0"*--"1" Network
 Simulation "0"--"1" Probability
 Entity <|-- Node
@@ -61,12 +59,12 @@ Node "0"--"0..*" Pod
 Network "0"*--"0..*" Way
 Network "0"*--"0..*" Line
 Way <|-- Switch
-Way <|-- Route
+Way <|-- Road
 Switch <|-- SwitchIn
 Switch <|-- SwitchOut
-Switch "2"--"3" Route
+Switch "2"--"3" Road
 SwitchIn "1"--"1" SwitchOut
-Route "0"*--"0..*" Track
+Road "0"*--"0..*" Track
 Track <|-- Step
 Track <|-- Section
 Step <|-- Sensor
@@ -79,8 +77,8 @@ Pod "0"--"0..*" Traveler
 Line <|-- Loop
 Line <|-- Bridge
 Loop "0"--"2..*" Switch
-Loop "0"--"2..*" Route
-Bridge "0"--"1" Route
+Loop "0"--"2..*" Road
+Bridge "0"--"1" Road
 Bridge "0"--"2" Switch
 
 @enduml

@@ -170,25 +170,25 @@ async def _get_switch(simulations, network_index, switch_index):
     return simulations[network_index]._network.switches[switch_index].serialize()
 
 
-@_app.route("/networks/<int:network_index>/routes/<int:route_index>/", methods=["GET"])
+@_app.route("/networks/<int:network_index>/roads/<int:road_index>/", methods=["GET"])
 @_synchronize()
-async def _get_route(simulations, network_index, route_index):
+async def _get_road(simulations, network_index, road_index):
     """Requête get pour récupérer le fichier json d'une route depuis la vue"""
-    return simulations[network_index]._network.routes[route_index].serialize()
+    return simulations[network_index]._network.roads[road_index].serialize()
 
 
-@_app.route("/networks/<int:network_index>/routes/<int:route_index>/steps/<int:step_index>/", methods=["GET"])
+@_app.route("/networks/<int:network_index>/roads/<int:road_index>/steps/<int:step_index>/", methods=["GET"])
 @_synchronize()
-async def _get_step(simulations, network_index, route_index, step_index):
+async def _get_step(simulations, network_index, road_index, step_index):
     """Requête get pour récupérer le fichier json d'une étape depuis la vue"""
-    return simulations[network_index]._network.routes[route_index].steps[step_index].serialize()
+    return simulations[network_index]._network.roads[road_index].steps[step_index].serialize()
 
 
-@_app.route("/networks/<int:network_index>/routes/<int:route_index>/sections/<int:section_index>/", methods=["GET"])
+@_app.route("/networks/<int:network_index>/roads/<int:road_index>/sections/<int:section_index>/", methods=["GET"])
 @_synchronize()
-async def _get_section(simulations, network_index, route_index, section_index):
+async def _get_section(simulations, network_index, road_index, section_index):
     """Requête get pour récupérer le fichier json d'une section depuis la vue"""
-    return simulations[network_index]._network.routes[route_index].sections[section_index].serialize()
+    return simulations[network_index]._network.roads[road_index].sections[section_index].serialize()
 
 
 def run_app(port, networks, wave):

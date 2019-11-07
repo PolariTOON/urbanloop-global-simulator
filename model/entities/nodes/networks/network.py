@@ -381,9 +381,9 @@ class Network(Node):
         :return: void
         """
         while True:
-            print("-------------------------------------------------------------")
-            print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
-            print("-------------------------------------------------------------")
+            #print("-------------------------------------------------------------")
+            #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
+            #print("-------------------------------------------------------------")
             if self._dynamic_routing and int(int(self.env.now) % (30 / self.env.tick)) == 0:  # TODO: utilise self.env.time plutôt que self.env.tick
                 # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
                 yield from self._update_routing()
@@ -396,6 +396,7 @@ class Network(Node):
                     pass
                 elif "refill" == message["type"]:
                     # On demande à un dépôt d'envoyer une capsule à la station qui le demande
+                    # TODO:  ne pas choisir aléatoirement
                     sheds = self.sheds
                     if sheds:
                         station = message["station"]
@@ -404,6 +405,18 @@ class Network(Node):
                             "author": self,
                             "type": "refill",
                             "station": station
+                        })
+                elif "empty" == message["type"]:
+                    # On demande à un dépôt d'envoyer une capsule à la station qui le demande
+                    # TODO:  ne pas choisir aléatoirement
+                    sheds = self.sheds
+                    if sheds:
+                        station = message["station"]
+                        shed = choice(sheds)
+                        yield from station.write({
+                            "author": self,
+                            "type": "empty",
+                            "shed": shed
                         })
                 else:
                     raise ValueError("Invalid message")

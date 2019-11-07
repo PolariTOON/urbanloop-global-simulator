@@ -233,5 +233,12 @@ class Road(Way):
                         "type": "refill",
                         "station": station
                     })
+                elif "empty" == message["type"]:
+                    station = message["station"]
+                    yield from self.parent.write({
+                        "author": self,
+                        "type": "empty",
+                        "station": station
+                    })
                 else:
                     raise ValueError("Invalid message")

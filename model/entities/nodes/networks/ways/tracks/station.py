@@ -1,4 +1,5 @@
 from .....tokens.pod import Pod
+from .....tokens.traveler import Traveler
 from .step import Step
 
 station_types = {
@@ -114,10 +115,34 @@ class Station(Step):
     def capacity(self):
         return self._capacity
 
+    def send_pod(self, destination, traveler=False):
+        """envoie une capsule
+        destination : nom de la station ou entrepôt où envoyer
+        traveler : si la capsule doit contenir un voyageur ou non
+        """
+        pod = self._pods.pop(0)
+        if traveler:
+            #TODO: vraie montée des voyageurs
+            pod.travelers = [self._travelers.pop(0)]
+        self._departure_pods.append({
+            "pod": pod,
+            "destination": destination
+        })
+
     def update(self):
         """Fonction gérant le processus gare"""
         refill = False
+        empty = False
         while True:
+
+            # Génération d'un voyageur tous les 500 ticks
+            if self.env.now % 1000 == 0 and self.name != "Gare":
+                self._travelers.append(Traveler(self.env))
+
+            # On envoie tous les voyageurs à la gare
+            if len(self._travelers) > 0 and len(self._pods) > 0:
+                self.send_pod(self.find({"name": "Gare"}), traveler=True)
+
             if self._departure_pods and int((self.env.time - 1) % (self.next.margin / self.next.speed)) == 0:
                 dico = self._departure_pods.pop(0)
                 pod = dico["pod"]
@@ -135,6 +160,15 @@ class Station(Step):
                     "type": "refill",
                     "station": self
                 })
+            if len(self._pods) > 2 * self._capacity / 3 and not empty:
+                # Vide la station de capsules
+                pass
+                #yield from self.parent.write({
+                #    "author": self,
+                #    "type": "empty",
+                #    "station": self
+                #    })
+
             while True:
                 message = yield from self.read()
                 if message is None:
@@ -166,5 +200,7 @@ class Station(Step):
                         })
                 elif "pod_exit" == message["type"]:
                     pass
+                elif "empty" == message["type"]:
+                    self.send_pod(message["shed"])
                 else:
                     raise ValueError("Invalid message")

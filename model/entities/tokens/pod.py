@@ -13,7 +13,7 @@ class Pod(Token):
         self._position = position or 0
         travelers = travelers or {
             "count": 0,
-            "max": 0
+            "max": 1
         }
         travelers["count"] = travelers["count"] or 0
         travelers["max"] = travelers["max"] or 0

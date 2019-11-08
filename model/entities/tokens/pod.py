@@ -1,6 +1,6 @@
 from .token import Token
 from .traveler import Traveler
-
+from numpy.random import normal
 
 class Pod(Token):
     """
@@ -26,6 +26,7 @@ class Pod(Token):
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
+        self._coef = normal(0, 0.5) #Gaussienne à 5%
 
     @property
     def position(self):
@@ -80,7 +81,7 @@ class Pod(Token):
     @speed.setter
     def speed(self, value):
         """setter de l'attribut speed"""
-        self._speed = value
+        self._speed = value + self._coef
 
     @property
     def speed_restore(self):
@@ -128,7 +129,7 @@ class Pod(Token):
                 else:
                     self._length_before_restore = None
                     if self._speed_restore is not None:
-                        self._speed = self._speed_restore
+                        self.speed = self._speed_restore
                         self._speed_restore = None
 
             # La capsule avance
@@ -181,7 +182,7 @@ class Pod(Token):
                     break
                 elif "speed" == message["type"]:
                     # Ordre de changement de vitesse
-                    self._speed = message["speed"]
+                    self.speed = message["speed"]
                 elif "passing" == message["type"]:
                     self._track_or_switch = self._track_or_switch.next
                     yield from self._track_or_switch.write({
@@ -206,7 +207,7 @@ class Pod(Token):
                     # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
                     # Ou lors d'une discrétisation
                     # La capsule prend une vitesse sur une certaine distance puis reprend la vitesse moyenne
-                    self._speed = message["speed"]
+                    self.speed = message["speed"]
                     self._length_before_restore = message["length_before_restore"]
                     self._speed_restore = message["speed_restore"]
                 elif "departure" == message["type"]:
@@ -214,6 +215,6 @@ class Pod(Token):
                     destination = message["destination"]
                     self._destination = destination
                     self._source = self._track_or_switch
-                    self._speed = self._track_or_switch.next.speed
+                    self.speed = self._track_or_switch.next.speed
                 else:
                     raise ValueError("Invalid message")

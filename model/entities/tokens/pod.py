@@ -28,8 +28,12 @@ class Pod(Token):
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
+        # TODO : sérialiser ces paramètres
         self._coef = normal(1, 5/30) #Gaussienne à 5%
-        # TODO: sérialiser coef
+        print(self._coef)
+        self._endSpeed = self._speed
+        self._acceleration = 2
+        self._brake = 5
 
     @property
     def position(self):
@@ -85,6 +89,8 @@ class Pod(Token):
     def speed(self, value):
         """setter de l'attribut speed"""
         self._speed = value * self._coef
+        if self._speed < self._track_or_switch.speed / 10:
+            self._speed = self._track_or_switch.speed / 10
 
     @property
     def speed_restore(self):
@@ -145,8 +151,14 @@ class Pod(Token):
                 if closest:
                     diff = closest.position - self._position
                     if diff < self._track_or_switch.margin:
-                        self._speed = closest.speed - diff 
+                        self.speed = closest.speed - diff
+                    elif self._speed < self._track_or_switch.speed:
+                        self.speed = self._track_or_switch.speed
+                elif self._speed < self._track_or_switch.speed:
+                    self.speed = self._track_or_switch.speed
 
+            # La capsule accélère ou freine
+            
             # La capsule avance
             if self._speed != 0:
                 self._position += self._speed * self.env.tick

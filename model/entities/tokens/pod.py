@@ -83,7 +83,7 @@ class Pod(Token):
     @speed.setter
     def speed(self, value):
         """setter de l'attribut speed"""
-        self._speed = value + self._coef
+        self._speed = value * self._coef
 
     @property
     def speed_restore(self):

@@ -173,9 +173,9 @@ class Station(Step):
                     "type": "refill",
                     "station": self
                 })
-            if len(self._pods) > 2 * self._capacity / 3 and not empty:
+            while len(self._pods) > 2 * self._capacity / 3:# and not empty:
                 # Vide la station de capsules
-                pass
+                self._pods.pop()
                 #yield from self.parent.write({
                 #    "author": self,
                 #    "type": "empty",

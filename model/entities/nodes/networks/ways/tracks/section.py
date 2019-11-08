@@ -1,4 +1,5 @@
 from math import hypot, nan
+import sys
 
 from .....tokens.pod import Pod
 from .track import Track
@@ -136,3 +137,14 @@ class Section(Track):
         if "id" in pod:
             del pod["id"]
         self._pods.append(Pod(env, self, self._speed, **pod))
+
+    def closest(self, pod):
+        min_dist = sys.maxsize
+        pod_return = None
+        for pod_checked in self._pods:
+            if pod_checked.id != pod.id:
+                diff = pod_checked.position - pod.position
+                if diff > 0 and diff < min_dist:
+                    min_dist = diff
+                    pod_return = pod_checked
+        return pod_return

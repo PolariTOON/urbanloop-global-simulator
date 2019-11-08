@@ -1,6 +1,8 @@
+from numpy.random import normal
+
 from .token import Token
 from .traveler import Traveler
-from numpy.random import normal
+
 
 class Pod(Token):
     """
@@ -116,6 +118,9 @@ class Pod(Token):
         })
         return dict
 
+    def closest(self):
+        return self._track_or_switch.closest(self)
+
     def update(self):
         """
         Fonction qui gère le processus "pod", à chaque tour d'événement simpy les actions sont exécutées
@@ -131,6 +136,13 @@ class Pod(Token):
                     if self._speed_restore is not None:
                         self.speed = self._speed_restore
                         self._speed_restore = None
+
+            # La capsule détecte la capsule la plus proche devant elle
+            if type(self._track_or_switch).__name__ == "Section":
+                closest = self.closest()
+                if closest and closest.position - self._position < self._track_or_switch.margin:
+                    self._speed -= 0.1
+                    print(self._position, closest.position, self._track_or_switch.margin)
 
             # La capsule avance
             if self._speed != 0:

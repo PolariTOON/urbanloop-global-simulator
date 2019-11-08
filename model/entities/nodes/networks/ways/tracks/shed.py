@@ -28,6 +28,7 @@ class Shed(Step):
             dest = self.find(dico["destination"])
             dico["pod"] = Pod(env, self, 0, p)
             dico["destination"] = dest
+        self._wait = -1
 
     def serialize(self):
         """sérialise les informations du dépôt"""
@@ -70,8 +71,15 @@ class Shed(Step):
     def update(self):
         """Fonction gérant le processus dépôt"""
         while True:
-            if self._departure_pods\
-                    and int((self.env.time - 1) % (self.next.margin / self.next.speed)) == 0:
+            # Attente pour le prochain départ
+            if self._wait != -1:
+                self._wait += self.env.tick
+                if self._wait > self.next.margin / self.next.speed:
+                    self._wait = -1
+
+            # Départ d'une capsule
+            if self._departure_pods and self._wait == -1:
+                self._wait = 0
                 dico = self._departure_pods.pop(0)
                 pod = dico["pod"]
                 destination = dico["destination"]

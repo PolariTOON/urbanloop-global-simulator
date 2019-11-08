@@ -1,3 +1,5 @@
+from random import choice
+
 from .....tokens.pod import Pod
 from .....tokens.traveler import Traveler
 from .step import Step
@@ -136,13 +138,16 @@ class Station(Step):
         empty = False
         while True:
 
-            # Génération d'un voyageur tous les 500 ticks
-            if self.env.now % 1000 == 0 and self.name != "Gare":
+            # Génération d'un voyageur tous les 1000 ticks
+            if self.env.now % 1000 == 0:
                 self._travelers.append(Traveler(self.env))
 
-            # On envoie tous les voyageurs à la gare
+            # On envoie les voyageurs au hasard
             if len(self._travelers) > 0 and len(self._pods) > 0:
-                self.send_pod(self.find({"name": "Gare"}), traveler=True)
+                stations = self._parent.parent.stations_names
+                stations.remove(self.name)
+                name = choice(stations)
+                self.send_pod(self.find({"name": name}), traveler=True)
 
             # Attente pour le prochain départ
             if self._wait != -1:

@@ -100,6 +100,10 @@ class Network(Node):
         return [station for road in self._roads for station in road.stations]
 
     @property
+    def stations_names(self):
+        return [station.name for road in self._roads for station in road.stations]
+
+    @property
     def margin_min(self):
         return self._margin_min
 

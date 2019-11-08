@@ -19,7 +19,7 @@ class Pod(Token):
         }
         travelers["count"] = travelers["count"] or 0
         travelers["max"] = travelers["max"] or 0
-        self._travelers = [Traveler(env, 0) for k in range(travelers["count"])]
+        self._travelers = [Traveler(env, 0) for _ in range(travelers["count"])]
         self._capacity = travelers["max"]
         self._track_or_switch = track_or_switch
         self.source = self.source or self._track_or_switch or None
@@ -28,7 +28,7 @@ class Pod(Token):
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
-        self._coef = normal(0, 0.5) #Gaussienne à 5%
+        self._coef = normal(1, 5/30) #Gaussienne à 5%
 
     @property
     def position(self):
@@ -126,6 +126,7 @@ class Pod(Token):
         Fonction qui gère le processus "pod", à chaque tour d'événement simpy les actions sont exécutées
         :return: void
         """
+        checked = False
         while True:
             # Gestion du décalage et de la discrétisation : on reprend la vitesse moyenne après avoir parcouru la bonne distance
             if self._length_before_restore is not None:
@@ -147,8 +148,18 @@ class Pod(Token):
             if self._speed != 0:
                 self._position += self._speed * self.env.tick
 
+            # La capsule envoie sa vitesse pour vérification
+            if type(self._track_or_switch).__name__ == "Section" and self._position * 2 >= self._track_or_switch.length and not checked:
+                checked = True
+                yield from self._track_or_switch.write({
+                    "author": self,
+                    "type": "speed_check",
+                    "speed": self._speed
+                })
+
             # La capsule s'insère et tourne si elle en a reçu l'ordre
             if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._track_or_switch.length:
+                checked = False
                 self.position -= self._track_or_switch.length
                 self._track_or_switch = self._track_or_switch.beside.sections[0]
                 yield from self._track_or_switch.write({
@@ -161,6 +172,7 @@ class Pod(Token):
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
             # capsule indique à la piste/l'aiguillage sur laquelle/lequel elle rentre
             if self._position > self._track_or_switch.length and self._speed != 0:
+                checked = False
                 bridge_to_switch = False
                 self._position -= self._track_or_switch.length
                 t = self._position / self._speed

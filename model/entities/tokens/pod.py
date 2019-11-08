@@ -142,7 +142,6 @@ class Pod(Token):
                 closest = self.closest()
                 if closest and closest.position - self._position < self._track_or_switch.margin:
                     self._speed -= 0.1
-                    print(self._position, closest.position, self._track_or_switch.margin)
 
             # La capsule avance
             if self._speed != 0:

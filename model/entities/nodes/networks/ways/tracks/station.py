@@ -30,7 +30,7 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = travelers["average_waiting_time"] or 0
         self._all_time_count = travelers["all_time_count"] or 0
-        self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
+        self._pods = [Pod(env, self, 0) for _ in range(pods["count"])]
         self._capacity = pods["max"]
         if travelers["count"]:
             self._travelers = [self._average_waiting_time in range(travelers["count"])]

@@ -29,6 +29,7 @@ class Pod(Token):
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
         self._coef = normal(1, 5/30) #Gaussienne à 5%
+        # TODO: sérialiser coef
 
     @property
     def position(self):
@@ -141,8 +142,10 @@ class Pod(Token):
             # La capsule détecte la capsule la plus proche devant elle
             if type(self._track_or_switch).__name__ == "Section":
                 closest = self.closest()
-                if closest and closest.position - self._position < self._track_or_switch.margin:
-                    self._speed -= 0.1
+                if closest:
+                    diff = closest.position - self._position
+                    if diff < self._track_or_switch.margin:
+                        self._speed = closest.speed - diff 
 
             # La capsule avance
             if self._speed != 0:

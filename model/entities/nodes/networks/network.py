@@ -11,6 +11,8 @@ from ..node import Node
 from .ways.road import Road
 from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
+from .ways.tracks.station import Station
+from .ways.tracks.section import Section
 
 
 # TODO : Gérer les timers des capsules (temps de trajets)
@@ -284,6 +286,29 @@ class Network(Node):
             if "id" in loop:
                 del loop["id"]
             self._loops[b] = Loop(b, **loop)
+
+    def _init_station(self):
+    	#mise à jour de l'initialisation d'une station, afin de modéliser les voies d'entrée et de sortie à une station.
+    	#on y rajoute un switch in et un switch out sur la boucle qui contient la gare afin d'y entrer et d'y sortir
+    	#on crée une nouvelle boucle pour la station qui va contenir un switch in pour rentrer dans la station, un switch out pour en sortir et la station entre les 2 ainsi que 3 sections pour relier ces éléments
+    	#cela implique aussi de rajouter les 2 bridges nécessaires pour relier les switchs
+    	id_loop = len(self._loops)
+    	new_loop = Loop(id_loop)
+    	
+    	id_road = len(self._roads)
+    	new_road1 = Road(env, id_road, self._margin_min, self._pod_size, False)
+    	new_road2 = Road(env, id_road + 1, self._margin_min, self._pod_size, False)
+
+    	id_station = len(self._stations)
+    	new_station = Station(env, id_station, name="test")
+
+    	id_switch = len(self._switches)
+    	new_switch_in = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number)
+    	new_switch_out = SwitchOut(env, id_switch + 1, self._margin_min, self._pod_size, max_speed)
+
+    	new_section0 = Section(env, 0, margin_min, pod_size, is_bridge)
+    	new_section1 = Section(env, 1, margin_min, pod_size, is_bridge)
+    	new_section2 = Section(env, 2, margin_min, pod_size, is_bridge)
 
     def _init_parent_of_children(self):
         """

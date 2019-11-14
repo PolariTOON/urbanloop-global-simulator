@@ -29,8 +29,11 @@ class Pod(Token):
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
         # TODO : sérialiser ces paramètres
-        self._coef = normal(1, 5/30) #Gaussienne à 5%
-        print(self._coef)
+        self._coef = normal(1, 5/300) #Gaussienne à 5%
+        if self._coef > 1.05:
+            self._coef = 1.05
+        elif self._coef < 0.95:
+            self._coef = 0.95
         self._endSpeed = self._speed
         self._acceleration = 2
         self._brake = 5
@@ -88,9 +91,7 @@ class Pod(Token):
     @speed.setter
     def speed(self, value):
         """setter de l'attribut speed"""
-        self._speed = value * self._coef
-        if self._speed < self._track_or_switch.speed / 10:
-            self._speed = self._track_or_switch.speed / 10
+        self._endSpeed = value * self._coef
 
     @property
     def speed_restore(self):
@@ -145,6 +146,16 @@ class Pod(Token):
                         self.speed = self._speed_restore
                         self._speed_restore = None
 
+            # La capsule accélère ou freine
+            if self._speed < self._endSpeed:
+                self._speed += self._acceleration
+                if self._speed > self._endSpeed:
+                    self._speed = self._endSpeed
+            elif self._speed > self._endSpeed:
+                self._speed -= self._brake
+                if self._speed < self._endSpeed:
+                    self._speed = self._endSpeed
+
             # La capsule détecte la capsule la plus proche devant elle
             if type(self._track_or_switch).__name__ == "Section":
                 closest = self.closest()
@@ -152,12 +163,12 @@ class Pod(Token):
                     diff = closest.position - self._position
                     if diff < self._track_or_switch.margin:
                         self.speed = closest.speed - diff
+                    # Si la plus proche est trop loin on réaugmente la vitesse
                     elif self._speed < self._track_or_switch.speed:
                         self.speed = self._track_or_switch.speed
+                # S'il n'y a pas de capsule devant on réaugmente la vitesse
                 elif self._speed < self._track_or_switch.speed:
                     self.speed = self._track_or_switch.speed
-
-            # La capsule accélère ou freine
             
             # La capsule avance
             if self._speed != 0:
@@ -238,6 +249,7 @@ class Pod(Token):
                 elif "docked" == message["type"]:
                     # La capsule s'arrête dans une gare ou un dépôt
                     self._speed = 0
+                    self._endSpeed = 0
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner
                     self._turn = True

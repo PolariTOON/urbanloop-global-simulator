@@ -46,7 +46,6 @@ class Station(Step):
             dest = self.find(dico["destination"])
             dico["pod"] = Pod(env, self, 0, p)
             dico["destination"] = dest
-        self._wait = -1
 
     def serialize(self):
         """Permet la serialisation des informations"""
@@ -136,6 +135,7 @@ class Station(Step):
         """Fonction gérant le processus gare"""
         refill = False
         empty = False
+        wait = -1
         while True:
 
             # Génération d'un voyageur tous les 1000 ticks
@@ -150,13 +150,13 @@ class Station(Step):
                 self.send_pod(self.find({"name": name}), traveler=True)
 
             # Attente pour le prochain départ
-            if self._wait != -1:
-                self._wait += self.env.tick
-                if self._wait > self.next.margin / self.next.speed:
-                    self._wait = -1
+            if wait != -1:
+                wait += self.env.tick
+                if wait > self.next.margin / self.next.speed:
+                    wait = -1
 
             # Départ d'une capsule
-            if self._departure_pods and self._wait == -1:
+            if self._departure_pods and wait == -1:
                 dico = self._departure_pods.pop(0)
                 pod = dico["pod"]
                 destination = dico["destination"]
@@ -165,6 +165,7 @@ class Station(Step):
                     "type": "departure",
                     "destination": destination
                 })
+
             if len(self._pods) < self._capacity / 3 and not refill:
                 # Re-approvisionnement des capsules
                 refill = True

@@ -3,6 +3,7 @@ from random import choice
 from .....tokens.pod import Pod
 from .....tokens.traveler import Traveler
 from .step import Step
+import datetime
 
 station_types = {
     "city": 0,
@@ -125,10 +126,14 @@ class Station(Step):
         pod = self._pods.pop(0)
         if traveler:
             #TODO: vraie montée des voyageurs
-            pod.travelers = [self._travelers.pop(0)]
+            going_traveler = self.travelers.pop(0)
+            going_traveler.departure(self.env.time)
+            pod.travelers = [going_traveler]
         self._departure_pods.append({
             "pod": pod,
-            "destination": destination
+            "destination": destination,
+            "timestamp": self.env.time,
+            "waiting_time": going_traveler.waiting_time
         })
 
     def update(self):
@@ -140,7 +145,8 @@ class Station(Step):
 
             # Génération d'un voyageur tous les 1000 ticks
             if self.env.now % 1000 == 0:
-                self._travelers.append(Traveler(self.env))
+                self._travelers.append(Traveler(self.env,self.env.time))
+                self._all_time_count += 1
 
             # On envoie les voyageurs au hasard
             if len(self._travelers) > 0 and len(self._pods) > 0:
@@ -157,6 +163,7 @@ class Station(Step):
 
             # Départ d'une capsule
             if self._departure_pods and wait == -1:
+                # ordre de départ pour la capsule
                 dico = self._departure_pods.pop(0)
                 pod = dico["pod"]
                 destination = dico["destination"]
@@ -165,6 +172,15 @@ class Station(Step):
                     "type": "departure",
                     "destination": destination
                 })
+                # prévient le parent
+                yield from self.parent.write({
+                    "author": self,
+                    "pod": pod,
+                    "type": "departure",
+                    "destination": destination,
+                    "timestamp": dico["timestamp"],
+                    "waiting_time": dico["waiting_time"]
+                    })
 
             if len(self._pods) < self._capacity / 3 and not refill:
                 # Re-approvisionnement des capsules

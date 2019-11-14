@@ -4,6 +4,7 @@ les noeuds peuvent être des routes (partie interne d'une boucle) ou des ponts (
 """
 from math import inf
 from random import choice
+import datetime
 
 from ....lines.bridge import Bridge
 from ....lines.loop import Loop
@@ -447,6 +448,15 @@ class Network(Node):
                             "type": "empty",
                             "shed": shed
                         })
+                elif "departure" == message["type"]:
+                    timestamp = message["timestamp"]
+                    origin = message["origin"]
+                    destination = message["destination"]
+                    waiting_time = message["waiting_time"]
+
+                    print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Departure: " + origin+ " -> " + destination.name)
+                    print("waiting time: " + str(round(waiting_time)) + "s\n")
+
                 else:
                     raise ValueError("Invalid message")
 

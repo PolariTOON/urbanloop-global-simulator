@@ -240,5 +240,15 @@ class Road(Way):
                         "type": "empty",
                         "station": station
                     })
+                elif "departure" == message["type"]:
+                    yield from self.parent.write({
+                        "author": self,
+                        "pod": message["pod"],
+                        "type": "departure",
+                        "origin": message["author"].name,
+                        "destination": message["destination"],
+                        "timestamp": message["timestamp"],
+                        "waiting_time": message["waiting_time"]
+                        })
                 else:
                     raise ValueError("Invalid message")

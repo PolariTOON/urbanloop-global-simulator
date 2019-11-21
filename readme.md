@@ -43,18 +43,28 @@ Ce dépôt comprend différents dossiers et fichiers correspondant à la réalis
 
 ## Usage
 
-### Prérequis
+Commencez par télécharger les sources en clonant le dépôt.
+
+Il existe deux manières d'utiliser le projet : [en local](#en-local), ou [avec *Docker*](#avec-docker).
+
+### En local
+
+#### Prérequis
 
 * `python3.7`
+* `pip3.7`
 
-### Dépendances
+#### Installation des dépendances
 
-* `simpy`
-* `flask`
+Pour installer les différentes dépendances (`simpy`, `flask`...), utilisez `pip3.7` :
 
-### Lancement
+```sh
+$ pip3.7 install -r requirements.txt
+```
 
-Pour lancer le programme (après téléchargement des sources), exécuter la commande suivante :
+#### Lancement
+
+Pour lancer le programme, utilisez `python3.7` :
 
 ```sh
 $ python3.7 main.py -p
@@ -70,6 +80,28 @@ Pour plus d'informations, utilisez la commande suivante :
 
 ```sh
 $ python3.7 main.py -h
+```
+
+### Avec *Docker*
+
+#### Prérequis
+
+* `docker`
+
+#### Conteurisation
+
+Le projet peut être embarqué dans un conteneur *Docker* en exécutant la commande suivante :
+
+```sh
+$ docker build -t urbanloop-simulator .
+```
+
+#### Lancement
+
+Le conteneur peut ensuite être utilisé comme ceci :
+
+```sh
+docker run -itp 80:8090 --env n='{"0": "path/to/network0.json", "42": "path/to/network42.json"}' urbanloop-simulator
 ```
 
 ### Utilisation

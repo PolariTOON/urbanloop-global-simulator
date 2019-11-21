@@ -195,4 +195,4 @@ def run_app(port, networks, wave):
     """Fonction permettant de lancer l'application"""
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
     Thread(target=lambda: run(_run_simulations(networks, wave))).start()
-    _app.run(port=port)
+    _app.run(host="0.0.0.0", port=port)

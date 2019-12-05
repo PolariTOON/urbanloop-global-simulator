@@ -14,7 +14,6 @@ from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
 from .ways.tracks.station import Station
 from .ways.tracks.section import Section
-from .Statistiques import *
 
 # TODO : Gérer les timers des capsules (temps de trajets)
 # TODO : Gérer les stats

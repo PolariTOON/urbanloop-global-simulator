@@ -88,6 +88,17 @@ class Shed(Step):
                     "type": "departure",
                     "destination": destination
                 })
+                # prévient le parent
+                yield from self.parent.write({
+                    "author": self,
+                    "pod": pod,
+                    "type": "departure",
+                    "destination": destination,
+                    "timestamp": self.env.time,
+                    "waiting_time": 0,
+                    "traveler": False
+                    })
+
             while True:
                 message = yield from self.read()
                 if message is None:

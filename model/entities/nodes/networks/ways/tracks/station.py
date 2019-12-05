@@ -129,11 +129,13 @@ class Station(Step):
             going_traveler = self.travelers.pop(0)
             going_traveler.departure(self.env.time)
             pod.travelers = [going_traveler]
+
         self._departure_pods.append({
             "pod": pod,
             "destination": destination,
             "timestamp": self.env.time,
-            "waiting_time": going_traveler.waiting_time
+            "waiting_time": going_traveler.waiting_time,
+            "traveler": traveler
         })
 
     def update(self):
@@ -179,7 +181,8 @@ class Station(Step):
                     "type": "departure",
                     "destination": destination,
                     "timestamp": dico["timestamp"],
-                    "waiting_time": dico["waiting_time"]
+                    "waiting_time": dico["waiting_time"],
+                    "traveler": dico["traveler"] 
                     })
 
             if len(self._pods) < self._capacity / 3 and not refill:
@@ -221,7 +224,8 @@ class Station(Step):
                         yield from self.parent.write({
                             "author": self,
                             "type": "docked",
-                            "pod": pod
+                            "pod": pod,
+                            "timestamp": self.env.time
                         })
                     else:
                         yield from pod.write({

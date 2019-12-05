@@ -224,7 +224,8 @@ class Road(Way):
                     yield from self._parent.write({
                         "author": self,
                         "type": "docked",
-                        "pod": pod
+                        "pod": pod,
+                        "timestamp": message["timestamp"]
                     })
                 elif "refill" == message["type"]:
                     station = message["station"]
@@ -248,7 +249,8 @@ class Road(Way):
                         "origin": message["author"].name,
                         "destination": message["destination"],
                         "timestamp": message["timestamp"],
-                        "waiting_time": message["waiting_time"]
+                        "waiting_time": message["waiting_time"],
+                        "traveler": message["traveler"]
                         })
                 else:
                     raise ValueError("Invalid message")

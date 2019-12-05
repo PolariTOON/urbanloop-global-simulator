@@ -14,7 +14,7 @@ from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
 from .ways.tracks.station import Station
 from .ways.tracks.section import Section
-
+from .Statistiques import *
 
 # TODO : Gérer les timers des capsules (temps de trajets)
 # TODO : Gérer les stats
@@ -295,53 +295,53 @@ class Network(Node):
     	#un switch out pour en sortir et la station entre les 2 ainsi que 3 sections pour relier ces éléments
     	#on crée aussi un switch in et un switch out pour entrer et sortir de la boucle principale pour aller dans la station
     	#Cela implique aussi de rajouter les 2 bridges nécessaires pour relier les switchs
-    	id_loop = len(self._loops)
-    	new_loop = Loop(id_loop)
+        id_loop = len(self._loops)
+        new_loop = Loop(id_loop)
 
-    	self._loops[id_loop] = new_loop
-    	steps0 = []
-    	steps1 = []
+        self._loops[id_loop] = new_loop
+        steps0 = []
+        steps1 = []
         elements = self._loops[id_loop]["elements"]
         roads = self._loops[id_loop]["roads"]
 
-    	id_road = len(self._roads)
-    	new_road0 = Road(env, id_road, self._margin_min, self._pod_size, False)
-    	new_road1 = Road(env, id_road + 1, self._margin_min, self._pod_size, False)
+        id_road = len(self._roads)
+        new_road0 = Road(env, id_road, self._margin_min, self._pod_size, False)
+        new_road1 = Road(env, id_road + 1, self._margin_min, self._pod_size, False)
 
-    	id_station = len(self._stations)
-    	new_station = Station(env, id_station, name="test")
+        id_station = len(self._stations)
+        new_station = Station(env, id_station, name="test")
 
-    	id_switch = len(self._switches)
-    	new_switch_in_loop = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number)
-    	new_switch_out_loop = SwitchOut(env, id_switch + 1, self._margin_min, self._pod_size, max_speed)
-    	new_switch_in_station = SwitchIn(env, id_switch + 2, self._margin_min, self._pod_size, max_speed, places_number)
-    	new_switch_out_station = SwitchOut(env, id_switch + 3, self._margin_min, self._pod_size, max_speed)
+        id_switch = len(self._switches)
+        new_switch_in_loop = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number)
+        new_switch_out_loop = SwitchOut(env, id_switch + 1, self._margin_min, self._pod_size, max_speed)
+        new_switch_in_station = SwitchIn(env, id_switch + 2, self._margin_min, self._pod_size, max_speed, places_number)
+        new_switch_out_station = SwitchOut(env, id_switch + 3, self._margin_min, self._pod_size, max_speed)
 
-    	new_section0 = Section(env, 0, self.margin_min, self.pod_size, is_bridge)
-    	new_section1 = Section(env, 1, self.margin_min, self.pod_size, is_bridge)
-    	new_section2 = Section(env, 2, self.margin_min, self.pod_size, is_bridge)
+        new_section0 = Section(env, 0, self.margin_min, self.pod_size, is_bridge)
+        new_section1 = Section(env, 1, self.margin_min, self.pod_size, is_bridge)
+        new_section2 = Section(env, 2, self.margin_min, self.pod_size, is_bridge)
 
 
-    	new_road0.append({
+        new_road0.append({
                 "steps": new_station,
                 "sections": [new_section0, new_section1]
             })
 
-    	new_road1.append({
+        new_road1.append({
                 "sections": [new_section2]
             })
 
-    	id_bridge = len(self.bridges)
-    	new_bridge_0 = Bridge(self, id_bridge)
-    	new_bridge_1 = Bridge(self, id_bridge)
+        id_bridge = len(self.bridges)
+        new_bridge_0 = Bridge(self, id_bridge)
+        new_bridge_1 = Bridge(self, id_bridge)
 
-    	new_bridge_0["switches"] = [new_switch_out_loop, new_switch_in_station]
-    	self._init_pods_of_line(new_bridge_0)
-    	self._bridges[id_bridge] = Bridge(id_bridge, **new_bridge_0)
+        new_bridge_0["switches"] = [new_switch_out_loop, new_switch_in_station]
+        self._init_pods_of_line(new_bridge_0)
+        self._bridges[id_bridge] = Bridge(id_bridge, **new_bridge_0)
 
-    	new_bridge_1["switches"] = [new_switch_out_station, new_switch_in_loop]
-    	self._init_pods_of_line(new_bridge_1)
-    	self._bridges[id_bridge+1] = Bridge(id_bridge+1, **new_bridge_1)
+        new_bridge_1["switches"] = [new_switch_out_station, new_switch_in_loop]
+        self._init_pods_of_line(new_bridge_1)
+        self._bridges[id_bridge+1] = Bridge(id_bridge+1, **new_bridge_1)
 
 
 
@@ -457,6 +457,9 @@ class Network(Node):
                     break
                 elif "docked" == message["type"]:
                     # Une capsule stationne
+                    timestamp = message["timestamp"]
+                    print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Arrival")
+                    print("\n")
                     pass
                 elif "refill" == message["type"]:
                     # On demande à un dépôt d'envoyer une capsule à la station qui le demande
@@ -487,9 +490,12 @@ class Network(Node):
                     origin = message["origin"]
                     destination = message["destination"]
                     waiting_time = message["waiting_time"]
+                    traveler = message["traveler"]
 
                     print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Departure: " + origin+ " -> " + destination.name)
-                    print("waiting time: " + str(round(waiting_time)) + "s\n")
+                    print("waiting time: " + str(round(waiting_time)) + " seconds")
+                    print("traveler: " + str(traveler))
+                    print("\n")
 
                 else:
                     raise ValueError("Invalid message")

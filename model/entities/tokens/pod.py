@@ -170,9 +170,12 @@ class Pod(Token):
 
             # La capsule détecte la capsule la plus proche devant elle
             if type(self._track_or_switch).__name__ == "Section":
-                closest = self.closest()
+                closest, same_section = self.closest()
                 if closest:
-                    diff = closest.position - self._position
+                    if same_section:
+                        diff = closest.position - self._position
+                    else:
+                        diff = closest.position + (self._track_or_switch.length - self._position)
                     if diff < self._track_or_switch.margin:
                         self.speed = closest.speed - diff
                     # Si la plus proche est trop loin on réaugmente la vitesse

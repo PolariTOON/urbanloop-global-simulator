@@ -149,10 +149,24 @@ class Section(Track):
     def closest(self, pod):
         min_dist = sys.maxsize
         pod_return = None
+        #On regarde dans la section si on trouve des capsules
         for pod_checked in self._pods:
             if pod_checked.id != pod.id:
                 diff = pod_checked.position - pod.position
                 if diff > 0 and diff < min_dist:
                     min_dist = diff
                     pod_return = pod_checked
+        #Si on a pas trouvé de capsules on cherche dans la section suivante
+        next = None
+        if not pod_return:
+            if type(self.next).__name__ == "Switch":
+                next = self.next.sections[0]
+            elif type(self.next.next).__name__ == "Section":
+                next = self.next.next
+            if next:
+                for pod_checked in next._pods:
+                    diff = pod_checked.position + (self._length - pod.position)
+                    if diff > 0 and diff < min_dist:
+                        min_dist = diff
+                        pod_return = pod_checked
         return pod_return

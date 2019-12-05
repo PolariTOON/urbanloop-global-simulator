@@ -183,7 +183,7 @@ class Station(Step):
                     "timestamp": dico["timestamp"],
                     "waiting_time": dico["waiting_time"],
                     "traveler": dico["traveler"] 
-                    })
+                })
 
             if len(self._pods) < self._capacity / 3 and not refill:
                 # Re-approvisionnement des capsules

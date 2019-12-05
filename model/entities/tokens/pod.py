@@ -32,8 +32,12 @@ class Pod(Token):
         self._coef = normal(1, 5/300) #Gaussienne à 5%
         if self._coef > 1.05:
             self._coef = 1.05
+            self._failing = True
         elif self._coef < 0.95:
             self._coef = 0.95
+            self._failing = True
+        else:
+            self._failing = False
         self._endSpeed = self._speed
         self._acceleration = 2
         self._brake = 5
@@ -109,6 +113,13 @@ class Pod(Token):
         """
         return self._length_before_restore
 
+    @property
+    def failing(self):
+        """
+        Renvoie si la capsule est défaillante ou non
+        """
+        return self._failing
+
     def serialize(self):
         dict = super().serialize()
         dict.update({
@@ -122,7 +133,8 @@ class Pod(Token):
             "length_before_restore": self.length_before_restore,
             "speed": self.speed,
             "source": self.source.element_of_loop,
-            "destination": self.destination.element_of_loop
+            "destination": self.destination.element_of_loop,
+            "failing": self.failing
         })
         return dict
 

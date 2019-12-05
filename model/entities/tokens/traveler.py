@@ -2,10 +2,10 @@ from .token import Token
 
 
 class Traveler(Token):
-    def __init__(self, env, generation_time=0, waiting_time=None, **kwargs):
+    def __init__(self, env, generation_time, waiting_time=None, **kwargs):
         super().__init__(env, **kwargs)
         self._waiting_time = waiting_time or 0
-        self._generation_time= generation_time
+        self._generation_time = generation_time or 0
 
     @property
     def name(self):

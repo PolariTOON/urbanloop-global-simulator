@@ -3,6 +3,7 @@ const {Circle} = Konva;
 
 const shadowColor = "#333"
 const outerColor = "#fc0";
+const failingOuterColor = "#33ff4f";
 const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
 const fullInnerColor = "#333";
@@ -109,6 +110,8 @@ export class Pod extends Entity {
         super.add(innerShape);
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
+        this._outerColor = outerColor;
+        this._failing = false;
         this._keepFlag = keepFlag;
         this.unselect();
     }
@@ -179,7 +182,11 @@ export class Pod extends Entity {
         this.__outerShape.fill(selectedOuterColor);
     }
     unselect() {
-        this.__outerShape.fill(outerColor);
+        if (this._failing) {
+            this.__outerShape.fill(failingOuterColor);
+        } else {
+            this.__outerShape.fill(outerColor); 
+        }
     }
     update(json, json2, json3) {
         const name = json["name"];
@@ -189,6 +196,7 @@ export class Pod extends Entity {
         const travelerMax = json["travelers"]["max"];
         const source = json["source"]["name"];
         const destination = json["destination"]["name"];
+        const failing = json["failing"];
         this._name = name;
         this._x = x;
         this._y = y;
@@ -198,5 +206,9 @@ export class Pod extends Entity {
         this._speed = speed;
         this._source = source;
         this._destination = destination;
+        if (failing && !this.failing) {
+            this.__outerShape.fill(failingOuterColor);
+        }
+        this._failing = failing;
     }
 }

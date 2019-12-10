@@ -4,6 +4,7 @@ from .....tokens.pod import Pod
 from .....tokens.traveler import Traveler
 from .step import Step
 import datetime
+import time
 
 station_types = {
     "city": 0,
@@ -51,7 +52,7 @@ class Station(Step):
     def serialize(self):
         """Permet la serialisation des informations"""
         dict = super().serialize()
-        departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"]} for dico in self._departure_pods]
+        departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
         self.element_of_loop.update({
             "name": self.name
         })
@@ -124,9 +125,11 @@ class Station(Step):
         traveler : si la capsule doit contenir un voyageur ou non
         """
         pod = self._pods.pop(0)
+        waiting_time = 0
         if traveler:
             #TODO: vraie montée des voyageurs
             going_traveler = self.travelers.pop(0)
+            waiting_time = going_traveler.waiting_time
             going_traveler.departure(self.env.time)
             pod.travelers = [going_traveler]
 
@@ -134,7 +137,7 @@ class Station(Step):
             "pod": pod,
             "destination": destination,
             "timestamp": self.env.time,
-            "waiting_time": going_traveler.waiting_time,
+            "waiting_time": waiting_time,
             "traveler": traveler
         })
 
@@ -160,7 +163,7 @@ class Station(Step):
             # Attente pour le prochain départ
             if wait != -1:
                 wait += self.env.tick
-                if wait > self.next.margin / self.next.speed and wait >= Traveler.boarding_speed:
+                if wait > self.next.margin / self.next.speed:
                     wait = -1
 
             # Départ d'une capsule
@@ -185,7 +188,7 @@ class Station(Step):
                     "traveler": dico["traveler"] 
                 })
 
-            if len(self._pods) < self._capacity / 3 and not refill:
+            if len(self._pods) < self._capacity / 2 and not refill:
                 # Re-approvisionnement des capsules
                 refill = True
                 yield from self.parent.write({
@@ -193,15 +196,16 @@ class Station(Step):
                     "type": "refill",
                     "station": self
                 })
-            while len(self._pods) > 2 * self._capacity / 3:# and not empty:
+                
+            if len(self._pods) > self._capacity / 2 and not empty:
                 # Vide la station de capsules
-                self._pods.pop()
-				#TODO debugger
-                #yield from self.parent.write({
-                #    "author": self,
-                #    "type": "empty",
-                #    "station": self
-                #    })
+                if len(self._pods[0].travelers) == 0:
+                    empty = True
+                    yield from self.parent.write({
+                        "author": self,
+                        "type": "empty",
+                        "station": self
+                    })
 
             while True:
                 message = yield from self.read()
@@ -234,6 +238,7 @@ class Station(Step):
                             "type": "passing"
                         })
                 elif "pod_exit" == message["type"]:
+                    empty = False
                     pass
                 elif "empty" == message["type"]:
                     self.send_pod(message["shed"])

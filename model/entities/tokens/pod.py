@@ -177,7 +177,7 @@ class Pod(Token):
                     else:
                         diff = closest.position + (self._track_or_switch.length - self._position)
                     if diff < self._track_or_switch.margin:
-                        self.speed = closest.speed * 0.9
+                        self.speed = closest.speed / 2
                     # Si la plus proche est trop loin on réaugmente la vitesse
                     elif self._speed < self._track_or_switch.speed:
                         self.speed = self._track_or_switch.speed

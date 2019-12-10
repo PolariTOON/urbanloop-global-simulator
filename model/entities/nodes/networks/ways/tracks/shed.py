@@ -119,7 +119,8 @@ class Shed(Step):
                         yield from self.parent.write({
                             "author": self,
                             "type": "docked",
-                            "pod": pod
+                            "pod": pod,
+                            "timestamp": self.env.time
                         })
                     else:
                         yield from pod.write({

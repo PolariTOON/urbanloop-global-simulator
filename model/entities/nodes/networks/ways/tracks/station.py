@@ -144,7 +144,6 @@ class Station(Step):
     def update(self):
         """Fonction gérant le processus gare"""
         refill = False
-        empty = False
         wait = -1
         while True:
 
@@ -197,15 +196,13 @@ class Station(Step):
                     "station": self
                 })
                 
-            if len(self._pods) > self._capacity / 2 and not empty:
+            if len(self._pods) > self._capacity / 2 and len(self._travelers) == 0:
                 # Vide la station de capsules
-                if len(self._pods[0].travelers) == 0:
-                    empty = True
-                    yield from self.parent.write({
-                        "author": self,
-                        "type": "empty",
-                        "station": self
-                    })
+                yield from self.parent.write({
+                    "author": self,
+                    "type": "empty",
+                    "station": self
+                })
 
             while True:
                 message = yield from self.read()
@@ -238,7 +235,6 @@ class Station(Step):
                             "type": "passing"
                         })
                 elif "pod_exit" == message["type"]:
-                    empty = False
                     pass
                 elif "empty" == message["type"]:
                     self.send_pod(message["shed"])

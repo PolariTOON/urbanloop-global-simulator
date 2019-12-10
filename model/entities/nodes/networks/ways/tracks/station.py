@@ -160,7 +160,7 @@ class Station(Step):
             # Attente pour le prochain départ
             if wait != -1:
                 wait += self.env.tick
-                if wait > self.next.margin / self.next.speed:
+                if wait > self.next.margin / self.next.speed and wait >= Traveler.boarding_speed:
                     wait = -1
 
             # Départ d'une capsule
@@ -196,6 +196,7 @@ class Station(Step):
             while len(self._pods) > 2 * self._capacity / 3:# and not empty:
                 # Vide la station de capsules
                 self._pods.pop()
+				#TODO debugger
                 #yield from self.parent.write({
                 #    "author": self,
                 #    "type": "empty",

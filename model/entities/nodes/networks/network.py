@@ -289,7 +289,7 @@ class Network(Node):
                 del loop["id"]
             self._loops[b] = Loop(b, **loop)
 
-    def _init_station(self, max_speed, places_number):
+    def _init_station(self, env, max_speed, places_number, previous_road, id_loop_current, id_switch_current):
     	#Mise à jour de l'initialisation d'une station, afin de modéliser les voies d'entrée et de sortie à une station.
     	#On y rajoute un switch in et un switch out sur la boucle qui contient la gare afin d'y entrer et d'y sortir
     	#On crée une nouvelle boucle pour la station qui va contenir un switch in pour rentrer dans la station, 
@@ -300,50 +300,80 @@ class Network(Node):
         new_loop = Loop(id_loop)
 
         self._loops[id_loop] = new_loop
-        steps0 = []
-        steps1 = []
         elements = self._loops[id_loop]["elements"]
         roads = self._loops[id_loop]["roads"]
 
         id_road = len(self._roads)
         new_road0 = Road(env, id_road, self._margin_min, self._pod_size, False)
         new_road1 = Road(env, id_road + 1, self._margin_min, self._pod_size, False)
+        new_road_bridge_0 = Road(env, id_road + 2, self._margin_min, self._pod_size, False)
+        new_road_bridge_1 = Road(env, id_road + 3, self._margin_min, self._pod_size, False)
+        new_road_loop = Road(env, id_road + 4, self._margin_min, self._pod_size, False)
 
         id_station = len(self._stations)
-        new_station = Station(env, id_station, name="test")
+        new_station = Station(env, id_station, name="test", x=100, y = 100)
 
         id_switch = len(self._switches)
-        new_switch_in_loop = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number)
-        new_switch_out_loop = SwitchOut(env, id_switch + 1, self._margin_min, self._pod_size, max_speed)
-        new_switch_in_station = SwitchIn(env, id_switch + 2, self._margin_min, self._pod_size, max_speed, places_number)
-        new_switch_out_station = SwitchOut(env, id_switch + 3, self._margin_min, self._pod_size, max_speed)
+        new_switch_in_loop = SwitchIn(env, id_switch, self._margin_min, self._pod_size, max_speed, places_number, x=20, y=110)
+        new_switch_out_loop = SwitchOut(env, id_switch + 1, self._margin_min, self._pod_size, max_speed, x=20, y = 90)
+        new_switch_in_station = SwitchIn(env, id_switch + 2, self._margin_min, self._pod_size, max_speed, places_number,x=50,y=90)
+        new_switch_out_station = SwitchOut(env, id_switch + 3, self._margin_min, self._pod_size, max_speed,x=50, y=110)
 
-        new_section0 = Section(env, 0, self.margin_min, self.pod_size, is_bridge)
-        new_section1 = Section(env, 1, self.margin_min, self.pod_size, is_bridge)
-        new_section2 = Section(env, 2, self.margin_min, self.pod_size, is_bridge)
+        new_section0 = Section(env, 0, self.margin_min, self.pod_size, False)
+        new_section1 = Section(env, 1, self.margin_min, self.pod_size, False)
+        new_section2 = Section(env, 0, self.margin_min, self.pod_size, False)
+        new_section3 = Section(env, 0, self.margin_min, self.pod_size, True)
+        new_section4 = Section(env, 0, self.margin_min, self.pod_size, True)
+        new_section5 = Section(env, 0, self.margin_min, self.pod_size, False)
 
 
         new_road0.append({
-                "steps": new_station,
-                "sections": [new_section0, new_section1]
-            })
+            "steps": new_station,
+            "sections": [new_section0, new_section1]
+        })
 
         new_road1.append({
-                "sections": [new_section2]
-            })
+            "sections": [new_section2]
+        })
+
+        new_road_bridge_0.append({
+            "sections" : [new_section3]
+        })
+        new_road_bridge_1.append({
+            "sections" : [new_section4]
+        })
+
+        new_road_loop.append({
+            "sections" : [new_section5]
+        })
+
+        #new_switch_out_loop["previous"] = previous_road
+        #new_switch_out_loop["next"] = new_road_loop
+        #new_switch_out_loop["beside"] = new_road_bridge_0
+        #self._switches.append(new_switch_out_loop)
+        #self._loop[id_loop_current]["switches"][] = new_switch
+
+        #new_switch_in_loop["previous"] = new_road_loop
+        #new_switch_in_loop["next"] = #route suivante
+        #new_switch_in_loop["beside"] = new_road_bridge_0
+        #self._switches.append(new_switch_out_loop)
+        #self._loop[id_loop_current]["switches"][] = new_switch
+        
 
         id_bridge = len(self.bridges)
         new_bridge_0 = Bridge(self, id_bridge)
-        new_bridge_1 = Bridge(self, id_bridge)
+        new_bridge_1 = Bridge(self, id_bridge+1)
+
 
         new_bridge_0["switches"] = [new_switch_out_loop, new_switch_in_station]
+        new_bridge_0["roads"] = [new_road_bridge_0]
         self._init_pods_of_line(new_bridge_0)
         self._bridges[id_bridge] = Bridge(id_bridge, **new_bridge_0)
 
         new_bridge_1["switches"] = [new_switch_out_station, new_switch_in_loop]
+        new_bridge_0["roads"] = [new_road_bridge_1]
         self._init_pods_of_line(new_bridge_1)
         self._bridges[id_bridge+1] = Bridge(id_bridge+1, **new_bridge_1)
-
 
 
     def _init_parent_of_children(self):

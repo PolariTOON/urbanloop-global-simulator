@@ -14,6 +14,7 @@ from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
 from .ways.tracks.station import Station
 from .ways.tracks.section import Section
+from .Statistiques import *
 
 # TODO : Gérer les timers des capsules (temps de trajets)
 # TODO : Gérer les stats
@@ -37,6 +38,7 @@ class Network(Node):
         self._init_graph_from_json(env, max_speed, places_number)
         self._init_parent_of_children()
         self._init_weights()
+        self._statistiques = Statistiques()
         # Initialisation de la table de routage de chaque aiguillage
         # C'est une liste de ditcionnaire de la forme {"switch": s, "table": t}
         # où t contient les destinations pour lesquelles il faut tourner en s1
@@ -459,6 +461,7 @@ class Network(Node):
                     timestamp = message["timestamp"]
                     print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Arrival")
                     print("\n")
+                    self._statistiques.remove_traveling_pod(message["pod"],timestamp)
                     pass
                 elif "refill" == message["type"]:
                     # On demande à un dépôt d'envoyer une capsule à la station qui le demande
@@ -490,11 +493,13 @@ class Network(Node):
                     destination = message["destination"]
                     waiting_time = message["waiting_time"]
                     traveler = message["traveler"]
-
+                    if traveler:
+                        self._statistiques.add_waiting_time(timestamp,waiting_time)
                     print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Departure: " + origin+ " -> " + destination.name)
                     print("waiting time: " + str(round(waiting_time)) + " seconds")
                     print("traveler: " + str(traveler))
                     print("\n")
+                    self._statistiques.add_traveling_pod(message["pod"],timestamp,traveler)
 
                 else:
                     raise ValueError("Invalid message")

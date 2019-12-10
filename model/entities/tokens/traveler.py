@@ -16,6 +16,10 @@ class Traveler(Token):
     def waiting_time(self):
         return self._waiting_time
 
+    @classmethod
+    def boarding_speed(self):
+        return self._boarding_speed
+
     @property
     def boarding_speed(self):
         return self._boarding_speed

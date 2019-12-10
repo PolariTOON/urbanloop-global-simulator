@@ -19,7 +19,7 @@ class Statistiques:
 
 	def remove_traveling_pod(self,pod,timestamp):
 		self._traveling_pods[pod.id][2] = timestamp
-		self.travels.append(self._traveling_pods[pod.id])
+		self._travels.append(self._traveling_pods[pod.id])
 		self._traveling_pods[pod.id] = []
 		if len(pod.travelers)>0:
 			self._nb_traveler -= 1
@@ -27,4 +27,4 @@ class Statistiques:
 
 	def add_waiting_time(self,timestamp,waiting_time):
 		self._waiting_times.append((timestamp,waiting_time))
-		print(self._waiting_times)
+		#print(self._waiting_times)

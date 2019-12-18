@@ -41,6 +41,7 @@ class Pod(Token):
         self._endSpeed = self._speed
         self._acceleration = 2
         self._brake = 5
+        self._ready = False
 
     @property
     def position(self):
@@ -66,6 +67,9 @@ class Pod(Token):
     def travelers(self, value):
         """setter de l'attribut travelers"""
         self._travelers = value
+
+    def isEmpty(self):
+        return len(self._travelers) == 0
 
     @property
     def capacity(self):
@@ -119,6 +123,14 @@ class Pod(Token):
         Renvoie si la capsule est défaillante ou non
         """
         return self._failing
+
+    @property
+    def ready(self):
+        return self._ready
+        
+    @ready.setter
+    def ready(self, value):
+        self._ready = value
 
     def serialize(self):
         dict = super().serialize()

@@ -34,7 +34,8 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = travelers["average_waiting_time"] or 0
         self._all_time_count = travelers["all_time_count"] or 0
-        self._pods = [Pod(env, self, 0) for _ in range(pods["count"])]
+        #self._pods = [Pod(env, self, 0) for _ in range(pods["count"])]
+        self._pods = [None for _ in range(4)]
         self._capacity = pods["max"]
         if travelers["count"]:
             self._travelers = [self._average_waiting_time in range(travelers["count"])]
@@ -59,7 +60,7 @@ class Station(Step):
         dict.update({
             "type": "station",
             "pods": {
-                "count": len(self.pods),
+                "count": self.pods_size,
                 "max": self.capacity
             },
             "travelers": {
@@ -118,13 +119,16 @@ class Station(Step):
     @property
     def capacity(self):
         return self._capacity
+        
+    @property
+    def pods_size(self):
+        return sum(pod is not None for pod in self._pods)
 
-    def send_pod(self, destination, traveler=False):
+    def send_pod(self, pod, destination, traveler=False):
         """envoie une capsule
         destination : nom de la station ou entrepôt où envoyer
         traveler : si la capsule doit contenir un voyageur ou non
         """
-        pod = self._pods.pop(0)
         waiting_time = 0
         if traveler:
             #TODO: vraie montée des voyageurs
@@ -140,34 +144,49 @@ class Station(Step):
             "waiting_time": waiting_time,
             "traveler": traveler
         })
+        pod.ready = True
 
     def update(self):
         """Fonction gérant le processus gare"""
         refill = False
         wait = -1
+        full = False
         while True:
 
             # Génération d'un voyageur tous les 1000 ticks
             if self.env.now % 1000 == 0:
                 self._travelers.append(Traveler(self.env,self.env.time))
                 self._all_time_count += 1
-
-            # On envoie les voyageurs au hasard
-            if len(self._travelers) > 0 and len(self._pods) > 0:
-                stations = self._parent.parent.stations_names
-                stations.remove(self.name)
-                name = choice(stations)
-                self.send_pod(self.find({"name": name}), traveler=True)
+            
+            # On envoie les voyageurs au hasard s'il y a de la place
+            if len(self._travelers) > 0 and self.pods_size > 0 and not full:
+                added = False
+                for pod in self._pods:
+                    if pod and pod.isEmpty():
+                        stations = self._parent.parent.stations_names
+                        stations.remove(self.name)
+                        name = choice(stations)
+                        self.send_pod(pod, self.find({"name": name}), traveler=True)
+                        added = True
+                if not added:
+                    full = True
 
             # Attente pour le prochain départ
             if wait != -1:
                 wait += self.env.tick
                 if wait > self.next.margin / self.next.speed:
                     wait = -1
+             
+            # Les capsules avancent dans les places 
+            for i in range(len(self._pods)-1):
+                if self._pods[i] and not self._pods[i+1]:
+                    self._pods[i+1] = self._pods[i]
+                    self._pods[i] = None
 
             # Départ d'une capsule
-            if self._departure_pods and wait == -1:
+            if wait == -1 and self.pods[-1] and self.pods[-1].ready:
                 # ordre de départ pour la capsule
+                self._pods[-1] = None
                 dico = self._departure_pods.pop(0)
                 pod = dico["pod"]
                 destination = dico["destination"]
@@ -187,7 +206,7 @@ class Station(Step):
                     "traveler": dico["traveler"] 
                 })
 
-            if len(self._pods) < self._capacity / 2 and not refill:
+            if self.pods_size < self._capacity / 2 and not refill:
                 # Re-approvisionnement des capsules
                 refill = True
                 yield from self.parent.write({
@@ -196,7 +215,7 @@ class Station(Step):
                     "station": self
                 })
                 
-            if len(self._pods) > self._capacity / 2 and len(self._travelers) == 0:
+            if self.pods_size > self._capacity / 2 and len(self._travelers) == 0:
                 # Vide la station de capsules
                 yield from self.parent.write({
                     "author": self,
@@ -216,8 +235,9 @@ class Station(Step):
                         "pod": pod
                     })
                     # la capsule va se garer dans la station s'il y a de la place
-                    if pod.destination == self and len(self._pods) < self._capacity:
-                        self._pods.append(pod)
+                    if pod.destination == self and self.pods_size < self._capacity:
+                        self._pods[0] = pod
+                        full = False
                         refill = False
                         yield from pod.write({
                             "author": self,

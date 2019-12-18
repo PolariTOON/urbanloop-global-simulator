@@ -187,8 +187,9 @@ class Station(Step):
             if wait == -1 and self.pods[-1] and self.pods[-1].ready:
                 # ordre de départ pour la capsule
                 self._pods[-1] = None
-                dico = self._departure_pods.pop(0)
+                dico = self._departure_pods.pop()
                 pod = dico["pod"]
+                pod.ready = False
                 destination = dico["destination"]
                 yield from pod.write({
                     "author": self,

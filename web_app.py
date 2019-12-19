@@ -6,6 +6,7 @@ from logging import ERROR, getLogger
 from threading import Thread
 
 from controler.simulation import Simulation
+import modifjson
 
 
 _app = Flask(__name__, static_url_path="", static_folder="view/static", template_folder="view/templates")
@@ -85,6 +86,7 @@ def get_root():
 async def _post_network(simulations, network_index, network_item):
     """Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json"""
     if network_item is not None:
+        network_item = modifjson.mod_station(network_item)
         if "id" in network_item:
             del network_item["id"]
         simulation = Simulation(network_index, _wave, **network_item)

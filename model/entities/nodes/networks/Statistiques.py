@@ -1,13 +1,10 @@
 
-
-
-
 class Statistiques:
 
 	def __init__(self):
 		self._waiting_times = [] # tableau des temps d'attente
 		self._nb_traveler = 0 # nombre actuel de voyageur dans une capsule
-		self._traveling_pods = {} # tableau des capsules en voyage
+		self._traveling_pods = {} # dictionnaire des capsules en voyage
 		self._travels = [] # tableau des voyages effectués
 
 
@@ -28,3 +25,12 @@ class Statistiques:
 	def add_waiting_time(self,timestamp,waiting_time):
 		self._waiting_times.append((timestamp,waiting_time))
 		#print(self._waiting_times)
+	
+	def serialize(self):
+		dict = {
+		"waiting_time": self._waiting_times,
+		"nb_traveler": self._nb_traveler
+		}
+
+		return dict
+

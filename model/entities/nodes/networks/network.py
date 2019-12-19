@@ -160,7 +160,8 @@ class Network(Node):
             "max_speed": self.max_speed,
             "pod_size": self.pod_size,
             "places_number": self.places_number,
-            "dynamic_routing": self.dynamic_routing
+            "dynamic_routing": self.dynamic_routing,
+            "stats": self._statistiques.serialize()
         })
         return dict
 

@@ -34,6 +34,20 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         this._selectedEntity = null;
         this._viewBox = null;
         this._origin = null;
+        this._stats = null;
+        this._chart = null;
+    }
+    get chart(){
+        return this._chart;
+    }
+    set chart(value){
+        this._chart = value;
+    }
+    get stats(){
+        return this._stats;
+    }
+    set stats(value){
+        this._stats = value;
     }
     get networkIndex() {
         return this._networkIndex;

@@ -5,6 +5,7 @@
         <link type="text/css" rel="stylesheet" href="./index.css"/>
         <script type="text/javascript" src="https://unpkg.com/konva@3.1.6/konva.min.js" defer=""></script>
         <script type="module" src="./index.js"></script>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
         <title>UrbanLoop Simulator</title>
     </head>
     <body>
@@ -41,11 +42,15 @@
             <aside hidden="" id="stats-panel">
                 <h2>Statistics</h2>
                 <div id="stats-content"></div>
+                <div id="chart" style="width:100%; height:400px;"></div>
             </aside>
             <aside hidden="" id="views-panel">
                 <h2>Views</h2>
                 <div id="views-content"></div>
             </aside>
         </main>
+
+        
+
     </body>
 </html>

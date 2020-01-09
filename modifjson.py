@@ -9,12 +9,13 @@ def mod_station(item):
 	for loop in data["loops"]:
 		if (loop["name"] != " "):
 			for i in range(len(loop["elements"])):
-				if loop["elements"][i]["type"] == "station":
+				type = loop["elements"][i]["type"]
+				if (type == "station" or type == "shed"):
 
 					station_name = loop["elements"][i]["name"]
 
-					bridge_name1 = "entree " + station_name
-					bridge_name2 = "sortie " + station_name
+					bridge_name1 = " "
+					bridge_name2 = " "
 
 					loop_name = " "
 
@@ -114,19 +115,36 @@ def mod_station(item):
 					data["bridges"].append({"name": bridge_name1, "section": {"speed": 6, "path": {"type": "line"}}, "pods": []},)
 					data["bridges"].append({"name": bridge_name2, "section": {"speed": 6, "path": {"type": "line"}}, "pods": []},)
 
-					data["loops"].append({"name": loop_name,
-		      			"elements": [
-		        			{"type": "switch_in", "x": x_in2, "y": y_in2, "id_bridge": id_bridge, "pods": []},
-		        			{"type": "station", "name": station_name, "x": x_s, "y": y_s, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-		        			{"type": "switch_out", "x": x_out2, "y": y_out2, "id_bridge": id_bridge+1, "pods": []}
-		      			],
-		      			"sections": [
-		        			{"speed": 7, "path": {"type": "line"}},
-		        			{"speed": 7, "path": {"type": "line"}},
-		        			{"speed": 7, "path": {"type": "line"}}
-		      			],
-		      			"pods": []
-		    		})
+					if type == "station":
+
+						data["loops"].append({"name": loop_name,
+							"elements": [
+								{"type": "switch_in", "x": x_in2, "y": y_in2, "id_bridge": id_bridge, "pods": []},
+								{"type": "station", "name": station_name, "x": x_s, "y": y_s, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+								{"type": "switch_out", "x": x_out2, "y": y_out2, "id_bridge": id_bridge+1, "pods": []}
+							],
+							"sections": [
+								{"speed": 7, "path": {"type": "line"}},
+								{"speed": 7, "path": {"type": "line"}},
+								{"speed": 7, "path": {"type": "line"}}
+							],
+							"pods": []
+						})
+
+					else:
+						data["loops"].append({"name": loop_name,
+							"elements": [
+								{"type": "switch_in", "x": x_in2, "y": y_in2, "id_bridge": id_bridge, "pods": []},
+        						{"type": "shed", "name": station_name, "x": x_s, "y": y_s, "pods": {"max": 100, "count": 100}},
+								{"type": "switch_out", "x": x_out2, "y": y_out2, "id_bridge": id_bridge+1, "pods": []}
+							],
+							"sections": [
+								{"speed": 7, "path": {"type": "line"}},
+								{"speed": 7, "path": {"type": "line"}},
+								{"speed": 7, "path": {"type": "line"}}
+							],
+							"pods": []
+						})
 
 	s = open("sortie.json", "w")
 

@@ -131,11 +131,7 @@ class Station(Step):
         """
         waiting_time = 0
         if traveler:
-            #TODO: vraie montée des voyageurs
-            going_traveler = self.travelers.pop(0)
-            waiting_time = going_traveler.waiting_time
-            going_traveler.departure(self.env.time)
-            pod.travelers = [going_traveler]
+            waiting_time = pod.travelers[0].waiting_time
 
         self._departure_pods.append({
             "pod": pod,
@@ -151,6 +147,7 @@ class Station(Step):
         refill = False
         wait = -1
         full = False
+        boarding = [-1 for _ in range(len(self._pods))]
         while True:
 
             # Génération d'un voyageur tous les 1000 ticks
@@ -163,13 +160,24 @@ class Station(Step):
                 added = False
                 for pod in self._pods:
                     if pod and pod.isEmpty():
-                        stations = self._parent.parent.stations_names
-                        stations.remove(self.name)
-                        name = choice(stations)
-                        self.send_pod(pod, self.find({"name": name}), traveler=True)
+                        going_traveler = self.travelers.pop(0)
+                        going_traveler.departure(self.env.time)
+                        pod.travelers = [going_traveler]
+                        boarding[self._pods.index(pod)] = 0
                         added = True
                 if not added:
                     full = True
+
+            # Attente de la montée du voyageur pour l'envoi d'une capsule
+            for i in range(len(boarding)):
+                if boarding[i] != -1:
+                    boarding[i] += self.env.tick
+                    if boarding[i] > self._pods[i].travelers[0].boarding_speed:
+                        stations = self._parent.parent.stations_names
+                        stations.remove(self.name)
+                        name = choice(stations)
+                        self.send_pod(self._pods[i], self.find({"name": name}))
+                        boarding[i] = -1
 
             # Attente pour le prochain départ
             if wait != -1:
@@ -182,6 +190,8 @@ class Station(Step):
                 if self._pods[i] and not self._pods[i+1]:
                     self._pods[i+1] = self._pods[i]
                     self._pods[i] = None
+                    boarding[i+1] = boarding[i]
+                    boarding[i] = -1
 
             # Départ d'une capsule
             if wait == -1 and self.pods[-1] and self.pods[-1].ready:

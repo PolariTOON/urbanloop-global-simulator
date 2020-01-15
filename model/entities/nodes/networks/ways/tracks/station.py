@@ -34,6 +34,7 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = travelers["average_waiting_time"] or 0
         self._all_time_count = travelers["all_time_count"] or 0
+        self._boarding = 0
         #self._pods = [Pod(env, self, 0) for _ in range(pods["count"])]
         self._pods = [None for _ in range(4)]
         self._capacity = pods["max"]
@@ -66,7 +67,8 @@ class Station(Step):
             "travelers": {
                 "count": len(self.travelers),
                 "average_waiting_time": self.average_waiting_time,
-                "all_time_count": self.all_time_count
+                "all_time_count": self.all_time_count,
+                "boarding": self.boarding
             },
             "station_type": self.type,
             "departure_pods": departure_pods,
@@ -92,6 +94,10 @@ class Station(Step):
     @property
     def all_time_count(self):
         return self._all_time_count
+		
+    @property
+    def boarding(self):
+        return self._boarding
 
     @property
     def pods(self):
@@ -164,6 +170,7 @@ class Station(Step):
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
                         boarding[self._pods.index(pod)] = 0
+                        self._boarding += 1
                         added = True
                 if not added:
                     full = True
@@ -178,6 +185,7 @@ class Station(Step):
                         name = choice(stations)
                         self.send_pod(self._pods[i], self.find({"name": name}))
                         boarding[i] = -1
+                        self._boarding -= 1
 
             # Attente pour le prochain départ
             if wait != -1:

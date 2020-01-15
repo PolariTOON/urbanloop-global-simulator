@@ -107,6 +107,7 @@ export class Station extends Entity {
         const podMax = json["pods"]["max"];
         const travelerCount = json["travelers"]["count"];
         const travelerAllTimeCount = json["travelers"]["all_time_count"];
+				const travelerBoarding = json["travelers"]["boarding"];
         const travelerAverageWaitingTime = json["travelers"]["average_waiting_time"];
         const stationType = json["station_type"];
         this._name = name;
@@ -116,6 +117,7 @@ export class Station extends Entity {
         this._podMax = podMax;
         this._travelerCount = travelerCount;
         this._travelerAllTimeCount = travelerAllTimeCount;
+				this._travelerBoarding = travelerBoarding;
         this._travelerAverageWaitingTime = travelerAverageWaitingTime;
         this._stationType = stationType;
     }

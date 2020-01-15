@@ -45,6 +45,8 @@ ${state.selectedEntity instanceof Pod ? `\
     <dd>${state.selectedEntity._podCount} / ${state.selectedEntity._podMax}</dd>
     <dt>Travelers</dt>
     <dd>${state.selectedEntity._travelerCount} (${state.selectedEntity._travelerAllTimeCount} since simulation start)</dd>
+		<dt>Boarding Travelers</dt>
+		<dd>${state.selectedEntity._travelerBoarding}</dd>
     <dt>Average waiting duration (in s)</dt>
     <dd>${state.selectedEntity._travelerAverageWaitingTime}</dd>
 ` : state.selectedEntity instanceof Switch ? `\

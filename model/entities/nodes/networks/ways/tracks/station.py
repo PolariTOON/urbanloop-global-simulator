@@ -37,7 +37,8 @@ class Station(Step):
         self._boarding = 0
         #self._pods = [Pod(env, self, 0) for _ in range(pods["count"])]
         self._pods = [None for _ in range(4)]
-        self._capacity = pods["max"]
+        #self._capacity = pods["max"]
+        self._capacity = 4
         if travelers["count"]:
             self._travelers = [self._average_waiting_time in range(travelers["count"])]
         else:

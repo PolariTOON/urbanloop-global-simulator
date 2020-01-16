@@ -2,14 +2,19 @@ import json
 import math
 
 def mod_station(item):
-	print(" + ++ + + + + + +++++++++ + + + + + ++ ++ + blob ++ ++ + + ++ + + + ++ + + + + + ++")
 
 	data = item
 
 	for loop in data["loops"]:
 		if (loop["name"] != " "):
-			for i in range(len(loop["elements"])):
+			print("len : ",len(loop["elements"]))
+			over = 0
+			i = 0
+			while (over == 0):
+				print(i)
+				print(loop["name"])
 				type = loop["elements"][i]["type"]
+				print(loop["elements"][i])
 				if (type == "station" or type == "shed"):
 
 					station_name = loop["elements"][i]["name"]
@@ -28,8 +33,8 @@ def mod_station(item):
 					x_out1 = x #coordonnées du switch out qui va dans la nouvelle boucle
 					y_out1 = y
 
-					h1 = 25 #longueur des ponts
-					h2 = 50#écart entre les 2 switchs de chaque boucle
+					h1 = 20 #longueur des ponts
+					h2 = 10#écart entre les 2 switchs de chaque boucle
 					e = 15#écart entre les switchs de la nouvelle boucle et la station
 
 					if i == len(loop["elements"]) - 1:
@@ -112,8 +117,8 @@ def mod_station(item):
 
 					loop["sections"].append(loop["sections"][0])
 
-					data["bridges"].append({"name": bridge_name1, "section": {"speed": 6, "path": {"type": "line"}}, "pods": []},)
-					data["bridges"].append({"name": bridge_name2, "section": {"speed": 6, "path": {"type": "line"}}, "pods": []},)
+					data["bridges"].append({"name": bridge_name1, "section": {"speed": 20, "path": {"type": "line"}}, "pods": []},)
+					data["bridges"].append({"name": bridge_name2, "section": {"speed": 20, "path": {"type": "line"}}, "pods": []},)
 
 					if type == "station":
 
@@ -124,9 +129,9 @@ def mod_station(item):
 								{"type": "switch_out", "x": x_out2, "y": y_out2, "id_bridge": id_bridge+1, "pods": []}
 							],
 							"sections": [
-								{"speed": 7, "path": {"type": "line"}},
-								{"speed": 7, "path": {"type": "line"}},
-								{"speed": 7, "path": {"type": "line"}}
+								{"speed": 20, "path": {"type": "line"}},
+								{"speed": 20, "path": {"type": "line"}},
+								{"speed": 20, "path": {"type": "line"}}
 							],
 							"pods": []
 						})
@@ -145,6 +150,11 @@ def mod_station(item):
 							],
 							"pods": []
 						})
+
+				i = i+1 
+				print("i : ",i)
+				if (i == len(loop["elements"])):
+					over = 1
 
 	s = open("sortie.json", "w")
 

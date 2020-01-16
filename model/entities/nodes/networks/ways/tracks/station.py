@@ -197,11 +197,9 @@ class Station(Step):
              
             # Les capsules avancent dans les places 
             for i in range(len(self._pods)-1):
-                if self._pods[i] and not self._pods[i+1]:
+                if self._pods[i] and not self._pods[i+1] and boarding[i] != -1:
                     self._pods[i+1] = self._pods[i]
                     self._pods[i] = None
-                    boarding[i+1] = boarding[i]
-                    boarding[i] = -1
 
             # Départ d'une capsule
             if wait == -1 and self.pods[-1] and self.pods[-1].ready:

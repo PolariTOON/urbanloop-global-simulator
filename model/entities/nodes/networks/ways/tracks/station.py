@@ -154,6 +154,7 @@ class Station(Step):
         refill = False
         wait = -1
         full = False
+        forward = [-1 for _ in range(self._pods)]
         boarding = [-1 for _ in range(len(self._pods))]
         while True:
 
@@ -165,8 +166,9 @@ class Station(Step):
             # On envoie les voyageurs au hasard s'il y a de la place
             if len(self._travelers) > 0 and self.pods_size > 0 and not full:
                 added = False
-                for pod in self._pods:
-                    if pod and pod.isEmpty():
+                for pod in self._pods.reverse():
+                    i = self._pods.index(pod)
+                    if pod and pod.isEmpty() and forward[i] != -1:
                         going_traveler = self.travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
@@ -197,9 +199,17 @@ class Station(Step):
              
             # Les capsules avancent dans les places 
             for i in range(len(self._pods)-1):
-                if self._pods[i] and not self._pods[i+1] and boarding[i] != -1:
+                if self._pods[i] and not self._pods[i+1] and not forward[i] and boarding[i] != -1:
                     self._pods[i+1] = self._pods[i]
                     self._pods[i] = None
+                    forward[i] = 0
+
+            # Attente pour continuer d'avancer dans les places
+            for i in range(len(forward)):
+                if forward[i] != 1:
+                    forward[i] += 1
+                    if forward[i] > 5:
+                        forward[i] = -1
 
             # Départ d'une capsule
             if wait == -1 and self.pods[-1] and self.pods[-1].ready:

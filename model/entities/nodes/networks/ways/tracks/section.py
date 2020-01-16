@@ -110,14 +110,6 @@ class Section(Track):
                         "type": "speed",
                         "speed": self._speed
                     })
-                elif "speed_check" == message["type"]:
-                    margin = self._speed * 5 / 100
-                    if message["speed"] < self._speed - margin or message["speed"] > self._speed + margin:
-                        yield from message["author"].write({
-                            "author": self,
-                            "type": "speed",
-                            "speed": self._speed
-                        })
                 else:
                     raise ValueError("Invalid message")
 

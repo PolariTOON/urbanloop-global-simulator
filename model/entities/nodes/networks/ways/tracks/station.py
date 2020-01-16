@@ -170,6 +170,7 @@ class Station(Step):
                         going_traveler = self.travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
+                        self._average_waiting_time = (self._average_waiting_time * (self._all_time_count - 1) + going_traveler.waiting_time) / self._all_time_count
                         boarding[self._pods.index(pod)] = 0
                         self._boarding += 1
                         added = True

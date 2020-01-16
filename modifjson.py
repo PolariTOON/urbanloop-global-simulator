@@ -7,14 +7,10 @@ def mod_station(item):
 
 	for loop in data["loops"]:
 		if (loop["name"] != " "):
-			print("len : ",len(loop["elements"]))
 			over = 0
 			i = 0
 			while (over == 0):
-				print(i)
-				print(loop["name"])
 				type = loop["elements"][i]["type"]
-				print(loop["elements"][i])
 				if (type == "station" or type == "shed"):
 
 					station_name = loop["elements"][i]["name"]
@@ -111,7 +107,7 @@ def mod_station(item):
 
 					loop["elements"].pop(i)
 
-					loop["elements"].insert(i, {"type": "switch_out", "x": x_out1, "y": y_out1, "id_bridge": id_bridge, "pods": []})
+					loop["elements"].insert(i, {"type": "switch_out", "x": x_out1, "y": y_out1, "id_bridge": id_bridge, "pods": [], "stat_or_shed": station_name})
 					loop["elements"].insert(i+1, {"type": "switch_in", "x": x_in1, "y": y_in1, "id_bridge": id_bridge+1, "pods": []})
 
 
@@ -152,7 +148,6 @@ def mod_station(item):
 						})
 
 				i = i+1 
-				print("i : ",i)
 				if (i == len(loop["elements"])):
 					over = 1
 

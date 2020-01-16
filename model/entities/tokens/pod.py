@@ -201,7 +201,8 @@ class Pod(Token):
                 self._position += self._speed * self.env.tick
 
             # La capsule s'insère et tourne si elle en a reçu l'ordre
-            if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._track_or_switch.length:
+
+            if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._track_or_switch.length :
                 checked = False
                 self.position -= self._track_or_switch.length
                 self._track_or_switch = self._track_or_switch.beside.sections[0]
@@ -214,6 +215,17 @@ class Pod(Token):
 
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
             # capsule indique à la piste/l'aiguillage sur laquelle/lequel elle rentre
+
+            if type(self._track_or_switch).__name__ == "SwitchOut" :
+
+                print(" ------------------------------------------   --------------------------------")
+                print(" ------------------------------------------   --------------------------------")
+                print(" ------------------------------------------   --------------------------------")
+                print(" ----------------------------------------", self._track_or_switch.stat_or_shed, self._destination._name)
+                print(" ------------------------------------------   --------------------------------")
+                print(" ------------------------------------------   --------------------------------")
+                print(" ------------------------------------------   --------------------------------")
+
             if self._position > self._track_or_switch.length and self._speed != 0:
                 bridge_to_switch = False
                 self._position -= self._track_or_switch.length
@@ -227,6 +239,7 @@ class Pod(Token):
                             bridge_to_switch = True
                     self._track_or_switch = self._track_or_switch.next
                 self._position = t * self._track_or_switch.speed
+
                 if bridge_to_switch:
                     yield from self._track_or_switch.write({
                         "author": self,
@@ -267,8 +280,8 @@ class Pod(Token):
                     self._speed = 0
                     self._endSpeed = 0
                 elif "insert" == message["type"]:
-                    # Ordre d'insertion, la capsule est autorisée à tourner
-                    self._turn = True
+                    # Ordre d'insertion, la capsule est autorisée à tourner:
+                    self._turn = not self._track_or_switch.stat_or_shed or self._track_or_switch.stat_or_shed == self._destination.name
                 elif "speed_a_while" == message["type"]:
                     # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
                     # Ou lors d'une discrétisation

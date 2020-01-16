@@ -4,7 +4,7 @@ from .switch import Switch
 class SwitchOut(Switch):
     """Classe modélisant un aiguillage sortant
     Elle gère une partie de l'algorithme d'aiguillage"""
-    def __init__(self, env, id, margin_min, pod_size, max_speed, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, max_speed, stat_or_shed=None, **kwargs):
         super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
         self._switch_in = None
         self._routing_table = None
@@ -17,6 +17,7 @@ class SwitchOut(Switch):
             self._switch_in._switch_out = self
             self._beside.sections[-1].next.switch_in = self
         self._length = None
+        self._stat_or_shed = stat_or_shed
 
     @property
     def switch_in(self):
@@ -41,6 +42,10 @@ class SwitchOut(Switch):
     @property
     def name(self):
         return super().name or "Switch \"out\" %d" % self.id
+
+    @property
+    def stat_or_shed(self):
+        return self._stat_or_shed
 
     def set_c1_length(self):
         self._length = self._switch_in.finalisation_length * self.speed / self._switch_in.speed - self._beside.sections[0].length * self.speed / self._beside.sections[0].speed

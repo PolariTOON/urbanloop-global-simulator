@@ -216,8 +216,6 @@ class Pod(Token):
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
             # capsule indique à la piste/l'aiguillage sur laquelle/lequel elle rentre
 
-            if type(self._track_or_switch).__name__ == "SwitchOut" :
-
             if self._position > self._track_or_switch.length and self._speed != 0:
                 bridge_to_switch = False
                 self._position -= self._track_or_switch.length

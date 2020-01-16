@@ -207,7 +207,7 @@ class Station(Step):
             # Attente pour continuer d'avancer dans les places
             for i in range(len(forward)):
                 if forward[i] != 1:
-                    forward[i] += 1
+                    forward[i] += self.env.tick
                     if forward[i] > 5:
                         forward[i] = -1
 

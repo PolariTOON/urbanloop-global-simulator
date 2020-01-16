@@ -39,6 +39,7 @@ class Station(Step):
         self._pods = [None for _ in range(4)]
         #self._capacity = pods["max"]
         self._capacity = 4
+        self._parallel = False
         if travelers["count"]:
             self._travelers = [self._average_waiting_time in range(travelers["count"])]
         else:
@@ -147,14 +148,14 @@ class Station(Step):
             "waiting_time": waiting_time,
             "traveler": traveler
         })
-        pod.ready = True
+        pod.ready = True        
 
     def update(self):
         """Fonction gérant le processus gare"""
         refill = False
         wait = -1
         full = False
-        forward = [-1 for _ in range(self._pods)]
+        forward = [-1 for _ in range(len(self._pods))]
         boarding = [-1 for _ in range(len(self._pods))]
         while True:
 
@@ -166,7 +167,9 @@ class Station(Step):
             # On envoie les voyageurs au hasard s'il y a de la place
             if len(self._travelers) > 0 and self.pods_size > 0 and not full:
                 added = False
-                for pod in self._pods.reverse():
+                pods_copy = self._pods.copy()
+                pods_copy.reverse()
+                for pod in pods_copy:
                     i = self._pods.index(pod)
                     if pod and pod.isEmpty() and forward[i] != -1:
                         going_traveler = self.travelers.pop(0)
@@ -197,23 +200,24 @@ class Station(Step):
                 if wait > self.next.margin / self.next.speed:
                     wait = -1
              
-            # Les capsules avancent dans les places 
-            for i in range(len(self._pods)-1):
-                if self._pods[i] and not self._pods[i+1] and not forward[i] and boarding[i] != -1:
-                    self._pods[i+1] = self._pods[i]
-                    self._pods[i] = None
-                    forward[i] = 0
+            # En parallèle pas d'avancement dans les places
+            if not self._parallel:
+                # Les capsules avancent dans les places 
+                for i in range(len(self._pods)-1):
+                    if self._pods[i] and not self._pods[i+1] and forward[i] == -1 and boarding[i] == -1:
+                        self._pods[i+1] = self._pods[i]
+                        self._pods[i] = None
+                        forward[i] = 0
 
-            # Attente pour continuer d'avancer dans les places
-            for i in range(len(forward)):
-                if forward[i] != 1:
-                    forward[i] += self.env.tick
-                    if forward[i] > 5:
-                        forward[i] = -1
+                # Attente pour continuer d'avancer dans les places
+                for i in range(len(forward)):
+                    if forward[i] != 1:
+                        forward[i] += self.env.tick
+                        if forward[i] > self.env.tick:
+                            forward[i] = -1
 
             # Départ d'une capsule
             if wait == -1 and self.pods[-1] and self.pods[-1].ready:
-                # ordre de départ pour la capsule
                 self._pods[-1] = None
                 dico = self._departure_pods.pop()
                 pod = dico["pod"]

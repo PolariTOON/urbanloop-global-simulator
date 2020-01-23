@@ -212,3 +212,5 @@ label#stats-tab > input {
 label#views-tab > input {
     background-image: url("icons.svg#views");
 }
+
+button.link { background:none;border:none; }

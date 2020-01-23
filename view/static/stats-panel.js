@@ -8,7 +8,9 @@ notImplemented.append("Not implemented");
 function serialize() {
 	const stats = `
 	<dl>
-	<dt>Number of traverlers:</dt>
+	<dt>
+        <button class="link">Number of traverlers:</button>
+    </dt>
 	<dd>${state.stats.nbTraveler}</dd>
 	</dl>
 ` 

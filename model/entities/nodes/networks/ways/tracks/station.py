@@ -190,7 +190,7 @@ class Station(Step):
                         stations = self._parent.parent.stations_names
                         stations.remove(self.name)
                         name = choice(stations)
-                        self.send_pod(self._pods[i], self.find({"name": name}))
+                        self.send_pod(self._pods[i], self.find({"name": name}),True)
                         boarding[i] = -1
                         self._boarding -= 1
 

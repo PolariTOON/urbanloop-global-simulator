@@ -3,9 +3,12 @@
 
 export class Statisctics{
 	//_nbTraveler
-	constructor() {
+
+	constructor(chartOptions) {
         this._nbTraveler = 0;
         this._chart = null;
+        this.chartOptions = chartOptions;
+
     }
 
 	get nbTraveler(){
@@ -35,6 +38,13 @@ export class Statisctics{
 	    var series = this._chart.series[0];
 	    var shift = series.data.length > 200;
 	    this._chart.series[0].addPoint(point, true, false);
+	}
+
+	restartChart(){
+		console.log("restarting chart...");
+		this._chart.destroy();
+		this._chart = new Highcharts.Chart(this.chartOptions);
+    	this._chart.series[0].setData([]);
 	}
 
 }

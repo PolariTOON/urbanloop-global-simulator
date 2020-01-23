@@ -8,7 +8,6 @@ const {Group, Layer, Stage} = Konva;
 const zoomIntensity = 0.8;
 const minScale = 0.01;
 
-const statistics = new Statisctics();
 const article = document.querySelector("main > article");
 const stage = new Stage({
     container: article,
@@ -75,6 +74,7 @@ var chartOptions = {
     }
 }
     
+const statistics = new Statisctics(chartOptions);
 var chart = new Highcharts.Chart(chartOptions);
 statistics.chart = chart;
 
@@ -121,6 +121,7 @@ state.addEventListener("load", async (event) => {
 });
 
 state.addEventListener("unload", async (event) => {
+    statistics.restartChart();
     heading.textContent = "Undefined network";
     rateView.control.value = "×-";
     dateView.control.value = "Day -, --:--:--";

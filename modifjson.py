@@ -32,6 +32,7 @@ def mod_station(item):
 					h1 = 20 #longueur des ponts
 					h2 = 10#écart entre les 2 switchs de chaque boucle
 					e = 15#écart entre les switchs de la nouvelle boucle et la station
+					spd = 20#vitesse sur les sections inutilisées (pour changer la longueur des switchs)
 
 					if i == len(loop["elements"]) - 1:
 						elt_suiv = loop["elements"][0]
@@ -113,8 +114,8 @@ def mod_station(item):
 
 					loop["sections"].append(loop["sections"][0])
 
-					data["bridges"].append({"name": bridge_name1, "section": {"speed": 20, "path": {"type": "line"}}, "pods": []},)
-					data["bridges"].append({"name": bridge_name2, "section": {"speed": 20, "path": {"type": "line"}}, "pods": []},)
+					data["bridges"].append({"name": bridge_name1, "section": {"speed": spd, "path": {"type": "line"}}, "pods": []},)
+					data["bridges"].append({"name": bridge_name2, "section": {"speed": spd, "path": {"type": "line"}}, "pods": []},)
 
 					if type == "station":
 
@@ -125,9 +126,9 @@ def mod_station(item):
 								{"type": "switch_out", "x": x_out2, "y": y_out2, "id_bridge": id_bridge+1, "pods": []}
 							],
 							"sections": [
-								{"speed": 20, "path": {"type": "line"}},
-								{"speed": 20, "path": {"type": "line"}},
-								{"speed": 20, "path": {"type": "line"}}
+								{"speed": spd, "path": {"type": "line"}},
+								{"speed": spd, "path": {"type": "line"}},
+								{"speed": spd, "path": {"type": "line"}}
 							],
 							"pods": []
 						})
@@ -140,9 +141,9 @@ def mod_station(item):
 								{"type": "switch_out", "x": x_out2, "y": y_out2, "id_bridge": id_bridge+1, "pods": []}
 							],
 							"sections": [
-								{"speed": 7, "path": {"type": "line"}},
-								{"speed": 7, "path": {"type": "line"}},
-								{"speed": 7, "path": {"type": "line"}}
+								{"speed": spd, "path": {"type": "line"}},
+								{"speed": spd, "path": {"type": "line"}},
+								{"speed": spd, "path": {"type": "line"}}
 							],
 							"pods": []
 						})

@@ -5,6 +5,7 @@ from .....tokens.traveler import Traveler
 from .step import Step
 import datetime
 import time
+from .poisson import *
 
 station_types = {
     "city": 0,
@@ -52,6 +53,7 @@ class Station(Step):
             dest = self.find(dico["destination"])
             dico["pod"] = Pod(env, self, 0, p)
             dico["destination"] = dest
+
 
     def serialize(self):
         """Permet la serialisation des informations"""
@@ -148,7 +150,7 @@ class Station(Step):
             "waiting_time": waiting_time,
             "traveler": traveler
         })
-        pod.ready = True        
+        pod.ready = True       
 
     def update(self):
         """Fonction gérant le processus gare"""
@@ -160,9 +162,19 @@ class Station(Step):
         while True:
 
             # Génération d'un voyageur tous les 1000 ticks
+            esp = 1 #esperence de la loi de poisson pour la génération des voyageurs (1 voyageur tous les 1000 ticks)
             if self.env.now % 1000 == 0:
-                self._travelers.append(Traveler(self.env,self.env.time))
-                self._all_time_count += 1
+
+                #détermination aléatoire du nombre de voyageurs générés
+                nbvoy = hpoisson(esp)
+                print("------------------------------------------")
+                print("------------------------------------------")
+                print("---------------------- nombre de voyageurs générés : ",nbvoy,"-----------------------")
+                print("------------------------------------------")
+                for i in range (nbvoy):
+                    self._travelers.append(Traveler(self.env,self.env.time))
+                    self._all_time_count += 1
+
             
             # On envoie les voyageurs au hasard s'il y a de la place
             if len(self._travelers) > 0 and self.pods_size > 0 and not full:

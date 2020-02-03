@@ -156,43 +156,26 @@ class Station(Step):
         """Fonction gérant le processus gare"""
         refill = False
         wait = -1
-        full = False
-        forward = [-1 for _ in range(len(self._pods))]
+        forward = [-1 for _ in range(len(self._pods)-1)]
         boarding = [-1 for _ in range(len(self._pods))]
         while True:
 
             # Génération d'un voyageur tous les 1000 ticks
-            esp = 1 #esperence de la loi de poisson pour la génération des voyageurs (1 voyageur tous les 1000 ticks)
             if self.env.now % 1000 == 0:
-
-                #détermination aléatoire du nombre de voyageurs générés
-                nbvoy = hpoisson(esp)
-                print("------------------------------------------")
-                print("------------------------------------------")
-                print("---------------------- nombre de voyageurs générés : ",nbvoy,"-----------------------")
-                print("------------------------------------------")
-                for i in range (nbvoy):
-                    self._travelers.append(Traveler(self.env,self.env.time))
-                    self._all_time_count += 1
-
-            
+                self._travelers.append(Traveler(self.env,self.env.time))
+                self._all_time_count += 1
+      
             # On envoie les voyageurs au hasard s'il y a de la place
-            if len(self._travelers) > 0 and self.pods_size > 0 and not full:
-                added = False
-                pods_copy = self._pods.copy()
-                pods_copy.reverse()
-                for pod in pods_copy:
-                    i = self._pods.index(pod)
-                    if pod and pod.isEmpty() and forward[i] != -1:
+            if len(self._travelers) > 0 and self.pods_size > 0:
+                for i in range(self.capacity-1, -1, -1):
+                    pod = self._pods[i]
+                    if pod and pod.isEmpty() and (i == 0 or forward[i-1] == -1):
                         going_traveler = self.travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
                         self._average_waiting_time = (self._average_waiting_time * (self._all_time_count - 1) + going_traveler.waiting_time) / self._all_time_count
                         boarding[self._pods.index(pod)] = 0
                         self._boarding += 1
-                        added = True
-                if not added:
-                    full = True
 
             # Attente de la montée du voyageur pour l'envoi d'une capsule
             for i in range(len(boarding)):
@@ -285,7 +268,6 @@ class Station(Step):
                     # la capsule va se garer dans la station s'il y a de la place
                     if pod.destination == self and self.pods_size < self._capacity:
                         self._pods[0] = pod
-                        full = False
                         refill = False
                         yield from pod.write({
                             "author": self,
@@ -304,7 +286,7 @@ class Station(Step):
                         })
                 elif "pod_exit" == message["type"]:
                     pass
-                elif "empty" == message["type"]:
-                    self.send_pod(message["shed"])
+                #elif "empty" == message["type"]:
+                #    self.send_pod(message["shed"])
                 else:
                     raise ValueError("Invalid message")

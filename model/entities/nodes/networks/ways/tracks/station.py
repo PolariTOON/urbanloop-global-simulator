@@ -286,7 +286,8 @@ class Station(Step):
                         })
                 elif "pod_exit" == message["type"]:
                     pass
-                #elif "empty" == message["type"]:
+                elif "empty" == message["type"]:
                 #    self.send_pod(message["shed"])
+                    pass;
                 else:
                     raise ValueError("Invalid message")

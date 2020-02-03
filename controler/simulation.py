@@ -48,8 +48,6 @@ class Simulation:
     def rate(self, value):
         if value < 0:
             self._rate = 0
-        elif value > self._max_rate:
-            self._rate = self._max_rate
         else:
             self._rate = value
 

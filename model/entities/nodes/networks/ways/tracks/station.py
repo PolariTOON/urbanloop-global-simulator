@@ -76,7 +76,7 @@ class Station(Step):
                 "all_time_count": self.all_time_count,
                 "boarding": self.boarding
             },
-            "station_type": self.type,
+            "station_type": self.station_type,
             #"departure_pods": departure_pods,
             "element_of_loop": self.element_of_loop
         })

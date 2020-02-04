@@ -1,3 +1,4 @@
+import sys
 from configparser import ConfigParser
 from math import floor
 from random import random, seed
@@ -11,6 +12,7 @@ from .probability import Probability
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
     def __init__(self, id, wave, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+        sys.setrecursionlimit(3000)
         running = running or False
         rate = rate or 0
         max_rate = max_rate or 7

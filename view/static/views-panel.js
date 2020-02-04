@@ -198,6 +198,9 @@ state.addEventListener("update", (event) => {
         }
         updateViewSwitch(switchInJSON, switchOutJSON, bridgeJSON);
     }
+    else if (selected instanceof Station) {
+      notImplemented.remove();
+    }
     else
         updateViewOther();
 });

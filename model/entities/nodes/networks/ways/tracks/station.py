@@ -6,6 +6,7 @@ from .step import Step
 import datetime
 import time
 from .poisson import *
+from controler import probability
 
 station_types = {
     "city": 0,
@@ -35,6 +36,7 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = travelers["average_waiting_time"] or 0
         self._all_time_count = travelers["all_time_count"] or 0
+        self._departure_count = 0
         self._boarding = 0
         #self._pods = [Pod(env, self, 0) for _ in range(pods["count"])]
         self._pods = [None for _ in range(4)]
@@ -74,7 +76,7 @@ class Station(Step):
                 "all_time_count": self.all_time_count,
                 "boarding": self.boarding
             },
-            "station_type": self.type,
+            "station_type": self.station_type,
             "departure_pods": departure_pods,
             "element_of_loop": self.element_of_loop
         })
@@ -119,7 +121,7 @@ class Station(Step):
         self._travelers = value
 
     @property
-    def type(self):
+    def station_type(self):
         """type de la station
         0 : ville
         1 : résidentiel
@@ -161,20 +163,6 @@ class Station(Step):
         boarding = [-1 for _ in range(len(self._pods))]
         while True:
 
-            # Génération d'un voyageur tous les 1000 ticks
-            esp = 1 #esperence de la loi de poisson pour la génération des voyageurs (1 voyageur tous les 1000 ticks)
-            if self.env.now % 1000 == 0:
-
-                #détermination aléatoire du nombre de voyageurs générés
-                nbvoy = hpoisson(esp)
-                print("------------------------------------------")
-                print("------------------------------------------")
-                print("---------------------- nombre de voyageurs générés : ",nbvoy,"-----------------------")
-                print("------------------------------------------")
-                for i in range (nbvoy):
-                    self._travelers.append(Traveler(self.env,self.env.time))
-                    self._all_time_count += 1
-
             
             # On envoie les voyageurs au hasard s'il y a de la place
             if len(self._travelers) > 0 and self.pods_size > 0 and not full:
@@ -187,7 +175,8 @@ class Station(Step):
                         going_traveler = self.travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
-                        self._average_waiting_time = (self._average_waiting_time * (self._all_time_count - 1) + going_traveler.waiting_time) / self._all_time_count
+                        self._departure_count += 1
+                        self._average_waiting_time = (self._average_waiting_time * (self._departure_count - 1) + going_traveler.waiting_time) / self._departure_count
                         boarding[self._pods.index(pod)] = 0
                         self._boarding += 1
                         added = True

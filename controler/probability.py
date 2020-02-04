@@ -1,7 +1,7 @@
 from numpy import floor, sum
-from numpy.random import poisson
-from random import randrange
+import random
 from scipy.stats import norm
+import math
 
 from model.entities.nodes.networks.ways.tracks import station
 
@@ -78,7 +78,7 @@ class Probability:
         return round(result / 100, 2)
 
 
-def generate_traveler_poisson(traveler_per_day, hour):
+def generate_traveler_poisson(traveler_per_day, hour, tick_per_second):
     """
     This function gives you the amount of travelers you would create
     at a given hour.
@@ -91,6 +91,12 @@ def generate_traveler_poisson(traveler_per_day, hour):
     peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]
     somme_coefficient = int(sum(peak_hours_coefficient))
     traveler_per_day = int(traveler_per_day)
-    traveler_lambda_per_hour = [traveler_per_day * coefficient / (3600 * somme_coefficient) for coefficient in
+    traveler_lambda_per_hour = [traveler_per_day * coefficient / (24 * somme_coefficient) for coefficient in
                                 peak_hours_coefficient]
-    return max(poisson(traveler_lambda_per_hour[hour], 1)[0], 1)
+    traveler_per_tick = traveler_lambda_per_hour[hour] / (3600 * tick_per_second)
+    prob = 1 - math.exp(-traveler_per_tick)
+    if random.random() <= prob:
+        return 1
+    else:
+        return 0 
+

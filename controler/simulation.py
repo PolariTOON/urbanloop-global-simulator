@@ -1,16 +1,17 @@
 from configparser import ConfigParser
 from math import floor
-from random import random, seed
+from random import random, seed, randint
 from simpy import Environment
+from model.entities.tokens.traveler import Traveler
 
 from model.entities.nodes.networks.network import Network
 
-from .probability import Probability
+from .probability import Probability, generate_traveler_poisson
 
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, wave, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+    def __init__(self, id, wave, travelers_per_day=2000, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
         running = running or False
         rate = rate or 0
         max_rate = max_rate or 7
@@ -31,6 +32,7 @@ class Simulation:
         self._network = Network(self._env, id, **kwargs)
         self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
         self._env.time = time  # Temps réel actuel en seconde
+        self._travelers_per_day = travelers_per_day
 
     @property
     def running(self):
@@ -86,7 +88,14 @@ class Simulation:
             until = floor(self._env.now) + 1
             self._env.run(until=until)
             self._state = random() * 2 ** 53
-
+        second = self._env.time
+        if (generate_traveler_poisson(self._travelers_per_day, int(round(second / 3600, 2)), self._env.tick)):          
+            ri = randint(1,len(self._network.stations))
+            s = self._network.stations[ri-1]
+            r = random()
+            if r <= self._probability.station_probability(s.station_type, second, False):
+                s._travelers.append(Traveler(self._env, self._env.time))
+                s._all_time_count += 1
     def serialize(self):
         dict = self._network.serialize()
         dict.update({

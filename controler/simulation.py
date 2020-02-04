@@ -1,3 +1,4 @@
+import sys
 from configparser import ConfigParser
 from math import floor
 from random import random, seed, randint
@@ -11,7 +12,12 @@ from .probability import Probability, generate_traveler_poisson
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
+<<<<<<< HEAD
     def __init__(self, id, wave, travelers_per_day=2000, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+=======
+    def __init__(self, id, wave, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+        sys.setrecursionlimit(3000)
+>>>>>>> a0fb233c98e260ded36c08459a0a2209ee0ac4c1
         running = running or False
         rate = rate or 0
         max_rate = max_rate or 7
@@ -50,8 +56,6 @@ class Simulation:
     def rate(self, value):
         if value < 0:
             self._rate = 0
-        elif value > self._max_rate:
-            self._rate = self._max_rate
         else:
             self._rate = value
 

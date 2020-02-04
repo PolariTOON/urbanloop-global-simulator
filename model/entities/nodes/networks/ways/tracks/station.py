@@ -60,7 +60,7 @@ class Station(Step):
     def serialize(self):
         """Permet la serialisation des informations"""
         dict = super().serialize()
-        departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
+        #departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
         self.element_of_loop.update({
             "name": self.name
         })
@@ -76,8 +76,13 @@ class Station(Step):
                 "all_time_count": self.all_time_count,
                 "boarding": self.boarding
             },
+<<<<<<< HEAD
             "station_type": self.station_type,
             "departure_pods": departure_pods,
+=======
+            "station_type": self.type,
+            #"departure_pods": departure_pods,
+>>>>>>> a0fb233c98e260ded36c08459a0a2209ee0ac4c1
             "element_of_loop": self.element_of_loop
         })
         return dict
@@ -157,21 +162,16 @@ class Station(Step):
     def update(self):
         """Fonction gérant le processus gare"""
         refill = False
+        empty = False
         wait = -1
-        full = False
-        forward = [-1 for _ in range(len(self._pods))]
+        forward = [-1 for _ in range(len(self._pods)-1)]
         boarding = [-1 for _ in range(len(self._pods))]
         while True:
-
-            
             # On envoie les voyageurs au hasard s'il y a de la place
-            if len(self._travelers) > 0 and self.pods_size > 0 and not full:
-                added = False
-                pods_copy = self._pods.copy()
-                pods_copy.reverse()
-                for pod in pods_copy:
-                    i = self._pods.index(pod)
-                    if pod and pod.isEmpty() and forward[i] != -1:
+            if len(self._travelers) > 0 and self.pods_size > 0:
+                for i in range(self.capacity-1, -1, -1):
+                    pod = self._pods[i]
+                    if pod and pod.isEmpty() and (i == 0 or forward[i-1] == -1):
                         going_traveler = self.travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
@@ -179,9 +179,6 @@ class Station(Step):
                         self._average_waiting_time = (self._average_waiting_time * (self._departure_count - 1) + going_traveler.waiting_time) / self._departure_count
                         boarding[self._pods.index(pod)] = 0
                         self._boarding += 1
-                        added = True
-                if not added:
-                    full = True
 
             # Attente de la montée du voyageur pour l'envoi d'une capsule
             for i in range(len(boarding)):
@@ -191,7 +188,9 @@ class Station(Step):
                         stations = self._parent.parent.stations_names
                         stations.remove(self.name)
                         name = choice(stations)
-                        self.send_pod(self._pods[i], self.find({"name": name}),True)
+                        while name == self.name:
+                            name = chose(stations)
+                        self.send_pod(self._pods[i], self.find({"name": name}), True)
                         boarding[i] = -1
                         self._boarding -= 1
 
@@ -243,7 +242,7 @@ class Station(Step):
                             "traveler": dico["traveler"] 
                         })
 
-            if self.pods_size < self._capacity / 2 and not refill:
+            if not refill and self.pods_size < self._capacity / 2:
                 # Re-approvisionnement des capsules
                 refill = True
                 yield from self.parent.write({
@@ -252,8 +251,9 @@ class Station(Step):
                     "station": self
                 })
                 
-            if self.pods_size > self._capacity / 2 and len(self._travelers) == 0:
+            if not empty and self.pods_size > self._capacity / 2 and len(self._travelers) == 0:
                 # Vide la station de capsules
+                empty = True
                 yield from self.parent.write({
                     "author": self,
                     "type": "empty",
@@ -274,7 +274,6 @@ class Station(Step):
                     # la capsule va se garer dans la station s'il y a de la place
                     if pod.destination == self and self.pods_size < self._capacity:
                         self._pods[0] = pod
-                        full = False
                         refill = False
                         yield from pod.write({
                             "author": self,
@@ -292,8 +291,13 @@ class Station(Step):
                             "type": "passing"
                         })
                 elif "pod_exit" == message["type"]:
-                    pass
+                    empty = False
                 elif "empty" == message["type"]:
-                    self.send_pod(message["shed"])
+                    if self._pods[-1]:
+                        if boarding[-1] == -1 and forward[-1] == -1:
+                            self.send_pod(self._pods[-1], message["shed"])
+                    else:
+                        empty = False
+                    pass;
                 else:
                     raise ValueError("Invalid message")

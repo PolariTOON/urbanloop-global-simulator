@@ -76,13 +76,8 @@ class Station(Step):
                 "all_time_count": self.all_time_count,
                 "boarding": self.boarding
             },
-<<<<<<< HEAD
-            "station_type": self.station_type,
-            "departure_pods": departure_pods,
-=======
             "station_type": self.type,
             #"departure_pods": departure_pods,
->>>>>>> a0fb233c98e260ded36c08459a0a2209ee0ac4c1
             "element_of_loop": self.element_of_loop
         })
         return dict

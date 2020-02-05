@@ -31,6 +31,9 @@ class Traveler(Token):
     def serialize(self):
         dict = super().serialize()
         return dict
+        
+    def distanceToPod(self):
+        return self.env.tick / self._boarding_speed
 
     def update(self):
         return

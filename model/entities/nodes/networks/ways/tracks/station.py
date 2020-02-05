@@ -57,7 +57,6 @@ class Station(Step):
             dico["pod"] = Pod(env, self, 0, p)
             dico["destination"] = dest
 
-
     def serialize(self):
         """Permet la serialisation des informations"""
         dict = super().serialize()
@@ -77,7 +76,7 @@ class Station(Step):
                 "count": len(self.travelers),
                 "average_waiting_time": self.average_waiting_time,
                 "all_time_count": self.all_time_count,
-                "boarding": self.boardingCount
+                "boarding_speeds": [pod.travelers[0].distanceToPod() if pod and not pod.isEmpty() else None for pod in self._pods]
             },
             "station_type": self.station_type,
             #"departure_pods": departure_pods,

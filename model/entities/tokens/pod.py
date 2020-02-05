@@ -42,6 +42,8 @@ class Pod(Token):
         self._acceleration = 2
         self._brake = 5
         self._ready = False
+        self._traveled_distance = 0
+        self._traveled_distance_t = 0
 
     @property
     def position(self):
@@ -180,7 +182,7 @@ class Pod(Token):
                     self._speed = self._endSpeed
 
             # La capsule détecte la capsule la plus proche devant elle
-            if type(self._track_or_switch).__name__ == "Section":
+            if self.env.now % 20 == 0 and type(self._track_or_switch).__name__ == "Section":
                 closest, same_section = self.closest()
                 if closest:
                     if same_section:
@@ -199,6 +201,9 @@ class Pod(Token):
             # La capsule avance
             if self._speed != 0:
                 self._position += self._speed * self.env.tick
+                self._traveled_distance += self._speed * self.env.tick
+                if len(self._travelers) > 0:
+                    self._traveled_distance_t += self._speed * self.env.tick
 
             # La capsule s'insère et tourne si elle en a reçu l'ordre
 
@@ -256,14 +261,16 @@ class Pod(Token):
                     yield from self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
-                        "pod": self
+                        "pod": self,
+                        "traveled_distance": self._traveled_distance
                     })
                 elif "passing_from_switch" == message["type"]:
                     self._track_or_switch = self._track_or_switch.next.sections[0]
                     yield from self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
-                        "pod": self
+                        "pod": self,
+                        "traveled_distance": self._traveled_distance
                     })
                 elif "docked" == message["type"]:
                     # La capsule s'arrête dans une gare ou un dépôt

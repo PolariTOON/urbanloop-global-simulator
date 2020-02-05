@@ -210,7 +210,7 @@ class Station(Step):
                 for i in range(len(forward)):
                     if forward[i] != 1:
                         forward[i] += self.env.tick
-                        if forward[i] > self.env.tick:
+                        if forward[i] > 2:
                             forward[i] = -1
 
             # Départ d'une capsule
@@ -271,6 +271,7 @@ class Station(Step):
                     # la capsule va se garer dans la station s'il y a de la place
                     if pod.destination == self and self.pods_size < self._capacity:
                         self._pods[0] = pod
+                        pod.travelers = []
                         refill = False
                         yield from pod.write({
                             "author": self,

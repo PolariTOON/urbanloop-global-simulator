@@ -99,11 +99,11 @@ export class Station extends Entity {
     get _travelerAverageWaitingTime() {
         return this.__travelerAverageWaitingTime;
     }
-    set _travelerBoardingSpeeds(value) {
-        this.__travelerBoardingSpeeds = value;
+    set _travelerBoardingTimes(value) {
+        this.__travelerBoardingTimes = value;
     }
-    get _travelerBoardingSpeeds() {
-        return this.__travelerBoardingSpeeds;
+    get _travelerBoardingTimes() {
+        return this.__travelerBoardingTimes;
     }
     set _stationType(value) {
         this.__stationType = value;
@@ -128,7 +128,7 @@ export class Station extends Entity {
         const travelerCount = json["travelers"]["count"];
         const travelerAllTimeCount = json["travelers"]["all_time_count"];
         const travelerAverageWaitingTime = json["travelers"]["average_waiting_time"];
-        const travelerBoardingSpeeds = json["travelers"]["boarding_speeds"];
+        const travelerBoardingTimes = json["travelers"]["boarding_times"];
         const stationType = json["station_type"];
         this._name = name;
         this._x = x;
@@ -140,7 +140,7 @@ export class Station extends Entity {
         this._travelerCount = travelerCount;
         this._travelerAllTimeCount = travelerAllTimeCount;
         this._travelerAverageWaitingTime = travelerAverageWaitingTime;
-        this._travelerBoardingSpeeds = travelerBoardingSpeeds;
+        this._travelerBoardingTimes = travelerBoardingTimes;
         this._stationType = stationType;
     }
 }

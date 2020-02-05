@@ -115,6 +115,8 @@ layerStation.add(line5);
 let podsStation = [null, null, null, null];
 let boarding = [false, false, false, false];
 let travelers = [null, null, null, null];
+let previous = [null, null, null, null];
+let ratio = [1, 1, 1, 1];
 
 layerSwitch.hide();
 layerStation.hide();
@@ -305,8 +307,12 @@ state.addEventListener("update", (event) => {
                       });
                       travelers[i] = traveler;
                       layerStation.add(traveler);
+                      previous[i] = Date.now();
                   } else {
-                    travelers[i].y(travelers[i].y() - selected._travelerBoardingSpeeds[i] * travelLength * 1.4);
+                    const now = Date.now();
+                    const dist = (now - previous[i]) * travelLength / selected._travelerBoardingTimes[i] / 1000;
+                    travelers[i].y(travelers[i].y() - dist);
+                    previous[i] = now;
                   }
                 } else if (travelers[i] != null) {
                     travelers[i].remove();

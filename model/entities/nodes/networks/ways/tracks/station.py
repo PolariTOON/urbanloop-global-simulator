@@ -76,7 +76,7 @@ class Station(Step):
                 "count": len(self.travelers),
                 "average_waiting_time": self.average_waiting_time,
                 "all_time_count": self.all_time_count,
-                "boarding_speeds": [pod.travelers[0].distanceToPod() if pod and not pod.isEmpty() else None for pod in self._pods]
+                "boarding_times": [pod.travelers[0].boarding_time if pod and not pod.isEmpty() else None for pod in self._pods]
             },
             "station_type": self.station_type,
             #"departure_pods": departure_pods,
@@ -161,13 +161,13 @@ class Station(Step):
         refill = False
         empty = False
         wait = -1
-        forward = [-1 for _ in range(len(self._pods)-1)]
+        forward = [-1 for _ in range(self._capacity - 1)]
         while True:
             # On envoie les voyageurs au hasard s'il y a de la place
             if len(self._travelers) > 0 and self.pods_size > 0:
-                for i in range(self.capacity-1, -1, -1):
+                for i in range(self._capacity - 1, -1, -1):
                     pod = self._pods[i]
-                    if pod and pod.isEmpty() and (i == 0 or forward[i-1] == -1):
+                    if pod and pod.isEmpty() and (i == self._capacity-1 or forward[i] == -1):
                         going_traveler = self.travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
@@ -180,7 +180,7 @@ class Station(Step):
             for i in range(len(self._boarding)):
                 if self._boarding[i] != -1:
                     self._boarding[i] += self.env.tick
-                    if self._boarding[i] > self._pods[i].travelers[0].boarding_speed:
+                    if self._boarding[i] > self._pods[i].travelers[0].boarding_time:
                         stations = self._parent.parent.stations_names
                         stations.remove(self.name)
                         name = choice(stations)
@@ -199,17 +199,17 @@ class Station(Step):
             # En parallèle pas d'avancement dans les places
             if not self._parallel:
                 # Les capsules avancent dans les places 
-                for i in range(len(self._pods)-1):
+                for i in range(self._capacity - 1):
                     if self._pods[i] and not self._pods[i+1] and forward[i] == -1 and self._boarding[i] == -1:
-                        self._pods[i+1] = self._pods[i]
-                        self._pods[i] = None
                         forward[i] = 0
 
                 # Attente pour continuer d'avancer dans les places
                 for i in range(len(forward)):
-                    if forward[i] != 1:
+                    if forward[i] != -1:
                         forward[i] += self.env.tick
                         if forward[i] > 2:
+                            self._pods[i+1] = self._pods[i]
+                            self._pods[i] = None
                             forward[i] = -1
 
             # Départ d'une capsule

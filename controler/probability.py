@@ -12,12 +12,12 @@ class Probability:
     Modélise la prbabilité d'apparition d'un voyageur dans une gare
     """
 
-    def __init__(self, prob=None, traveler=None):
-        self._city_percent = int(prob['city_percent']) or 40
-        self._activity_and_residential_percent = int(prob['activity_and_residential_percent']) or 30
-        self._activity_and_residential_fluctuation = int(prob['activity_and_residential_fluctuation']) or 20
-        self._morning_peak_hour = int(traveler['morning_peak_hour']) or 8
-        self._evening_peak_hour = int(traveler['evening_peak_hour']) or 18
+    def __init__(self, prob, traveler):
+        self._city_percent = int(prob['city_percent'])
+        self._activity_and_residential_percent = int(prob['activity_and_residential_percent'])
+        self._activity_and_residential_fluctuation = int(prob['activity_and_residential_fluctuation'])
+        self._morning_peak_hour = int(traveler['morning_peak_hour'])
+        self._evening_peak_hour = int(traveler['evening_peak_hour'])
         if self._activity_and_residential_fluctuation < 0 or self._activity_and_residential_fluctuation >= self._activity_and_residential_percent:
             self._activity_and_residential_fluctuation = floor(self._activity_and_residential_percent / 2)
 
@@ -39,10 +39,7 @@ class Probability:
         :param second: The time in second
         :param is_arrival: If the station is a departure or destination station
         :return: The probability to lead a traveler to the chosen station_type at the given time
-        """
-        print("evening_peak_hour", self._evening_peak_hour)
-        print("city", self._city_percent)
- 
+        """ 
         if None in (
                 self._city_percent, self._activity_and_residential_percent, self._activity_and_residential_fluctuation):
             print("Converter hasn't been loaded")

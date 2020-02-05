@@ -1,5 +1,4 @@
 import sys
-from configparser import ConfigParser
 from math import floor
 from random import random, seed, randint
 from simpy import Environment
@@ -12,16 +11,26 @@ from .probability import Probability, generate_traveler_poisson
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, wave, travelers_per_day=2000, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+    def __init__(self, id, wave, traveler=None, prob=None, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
         running = running or False
         rate = rate or 0
         max_rate = max_rate or 7
         jerky = jerky or False
         time = time or 0
         state = state or (seed(), random() * 2 ** 53)[1]
-        self._config = ConfigParser()
-        self._config.read('resources/config.ini')  # TODO : déplacer ce qui est nécessaire dans le json
-        self._probability = Probability(self._config['TRAVELER'], self._config['PROB'])
+        traveler = traveler or {
+            "travelers_per_day" : 2000,
+            "morning_peak_hour" : 8,
+            "evening_peak_hour" : 18
+        }
+        prob = prob or {
+            "activity_and_residential_percent" : 30,
+            "city_percent" : 20,
+            "activity_and_residential_fluctuation" : 20
+        }
+        print(traveler)
+        print(prob)
+        self._probability = Probability(prob, traveler)
         self._env = Environment()
         self._wave = wave
         self._running = running
@@ -33,7 +42,7 @@ class Simulation:
         self._network = Network(self._env, id, **kwargs)
         self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
         self._env.time = time  # Temps réel actuel en seconde
-        self._travelers_per_day = travelers_per_day
+        self._travelers_per_day = traveler["travelers_per_day"]
 
     @property
     def running(self):

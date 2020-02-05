@@ -1,5 +1,6 @@
 import {state} from "./state.js";
 import {Switch} from "./switch.js";
+import {Station} from "./station.js";
 
 const {Line, Group, Layer, Circle} = Konva;
 
@@ -24,11 +25,11 @@ const xM2 = margin + sizeIn;
 const yM2 = size;
 
 let stage = new Konva.Stage({
-    container: viewsObject,
-    width: width,
-    height: height
-  });
-let layer = new Layer();
+  container: viewsObject,
+  width: width,
+  height: height
+});
+let layerSwitch = new Layer();
 let groupLines = new Group();
 let groupPods = new Group();
 let switchOut = new Line({
@@ -56,12 +57,19 @@ let podsOut = [];
 let podsIn = [];
 let podsBridge = [];
 
-stage.add(layer);
-layer.add(groupLines);
-layer.add(groupPods);
+stage.add(layerSwitch);
+layerSwitch.add(groupLines);
+layerSwitch.add(groupPods);
 groupLines.add(switchIn);
 groupLines.add(switchOut);
 groupLines.add(bridge);
+
+let layerStation = new Layer();
+stage.add(layerStation);
+let podsStation = [null, null, null, null];
+
+layerSwitch.hide();
+layerStation.hide();
 
 function getPodFromName(list, name){
     for (const e of list){
@@ -97,13 +105,13 @@ function updatePodsSwitch(jsonFile, pods){
         const p = getPodFromName(pods, pod["name"]);
         if (p === null){
             const newPod = new Circle({
-          x: x,
-          y: y,
-          radius: 4,
-          fill: 'red',
-          stroke: 'black',
-          strokeWidth: 1
-        });
+              x: x,
+              y: y,
+              radius: 4,
+              fill: 'red',
+              stroke: 'black',
+              strokeWidth: 1
+            });
             groupPods.add(newPod);
             newPods.push({"name": pod["name"], "pod": newPod});
         } else {
@@ -154,7 +162,7 @@ function updateViewSwitch(switchInJSON, switchOutJSON, bridgeJSON) {
     updatePodsSwitch(switchOutJSON, podsOut);
     updatePodsBridge(bridgeJSON, podsBridge);
     updatePodsSwitch(switchInJSON, podsIn);
-    layer.batchDraw();
+    layerSwitch.batchDraw();
 }
 
 function updateViewOther() {
@@ -171,6 +179,8 @@ state.addEventListener("update", (event) => {
     let id_bridge = null;
     if (selected instanceof Switch){
         notImplemented.remove();
+        layerStation.hide();
+        layerSwitch.show();
         viewsTab.append(viewsObject);
         b1: for (const loop of networkJSON["loops"]){
             for (const elt of loop["elements"]){
@@ -200,6 +210,54 @@ state.addEventListener("update", (event) => {
     }
     else if (selected instanceof Station) {
       notImplemented.remove();
+      viewsTab.append(viewsObject);
+      layerSwitch.hide();
+      layerStation.show();
+      for (const loop of networkJSON["loops"]) {
+        for (const elt of loop["elements"]) {
+          if (selected._name === elt["name"]) {
+            for (let i = 0; i < selected._podMax; i++) {
+              if (selected._podPos[i]) {
+                if (podsStation[i] == null) {
+                  const outerShape = new Circle({
+                    x: 40+i*50,
+                    y: 40,
+                    radius: 20,
+                    fill: 'yellow',
+                    stroke: 'black',
+                    strokeWidth: 1
+                  });
+                  const innerShape = new Circle({
+                    x: 40+i*50,
+                    y: 40,
+                    radius: 15,
+                    fill: 'white',
+                    stroke: 'black',
+                    strokeWidth: 1
+                  });
+                  podsStation[i] = {
+                    outer: outerShape,
+                    inner: innerShape
+                  };
+                  layerStation.add(outerShape);
+                  layerStation.add(innerShape);
+                } else if (podsStation[i]["inner"].getAttr('fill') === 'white' && selected._podBoarding[i]) {
+                  podsStation[i]["inner"].fill('gray');
+                } else if (podsStation[i]["inner"].getAttr('fill') === 'gray' && !selected._podBoarding[i]) {
+                  podsStation[i]["inner"].fill('black');
+                }
+              } else {
+                if (podsStation[i] != null) {
+                  podsStation[i]["outer"].destroy();
+                  podsStation[i]["inner"].destroy();
+                  podsStation[i] = null;
+                }
+              }
+            }
+          }
+        }
+      }
+      layerStation.batchDraw();
     }
     else
         updateViewOther();

@@ -69,6 +69,18 @@ export class Station extends Entity {
     get _podMax() {
         return this.__podMax;
     }
+    set _podPos(value) {
+        this.__podPos = value;
+    }
+    get _podPos() {
+        return this.__podPos;
+    }
+    set _podBoarding(value) {
+        this.__podBoarding = value;
+    }
+    get _podBoarding() {
+        return this.__podBoarding;
+    }
     set _travelerCount(value) {
         this.__travelerCount = value;
     }
@@ -105,6 +117,8 @@ export class Station extends Entity {
         const y = json["y"];
         const podCount = json["pods"]["count"];
         const podMax = json["pods"]["max"];
+        const podPos = json["pods"]["pos"];
+        const podBoarding = json["pods"]["boarding"];
         const travelerCount = json["travelers"]["count"];
         const travelerAllTimeCount = json["travelers"]["all_time_count"];
 				const travelerBoarding = json["travelers"]["boarding"];
@@ -115,6 +129,8 @@ export class Station extends Entity {
         this._y = y;
         this._podCount = podCount;
         this._podMax = podMax;
+        this._podPos = podPos;
+        this._podBoarding = podBoarding;
         this._travelerCount = travelerCount;
         this._travelerAllTimeCount = travelerAllTimeCount;
 				this._travelerBoarding = travelerBoarding;

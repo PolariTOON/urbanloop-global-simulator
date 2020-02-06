@@ -10,7 +10,7 @@ class Pod(Token):
     des ordres de vitesses qui peuvent être sur une certaine distance
     au niveau des aiguillages
     """
-    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, **kwargs):
+    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, ready=None, traveled_distance=None, traveled_distance_t=None, **kwargs):
         super().__init__(env, **kwargs)
         self._position = position or 0
         travelers = travelers or {
@@ -28,7 +28,6 @@ class Pod(Token):
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
-        # TODO : sérialiser ces paramètres
         self._coef = normal(1, 5/300) #Gaussienne à 5%
         if self._coef > 1.05:
             self._coef = 1.05
@@ -39,11 +38,11 @@ class Pod(Token):
         else:
             self._failing = False
         self._endSpeed = self._speed
-        self._acceleration = 2
-        self._brake = 5
-        self._ready = False
-        self._traveled_distance = 0
-        self._traveled_distance_t = 0
+        self._acceleration = acceleration or 2
+        self._brake = brake or 5
+        self._ready = ready or False
+        self._traveled_distance = traveled_distance or 0
+        self._traveled_distance_t = traveled_distance_t or 0
 
     @property
     def position(self):
@@ -148,7 +147,13 @@ class Pod(Token):
             "speed": self.speed,
             "source": self.source.element_of_loop,
             "destination": self.destination.element_of_loop,
-            "failing": self.failing
+            "failing": self.failing,
+            "coef": self._coef,
+            "acceleration": self._acceleration,
+            "brake": self._brake,
+            "ready": self._ready,
+            "traveled_distance": self._traveled_distance,
+            "traveled_distance_t": self._traveled_distance_t
         })
         return dict
 

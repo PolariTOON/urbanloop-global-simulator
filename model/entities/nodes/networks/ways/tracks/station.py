@@ -18,7 +18,7 @@ station_types = {
 class Station(Step):
     """ Classe modélisant une gare, y est géré lé départ des capsules, le réapprovisionnement, la génération des voyageurs et leur montée
     dans les capsules, les échanges de messages avec les autres éléments du réseau"""
-    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, station_type=None, element_of_loop=None, **kwargs):
+    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, departure_count=None, station_type=None, element_of_loop=None, parallel=None, **kwargs):
         super().__init__(env, id, **kwargs)
         pods = pods or {
             "count": 0,
@@ -36,13 +36,11 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = travelers["average_waiting_time"] or 0
         self._all_time_count = travelers["all_time_count"] or 0
-        self._departure_count = 0
-        self._boardingCount = 0
-        #self._pods = [Pod(env, self, 0) for _ in range(pods["count"])]
-        self._pods = [None for _ in range(4)]
+        self._departure_count = departure_count or 0
         #self._capacity = pods["max"]
         self._capacity = 4
-        self._parallel = False
+        self._pods = [None for _ in range(self._capacity)]
+        self._parallel = parallel or False
         self._boarding = [-1 for _ in range(self._capacity)]
         if travelers["count"]:
             self._travelers = [self._average_waiting_time in range(travelers["count"])]
@@ -76,8 +74,9 @@ class Station(Step):
                 "count": len(self.travelers),
                 "average_waiting_time": self.average_waiting_time,
                 "all_time_count": self.all_time_count,
-                "boarding_times": [pod.travelers[0].boarding_time if pod and not pod.isEmpty() else None for pod in self._pods]
+                "boarding_times": [pod.travelers[0].boarding_time if pod and not pod.isEmpty() else None for pod in self._pods],
             },
+            "departure_count": self._departure_count,
             "station_type": self.station_type,
             #"departure_pods": departure_pods,
             "element_of_loop": self.element_of_loop
@@ -102,10 +101,6 @@ class Station(Step):
     @property
     def all_time_count(self):
         return self._all_time_count
-		
-    @property
-    def boardingCount(self):
-        return self._boardingCount
 
     @property
     def pods(self):
@@ -174,7 +169,6 @@ class Station(Step):
                         self._departure_count += 1
                         self._average_waiting_time = (self._average_waiting_time * (self._departure_count - 1) + going_traveler.waiting_time) / self._departure_count
                         self._boarding[self._pods.index(pod)] = 0
-                        self._boardingCount += 1
 
             # Attente de la montée du voyageur pour l'envoi d'une capsule
             for i in range(len(self._boarding)):
@@ -188,7 +182,6 @@ class Station(Step):
                             name = chose(stations)
                         self.send_pod(self._pods[i], self.find({"name": name}), True)
                         self._boarding[i] = -1
-                        self._boardingCount -= 1
 
             # Attente pour le prochain départ
             if wait != -1:

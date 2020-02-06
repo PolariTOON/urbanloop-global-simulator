@@ -208,8 +208,8 @@ class Station(Step):
             # Départ d'une capsule
             if wait == -1:
                 wait = 0
-                for i in range(len(self._pods)):
-                    if (i == len(self._pods)-1 or self._parallel) and self._pods[i] and self._pods[i].ready:
+                for i in range(self._capacity):
+                    if (i == self._capacity-1 or self._parallel) and self._pods[i] and self._pods[i].ready:
                         self._pods[i] = None
                         dico = self._departure_pods.pop()
                         pod = dico["pod"]

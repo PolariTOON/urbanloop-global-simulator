@@ -9,7 +9,7 @@
   "places_number": 5,
   "dynamic_routing": false,
   "traveler" : {
-      "travelers_per_day" : 4500,
+      "travelers_per_hour" : 1000,
       "morning_peak_hour" : 8,
       "evening_peak_hour" : 19
   },
@@ -53,7 +53,7 @@
         {"type": "station", "name": "Velodrome", "x": 411, "y": 570, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "station", "name": "Telecom Nancy", "x": 371, "y": 655, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "station", "name": "Eglise", "x": 222, "y": 658, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-        {"type": "shed", "name": "Jean-paul", "x": 189, "y": 550, "pods": {"max": 50, "count": 50}},
+        {"type": "shed", "name": "Jean-paul", "x": 189, "y": 550, "pods": {"max": 40, "count": 40}},
         {"type": "switch_out", "x": 215, "y": 469, "id_bridge": 3, "pods": []},
         {"type": "sensor", "x": 280, "y": 470}
       ],
@@ -75,7 +75,7 @@
         {"type": "switch_in", "x": 200, "y": 450, "id_bridge": 3, "pods": []},
         {"type": "station", "name": "Auchan", "x": 90, "y": 370, "pods": {"max": 3, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "station", "name": "Sapiniere", "x": 121, "y": 235, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-        {"type": "shed", "name": "Marie-Jeanne", "x": 212, "y": 229, "pods": {"max": 100, "count": 100}},
+        {"type": "shed", "name": "Marie-Jeanne", "x": 212, "y": 229, "pods": {"max": 40, "count": 40}},
         {"type": "switch_out", "x": 339, "y": 295, "id_bridge": 0, "pods": []},
         {"type": "sensor", "x": 300, "y": 370}
       ],

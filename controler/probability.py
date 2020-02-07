@@ -77,20 +77,20 @@ class Probability:
         return round(result / 100, 2)
 
 
-def generate_traveler_poisson(traveler_per_day, hour, tick_per_second):
+def generate_traveler_poisson(traveler_per_hour, hour, tick_per_second):
     """
     This function gives you the amount of travelers you would create
     at a given hour.
     The lambda parameter is calculated hour by hour. It represents
     the mean number of travelers in a second.
-    :param traveler_per_day: number of traveler per day
+    :param traveler_per_hour: number of traveler per hour
     :param hour: The hour at which you want to create a traveler
     :return: The number of traveler you would create at the given hour.
     """
     peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]
     somme_coefficient = int(sum(peak_hours_coefficient))
-    traveler_per_day = int(traveler_per_day)
-    traveler_lambda_per_hour = [traveler_per_day * coefficient / (24 * somme_coefficient) for coefficient in
+    traveler_per_hour = int(traveler_per_hour)
+    traveler_lambda_per_hour = [traveler_per_hour * coefficient / (24 * somme_coefficient) for coefficient in
                                 peak_hours_coefficient]
     traveler_per_tick = traveler_lambda_per_hour[hour] / (3600 * tick_per_second)
     prob = 1 - math.exp(-traveler_per_tick)

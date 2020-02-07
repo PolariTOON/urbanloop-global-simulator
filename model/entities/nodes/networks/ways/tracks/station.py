@@ -5,7 +5,6 @@ from .....tokens.traveler import Traveler
 from .step import Step
 import datetime
 import time
-from .poisson import *
 from controler import probability
 
 station_types = {
@@ -39,7 +38,7 @@ class Station(Step):
         self._departure_count = departure_count or 0
         #self._capacity = pods["max"]
         self._capacity = 4
-        self._pods = [None for _ in range(self._capacity)]
+        self._pods = [None, None, Pod(self.env, self, 0), Pod(self.env, self, 0)]
         self._parallel = parallel or False
         self._boarding = [-1 for _ in range(self._capacity)]
         if travelers["count"]:
@@ -68,7 +67,8 @@ class Station(Step):
                 "count": self.pods_size,
                 "max": self.capacity,
                 "pos": [True if pod else False for pod in self._pods],
-                "boarding": [self._boarding[i] != -1 for i in range(self._capacity)]
+                "boarding": [self._boarding[i] != -1 for i in range(self._capacity)],
+                "full": [not pod.isEmpty() if pod else False for pod in self._pods]
             },
             "travelers": {
                 "count": len(self.travelers),
@@ -133,6 +133,9 @@ class Station(Step):
     def pods_size(self):
         return sum(pod is not None for pod in self._pods)
 
+    def isFull(self):
+        return self._pods[0] != None
+
     def send_pod(self, pod, destination, traveler=False):
         """envoie une capsule
         destination : nom de la station ou entrepôt où envoyer
@@ -162,8 +165,8 @@ class Station(Step):
             if len(self._travelers) > 0 and self.pods_size > 0:
                 for i in range(self._capacity - 1, -1, -1):
                     pod = self._pods[i]
-                    if pod and pod.isEmpty() and (i == self._capacity-1 or forward[i] == -1):
-                        going_traveler = self.travelers.pop(0)
+                    if len(self._travelers) > 0 and pod and pod.isEmpty() and (i == self._capacity-1 or forward[i] == -1):
+                        going_traveler = self._travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
                         self._departure_count += 1
@@ -174,14 +177,14 @@ class Station(Step):
             for i in range(len(self._boarding)):
                 if self._boarding[i] != -1:
                     self._boarding[i] += self.env.tick
-                    if self._boarding[i] > self._pods[i].travelers[0].boarding_time:
+                    if self._pods[i] and self._boarding[i] > self._pods[i].travelers[0].boarding_time:
+                        self._boarding[i] = -1
                         stations = self._parent.parent.stations_names
                         stations.remove(self.name)
                         name = choice(stations)
                         while name == self.name:
                             name = chose(stations)
-                        self.send_pod(self._pods[i], self.find({"name": name}), True)
-                        self._boarding[i] = -1
+                        self.send_pod(self._pods[i], self.find({"name": name}), True)        
 
             # Attente pour le prochain départ
             if wait != -1:
@@ -261,7 +264,7 @@ class Station(Step):
                         "pod": pod
                     })
                     # la capsule va se garer dans la station s'il y a de la place
-                    if pod.destination == self and self.pods_size < self._capacity:
+                    if pod.destination == self and not self._pods[0]:
                         self._pods[0] = pod
                         pod.travelers = []
                         refill = False

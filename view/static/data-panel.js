@@ -7,6 +7,8 @@ import {Station} from "./station.js";
 import {Switch} from "./switch.js";
 
 const dataTab = document.getElementById("data-content");
+const closeButton = document.getElementById("close-button").control;
+
 
 function serialize() {
     const data = `\
@@ -64,6 +66,25 @@ ${state.selectedEntity instanceof Pod ? `\
 state.addEventListener("update", (event) => {
     serialize();
 });
+
+state.addEventListener("close", (event) => {
+    serialize();
+});
+
+closeButton.addEventListener("click", async (event) => {
+    if (closeButton["value"].localeCompare("Close section") == 0){
+        console.log("a")
+        closeButton["value"] = "Open section";
+    }
+    else {
+        console.log("b")
+        closeButton["value"] = "Close section";
+    }
+    state.close();
+});
+
+closeButton.style.display = "none";
+closeButton.disabled = false;
 
 // state.addEventListener("select", (event) => {
 //     serialize();

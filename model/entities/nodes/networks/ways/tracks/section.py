@@ -4,7 +4,6 @@ import sys
 from .....tokens.pod import Pod
 from .track import Track
 
-
 class Section(Track):
     """Classe modélisant une section du réseau"""
     def __init__(self, env, id, margin_min, pod_size, is_bridge, speed=None, path=None, **kwargs):
@@ -80,6 +79,10 @@ class Section(Track):
     @property
     def weight(self):
         return self._length / self._speed
+
+    @weight.setter
+    def weight(self, value):
+        self._weight = value
 
     @property
     def margin(self):

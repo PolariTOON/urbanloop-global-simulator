@@ -19,7 +19,7 @@ class Simulation:
         time = time or 0
         state = state or (seed(), random() * 2 ** 53)[1]
         traveler = traveler or {
-            "travelers_per_day" : 2000,
+            "travelers_per_hour" : 2000,
             "morning_peak_hour" : 8,
             "evening_peak_hour" : 18
         }
@@ -40,7 +40,7 @@ class Simulation:
         self._network = Network(self._env, id, **kwargs)
         self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
         self._env.time = time  # Temps réel actuel en seconde
-        self._travelers_per_day = traveler["travelers_per_day"]
+        self._travelers_per_hour = traveler["travelers_per_hour"]
 
     @property
     def running(self):
@@ -95,7 +95,7 @@ class Simulation:
             self._env.run(until=until)
             self._state = random() * 2 ** 53
         second = self._env.time
-        if (generate_traveler_poisson(self._travelers_per_day, int(round(second / 3600, 2)), self._env.tick)):          
+        if (generate_traveler_poisson(self._travelers_per_hour, int(round(second / 3600, 2)), self._env.tick)):          
             ri = randint(1,len(self._network.stations))
             s = self._network.stations[ri-1]
             r = random()

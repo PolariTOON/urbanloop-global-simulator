@@ -81,6 +81,12 @@ export class Station extends Entity {
     get _podBoarding() {
         return this.__podBoarding;
     }
+    set _podFull(value) {
+        this.__podFull = value;
+    }
+    get _podFull() {
+        return this.__podFull;
+    }
     set _travelerCount(value) {
         this.__travelerCount = value;
     }
@@ -125,6 +131,7 @@ export class Station extends Entity {
         const podMax = json["pods"]["max"];
         const podPos = json["pods"]["pos"];
         const podBoarding = json["pods"]["boarding"];
+        const podFull = json["pods"]["full"];
         const travelerCount = json["travelers"]["count"];
         const travelerAllTimeCount = json["travelers"]["all_time_count"];
         const travelerAverageWaitingTime = json["travelers"]["average_waiting_time"];
@@ -137,6 +144,7 @@ export class Station extends Entity {
         this._podMax = podMax;
         this._podPos = podPos;
         this._podBoarding = podBoarding;
+        this._podFull = podFull;
         this._travelerCount = travelerCount;
         this._travelerAllTimeCount = travelerAllTimeCount;
         this._travelerAverageWaitingTime = travelerAverageWaitingTime;

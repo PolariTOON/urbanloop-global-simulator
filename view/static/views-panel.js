@@ -291,14 +291,14 @@ state.addEventListener("update", (event) => {
                   };
                   layerStation.add(outerShape);
                   layerStation.add(innerShape);
-                } else if (!selected._podBoarding[i]) {
+                } else if (selected._podFull[i] && !selected._podBoarding[i]) {
                   podsStation[i]["inner"].fill('black');
                 }
                 
                 if (selected._podBoarding[i]) {
                   if (travelers[i] == null) {
                       const traveler = new Circle({
-                          x: firstPlaceX,
+                          x: firstPlaceX + i * radius * 2.5,
                           y: firstPlaceY + radius + travelLength,
                           radius: 5,
                           fill: 'black',

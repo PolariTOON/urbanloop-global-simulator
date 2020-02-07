@@ -226,13 +226,11 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
             this._selectedEntity.__innerPath.fill(closedColor);
             this._selectedEntity.__innerPath.stroke(closedColor);
             this._selectedEntity.__closed = 1;
-            console.log("closed = 0")
         }
         else {
             this._selectedEntity.__innerPath.fill(selectedPathColor);
             this._selectedEntity.__innerPath.stroke(selectedPathColor);
             this._selectedEntity.__closed = 0;
-            console.log("closed = 1")
         }
         this._close();
     }

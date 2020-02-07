@@ -38,7 +38,7 @@ class Station(Step):
         self._departure_count = departure_count or 0
         #self._capacity = pods["max"]
         self._capacity = 4
-        self._pods = [None for _ in range(self._capacity)]
+        self._pods = [None, None, Pod(self.env, self, 0), Pod(self.env, self, 0)]
         self._parallel = parallel or False
         self._boarding = [-1 for _ in range(self._capacity)]
         if travelers["count"]:
@@ -165,8 +165,8 @@ class Station(Step):
             if len(self._travelers) > 0 and self.pods_size > 0:
                 for i in range(self._capacity - 1, -1, -1):
                     pod = self._pods[i]
-                    if pod and pod.isEmpty() and (i == self._capacity-1 or forward[i] == -1):
-                        going_traveler = self.travelers.pop(0)
+                    if len(self._travelers) > 0 and pod and pod.isEmpty() and (i == self._capacity-1 or forward[i] == -1):
+                        going_traveler = self._travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
                         self._departure_count += 1
@@ -178,13 +178,13 @@ class Station(Step):
                 if self._boarding[i] != -1:
                     self._boarding[i] += self.env.tick
                     if self._pods[i] and self._boarding[i] > self._pods[i].travelers[0].boarding_time:
+                        self._boarding[i] = -1
                         stations = self._parent.parent.stations_names
                         stations.remove(self.name)
                         name = choice(stations)
                         while name == self.name:
                             name = chose(stations)
-                        self.send_pod(self._pods[i], self.find({"name": name}), True)
-                        self._boarding[i] = -1
+                        self.send_pod(self._pods[i], self.find({"name": name}), True)        
 
             # Attente pour le prochain départ
             if wait != -1:

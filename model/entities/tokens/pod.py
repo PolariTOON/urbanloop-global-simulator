@@ -187,7 +187,7 @@ class Pod(Token):
                     self._speed = self._endSpeed
 
             # La capsule détecte la capsule la plus proche devant elle
-            if self.env.now % 20 == 0 and type(self._track_or_switch).__name__ == "Section":
+            if type(self._track_or_switch).__name__ == "Section":
                 closest, same_section = self.closest()
                 if closest:
                     if same_section:

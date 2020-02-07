@@ -62,7 +62,6 @@ class Network(Node):
         for switch in self._switches:
             if isinstance(switch, SwitchOut):
                 switch.routing_table = self._get_switch_table(switch)
-
     @property
     def name(self):
         return super().name or "Network %d" % self.id

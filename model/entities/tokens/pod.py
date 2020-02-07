@@ -272,6 +272,10 @@ class Pod(Token):
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner:
                     self._turn = not self._track_or_switch.stat_or_shed or self._track_or_switch.stat_or_shed == self._destination.name
+                    if self._track_or_switch.stat_or_shed:
+                        stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
+                        if stat_or_shed.isFull():
+                            self._turn = False
                 elif "speed_a_while" == message["type"]:
                     # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
                     # Ou lors d'une discrétisation

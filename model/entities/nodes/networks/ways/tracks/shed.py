@@ -68,6 +68,9 @@ class Shed(Step):
         """Capacité d'accueil maximale du dépôt"""
         return self._capacity
 
+    def isFull(self):
+        return self._capacity - len(self._pods) == 0
+
     def update(self):
         """Fonction gérant le processus dépôt"""
         while True:
@@ -135,7 +138,7 @@ class Shed(Step):
                     for dico in self._departure_pods:
                         if dico["destination"] == station:  # TODO : gérer un moyen de savoir si on a déjà réapprovisionné à l'initialisation/génération
                             test_refill = False
-                    if test_refill:
+                    if test_refill and len(self._pods) > 0:
                         pod = self._pods.pop(0)
                         self._departure_pods.append({"pod": pod, "destination": station})
                 else:

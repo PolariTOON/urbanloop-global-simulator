@@ -139,6 +139,9 @@ class Station(Step):
     def pods_size(self):
         return sum(pod is not None for pod in self._pods)
 
+    def isFull(self):
+        return self._capacity - self.pods_size == 0
+
     def send_pod(self, pod, destination, traveler=False):
         """envoie une capsule
         destination : nom de la station ou entrepôt où envoyer

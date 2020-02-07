@@ -177,7 +177,7 @@ class Station(Step):
             for i in range(len(self._boarding)):
                 if self._boarding[i] != -1:
                     self._boarding[i] += self.env.tick
-                    if self._boarding[i] > self._pods[i].travelers[0].boarding_time:
+                    if self._pods[i] and self._boarding[i] > self._pods[i].travelers[0].boarding_time:
                         stations = self._parent.parent.stations_names
                         stations.remove(self.name)
                         name = choice(stations)

@@ -3,7 +3,7 @@ const {Circle} = Konva;
 
 const shadowColor = "#333"
 const outerColor = "#fc0";
-const failingOuterColor = "#33ff4f";
+const failingOuterColor = "#ff0707";
 const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
 const fullInnerColor = "#333";

@@ -65,10 +65,7 @@ class SwitchOut(Switch):
         :param pod: la capsule dont on veut savoir si elle doit être routée
         :return: True si la capsule doit être aiguillée, False sinon
         """
-        if pod.destination in self._routing_table:
-            return True
-        else:
-            return False
+        return pod.destination in self._routing_table
 
     def update(self):
         """

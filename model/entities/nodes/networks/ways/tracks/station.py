@@ -17,7 +17,7 @@ station_types = {
 class Station(Step):
     """ Classe modélisant une gare, y est géré lé départ des capsules, le réapprovisionnement, la génération des voyageurs et leur montée
     dans les capsules, les échanges de messages avec les autres éléments du réseau"""
-    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, station_type=None, element_of_loop=None, **kwargs):
+    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, departure_count=None, station_type=None, element_of_loop=None, parallel=None, **kwargs):
         super().__init__(env, id, **kwargs)
         pods = pods or {
             "count": 0,
@@ -35,13 +35,11 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = travelers["average_waiting_time"] or 0
         self._all_time_count = travelers["all_time_count"] or 0
-        self._departure_count = 0
-        self._boardingCount = 0
-        #self._pods = [Pod(env, self, 0) for _ in range(pods["count"])]
-        self._pods = [None for _ in range(4)]
+        self._departure_count = departure_count or 0
         #self._capacity = pods["max"]
         self._capacity = 4
-        self._parallel = False
+        self._pods = [None for _ in range(self._capacity)]
+        self._parallel = parallel or False
         self._boarding = [-1 for _ in range(self._capacity)]
         if travelers["count"]:
             self._travelers = [self._average_waiting_time in range(travelers["count"])]
@@ -55,7 +53,6 @@ class Station(Step):
             dest = self.find(dico["destination"])
             dico["pod"] = Pod(env, self, 0, p)
             dico["destination"] = dest
-
 
     def serialize(self):
         """Permet la serialisation des informations"""
@@ -76,8 +73,9 @@ class Station(Step):
                 "count": len(self.travelers),
                 "average_waiting_time": self.average_waiting_time,
                 "all_time_count": self.all_time_count,
-                "boarding": self.boardingCount
+                "boarding_times": [pod.travelers[0].boarding_time if pod and not pod.isEmpty() else None for pod in self._pods],
             },
+            "departure_count": self._departure_count,
             "station_type": self.station_type,
             #"departure_pods": departure_pods,
             "element_of_loop": self.element_of_loop
@@ -102,10 +100,6 @@ class Station(Step):
     @property
     def all_time_count(self):
         return self._all_time_count
-		
-    @property
-    def boardingCount(self):
-        return self._boardingCount
 
     @property
     def pods(self):
@@ -138,6 +132,9 @@ class Station(Step):
     def pods_size(self):
         return sum(pod is not None for pod in self._pods)
 
+    def isFull(self):
+        return self._capacity - self.pods_size == 0
+
     def send_pod(self, pod, destination, traveler=False):
         """envoie une capsule
         destination : nom de la station ou entrepôt où envoyer
@@ -161,26 +158,25 @@ class Station(Step):
         refill = False
         empty = False
         wait = -1
-        forward = [-1 for _ in range(len(self._pods)-1)]
+        forward = [-1 for _ in range(self._capacity - 1)]
         while True:
             # On envoie les voyageurs au hasard s'il y a de la place
             if len(self._travelers) > 0 and self.pods_size > 0:
-                for i in range(self.capacity-1, -1, -1):
+                for i in range(self._capacity - 1, -1, -1):
                     pod = self._pods[i]
-                    if pod and pod.isEmpty() and (i == 0 or forward[i-1] == -1):
+                    if pod and pod.isEmpty() and (i == self._capacity-1 or forward[i] == -1):
                         going_traveler = self.travelers.pop(0)
                         going_traveler.departure(self.env.time)
                         pod.travelers = [going_traveler]
                         self._departure_count += 1
                         self._average_waiting_time = (self._average_waiting_time * (self._departure_count - 1) + going_traveler.waiting_time) / self._departure_count
                         self._boarding[self._pods.index(pod)] = 0
-                        self._boardingCount += 1
 
             # Attente de la montée du voyageur pour l'envoi d'une capsule
             for i in range(len(self._boarding)):
                 if self._boarding[i] != -1:
                     self._boarding[i] += self.env.tick
-                    if self._boarding[i] > self._pods[i].travelers[0].boarding_speed:
+                    if self._boarding[i] > self._pods[i].travelers[0].boarding_time:
                         stations = self._parent.parent.stations_names
                         stations.remove(self.name)
                         name = choice(stations)
@@ -188,7 +184,6 @@ class Station(Step):
                             name = chose(stations)
                         self.send_pod(self._pods[i], self.find({"name": name}), True)
                         self._boarding[i] = -1
-                        self._boardingCount -= 1
 
             # Attente pour le prochain départ
             if wait != -1:
@@ -199,24 +194,24 @@ class Station(Step):
             # En parallèle pas d'avancement dans les places
             if not self._parallel:
                 # Les capsules avancent dans les places 
-                for i in range(len(self._pods)-1):
+                for i in range(self._capacity - 1):
                     if self._pods[i] and not self._pods[i+1] and forward[i] == -1 and self._boarding[i] == -1:
-                        self._pods[i+1] = self._pods[i]
-                        self._pods[i] = None
                         forward[i] = 0
 
                 # Attente pour continuer d'avancer dans les places
                 for i in range(len(forward)):
-                    if forward[i] != 1:
+                    if forward[i] != -1:
                         forward[i] += self.env.tick
                         if forward[i] > 2:
+                            self._pods[i+1] = self._pods[i]
+                            self._pods[i] = None
                             forward[i] = -1
 
             # Départ d'une capsule
             if wait == -1:
                 wait = 0
-                for i in range(len(self._pods)):
-                    if (i == len(self._pods)-1 or self._parallel) and self._pods[i] and self._pods[i].ready:
+                for i in range(self._capacity):
+                    if (i == self._capacity-1 or self._parallel) and self._pods[i] and self._pods[i].ready:
                         self._pods[i] = None
                         dico = self._departure_pods.pop()
                         pod = dico["pod"]

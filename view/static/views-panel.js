@@ -64,9 +64,59 @@ groupLines.add(switchIn);
 groupLines.add(switchOut);
 groupLines.add(bridge);
 
+const firstPlaceX = 40;
+const firstPlaceY = 40;
+const radius = 20;
+const travelLength = 100;
+
 let layerStation = new Layer();
+const line1 = new Line({
+    x: 0,
+    y: 0,
+    points: [firstPlaceX - radius*1.25, firstPlaceY-radius, firstPlaceX - radius*1.25, firstPlaceY+radius],
+    stroke: 'black',
+    strokeWidth: 2
+});
+const line2 = new Line({
+    x: 0,
+    y: 0,
+    points: [firstPlaceX + radius*1.25, firstPlaceY-radius, firstPlaceX + radius*1.25, firstPlaceY+radius],
+    stroke: 'black',
+    strokeWidth: 2
+});
+const line3 = new Line({
+    x: 0,
+    y: 0,
+    points: [firstPlaceX + radius*3.75, firstPlaceY-radius, firstPlaceX + radius*3.75, firstPlaceY+radius],
+    stroke: 'black',
+    strokeWidth: 2
+});
+const line4 = new Line({
+    x: 0,
+    y: 0,
+    points: [firstPlaceX + radius*6.25, firstPlaceY-radius, firstPlaceX + radius*6.25, firstPlaceY+radius],
+    stroke: 'black',
+    strokeWidth: 2
+});
+const line5 = new Line({
+    x: 0,
+    y: 0,
+    points: [firstPlaceX + radius*8.75, firstPlaceY-radius, firstPlaceX + radius*8.75, firstPlaceY+radius],
+    stroke: 'black',
+    strokeWidth: 2
+});
 stage.add(layerStation);
+layerStation.add(line1);
+layerStation.add(line2);
+layerStation.add(line3);
+layerStation.add(line4);
+layerStation.add(line5);
+
 let podsStation = [null, null, null, null];
+let boarding = [false, false, false, false];
+let travelers = [null, null, null, null];
+let previous = [null, null, null, null];
+let ratio = [1, 1, 1, 1];
 
 layerSwitch.hide();
 layerStation.hide();
@@ -220,17 +270,17 @@ state.addEventListener("update", (event) => {
               if (selected._podPos[i]) {
                 if (podsStation[i] == null) {
                   const outerShape = new Circle({
-                    x: 40+i*50,
-                    y: 40,
-                    radius: 20,
+                    x: firstPlaceX + i * radius * 2.5,
+                    y: firstPlaceY,
+                    radius: radius,
                     fill: 'yellow',
                     stroke: 'black',
                     strokeWidth: 1
                   });
                   const innerShape = new Circle({
-                    x: 40+i*50,
-                    y: 40,
-                    radius: 15,
+                    x: firstPlaceX + i * radius * 2.5,
+                    y: firstPlaceY,
+                    radius: radius * 0.75,
                     fill: 'white',
                     stroke: 'black',
                     strokeWidth: 1
@@ -241,10 +291,32 @@ state.addEventListener("update", (event) => {
                   };
                   layerStation.add(outerShape);
                   layerStation.add(innerShape);
-                } else if (podsStation[i]["inner"].getAttr('fill') === 'white' && selected._podBoarding[i]) {
-                  podsStation[i]["inner"].fill('gray');
-                } else if (podsStation[i]["inner"].getAttr('fill') === 'gray' && !selected._podBoarding[i]) {
+                } else if (!selected._podBoarding[i]) {
                   podsStation[i]["inner"].fill('black');
+                }
+                
+                if (selected._podBoarding[i]) {
+                  if (travelers[i] == null) {
+                      const traveler = new Circle({
+                          x: firstPlaceX,
+                          y: firstPlaceY + radius + travelLength,
+                          radius: 5,
+                          fill: 'black',
+                          stroke: 'black',
+                          strokeWidth: 1
+                      });
+                      travelers[i] = traveler;
+                      layerStation.add(traveler);
+                      previous[i] = Date.now();
+                  } else {
+                    const now = Date.now();
+                    const dist = (now - previous[i]) * travelLength / selected._travelerBoardingTimes[i] / 1000;
+                    travelers[i].y(travelers[i].y() - dist);
+                    previous[i] = now;
+                  }
+                } else if (travelers[i] != null) {
+                    travelers[i].remove();
+                    travelers[i]= null;
                 }
               } else {
                 if (podsStation[i] != null) {

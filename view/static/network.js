@@ -63,6 +63,19 @@ var chartOptions = {
         animation: {
             duration: 0
       }
+    }, {
+        name: 'waiting time',
+        data: [],
+        animation: {
+            duration: 0
+        }
+    }, {
+        name: 'number of traveling pods',
+        data: [],
+        animation: {
+            duration: 0
+        }
+
     }],
     credits: {
         enabled: false
@@ -142,13 +155,6 @@ state.addEventListener("unload", async (event) => {
 
 state.addEventListener("update", (event) => {
     const networkJSON = event.detail;
-    
-    const stats = networkJSON["stats"];
-    //console.log(networkJSON);
-    state.stats = statistics;
-    statistics.update(stats);
-    
-
 
     const name = networkJSON["name"];
     heading.textContent = name;
@@ -156,6 +162,12 @@ state.addEventListener("update", (event) => {
     const rate = networkJSON["rate"];
     rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
     let datetime = Math.floor(networkJSON["time"]);
+
+    statistics.datetime =datetime;
+    const stats = networkJSON["stats"];
+    state.stats = statistics;
+    statistics.update(stats);
+
     const seconds = datetime % 60;
     datetime = (datetime - seconds) / 60;
     const minutes = datetime % 60;

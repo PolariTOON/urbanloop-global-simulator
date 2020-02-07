@@ -9,7 +9,7 @@
   "places_number": 5,
   "dynamic_routing": false,
   "traveler" : {
-      "travelers_per_day" : 4500,
+      "travelers_per_hour" : 4500,
       "morning_peak_hour" : 8,
       "evening_peak_hour" : 19
   },

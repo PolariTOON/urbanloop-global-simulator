@@ -134,7 +134,7 @@ class Station(Step):
         return sum(pod is not None for pod in self._pods)
 
     def isFull(self):
-        return self._capacity - self.pods_size == 0
+        return self._pods[0] != None
 
     def send_pod(self, pod, destination, traveler=False):
         """envoie une capsule
@@ -264,7 +264,7 @@ class Station(Step):
                         "pod": pod
                     })
                     # la capsule va se garer dans la station s'il y a de la place
-                    if pod.destination == self and self.pods_size < self._capacity:
+                    if pod.destination == self and not self._pods[0]:
                         self._pods[0] = pod
                         pod.travelers = []
                         refill = False

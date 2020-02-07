@@ -5,7 +5,6 @@ from .....tokens.traveler import Traveler
 from .step import Step
 import datetime
 import time
-from .poisson import *
 from controler import probability
 
 station_types = {

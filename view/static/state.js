@@ -1,3 +1,7 @@
+const closedColor = "red"
+const selectedPathColor = "#0fc";
+
+
 async function getJSON(url) {
     const fetchInit = {
         method: "GET",
@@ -139,6 +143,12 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         this.dispatchEvent(new CustomEvent("pause"));
         this._running = false;
     }
+    _close() {
+        if (!this._loaded || !this._running) {
+            return;
+        }
+        this.dispatchEvent(new CustomEvent("close"));
+    }
     _decelerate() {
         if (!this._loaded) {
             return;
@@ -204,6 +214,27 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
             return;
         }
         this._play();
+    }
+    async close() {
+        var section_id = this._selectedEntity["_id"]
+        var section_name = this._selectedEntity["_name"]
+        const output = await postJSON(`/networks/${this._networkIndex}/close/${section_name}/`);
+        if (!output) {
+            return;
+        }
+        if (this._selectedEntity.__closed == 0){
+            this._selectedEntity.__innerPath.fill(closedColor);
+            this._selectedEntity.__innerPath.stroke(closedColor);
+            this._selectedEntity.__closed = 1;
+            console.log("closed = 0")
+        }
+        else {
+            this._selectedEntity.__innerPath.fill(selectedPathColor);
+            this._selectedEntity.__innerPath.stroke(selectedPathColor);
+            this._selectedEntity.__closed = 0;
+            console.log("closed = 1")
+        }
+        this._close();
     }
     async pause() {
         const output = await postJSON(`/networks/${this._networkIndex}/clock/pause/`);

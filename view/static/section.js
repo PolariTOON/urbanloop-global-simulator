@@ -5,6 +5,8 @@ const shadowColor = "#333"
 const pathColor = "#333";
 const selectedPathColor = "#0fc";
 
+const closeButton = document.getElementById("close-button").control;
+
 const outerStrokeWidth = 2;
 const innerStrokeWidth = 1;
 const pointerLength = 8;
@@ -68,6 +70,7 @@ export class Section extends Entity {
         this.__startElement = startElement;
         this.__endElement = endElement;
         this.__loopOrBridge = loopOrBridge;
+        this.__closed = 0;
         this.unselect();
     }
     set _x(value) {
@@ -102,14 +105,30 @@ export class Section extends Entity {
     get _length() {
         return this.__length;
     }
+    set _closed(value) {
+        this.__closed = value;
+    }
+    get _closed() {
+        return this.__closed;
+    }
     select() {
-        this.__innerPath.fill(selectedPathColor);
-        this.__innerPath.stroke(selectedPathColor);
+        closeButton.style.display = "block"
+        if (this.__closed == 0){
+            closeButton["value"] = "Close section"
+            this.__innerPath.fill(selectedPathColor);
+            this.__innerPath.stroke(selectedPathColor);
+        }
+        else{
+            closeButton["value"] = "Open section"
+        }
     }
     unselect() {
-        this.__innerPath.fill(pathColor);
-        this.__innerPath.stroke(pathColor);
-    }
+        closeButton.style.display = "none"
+        if (this.__closed == 0){
+            this.__innerPath.fill(pathColor);
+            this.__innerPath.stroke(pathColor);
+        }
+    }   
     scale(...args) {
         const that = super.scale(...args);
         if (that !== this) {

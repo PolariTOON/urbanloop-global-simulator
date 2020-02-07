@@ -79,4 +79,28 @@ export class Statisctics{
     	this._chart.series[1].setData([]);
     	this._chart.series[2].setData([]);
 	}
+
+	getStats(){
+		var res = "--- Detailed statisctis ---\n\n";
+		res += "Number of traveler:\n";
+		res += "\tmin: "+ this._chart.series[0].dataMin;
+		res += "\tmax: "+ this._chart.series[0].dataMax;
+
+		//let sum = this._chart.series[0].data.reduce((previous, current) => current += previous);
+		//let avg = sum / this._chart.series[0].data.length;
+		//res += "\tmean: "+ avg;
+		//console.log(this._chart.series[0].data);
+
+		res += "\nNumber of pods:\n";
+		res += "\tmin: "+ this._chart.series[2].dataMin;
+		res += "\tmax: "+ this._chart.series[2].dataMax;
+
+		res += "\nWaiting time\n";
+		res += "\tmin: "+ this._chart.series[1].dataMin;
+		res += "\tmax: "+ this._chart.series[1].dataMax;
+		//res += typeof(this._chart.series[0]);
+		//res += "\mmean: "+ Math.sum(this._chart.series[0])/this._chart.series[0].length;
+		 //res+= "Total duration: " + this._datetime-2880000;
+		return res;
+	}
 }

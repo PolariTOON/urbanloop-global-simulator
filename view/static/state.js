@@ -156,6 +156,25 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     _resize() {
         this.dispatchEvent(new CustomEvent("resize"));
     }
+    _downloadStats(){
+        //alert('Hello world!');
+        //var fileSystem=new ActiveXObject("Scripting.FileSystemObject");
+        let blob = new Blob([this._stats.getStats()], { type: 'text/plain' });
+        let url = window.URL.createObjectURL(blob);
+        const fileName = "test.txt";
+        let link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+            document.body.removeChild(link);
+        }, 100);
+
+
+        //this.dispatchEvent(new CustomEvent("downloadStats"));
+    }
+
     async reload() {
         const integer = /^(?:0|[1-9]\d*)$/;
         const url = new URL(location);
@@ -228,6 +247,10 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     }
     async resize() {
         this._resize();
+    }
+
+    async downloadStats(){
+        this._downloadStats();
     }
 }
 

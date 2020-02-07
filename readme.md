@@ -6,6 +6,8 @@
 
 * Stages de deuxième année à *Telecom Nancy* effectués par M. Tristan LE GODAIS et M. Malo MONGARD encadrés par M. Thibault CHOLEZ dont les objectifs principaux sont l'amélioration du simulateur avec notamment l'ajout de l'algorithme d'aiguillage réalisé lors d'un autre Projet Industriel. Ces stages ont amené une refonte complète du simulateur.
 
+* Projet Industriel 2019-2020 de M. GAU M. OLIVIER et M. ALIBAY encadré par M. Thibault CHOLEZ dont l'objectif est de continuer le développement de la refonte du simultauer effectuée lors des précédents stages.
+
 ## Contexte
 
 Ce projet s'inscrit dans l'étude de la faisabilité du projet *UrbanLoop* dont l'objectif est d'effectuer un fort remaniement des transports en commun en milieu urbain avec une application dans l'agglomération du *Grand Nancy*.
@@ -21,7 +23,10 @@ Le sous-projet présent est :
 	* Victor THEVENON ;
 	* Frederic VENIER ;
 	* Tristan LE GODAIS ;
-	* Malo MONGARD.
+	* Malo MONGARD ;
+	* Valentin GAU ;
+	* Antoine OLIVIER ;
+	* Dylan ALIBAY.
 
 Le projet de ce dépôt s'inscrit dans le cadre scolaire d'un Projet Industriel de 3ème année à *TELECOM Nancy*. Le sujet est *Simulation du réseau de transport urbain par capsules UrbanLoop*.
 
@@ -30,6 +35,8 @@ Le sujet du Projet Interdispiplinaire de Découverte de la Recherche est *Améli
 Les sujets des stages effectués sur le simulateur sont :
 * *Interfaçage du simulateur global du réseau UrbanLoop avec celui des postes d’aiguillage* ;
 * *Consolidation et extension du simulateur UrbanLoop*.
+
+Le sujet du Projet Industriel de 3ème année est *Extension et amélioration du simulateur du réseau Urbanloop*.
 
 ## Contenu
 

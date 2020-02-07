@@ -1,4 +1,5 @@
 from numpy.random import normal
+from random import random as rd
 
 from .token import Token
 from .traveler import Traveler
@@ -283,11 +284,15 @@ class Pod(Token):
                     self._endSpeed = 0
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner:
-                    self._turn = not self._track_or_switch.stat_or_shed or self._track_or_switch.stat_or_shed == self._destination.name
+                    #ATTENTION C'EST ALEATOIRE IL FAUDRA CORRIGER
                     if self._track_or_switch.stat_or_shed:
-                        stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
-                        if stat_or_shed.isFull():
-                            self._turn = False
+                        self._turn = not self._track_or_switch.stat_or_shed or self._track_or_switch.stat_or_shed == self._destination.name
+                        if self._track_or_switch.stat_or_shed:
+                            stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
+                            if stat_or_shed.isFull():
+                                self._turn = False
+                    else:
+                        self._turn = rd() > 0.5
                 elif "speed_a_while" == message["type"]:
                     # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
                     # Ou lors d'une discrétisation

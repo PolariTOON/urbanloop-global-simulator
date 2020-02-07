@@ -67,7 +67,8 @@ class Station(Step):
                 "count": self.pods_size,
                 "max": self.capacity,
                 "pos": [True if pod else False for pod in self._pods],
-                "boarding": [self._boarding[i] != -1 for i in range(self._capacity)]
+                "boarding": [self._boarding[i] != -1 for i in range(self._capacity)],
+                "full": [not pod.isEmpty() if pod else False for pod in self._pods]
             },
             "travelers": {
                 "count": len(self.travelers),

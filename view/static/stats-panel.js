@@ -7,11 +7,27 @@ notImplemented.append("Not implemented");
 
 function serialize() {
 	const stats = `
+    <script>
+        serie1(){
+            }
+    </script>
 	<dl>
+
 	<dt>
-        <button class="link">Number of traverlers:</button>
+        <button class="link"; onclick="serie1()">Number of traveler:</button>
     </dt>
 	<dd>${state.stats.nbTraveler}</dd>
+
+    <dt>
+        <button class="link">Average waiting time:</button>
+    </dt>
+    <dd>${state.stats.waitingTime} s</dd>
+
+    <dt>
+        <button class="link">Number of traveling pods:</button>
+    </dt>
+    <dd>${state.stats.nbPod}</dd>
+
 	</dl>
 ` 
 statsTab.innerHTML = stats;

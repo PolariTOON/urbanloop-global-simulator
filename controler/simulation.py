@@ -28,8 +28,6 @@ class Simulation:
             "city_percent" : 20,
             "activity_and_residential_fluctuation" : 20
         }
-        print(traveler)
-        print(prob)
         self._probability = Probability(prob, traveler)
         self._env = Environment()
         self._wave = wave

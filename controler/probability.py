@@ -79,13 +79,11 @@ class Probability:
 
 def generate_traveler_poisson(traveler_per_hour, hour, tick_per_second):
     """
-    This function gives you the amount of travelers you would create
-    at a given hour.
-    The lambda parameter is calculated hour by hour. It represents
-    the mean number of travelers in a second.
+    genere des voyageurs de manière aléatoire à chaque tick
     :param traveler_per_hour: number of traveler per hour
     :param hour: The hour at which you want to create a traveler
-    :return: The number of traveler you would create at the given hour.
+    :param tick_per_second : number of tick per second
+    :return: amount of generated traveler (0 or 1).
     """
     peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]
     somme_coefficient = int(sum(peak_hours_coefficient))

@@ -1,5 +1,6 @@
 import json
 import math
+""" créee un nouveau fichier json avec le nouveau modèle de stations et d'entrepôts"""
 
 def mod_station(item):
 
@@ -142,7 +143,7 @@ def mod_station(item):
 							],
 							"sections": [
 								{"speed": spd, "path": {"type": "line"}},
-								{"speed": spd, "path": {"type": "line"}},
+								{"speed": spd, "path": {"type": "line"}, "weight": 10000},
 								{"speed": spd, "path": {"type": "line"}}
 							],
 							"pods": []

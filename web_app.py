@@ -4,6 +4,7 @@ from functools import wraps
 from json import load
 from logging import ERROR, getLogger
 from threading import Thread
+from traceback import print_exc
 
 from controler.simulation import Simulation
 import modifjson
@@ -32,14 +33,24 @@ async def _run_simulations(networks, wave):
         if network_item is not None:
             if "id" in network_item:
                 del network_item["id"]
-            simulation = Simulation(network_index, _wave, **network_item)
-            _simulations[network_index] = simulation
+            try:
+                simulation = Simulation(network_index, _wave, **network_item)
+                _simulations[network_index] = simulation
+            except Exception:
+                print_exc()
     _loop = get_running_loop()
     while True:
         await sleep(_wave)
+        crashed_simulations = []
         for key in _simulations:
             simulation = _simulations[key]
-            simulation.update()
+            try:
+                simulation.update()
+            except Exception:
+                crashed_simulations.append(key)
+                print_exc()
+        for key in crashed_simulations:
+            del _simulations[key]
 
 
 def _synchronize(key=None):
@@ -54,11 +65,13 @@ def _synchronize(key=None):
         def routine(*args, **kwargs):
             if key is not None:
                 kwargs[key] = request.get_json()
-            try:
-                result = run_coroutine_threadsafe(coroutine(_simulations, *args, **kwargs), _loop).result()
-            except Exception as e:
+            future = run_coroutine_threadsafe(coroutine(_simulations, *args, **kwargs), _loop)
+            exception = future.exception()
+            if exception is not None:
                 result = None
-                print("\u001b[31m", e, "\u001b[0m")
+                print("\u001b[31m", exception, "\u001b[0m")
+            else:
+                result = future.result()
             return jsonify(result)
 
         return routine

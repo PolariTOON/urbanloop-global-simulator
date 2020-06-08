@@ -18,6 +18,9 @@ _wave = 0  # IDEA: calculer selon la vitesse et la précision des simulations, a
 _loop = None
 _simulations = {}
 
+_running_default = False    # par défaut on ne lance pas les simulations
+_speed_default = 0          # par défaut la vitesse de simulation est x1
+
 
 async def _run_simulations(networks, wave):
     """Lancement de simulations"""
@@ -26,16 +29,21 @@ async def _run_simulations(networks, wave):
     global _loop
     global _simulations
     _wave = wave
-    for network_index in networks:
+    for network_index in networks: # lancement des simulations avec les réseaux préchargés
         network_file = networks[network_index]
         with open(network_file) as file:
             network_item = load(file)
+            network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour les dépôts et stations
         if network_item is not None:
             if "id" in network_item:
                 del network_item["id"]
             try:
                 simulation = Simulation(network_index, _wave, **network_item)
                 _simulations[network_index] = simulation
+                global _running_default
+                simulation.running = _running_default
+                global _speed_default
+                simulation.rate = _speed_default
             except Exception:
                 print_exc()
     _loop = get_running_loop()
@@ -98,8 +106,9 @@ def get_root():
 @_synchronize("network_item")
 async def _post_network(simulations, network_index, network_item):
     """Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json"""
+    "network_item contient toutes les informations du fichier JSON"
     if network_item is not None:
-        network_item = modifjson.mod_station(network_item)
+        network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations
         if "id" in network_item:
             del network_item["id"]
         simulation = Simulation(network_index, _wave, **network_item)
@@ -211,3 +220,9 @@ def run_app(port, networks, wave):
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
     Thread(target=lambda: run(_run_simulations(networks, wave))).start()
     _app.run(port=port)
+
+def set_defaut(running, speed):
+    global _running_default
+    _running_default = running
+    global _speed_default
+    _speed_default = speed

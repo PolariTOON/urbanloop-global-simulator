@@ -1,0 +1,591 @@
+{
+  "bridges": [
+    {
+      "name": "Laxou - Villers-les-Nancy",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 19.44
+      }
+    },
+    {
+      "name": "Villers-les-Nancy - Laxou",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 19.44
+      }
+    },
+    {
+      "name": "Gare_entree",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 6
+      }
+    },
+    {
+      "name": "Gare_sortie",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 6
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    }
+  ],
+  "dynamic_routing": false,
+  "loops": [
+    {
+      "elements": [
+        {
+          "id_bridge": 0,
+          "pods": [],
+          "type": "switch_in",
+          "x": 340,
+          "y": 400
+        },
+        {
+          "id_bridge": 4,
+          "pods": [],
+          "stat_or_shed": "Velodrome",
+          "type": "switch_out",
+          "x": 390,
+          "y": 500
+        },
+        {
+          "id_bridge": 5,
+          "pods": [],
+          "type": "switch_in",
+          "x": 380,
+          "y": 500
+        },
+        {
+          "id_bridge": 2,
+          "pods": [],
+          "type": "switch_out",
+          "x": 320,
+          "y": 500
+        },
+        {
+          "id_bridge": 3,
+          "pods": [],
+          "type": "switch_in",
+          "x": 220,
+          "y": 500
+        },
+        {
+          "id_bridge": 1,
+          "pods": [],
+          "type": "switch_out",
+          "x": 215,
+          "y": 450
+        }
+      ],
+      "name": "Villers-les-Nancy",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 1,
+          "pods": [],
+          "type": "switch_in",
+          "x": 210,
+          "y": 440
+        },
+        {
+          "id_bridge": 6,
+          "pods": [],
+          "stat_or_shed": "Marie-Jeanne",
+          "type": "switch_out",
+          "x": 150,
+          "y": 330
+        },
+        {
+          "id_bridge": 7,
+          "pods": [],
+          "type": "switch_in",
+          "x": 159.8058067569092,
+          "y": 328.03883864861814
+        },
+        {
+          "id_bridge": 8,
+          "pods": [],
+          "stat_or_shed": "Jean-Paul",
+          "type": "switch_out",
+          "x": 200,
+          "y": 320
+        },
+        {
+          "id_bridge": 9,
+          "pods": [],
+          "type": "switch_in",
+          "x": 208.94427190999915,
+          "y": 324.4721359549996
+        },
+        {
+          "id_bridge": 0,
+          "pods": [],
+          "type": "switch_out",
+          "x": 330,
+          "y": 385
+        }
+      ],
+      "name": "Laxou",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 22.22
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 22.22
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 22.22
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 22.22
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 22.22
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 22.22
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 2,
+          "pods": [],
+          "type": "switch_in",
+          "x": 320,
+          "y": 530
+        },
+        {
+          "id_bridge": 10,
+          "pods": [],
+          "stat_or_shed": "Gare",
+          "type": "switch_out",
+          "x": 270,
+          "y": 570
+        },
+        {
+          "id_bridge": 11,
+          "pods": [],
+          "type": "switch_in",
+          "x": 262.1913119055697,
+          "y": 563.7530495244557
+        },
+        {
+          "id_bridge": 3,
+          "pods": [],
+          "type": "switch_out",
+          "x": 220,
+          "y": 530
+        }
+      ],
+      "name": "boucle_Gare_test",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 7
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 7
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 7
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 7
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 4,
+          "pods": [],
+          "type": "switch_in",
+          "x": 390,
+          "y": 520
+        },
+        {
+          "name": "Velodrome",
+          "pods": {
+            "count": 0,
+            "max": 2
+          },
+          "station_type": 0,
+          "travelers": {
+            "all_time_count": 0,
+            "average_waiting_time": 0,
+            "count": 0
+          },
+          "type": "station",
+          "x": 385.0,
+          "y": 535
+        },
+        {
+          "id_bridge": 5,
+          "pods": [],
+          "type": "switch_out",
+          "x": 380,
+          "y": 520
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 6,
+          "pods": [],
+          "type": "switch_in",
+          "x": 146.07767729723633,
+          "y": 310.3883864861816
+        },
+        {
+          "name": "Marie-Jeanne",
+          "pods": {
+            "count": 100,
+            "max": 100
+          },
+          "type": "shed",
+          "x": 148.03883864861817,
+          "y": 294.6990956751269
+        },
+        {
+          "id_bridge": 7,
+          "pods": [],
+          "type": "switch_out",
+          "x": 155.88348405414553,
+          "y": 308.42722513479976
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20,
+          "weight": 10000
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 8,
+          "pods": [],
+          "type": "switch_in",
+          "x": 208.94427190999917,
+          "y": 302.1114561800017
+        },
+        {
+          "name": "Jean-Paul",
+          "pods": {
+            "count": 100,
+            "max": 100
+          },
+          "type": "shed",
+          "x": 220.12461179749812,
+          "y": 290.93111629250274
+        },
+        {
+          "id_bridge": 9,
+          "pods": [],
+          "type": "switch_out",
+          "x": 217.88854381999835,
+          "y": 306.58359213500125
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20,
+          "weight": 10000
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 10,
+          "pods": [],
+          "type": "switch_in",
+          "x": 257.5060990489115,
+          "y": 585.6173761888606
+        },
+        {
+          "name": "Gare",
+          "pods": {
+            "count": 0,
+            "max": 2
+          },
+          "station_type": 0,
+          "travelers": {
+            "all_time_count": 0,
+            "average_waiting_time": 0,
+            "count": 0
+          },
+          "type": "station",
+          "x": 244.23132928837998,
+          "y": 594.206933092734
+        },
+        {
+          "id_bridge": 11,
+          "pods": [],
+          "type": "switch_out",
+          "x": 249.6974109544812,
+          "y": 579.3704257133163
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    }
+  ],
+  "margin_min": 2,
+  "max_speed": 30,
+  "name": "Mini network",
+  "places_number": 5,
+  "pod_size": 2,
+  "running": false,
+  "state": 56565,
+  "time": 28800,
+  "view_box": {
+    "height": 500,
+    "width": 600,
+    "x": 0,
+    "y": 200
+  }
+}

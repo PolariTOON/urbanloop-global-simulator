@@ -47,6 +47,7 @@ Ce dépôt comprend différents dossiers et fichiers correspondant à la réalis
 * [`view`](view) regroupe les éléments de l'interface graphique (*HTML* / *CSS* / *SVG* / *ECMAScript*) ;
 * [`controler`](controler) contient les fichiers permettant de gérer la simulation et le modèle probabiliste ;
 * [`resources`](resources) contient des exemples de réseaux au format *JSON*.
+* [`test_project`](test_project) contient des classes et fonctions permettant de lancer plusieurs simulations de manière automatique.
 
 ## Usage
 
@@ -67,16 +68,33 @@ Pour lancer le programme (après téléchargement des sources), exécuter la com
 $ python3.7 main.py -p
 ```
 
-Il est aussi possible de charger des réseaux dès le lancement comme ceci :
+Il est aussi possible de charger des réseaux dès le lancement comme ceci, les réseaux seront chargés à partir de l'id 0:
 
 ```sh
-$ python3.7 main.py -p -n '{"0": "path/to/network0.json", "42": "path/to/network42.json"}'
+$ python3.7 main.py -p -n path/to/network0.json path/to/network42.json
 ```
 
 Pour plus d'informations, utilisez la commande suivante :
 
 ```sh
 $ python3.7 main.py -h
+```
+
+Il est aussi possible de lancer plusieurs fois la même simulation via la commande:
+```sh
+$ python3.7 test_project/lauch_simulators.py -o True -r True -nb 10 -s 1 -p 8088 -n path/to/network0.json
+```
+
+Si l'option -o est désactivée, on peut lancer la commande:
+```sh
+$ python3.7 test_project\Simulations.py 8088 10
+```
+afin d'ouvrir les pages correspondant aux simulations lancées précédemment.
+
+Pour plus d'informations, utilisez la commande suivante :
+
+```sh
+$ python3.7 test_project/lauch_simulators.py -h
 ```
 
 ### Utilisation

@@ -9,6 +9,8 @@ from traceback import print_exc
 from controler.simulation import Simulation
 import modifjson
 
+"""Classe chargée de la réalisation de la simulation"""
+"La plupart des fonctions (async) sont utiles pour l'interface web"
 
 _app = Flask(__name__, static_url_path="", static_folder="view/static", template_folder="view/templates")
 _app.logger.setLevel(ERROR)
@@ -217,11 +219,19 @@ async def _get_section(simulations, network_index, road_index, section_index):
 
 def run_app(port, networks, wave):
     """Fonction permettant de lancer l'application"""
-    print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
+    "port = n° de port si on souhaite l'interface web (sinon -1)"
+    "networks contient les réseaux préchargés"
+    "wave contient la vitesse de tic de simulation"
+
     Thread(target=lambda: run(_run_simulations(networks, wave))).start()
-    _app.run(port=port)
+
+    if port != -1: # cas d'ouverture de l'interface web
+        print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
+        _app.run(port=port)
+
 
 def set_defaut(running, speed):
+    "permet de choisir une vitesse au lancement de la simulation et faire en sorte que la simulation soit déjà lancée"
     global _running_default
     _running_default = running
     global _speed_default

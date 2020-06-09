@@ -102,6 +102,7 @@ class Simulation:
             if r <= self._probability.station_probability(s.station_type, second, False):
                 s._travelers.append(Traveler(self._env, self._env.time))
                 s._all_time_count += 1
+
     def serialize(self):
         dict = self._network.serialize()
         dict.update({

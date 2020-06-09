@@ -13,12 +13,12 @@ class Simulations(Thread):
         Thread.__init__(self)
 
     def run(self):
-        sleep(5) #pour laisser la simulation commencer avant d'ouvrir la page
+        sleep(5)  # pour laisser la simulation commencer avant d'ouvrir la page
         for i in range(0, self.number):
             id = i
             webbrowser.open_new_tab('http://127.0.0.1:%s/?id=%s' %(self.port, id))
 
 
 if __name__ == '__main__':
-    simulations = Simulations(int(sys.argv[1]), int(sys.argv[2]))
+    simulations = Simulations(int(sys.argv[1]), int(sys.argv[2]))  # la première valeur est le port et la seconde le nombre de simulations à ouvrir
     simulations.run()

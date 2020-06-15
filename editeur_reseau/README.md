@@ -9,3 +9,13 @@ Dépendances :
 - bootstrap
 - rxjs-compat
 - popperjs
+
+Tips installation :
+
+https://nodejs.org/en/download/ -> pour télécharger node js
+npm install -g @angular/cli     -> pour installer Angular cli via un terminal
+npm install			-> autres dépendances
+
+Pour lancer l'application :
+
+Utiliser la commande `ng serve` dans un terminal dans ce dossier (**editeur_reseau/**).

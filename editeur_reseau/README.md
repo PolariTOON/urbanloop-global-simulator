@@ -12,9 +12,9 @@ Dépendances :
 
 Tips installation :
 
-https://nodejs.org/en/download/ -> pour télécharger node js
-npm install -g @angular/cli     -> pour installer Angular cli via un terminal
-npm install			-> autres dépendances
+* https://nodejs.org/en/download/ -> pour télécharger node js
+* npm install -g @angular/cli     -> pour installer Angular cli via un terminal
+* npm install			-> autres dépendances
 
 Pour lancer l'application :
 

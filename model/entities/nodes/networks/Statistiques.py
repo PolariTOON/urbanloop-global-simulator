@@ -3,36 +3,36 @@ import statistics as s
 class Statistiques:
 
 	def __init__(self):
-		self._waiting_times = [] # tableau des temps d'attente
+		self._waiting_times = []  		# tableau des temps d'attente
 		self._waiting_time = 0
 		self._average_waiting_time = 0
-		self._nb_traveler = 0 # nombre actuel de voyageur dans une capsule
+		self._nb_traveler = 0  			# nombre actuel de voyageur dans une capsule
 		self._nb_pod = 0
-		self._traveling_pods = {} # dictionnaire des capsules en voyage
-		self._travels = [] # tableau des voyages effectués
+		self._traveling_pods = {}  		# dictionnaire des capsules en voyage
+		self._travels = []  			# tableau des voyages effectués
 
-
-	def add_traveling_pod(self,pod,departure_time,traveler):
-		self._traveling_pods[pod.id] = [pod,departure_time,-1,traveler]
+	def add_traveling_pod(self, pod, departure_time, traveler):
+		# print("add")
+		self._traveling_pods[pod.id] = [pod, departure_time, -1, traveler]
 		self._nb_pod += 1
 		if traveler:
 			self._nb_traveler += 1
-			print("number of traveler: " + str(self._nb_traveler))
+			# print("\u001B[32m", "\t>", "number of traveler: " + str(self._nb_traveler), "\u001B[0m")
 
-	def remove_traveling_pod(self,pod,timestamp):
+	def remove_traveling_pod(self, pod, timestamp):
+		# print("rm")
 		self._traveling_pods[pod.id][2] = timestamp
 		self._travels.append(self._traveling_pods[pod.id])
 		self._traveling_pods[pod.id] = []
-		self._nb_pod -= 1
-		if len(pod.travelers)>0:
-			self._nb_traveler -= 1
-			print("number of traveler: " + str(self._nb_traveler))
+		self._nb_pod -= 1  # todo revoir le compte de voyageurs
+		self._nb_traveler -= 1
+		# print("\u001B[31m", "\t> number of traveler: " + str(self._nb_traveler), "\u001B[0m")
 
-	def add_waiting_time(self,timestamp,waiting_time):
+	def add_waiting_time(self, timestamp, waiting_time):
 		self._waiting_times.append(waiting_time)
 		self._waiting_time = waiting_time
 		self._average_waiting_time = round(s.mean(self._waiting_times),2)
-		#print(self._waiting_times)
+		# print(self._waiting_times)
 	
 	def serialize(self):
 		dict = {

@@ -97,7 +97,11 @@ class Section(Track):
                 elif "pod_exit" == message["type"]:
                     # Une capsule n'est plus dans la section
                     pod = message["pod"]
-                    self._pods.remove(pod)
+                    if pod in self._pods:
+                        self._pods.remove(pod)
+                    else:
+                        print(len(self._pods), pod.name, self.name)
+                        
                 elif "pod_entry" == message["type"]:
                     # Une capsule entre dans la section : il faut lui donner la bonne vitesse
                     # et il faut notifier le parent pour qu'il prévienne la piste/l'aiguillage précédente

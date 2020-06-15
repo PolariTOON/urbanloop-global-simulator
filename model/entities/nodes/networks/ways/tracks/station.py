@@ -15,7 +15,7 @@ station_types = {
 
 
 class Station(Step):
-    """ Classe modélisant une gare, y est géré lé départ des capsules, le réapprovisionnement, la génération des voyageurs et leur montée
+    """ Classe modélisant une gare, y sont gérés le départ des capsules, le réapprovisionnement, la génération des voyageurs et leur montée
     dans les capsules, les échanges de messages avec les autres éléments du réseau"""
     def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, departure_count=None, station_type=None, element_of_loop=None, parallel=None, **kwargs):
         super().__init__(env, id, **kwargs)
@@ -177,7 +177,7 @@ class Station(Step):
             for i in range(len(self._boarding)):
                 if self._boarding[i] != -1:
                     self._boarding[i] += self.env.tick
-                    if self._pods[i] and self._boarding[i] > self._pods[i].travelers[0].boarding_time:
+                    if self._pods[i] and self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si la capsule est disponible et que le temps d'embarquement est dépassé
                         self._boarding[i] = -1
                         stations = self._parent.parent.stations_names
                         stations.remove(self.name)

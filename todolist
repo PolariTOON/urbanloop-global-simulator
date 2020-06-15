@@ -1,5 +1,6 @@
 corriger l'accélération de vitesse de simulation
 corriger le routage (les capsules s'insèrent toujours)
+corriger la statistique de nb de voyageurs
 créer un réseau à l'échelle de Nancy + fond
 Déployer le simulateur & l'éditeur
 Ajouter des statistiques

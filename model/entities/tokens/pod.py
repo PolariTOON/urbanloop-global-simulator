@@ -4,6 +4,8 @@ from random import random as rd
 from .token import Token
 from .traveler import Traveler
 
+_pod_list = []
+_moving_travelers = 0
 
 class Pod(Token):
     """
@@ -67,8 +69,19 @@ class Pod(Token):
 
     @travelers.setter
     def travelers(self, value):
+        # print("set traveler")
+        global _moving_travelers
+        global _pod_list
         """setter de l'attribut travelers"""
         self._travelers = value
+        if len(self._travelers) == 0:
+            _moving_travelers -= 1
+            if self.name in _pod_list:
+                _pod_list.remove(self.name)
+        else:
+            _moving_travelers += 1
+            _pod_list.append(self.name)
+        # print("\u001B[36m moving travelers =", len(_pod_list), "\u001B[0m")  # cyan
 
     def isEmpty(self):
         return len(self._travelers) == 0
@@ -307,4 +320,4 @@ class Pod(Token):
                     self._source = self._track_or_switch
                     self.speed = self._track_or_switch.next.speed
                 else:
-                    raise ValueError("Invalid message")
+                    raise ValueError("Invalid message: ", message)

@@ -1,13 +1,33 @@
 {
   "bridges": [
     {
-      "name": "Laxou - Villers-les-Nancy",
+      "name": "Laxou - Nancy",
       "pods": [],
       "section": {
         "path": {
           "type": "line"
         },
-        "speed": 19.44
+        "speed": 15.28
+      }
+    },
+    {
+      "name": "Nancy - Villers-les-Nancy",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 12.5
+      }
+    },
+    {
+      "name": "Nancy - Laxou",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 15.28
       }
     },
     {
@@ -21,23 +41,123 @@
       }
     },
     {
-      "name": "Gare_entree",
+      "name": " ",
       "pods": [],
       "section": {
         "path": {
           "type": "line"
         },
-        "speed": 6
+        "speed": 20
       }
     },
     {
-      "name": "Gare_sortie",
+      "name": " ",
       "pods": [],
       "section": {
         "path": {
           "type": "line"
         },
-        "speed": 6
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
+      }
+    },
+    {
+      "name": " ",
+      "pods": [],
+      "section": {
+        "path": {
+          "type": "line"
+        },
+        "speed": 20
       }
     },
     {
@@ -129,44 +249,208 @@
           "id_bridge": 0,
           "pods": [],
           "type": "switch_in",
-          "x": 340,
-          "y": 400
+          "x": 365,
+          "y": 310
         },
         {
           "id_bridge": 4,
           "pods": [],
-          "stat_or_shed": "Velodrome",
+          "stat_or_shed": "Gare",
           "type": "switch_out",
-          "x": 390,
-          "y": 500
+          "x": 480,
+          "y": 290
         },
         {
           "id_bridge": 5,
           "pods": [],
           "type": "switch_in",
-          "x": 380,
-          "y": 500
+          "x": 487.0710678118655,
+          "y": 297.0710678118655
         },
         {
-          "id_bridge": 2,
+          "id_bridge": 6,
           "pods": [],
+          "stat_or_shed": "Stanislas",
           "type": "switch_out",
-          "x": 320,
-          "y": 500
+          "x": 560,
+          "y": 370
         },
         {
-          "id_bridge": 3,
+          "id_bridge": 7,
           "pods": [],
           "type": "switch_in",
-          "x": 220,
-          "y": 500
+          "x": 554.2288937337662,
+          "y": 378.1666598107082
+        },
+        {
+          "id_bridge": 8,
+          "pods": [],
+          "stat_or_shed": "Campus_ARTEM",
+          "type": "switch_out",
+          "x": 507,
+          "y": 445
+        },
+        {
+          "id_bridge": 9,
+          "pods": [],
+          "type": "switch_in",
+          "x": 497.1889144701316,
+          "y": 446.9345802453262
         },
         {
           "id_bridge": 1,
           "pods": [],
           "type": "switch_out",
+          "x": 436,
+          "y": 459
+        },
+        {
+          "id_bridge": 2,
+          "pods": [],
+          "type": "switch_out",
+          "x": 360,
+          "y": 417
+        }
+      ],
+      "name": "Nancy",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 1,
+          "pods": [],
+          "type": "switch_in",
+          "x": 415,
+          "y": 474
+        },
+        {
+          "id_bridge": 10,
+          "pods": [],
+          "stat_or_shed": "Velodrome",
+          "type": "switch_out",
+          "x": 411,
+          "y": 570
+        },
+        {
+          "id_bridge": 11,
+          "pods": [],
+          "type": "switch_in",
+          "x": 406.7420296367012,
+          "y": 579.04818702201
+        },
+        {
+          "id_bridge": 12,
+          "pods": [],
+          "stat_or_shed": "Telecom Nancy",
+          "type": "switch_out",
+          "x": 371,
+          "y": 655
+        },
+        {
+          "id_bridge": 13,
+          "pods": [],
+          "type": "switch_in",
+          "x": 361.00202631966147,
+          "y": 655.2013014834968
+        },
+        {
+          "id_bridge": 14,
+          "pods": [],
+          "stat_or_shed": "Eglise",
+          "type": "switch_out",
+          "x": 222,
+          "y": 658
+        },
+        {
+          "id_bridge": 15,
+          "pods": [],
+          "type": "switch_in",
+          "x": 219.0778146440098,
+          "y": 648.4364842894867
+        },
+        {
+          "id_bridge": 16,
+          "pods": [],
+          "stat_or_shed": "Jean-paul",
+          "type": "switch_out",
+          "x": 189,
+          "y": 550
+        },
+        {
+          "id_bridge": 17,
+          "pods": [],
+          "type": "switch_in",
+          "x": 192.05628648983003,
+          "y": 540.4784920893757
+        },
+        {
+          "id_bridge": 3,
+          "pods": [],
+          "type": "switch_out",
           "x": 215,
-          "y": 450
+          "y": 469
+        },
+        {
+          "type": "sensor",
+          "x": 280,
+          "y": 470
         }
       ],
       "name": "Villers-les-Nancy",
@@ -207,54 +491,111 @@
             "type": "line"
           },
           "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 16.67
         }
       ]
     },
     {
       "elements": [
         {
-          "id_bridge": 1,
+          "id_bridge": 2,
           "pods": [],
           "type": "switch_in",
-          "x": 210,
-          "y": 440
+          "x": 345,
+          "y": 420
         },
         {
-          "id_bridge": 6,
+          "id_bridge": 3,
+          "pods": [],
+          "type": "switch_in",
+          "x": 200,
+          "y": 450
+        },
+        {
+          "id_bridge": 18,
+          "pods": [],
+          "stat_or_shed": "Auchan",
+          "type": "switch_out",
+          "x": 90,
+          "y": 370
+        },
+        {
+          "id_bridge": 19,
+          "pods": [],
+          "type": "switch_in",
+          "x": 92.23804839705063,
+          "y": 360.2536602063924
+        },
+        {
+          "id_bridge": 20,
+          "pods": [],
+          "stat_or_shed": "Sapiniere",
+          "type": "switch_out",
+          "x": 121,
+          "y": 235
+        },
+        {
+          "id_bridge": 21,
+          "pods": [],
+          "type": "switch_in",
+          "x": 130.9783341103197,
+          "y": 234.34208786085804
+        },
+        {
+          "id_bridge": 22,
           "pods": [],
           "stat_or_shed": "Marie-Jeanne",
           "type": "switch_out",
-          "x": 150,
-          "y": 330
+          "x": 212,
+          "y": 229
         },
         {
-          "id_bridge": 7,
+          "id_bridge": 23,
           "pods": [],
           "type": "switch_in",
-          "x": 159.8058067569092,
-          "y": 328.03883864861814
-        },
-        {
-          "id_bridge": 8,
-          "pods": [],
-          "stat_or_shed": "Jean-Paul",
-          "type": "switch_out",
-          "x": 200,
-          "y": 320
-        },
-        {
-          "id_bridge": 9,
-          "pods": [],
-          "type": "switch_in",
-          "x": 208.94427190999915,
-          "y": 324.4721359549996
+          "x": 220.8733116838754,
+          "y": 233.61132733177777
         },
         {
           "id_bridge": 0,
           "pods": [],
           "type": "switch_out",
-          "x": 330,
-          "y": 385
+          "x": 339,
+          "y": 295
+        },
+        {
+          "type": "sensor",
+          "x": 300,
+          "y": 370
         }
       ],
       "name": "Laxou",
@@ -295,67 +636,30 @@
             "type": "line"
           },
           "speed": 22.22
-        }
-      ]
-    },
-    {
-      "elements": [
-        {
-          "id_bridge": 2,
-          "pods": [],
-          "type": "switch_in",
-          "x": 320,
-          "y": 530
-        },
-        {
-          "id_bridge": 10,
-          "pods": [],
-          "stat_or_shed": "Gare",
-          "type": "switch_out",
-          "x": 270,
-          "y": 570
-        },
-        {
-          "id_bridge": 11,
-          "pods": [],
-          "type": "switch_in",
-          "x": 262.1913119055697,
-          "y": 563.7530495244557
-        },
-        {
-          "id_bridge": 3,
-          "pods": [],
-          "type": "switch_out",
-          "x": 220,
-          "y": 530
-        }
-      ],
-      "name": "boucle_Gare_test",
-      "pods": [],
-      "sections": [
-        {
-          "path": {
-            "type": "line"
-          },
-          "speed": 7
         },
         {
           "path": {
             "type": "line"
           },
-          "speed": 7
+          "speed": 22.22
         },
         {
           "path": {
             "type": "line"
           },
-          "speed": 7
+          "speed": 22.22
         },
         {
           "path": {
             "type": "line"
           },
-          "speed": 7
+          "speed": 22.22
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 22.22
         }
       ]
     },
@@ -365,11 +669,11 @@
           "id_bridge": 4,
           "pods": [],
           "type": "switch_in",
-          "x": 390,
-          "y": 520
+          "x": 494.14213562373095,
+          "y": 275.85786437626905
         },
         {
-          "name": "Velodrome",
+          "name": "Gare",
           "pods": {
             "count": 0,
             "max": 2
@@ -381,15 +685,15 @@
             "count": 0
           },
           "type": "station",
-          "x": 385.0,
-          "y": 535
+          "x": 508.2842712474619,
+          "y": 268.7867965644036
         },
         {
           "id_bridge": 5,
           "pods": [],
           "type": "switch_out",
-          "x": 380,
-          "y": 520
+          "x": 501.2132034355964,
+          "y": 282.9289321881345
         }
       ],
       "name": " ",
@@ -421,25 +725,31 @@
           "id_bridge": 6,
           "pods": [],
           "type": "switch_in",
-          "x": 146.07767729723633,
-          "y": 310.3883864861816
+          "x": 576.3333196214164,
+          "y": 381.5422125324676
         },
         {
-          "name": "Marie-Jeanne",
+          "name": "Stanislas",
           "pods": {
-            "count": 100,
-            "max": 100
+            "count": 0,
+            "max": 2
           },
-          "type": "shed",
-          "x": 148.03883864861817,
-          "y": 294.6990956751269
+          "station_type": 0,
+          "travelers": {
+            "all_time_count": 0,
+            "average_waiting_time": 0,
+            "count": 0
+          },
+          "type": "station",
+          "x": 585.6977562043619,
+          "y": 394.2822018371724
         },
         {
           "id_bridge": 7,
           "pods": [],
           "type": "switch_out",
-          "x": 155.88348405414553,
-          "y": 308.42722513479976
+          "x": 570.5622133551826,
+          "y": 389.7088723431758
         }
       ],
       "name": " ",
@@ -455,8 +765,7 @@
           "path": {
             "type": "line"
           },
-          "speed": 20,
-          "weight": 10000
+          "speed": 20
         },
         {
           "path": {
@@ -472,25 +781,249 @@
           "id_bridge": 8,
           "pods": [],
           "type": "switch_in",
-          "x": 208.94427190999917,
-          "y": 302.1114561800017
+          "x": 510.86916049065235,
+          "y": 464.62217105973684
         },
         {
-          "name": "Jean-Paul",
+          "name": "Campus_ARTEM",
           "pods": {
-            "count": 100,
-            "max": 100
+            "count": 0,
+            "max": 2
           },
-          "type": "shed",
-          "x": 220.12461179749812,
-          "y": 290.93111629250274
+          "station_type": 0,
+          "travelers": {
+            "all_time_count": 0,
+            "average_waiting_time": 0,
+            "count": 0
+          },
+          "type": "station",
+          "x": 508.86548809370737,
+          "y": 480.3060894772026
         },
         {
           "id_bridge": 9,
           "pods": [],
           "type": "switch_out",
-          "x": 217.88854381999835,
-          "y": 306.58359213500125
+          "x": 501.0580749607839,
+          "y": 466.556751305063
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 10,
+          "pods": [],
+          "type": "switch_in",
+          "x": 429.09637404401985,
+          "y": 578.5159407265976
+        },
+        {
+          "name": "Velodrome",
+          "pods": {
+            "count": 0,
+            "max": 2
+          },
+          "station_type": 0,
+          "travelers": {
+            "all_time_count": 0,
+            "average_waiting_time": 0,
+            "count": 0
+          },
+          "type": "station",
+          "x": 440.5396693953854,
+          "y": 589.4269897825508
+        },
+        {
+          "id_bridge": 11,
+          "pods": [],
+          "type": "switch_out",
+          "x": 424.83840368072106,
+          "y": 587.5641277486076
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 12,
+          "pods": [],
+          "type": "switch_in",
+          "x": 371.4026029669935,
+          "y": 674.9959473606771
+        },
+        {
+          "name": "Telecom Nancy",
+          "pods": {
+            "count": 0,
+            "max": 2
+          },
+          "station_type": 0,
+          "travelers": {
+            "all_time_count": 0,
+            "average_waiting_time": 0,
+            "count": 0
+          },
+          "type": "station",
+          "x": 366.7055683520694,
+          "y": 690.0935586229332
+        },
+        {
+          "id_bridge": 13,
+          "pods": [],
+          "type": "switch_out",
+          "x": 361.404629286655,
+          "y": 675.1972488441738
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 14,
+          "pods": [],
+          "type": "switch_in",
+          "x": 202.87296857897323,
+          "y": 663.8443707119804
+        },
+        {
+          "name": "Eglise",
+          "pods": {
+            "count": 0,
+            "max": 2
+          },
+          "station_type": 0,
+          "travelers": {
+            "all_time_count": 0,
+            "average_waiting_time": 0,
+            "count": 0
+          },
+          "type": "station",
+          "x": 187.06660233520805,
+          "y": 663.445890890709
+        },
+        {
+          "id_bridge": 15,
+          "pods": [],
+          "type": "switch_out",
+          "x": 199.95078322298303,
+          "y": 654.2808550014671
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 16,
+          "pods": [],
+          "type": "switch_in",
+          "x": 169.95698417875127,
+          "y": 543.8874270203399
+        },
+        {
+          "name": "Jean-paul",
+          "pods": {
+            "count": 100,
+            "max": 100
+          },
+          "type": "shed",
+          "x": 157.20286555772975,
+          "y": 534.5422433302826
+        },
+        {
+          "id_bridge": 17,
+          "pods": [],
+          "type": "switch_out",
+          "x": 173.0132706685813,
+          "y": 534.3659191097156
         }
       ],
       "name": " ",
@@ -520,14 +1053,14 @@
     {
       "elements": [
         {
-          "id_bridge": 10,
+          "id_bridge": 18,
           "pods": [],
           "type": "switch_in",
-          "x": 257.5060990489115,
-          "y": 585.6173761888606
+          "x": 70.5073204127848,
+          "y": 365.5239032058987
         },
         {
-          "name": "Gare",
+          "name": "Auchan",
           "pods": {
             "count": 0,
             "max": 2
@@ -539,15 +1072,15 @@
             "count": 0
           },
           "type": "station",
-          "x": 244.23132928837998,
-          "y": 594.206933092734
+          "x": 57.006834920898704,
+          "y": 357.29366071351893
         },
         {
-          "id_bridge": 11,
+          "id_bridge": 19,
           "pods": [],
           "type": "switch_out",
-          "x": 249.6974109544812,
-          "y": 579.3704257133163
+          "x": 72.74536880983543,
+          "y": 355.7775634122911
         }
       ],
       "name": " ",
@@ -572,6 +1105,113 @@
           "speed": 20
         }
       ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 20,
+          "pods": [],
+          "type": "switch_in",
+          "x": 119.68417572171609,
+          "y": 215.04333177936059
+        },
+        {
+          "name": "Sapiniere",
+          "pods": {
+            "count": 0,
+            "max": 2
+          },
+          "station_type": 0,
+          "travelers": {
+            "all_time_count": 0,
+            "average_waiting_time": 0,
+            "count": 0
+          },
+          "type": "station",
+          "x": 123.68647456816299,
+          "y": 199.74687454431006
+        },
+        {
+          "id_bridge": 21,
+          "pods": [],
+          "type": "switch_out",
+          "x": 129.6625098320358,
+          "y": 214.38541964021863
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "id_bridge": 22,
+          "pods": [],
+          "type": "switch_in",
+          "x": 221.22265466355552,
+          "y": 211.25337663224923
+        },
+        {
+          "name": "Marie-Jeanne",
+          "pods": {
+            "count": 100,
+            "max": 100
+          },
+          "type": "shed",
+          "x": 232.57630150315984,
+          "y": 200.24907277232504
+        },
+        {
+          "id_bridge": 23,
+          "pods": [],
+          "type": "switch_out",
+          "x": 230.0959663474309,
+          "y": 215.864703964027
+        }
+      ],
+      "name": " ",
+      "pods": [],
+      "sections": [
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20,
+          "weight": 10000
+        },
+        {
+          "path": {
+            "type": "line"
+          },
+          "speed": 20
+        }
+      ]
     }
   ],
   "margin_min": 2,
@@ -579,9 +1219,19 @@
   "name": "Mini network",
   "places_number": 5,
   "pod_size": 2,
+  "prob": {
+    "activity_and_residential_fluctuation": 21,
+    "activity_and_residential_percent": 50,
+    "city_percent": 60
+  },
   "running": false,
-  "state": 56565,
+  "state": 42,
   "time": 28800,
+  "traveler": {
+    "evening_peak_hour": 19,
+    "morning_peak_hour": 8,
+    "travelers_per_hour": 1000
+  },
   "view_box": {
     "height": 500,
     "width": 600,

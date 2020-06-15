@@ -12,6 +12,18 @@ from .probability import Probability, generate_traveler_poisson
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
     def __init__(self, id, wave, traveler=None, prob=None, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+        """
+        "id" (entier positif) id du réseau
+        "wave" (flottant positif) pas de simulation
+        "traveler" paramètres de génération des voyageurs
+        "prob" paramètres d'appartion des voyageurs
+        "running" (booléen) un booléen indiquant si la simulation est déjà lancée (car on peut faire une sauvegarde d’un réseau en cours de simulation)
+        "rate" (entier positif) le logarithme en base 2 de la vitesse de la simulation
+        "max_rate" (entier positif) le logarithme en base 2 de la vitesse maximale de la simulation
+        "jerky" (booléen) un booléen indiquant l’algorithme utilisé pour accélérer la simulation
+        "time" (flottant positif) le temps simulé de reprise de la simulation (en s)
+        "state" (flottant) un seed permettant de choisir le générateur pseudo-aléatoire utilisé et donc de relancer une même simulation dans les mêmes conditions
+        """
         running = running or False
         rate = rate or 0
         max_rate = max_rate or 7
@@ -19,14 +31,14 @@ class Simulation:
         time = time or 0
         state = state or (seed(), random() * 2 ** 53)[1]
         traveler = traveler or {
-            "travelers_per_hour" : 2000,
-            "morning_peak_hour" : 8,
-            "evening_peak_hour" : 18
+            "travelers_per_hour": 2000,
+            "morning_peak_hour": 8,
+            "evening_peak_hour": 18
         }
         prob = prob or {
-            "activity_and_residential_percent" : 30,
-            "city_percent" : 20,
-            "activity_and_residential_fluctuation" : 20
+            "activity_and_residential_percent": 30,
+            "city_percent": 20,
+            "activity_and_residential_fluctuation": 20
         }
         self._probability = Probability(prob, traveler)
         self._env = Environment()
@@ -78,29 +90,29 @@ class Simulation:
         return self._state
 
     def update(self):
-        if not self._running:
+        if not self._running:   # simulation en pause
             return
         times = 1
         tick = self._wave
-        if self._jerky:
+        if self._jerky:  # mode jerky
             times *= 2 ** self._rate
-        else:
+        else:  # mode standard
             tick *= 2 ** self._rate
         self._env.tick = tick
-        for i in range(times):
-            self._env.time += self._env.tick
+        for i in range(times):  # dans le mode jerky, on calcule plusieurs ticks à la fois
+            self._env.time += self._env.tick  # on incrémente le temps
             self._time = self._env.time
-            seed(self._state)
-            until = floor(self._env.now) + 1
+            seed(self._state)  # à appeler avant d'utiliser random
+            until = floor(self._env.now) + 1  # durée de simulation calculée
             self._env.run(until=until)
             self._state = random() * 2 ** 53
         second = self._env.time
-        if (generate_traveler_poisson(self._travelers_per_hour, int(round(second / 3600, 2)), self._env.tick)):          
-            ri = randint(1,len(self._network.stations))
+        if generate_traveler_poisson(self._travelers_per_hour, int(round(second / 3600, 2)), self._env.tick):  # génération des voyageurs # todo vérifier la génération quand on accélère
+            ri = randint(1, len(self._network.stations))  # on choisit une station au hasard
             s = self._network.stations[ri-1]
             r = random()
-            if r <= self._probability.station_probability(s.station_type, second, False):
-                s._travelers.append(Traveler(self._env, self._env.time))
+            if r <= self._probability.station_probability(s.station_type, second, False):  # si le nombre aléatoire généré est inférieur à la probabilité d'appartion
+                s._travelers.append(Traveler(self._env, self._env.time))  # alors un voyageur est généré
                 s._all_time_count += 1
 
     def serialize(self):

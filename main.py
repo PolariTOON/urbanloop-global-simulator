@@ -4,7 +4,7 @@ from app import run_app
 
 
 def networks(value):
-    '''value contient un path de fichier json décrivant un réseau'''
+    """value contient un path de fichier json décrivant un réseau"""
 
     try:  # cas où plusieurs networks sont en paramètre
         global _networks0
@@ -50,6 +50,7 @@ if __name__ == '__main__':
     arguments = argument_parser.parse_args()
 
     if arguments.networks != {}:
-        arguments.networks = arguments.networks[0] # à cause de nargs= '+' on a une liste en sortie, donc je ne garde que le dictionnaire des réseaux
+        arguments.networks = arguments.networks[0]  # à cause de nargs= '+' on a une liste en sortie, donc je ne garde que le dictionnaire des réseaux
 
+    print("test")
     run_app(arguments.port, arguments.networks, arguments.wave)

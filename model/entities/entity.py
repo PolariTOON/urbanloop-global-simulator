@@ -43,7 +43,7 @@ class Entity:
             getter.cancel()
             return None
         message = condition[getter]
-        print(self.name, "  --  ", message["author"].name, "  --  ", message["type"])
+        # print("\t\t", self.name, "  --  ", message["author"].name, "  --  ", message["type"])
         return message
 
     def update(self):

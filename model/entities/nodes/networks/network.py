@@ -403,13 +403,13 @@ class Network(Node):
                 elif "docked" == message["type"]:
                     # Une capsule stationne
                     timestamp = message["timestamp"]
-                    print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Arrival")
-                    print("\n")
-                    self._statistiques.remove_traveling_pod(message["pod"],timestamp)
+                    # print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) + "] Arrival\u001B[0m\n")
+                    self._statistiques.remove_traveling_pod(message["pod"], timestamp)
                     pass
                 elif "refill" == message["type"]:
                     # On demande à un dépôt d'envoyer une capsule à la station qui le demande
                     # TODO:  ne pas choisir aléatoirement
+                    print("test refill network l.412")
                     sheds = self.sheds
                     if sheds:
                         station = message["station"]
@@ -422,6 +422,7 @@ class Network(Node):
                 elif "empty" == message["type"]:
                     # On demande à un dépôt d'envoyer une capsule à la station qui le demande
                     # TODO:  ne pas choisir aléatoirement
+                    print("test empty network l.425")
                     sheds = self.sheds
                     if sheds:
                         station = message["station"]
@@ -438,13 +439,12 @@ class Network(Node):
                     waiting_time = message["waiting_time"]
                     traveler = message["traveler"]
                     if traveler:
-                        self._statistiques.add_waiting_time(timestamp,waiting_time)
-                    print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Departure: " + origin+ " -> " + destination.name)
-                    print("waiting time: " + str(round(waiting_time)) + " seconds")
-                    print("traveler: " + str(traveler))
-                    print("\n")
-                    self._statistiques.add_traveling_pod(message["pod"],timestamp,traveler)
-
+                        self._statistiques.add_waiting_time(timestamp, waiting_time)
+                    # print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Departure: " + origin+ " -> " + destination.name)
+                    # print("waiting time: " + str(round(waiting_time)) + " seconds")
+                    # print("traveler: " + str(traveler))
+                    # print("\n")
+                    self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler)
                 else:
                     raise ValueError("Invalid message")
 

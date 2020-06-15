@@ -1,0 +1,51 @@
+.export {
+	margin: 0px;
+}
+
+#menu_options {
+    background: gray;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+    display: block;
+    width: 250px;
+}
+
+#menu_options[data-hide] {
+    display: none;
+}
+
+#arrow,
+#arrow::before {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    z-index: -1;
+    }
+
+#arrow::before {
+    content: '';
+    transform: rotate(45deg);
+    background: gray;
+}
+
+#menu_options[data-popper-placement^='top'] > #arrow {
+  bottom: -4px;
+}
+
+#menu_options[data-popper-placement^='bottom'] > #arrow {
+  top: -4px;
+}
+
+#menu_options[data-popper-placement^='left'] > #arrow {
+  right: -4px;
+}
+
+#menu_options[data-popper-placement^='right'] > #arrow {
+  left: -4px;
+}
+
+img {
+    height: 80%;
+    width: 80%;
+}

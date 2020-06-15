@@ -120,3 +120,7 @@ Vous pouvez visualiser ce qu'il se passe à un aiguillage lorsqu'il est sélecti
 ![](pictures/aig.png)
 
 Avec le bouton ![](pictures/poubelle.png) vous pouvez supprimer le réseau choisi, pour ensuite en choisir un différent.
+
+### Editeur
+
+Pour utiliser l'éditeur, les instructions sont disponibles sur le ReadMe présent dans le dossier [`editeur-de-r-eseau-urbanloop`](editeur-de-r-eseau-urbanloop)

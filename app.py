@@ -15,6 +15,9 @@ _wave = 0  # IDEA: calculer selon la vitesse et la précision des simulations, a
 _loop = None
 _simulations = {}
 
+_running_default = False
+_speed_default = 0
+
 
 async def _run_simulations(networks, wave):
     """Lancement de simulations"""
@@ -25,6 +28,7 @@ async def _run_simulations(networks, wave):
     _wave = wave
     for network_index in networks: # lancement des simulations avec les réseaux préchargés
         network_file = networks[network_index]
+        print(network_file)
         with open(network_file) as file:
             network_item = load(file)
             network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour les dépôts et stations

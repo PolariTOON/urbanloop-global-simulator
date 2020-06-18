@@ -18,24 +18,22 @@
     {
       "name": "Boucle 1",
       "elements": [
-        {"type": "switch_in", "x": 250, "y": 235, "id_bridge": 0, "pods": []},
+        {"type": "switch_out", "x": 250, "y": 235, "id_bridge": 0, "pods": []},
         {"type": "station", "name": "Gare b1", "x": 100, "y": 100, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-        {"type": "switch_out", "x": 150, "y": 235, "id_bridge": 1, "pods": []}
+        {"type": "switch_in", "x": 150, "y": 235, "id_bridge": 1, "pods": []}
       ],
       "sections": [
         {"speed": 7, "path": {"type": "line"}},
         {"speed": 7, "path": {"type": "line"}},
         {"speed": 7, "path": {"type": "line"}}
       ],
-      "pods": [
-        {"position": 0, "speed": 7, "source": {"loop": 0, "element": 1}, "destination": {"loop": 1, "element": 2}, "travelers": {"count": 0, "max": 0}}
-      ]
+      "pods": []
     },
     {
       "name": "Boucle 2",
       "elements": [
-        {"type": "switch_in", "x": 150, "y": 250, "id_bridge": 1, "pods": []},
-        {"type": "switch_out", "x": 250, "y": 250, "id_bridge": 0, "pods": []},
+        {"type": "switch_out", "x": 150, "y": 250, "id_bridge": 1, "pods": []},
+        {"type": "switch_in", "x": 250, "y": 250, "id_bridge": 0, "pods": []},
         {"type": "station", "name": "Gare b2", "x": 200, "y": 350, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
       ],
       "sections": [

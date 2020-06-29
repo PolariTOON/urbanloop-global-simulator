@@ -2,10 +2,11 @@
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
+        <meta name="viewport" content="width=460, user-scalable=no"/>
         <link type="text/css" rel="stylesheet" href="./index.css"/>
         <script type="text/javascript" src="https://unpkg.com/konva@3.1.6/konva.min.js" defer=""></script>
+        <script type="text/javascript" src="https://code.highcharts.com/highcharts.js" defer=""></script>
         <script type="module" src="./index.js"></script>
-        <script src="https://code.highcharts.com/highcharts.js"></script>
         <title>UrbanLoop Simulator</title>
     </head>
     <body>
@@ -26,7 +27,6 @@
                     <li><label title="Decelerate" id="decelerate-button"><input type="button" value="" disabled=""/>Decelerate</label></li>
                     <li><label title="Accelerate" id="accelerate-button"><input type="button" value="" disabled=""/>Accelerate</label></li>
                 </menu>
-                <button type="button" id="download-stats">Download stats</button>
                 <menu>
                     <li><label title="Data" id="data-tab"><input type="radio" name="tab" value="data-panel"/>Data</label></li>
                     <li><label title="Statistics" id="stats-tab"><input type="radio" name="tab" value="stats-panel"/>Statistics</label></li>
@@ -39,20 +39,17 @@
             <aside hidden="" id="data-panel">
                 <h2>Data</h2>
                 <div id="data-content"></div>
-                <label id="close-button"><input type="button" value="Close section" disabled=""/></label>
+                <p><label id="close-button"><input type="button" value="Close section" disabled=""/></label></p>
             </aside>
             <aside hidden="" id="stats-panel">
                 <h2>Statistics</h2>
                 <div id="stats-content"></div>
-                <div id="chart" style="width:100%; height:400px;"></div>
+                <p><a download="" id="download-stats-button">Download statistics</a></p>
             </aside>
             <aside hidden="" id="views-panel">
                 <h2>Views</h2>
                 <div id="views-content"></div>
             </aside>
         </main>
-
-        
-
     </body>
 </html>

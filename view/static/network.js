@@ -2,7 +2,6 @@ import {Bridge} from "./bridge.js";
 import {Entity} from "./entity.js";
 import {Loop} from "./loop.js";
 import {state} from "./state.js";
-import {Statisctics} from "./statisctics.js";
 const {Group, Layer, Stage} = Konva;
 
 const zoomIntensity = 0.8;
@@ -36,60 +35,6 @@ const dateView = document.createElement("label");
 dateView.innerHTML = "Date: <output>Day -, --:--:--</output>";
 secondParagraph.append(dateView);
 article.prepend(heading, firstParagraph, secondParagraph);
-
-var chartOptions = {
-    chart: {
-        renderTo: 'chart',
-        type: 'line',
-        animation: false
-    },
-    title: {
-        text: 'Number of traveler'
-    },
-    xAxis: {
-        ctitle: 'Time',
-        type: 'datetime',
-        tickPixelInterval: 150,
-        maxZoom: 20 * 1000
-    },
-    yAxis: {
-        title: 'Value',
-        minPadding: 0.2,
-        maxPadding: 0.2,
-    },
-    series: [{
-        name: 'number of traveler',
-        data: [],
-        animation: {
-            duration: 0
-      }
-    }, {
-        name: 'waiting time',
-        data: [],
-        animation: {
-            duration: 0
-        }
-    }, {
-        name: 'number of traveling pods',
-        data: [],
-        animation: {
-            duration: 0
-        }
-
-    }],
-    credits: {
-        enabled: false
-    },
-    drilldown: {
-        animation: {
-            duration: 0
-        }
-    }
-}
-    
-const statistics = new Statisctics(chartOptions);
-var chart = new Highcharts.Chart(chartOptions);
-statistics.chart = chart;
 
 state.addEventListener("load", async (event) => {
     const networkJSON = event.detail;
@@ -134,7 +79,6 @@ state.addEventListener("load", async (event) => {
 });
 
 state.addEventListener("unload", async (event) => {
-    statistics.restartChart();
     heading.textContent = "Undefined network";
     rateView.control.value = "×-";
     dateView.control.value = "Day -, --:--:--";
@@ -155,19 +99,12 @@ state.addEventListener("unload", async (event) => {
 
 state.addEventListener("update", (event) => {
     const networkJSON = event.detail;
-
     const name = networkJSON["name"];
     heading.textContent = name;
     const jerky = networkJSON["jerky"];
     const rate = networkJSON["rate"];
     rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
     let datetime = Math.floor(networkJSON["time"]);
-
-    statistics.datetime =datetime;
-    const stats = networkJSON["stats"];
-    state.stats = statistics;
-    statistics.update(stats);
-
     const seconds = datetime % 60;
     datetime = (datetime - seconds) / 60;
     const minutes = datetime % 60;

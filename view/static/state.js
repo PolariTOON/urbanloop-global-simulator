@@ -1,7 +1,6 @@
 const closedColor = "red"
 const selectedPathColor = "#0fc";
 
-
 async function getJSON(url) {
     const fetchInit = {
         method: "GET",
@@ -38,20 +37,6 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         this._selectedEntity = null;
         this._viewBox = null;
         this._origin = null;
-        this._stats = null;
-        this._chart = null;
-    }
-    get chart(){
-        return this._chart;
-    }
-    set chart(value){
-        this._chart = value;
-    }
-    get stats(){
-        return this._stats;
-    }
-    set stats(value){
-        this._stats = value;
     }
     get networkIndex() {
         return this._networkIndex;
@@ -166,25 +151,6 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     _resize() {
         this.dispatchEvent(new CustomEvent("resize"));
     }
-    _downloadStats(){
-        //alert('Hello world!');
-        //var fileSystem=new ActiveXObject("Scripting.FileSystemObject");
-        let blob = new Blob([this._stats.getStats()], { type: 'text/plain' });
-        let url = window.URL.createObjectURL(blob);
-        const fileName = "test.txt";
-        let link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.setAttribute("download", fileName);
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(() => {
-            document.body.removeChild(link);
-        }, 100);
-
-
-        //this.dispatchEvent(new CustomEvent("downloadStats"));
-    }
-
     async reload() {
         const integer = /^(?:0|[1-9]\d*)$/;
         const url = new URL(location);
@@ -276,10 +242,6 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     }
     async resize() {
         this._resize();
-    }
-
-    async downloadStats(){
-        this._downloadStats();
     }
 }
 

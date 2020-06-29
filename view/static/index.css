@@ -16,6 +16,12 @@
 ::-moz-focus-inner {
     border: 0;
 }
+a:not([download]):focus-within,
+a[download]:focus-within,
+label:focus-within {
+    outline: .1rem dashed #3339;
+    outline-offset: .1rem;
+}
 /*~~~~~~ html, body ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 html,
 body {
@@ -114,11 +120,6 @@ menu > li > label {
     cursor: default;
     font-size: 0;
 }
-menu > li > a[download]:focus-within,
-menu > li > label:focus-within {
-    outline: .1rem dashed #3339;
-    outline-offset: .1rem;
-}
 menu > li > a[download]::before,
 menu > li > label > input {
     content: attr(href);
@@ -212,5 +213,3 @@ label#stats-tab > input {
 label#views-tab > input {
     background-image: url("icons.svg#views");
 }
-
-button.link { background:none;border:none; }

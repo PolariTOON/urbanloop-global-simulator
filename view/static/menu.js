@@ -10,15 +10,6 @@ const decelerateButton = document.getElementById("decelerate-button").control;
 const dataTab = document.getElementById("data-tab").control;
 const statsTab = document.getElementById("stats-tab").control;
 const viewsTab = document.getElementById("views-tab").control;
-const downloadStats = document.getElementById("download-stats");
-
-state.addEventListener("downloadStats", (event) => {
-
-})
-
-downloadStats.addEventListener("click", async (event) => {
-    state.downloadStats();
-});
 
 state.addEventListener("load", (event) => {
     uploadButton.disabled = true;

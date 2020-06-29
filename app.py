@@ -28,7 +28,6 @@ async def _run_simulations(networks, wave):
     _wave = wave
     for network_index in networks: # lancement des simulations avec les réseaux préchargés
         network_file = networks[network_index]
-        print(network_file)
         with open(network_file) as file:
             network_item = load(file)
             network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour les dépôts et stations
@@ -64,12 +63,11 @@ def run_app(port, networks, wave):
     "port = n° de port si on souhaite l'interface web (sinon -1)"
     "networks contient les réseaux préchargés"
     "wave contient la vitesse de tic de simulation"
+
+    Thread(target=lambda: run(_run_simulations(networks, wave))).start()
     if port != -1:  # utilisation de l'interface web
         from config_Flask import run_app
         run_app(port, networks, wave)
-    else:
-        Thread(target=lambda: run(_run_simulations(networks, wave))).start()
-
 
 
 def set_defaut(running, speed):

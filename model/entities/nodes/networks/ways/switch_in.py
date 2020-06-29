@@ -1,10 +1,13 @@
 from .switch import Switch
+from ....tokens.pod import Pod
 
 
 class SwitchIn(Switch):
     """Cette classe modélise un aiguillage entrant
     Elle gère une une partie de l'algorithme d'aiguillage (ce qui se passe sur sa portion)"""
     def __init__(self, env, id, margin_min, pod_size, max_speed, places_number, cursor=None, discrete_places=None, **kwargs):
+        if "pods" in kwargs:                                    #  lors du chargement d'un réseau des pods peuvent être dans un switch_in
+            kwargs["pods"] = self.init_pods(env, kwargs["pods"])     #  on les initialise ici
         super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
         self._switch_out = None
         # Liaison de la route et des sections du pont
@@ -19,7 +22,7 @@ class SwitchIn(Switch):
         self._discretize_length = 0
         self._set_up_length = 0
         self._finalisation_length = 0
-        self._discrete_places = discrete_places or [None for a in range(places_number)]
+        self._discrete_places = self.init_pods(env, discrete_places) or [None for a in range(places_number)] # pods dans le switch, triés par ordre d'arrivée; initialisés si nécessaire
         self._pod_to_add = None
         self._cursor = cursor or 0
         self._first_place = int(self._cursor)
@@ -182,3 +185,13 @@ class SwitchIn(Switch):
                         self.pods.remove(pod)
                 else:
                     raise ValueError("Invalid message")
+
+    def init_pods(self, env, pods):
+        if pods is None:
+            return None
+        pods_init = []
+        for pod in pods:
+            if pod is not None:
+                pod = Pod(env, self, pod["speed"], **pod)
+            pods_init.append(pod)
+        return []

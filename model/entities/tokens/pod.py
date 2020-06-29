@@ -23,13 +23,13 @@ class Pod(Token):
         self._travelers = [Traveler(env, 0) for _ in range(travelers["count"])]
         self._capacity = travelers["max"]
         self._track_or_switch = track_or_switch
-        self.source = self.source or self._track_or_switch or None
-        self.destination = self.destination or self._track_or_switch or None
+        self.source = self.source or self._track_or_switch.element_of_loop or None  # si la capsule a déjà été créée mais change de voie, source n'est pas changé, sinon on setup via track_or_switch
+        self.destination = self.destination or self._track_or_switch.element_of_loop or None
         self._speed = pod_speed
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
-        self._coef = normal(1, 5/300) #Gaussienne à 5%
+        self._coef = normal(1, 5/300) # Gaussienne à 5%
         if self._coef > 1.05:
             self._coef = 1.05
             self._failing = True
@@ -146,8 +146,8 @@ class Pod(Token):
             "speed_restore": self.speed_restore,
             "length_before_restore": self.length_before_restore,
             "speed": self.speed,
-            "source": self.source.element_of_loop,
-            "destination": self.destination.element_of_loop,
+            "source": self.source,
+            "destination": self.destination,
             "failing": self.failing,
             "coef": self._coef,
             "acceleration": self._acceleration,
@@ -284,7 +284,7 @@ class Pod(Token):
                     self._endSpeed = 0
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner:
-                    #ATTENTION C'EST ALEATOIRE IL FAUDRA CORRIGER
+                    #ATTENTION C'EST ALEATOIRE IL FAUDRA CORRIGER # todo corriger ici
                     if self._track_or_switch.stat_or_shed:
                         self._turn = not self._track_or_switch.stat_or_shed or self._track_or_switch.stat_or_shed == self._destination.name
                         if self._track_or_switch.stat_or_shed:
@@ -303,8 +303,8 @@ class Pod(Token):
                 elif "departure" == message["type"]:
                     # La capsule part d'un dépôt ou d'une gare
                     destination = message["destination"]
-                    self._destination = destination
-                    self._source = self._track_or_switch
+                    self._destination = destination.element_of_loop
+                    self._source = self._track_or_switch.element_of_loop
                     self.speed = self._track_or_switch.next.speed
                 else:
                     raise ValueError("Invalid message")

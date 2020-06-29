@@ -3,16 +3,17 @@ import math
 """ créee un nouveau fichier json avec le nouveau modèle de stations et d'entrepôts"""
 
 def mod_station(item):
-
 	data = item
-
+	if "modified" in data.keys():
+		if data["modified"]:
+			return data
 	for loop in data["loops"]:
-		if (loop["name"] != " "):
+		if loop["name"] != " ":
 			over = 0
 			i = 0
-			while (over == 0):
+			while over == 0:
 				type = loop["elements"][i]["type"]
-				if (type == "station" or type == "shed"):
+				if type == "station" or type == "shed":
 
 					station_name = loop["elements"][i]["name"]
 
@@ -44,7 +45,6 @@ def mod_station(item):
 					x_suiv = elt_suiv["x"]
 					y_suiv = elt_suiv["y"]
 
-					
 					if y_suiv == y :
 						x_in2 = x_out1
 						y_in2 = y_out1 + h1
@@ -58,7 +58,7 @@ def mod_station(item):
 						x_s = x_out1 - h2/2
 						y_s = y_out1 + h1 + e
 
-					else :
+					else:
 						#angle entre la direction de la ligne et la verticale
 						alpha = math.atan((x_suiv-x)/(y_suiv-y))
 
@@ -76,7 +76,7 @@ def mod_station(item):
 						x4 = h3 * math.cos(gamma)
 						y4 = h3 * math.sin(gamma)
 
-						if (y_suiv > y):
+						if y_suiv > y:
 
 							x_in2 = x_out1 + x1
 							y_in2 = y_out1 - y1
@@ -152,11 +152,8 @@ def mod_station(item):
 				i = i+1 
 				if (i == len(loop["elements"])):
 					over = 1
-
+	data["modified"] = True
 	s = open("sortie.json", "w")
-
-	json.dump(data, s,sort_keys=True, indent=2)
-
+	json.dump(data, s, sort_keys=True, indent=2)
 	s.close()
-
 	return data

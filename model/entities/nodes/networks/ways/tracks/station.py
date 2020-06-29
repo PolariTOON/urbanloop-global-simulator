@@ -6,6 +6,7 @@ from .step import Step
 import datetime
 import time
 from controler import probability
+from ast import literal_eval
 
 station_types = {
     "city": 0,
@@ -25,7 +26,7 @@ class Station(Step):
         }
         pods["count"] = pods["count"] or 0
         pods["max"] = pods["max"] or 0
-        travelers = travelers or 0
+        travelers = travelers or None  # attention travelers n'est pas un traveler de pod, il y a des informations supplémentaires
         station_type = station_type or station_types["city"]
         element_of_loop = element_of_loop or {
             "loop": 0,
@@ -33,20 +34,25 @@ class Station(Step):
         }
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
-        self._average_waiting_time = travelers["average_waiting_time"] or 0
-        self._all_time_count = travelers["all_time_count"] or 0
+        self._average_waiting_time = 0
+        self._all_time_count = 0
+        self._travelers = []
+        if travelers is not None:       # initialisation des travelers et dépendances
+            self._average_waiting_time = travelers["average_waiting_time"]
+            self._all_time_count = travelers["all_time_count"]
+            if travelers["count"]:
+                for _ in range(travelers["count"]):
+                    self._travelers.append(Traveler(env, 0)) # todo pouvoir retrouver les temps d'attente quand on recharge le fichier pour ne pas fausser les stats (average_waiting_time) (ajouter dans serialize)
+                print(self.travelers)                        # pour le moment on génère de nouveaux travelers suivant le nombre qu'il y avait dans la station
         self._departure_count = departure_count or 0
         #self._capacity = pods["max"]
         self._capacity = 4
-        self._pods = [None, None, Pod(self.env, self, 0), Pod(self.env, self, 0)]
         self._parallel = parallel or False
         self._boarding = [-1 for _ in range(self._capacity)]
-        if travelers["count"]:
-            self._travelers = [self._average_waiting_time in range(travelers["count"])]
-        else:
-            self._travelers = []
+
         self._station_type = station_type
         self._element_of_loop = element_of_loop
+        self._pods = [None, None, Pod(self.env, self, 0), Pod(self.env, self, 0)]
         self._departure_pods = departure_pods or []
         for dico in self._departure_pods:
             p = dico["pod"]
@@ -74,11 +80,11 @@ class Station(Step):
                 "count": len(self.travelers),
                 "average_waiting_time": self.average_waiting_time,
                 "all_time_count": self.all_time_count,
-                "boarding_times": [pod.travelers[0].boarding_time if pod and not pod.isEmpty() else None for pod in self._pods],
+                "boarding_times": [pod.travelers[0].boarding_time if pod and not pod.isEmpty() else None for pod in self._pods],  # todo vérifier à quoi ça sert et introduire les temps d'attente
             },
             "departure_count": self._departure_count,
             "station_type": self.station_type,
-            #"departure_pods": departure_pods,
+            # "departure_pods": departure_pods,
             "element_of_loop": self.element_of_loop
         })
         return dict

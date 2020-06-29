@@ -62,6 +62,7 @@ class Network(Node):
         for switch in self._switches:
             if isinstance(switch, SwitchOut):
                 switch.routing_table = self._get_switch_table(switch)
+
     @property
     def name(self):
         return super().name or "Network %d" % self.id
@@ -147,6 +148,24 @@ class Network(Node):
         height = max_y - min_y
         return {"x": 0, "y": 0, "width": width, "height": height}
 
+    def afficher_tous_les_pods(self):
+        print("---------------", self.name, "---------------")
+        for loop in self._loops:
+            print("\u001B[33m", "loop : -", loop["name"], "-", "\u001B[0m")
+            for pod in loop["pods"]:
+                print("\t\tPod: ", pod["name"], pod["source"]["name"], "->", pod["destination"]["name"])
+            for element in loop["elements"]:
+                if element["type"] != "sensor":
+                    if len(element["pods"]) != 0:
+                        pods = element["pods"]
+                        print("\u001B[34m", "\telement : ", element["type"], pods["count"], "/", pods["max"], " pod(s)\u001B[0m")
+                        
+        for bridge in self.bridges:
+            print("\u001B[33m", "bridge : -", bridge["name"], "-", "\u001B[0m")
+            for pod in bridge["pods"]:
+                print("\t\tPod: ", pod["name"], pod["source"]["name"], "->", pod["destination"]["name"])
+            print("\u001B[34m", "\t", bridge, "\u001B[0m")
+
     def serialize(self):
         bridges = [bridge.serialize() for bridge in self._bridges]
         loops = [loop.serialize() for loop in self._loops]
@@ -169,6 +188,7 @@ class Network(Node):
         Création du model à partir du dictionnaire obtenu à partir du fichier json
         :return: (void) Le réseau est construit
         """
+        # self.afficher_tous_les_pods()
         #  Etape 1 : Récupérer les infos du json sous forme pratique
         for bridge in self._bridges:
             if "switch_in" in bridge:
@@ -248,13 +268,6 @@ class Network(Node):
             for s in range(len(self._loops[b]["switches"])):
                 #  Capsules
                 switch = self._loops[b]["switches"][s]
-                pods = switch["pods"]
-                for pod_branch_key in pods:
-                    pod_branch = pods[pod_branch_key]
-                    for pod_index in range(len(pod_branch)):
-                        pod = pod_branch[pod_index]
-                        pod["source"] = self._get_elt_of_loop(**pod["source"])
-                        pod["destination"] = self._get_elt_of_loop(**pod["destination"])
                 #  Routes et Id
                 id_switch = len(self._switches)
                 switch["previous"] = self._roads[
@@ -303,8 +316,8 @@ class Network(Node):
 
     def _init_pods_of_line(self, line):
         for pod in line["pods"]:
-            pod["source"] = self._get_elt_of_loop(**pod["source"])
-            pod["destination"] = self._get_elt_of_loop(**pod["destination"])
+            # pod["source"] = self._get_elt_of_loop(**pod["source"]) # faux on ne change pas les sources et destination d'une capsule
+            # pod["destination"] = self._get_elt_of_loop(**pod["destination"])
             _init_pod_of_line(line, pod)
 
     def _get_elt_of_loop(self, loop=None, element=None, **kwargs):
@@ -403,8 +416,8 @@ class Network(Node):
                 elif "docked" == message["type"]:
                     # Une capsule stationne
                     timestamp = message["timestamp"]
-                    print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Arrival")
-                    print("\n")
+                    #print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Arrival")
+                    #print("\n")
                     self._statistiques.remove_traveling_pod(message["pod"],timestamp)
                     pass
                 elif "refill" == message["type"]:
@@ -439,10 +452,10 @@ class Network(Node):
                     traveler = message["traveler"]
                     if traveler:
                         self._statistiques.add_waiting_time(timestamp,waiting_time)
-                    print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Departure: " + origin+ " -> " + destination.name)
-                    print("waiting time: " + str(round(waiting_time)) + " seconds")
-                    print("traveler: " + str(traveler))
-                    print("\n")
+                    #print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Departure: " + origin+ " -> " + destination.name)
+                    #print("waiting time: " + str(round(waiting_time)) + " seconds")
+                    #print("traveler: " + str(traveler))
+                    #print("\n")
                     self._statistiques.add_traveling_pod(message["pod"],timestamp,traveler)
 
                 else:

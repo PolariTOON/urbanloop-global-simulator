@@ -95,8 +95,8 @@ class Simulation:
             self._env.run(until=until)
             self._state = random() * 2 ** 53
         second = self._env.time
-        if (generate_traveler_poisson(self._travelers_per_hour, int(round(second / 3600, 2)), self._env.tick)):          
-            ri = randint(1,len(self._network.stations))
+        if generate_traveler_poisson(self._travelers_per_hour, int(round(second / 3600, 2)), self._env.tick):
+            ri = randint(1, len(self._network.stations))
             s = self._network.stations[ri-1]
             r = random()
             if r <= self._probability.station_probability(s.station_type, second, False):
@@ -112,5 +112,6 @@ class Simulation:
             "jerky": self.jerky,
             "time": self.time,
             "state": self.state,
+            "modified": True,
         })
         return dict

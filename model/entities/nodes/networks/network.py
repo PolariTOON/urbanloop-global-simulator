@@ -62,6 +62,7 @@ class Network(Node):
         for switch in self._switches:
             if isinstance(switch, SwitchOut):
                 switch.routing_table = self._get_switch_table(switch)
+
     @property
     def name(self):
         return super().name or "Network %d" % self.id
@@ -146,6 +147,7 @@ class Network(Node):
         width = max_x - min_x
         height = max_y - min_y
         return {"x": 0, "y": 0, "width": width, "height": height}
+
 
     def serialize(self):
         bridges = [bridge.serialize() for bridge in self._bridges]
@@ -248,13 +250,6 @@ class Network(Node):
             for s in range(len(self._loops[b]["switches"])):
                 #  Capsules
                 switch = self._loops[b]["switches"][s]
-                pods = switch["pods"]
-                for pod_branch_key in pods:
-                    pod_branch = pods[pod_branch_key]
-                    for pod_index in range(len(pod_branch)):
-                        pod = pod_branch[pod_index]
-                        pod["source"] = self._get_elt_of_loop(**pod["source"])
-                        pod["destination"] = self._get_elt_of_loop(**pod["destination"])
                 #  Routes et Id
                 id_switch = len(self._switches)
                 switch["previous"] = self._roads[
@@ -303,8 +298,8 @@ class Network(Node):
 
     def _init_pods_of_line(self, line):
         for pod in line["pods"]:
-            pod["source"] = self._get_elt_of_loop(**pod["source"])
-            pod["destination"] = self._get_elt_of_loop(**pod["destination"])
+            # pod["source"] = self._get_elt_of_loop(**pod["source"]) # faux on ne change pas les sources et destination d'une capsule
+            # pod["destination"] = self._get_elt_of_loop(**pod["destination"])
             _init_pod_of_line(line, pod)
 
     def _get_elt_of_loop(self, loop=None, element=None, **kwargs):
@@ -403,7 +398,6 @@ class Network(Node):
                 elif "docked" == message["type"]:
                     # Une capsule stationne
                     timestamp = message["timestamp"]
-                    # print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) + "] Arrival\u001B[0m\n")
                     self._statistiques.remove_traveling_pod(message["pod"], timestamp)
                     pass
                 elif "refill" == message["type"]:

@@ -5,7 +5,12 @@ from ..entity import Entity
 
 class Token(Entity):
     def __init__(self, env, source=None, destination=None, **kwargs):
-        super().__init__(env, uuid4().hex, **kwargs)
+        if "id" in kwargs.keys():  # lorsqu'on recharge un pod on remet l'ancien id
+            id0 = kwargs["id"]
+            del kwargs["id"]
+        else:
+            id0 = uuid4().hex      # pour un nouvel objet on génère un id aléatoire
+        super().__init__(env, id0, **kwargs)
         self._source = source or None
         self._destination = destination or None
 
@@ -27,8 +32,8 @@ class Token(Entity):
 
     def serialize(self):
         dict = super().serialize()
-        source = self.source.element_of_loop
-        destination = self.destination.element_of_loop
+        source = self.source
+        destination = self.destination
         dict.update({
             "source": source,
             "destination": destination

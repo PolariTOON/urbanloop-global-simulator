@@ -4,3 +4,5 @@
 */*.iml
 .vscode/
 __pycache__/
+sortie.json
+test_project/sortie.json

@@ -15,6 +15,9 @@ _wave = 0  # IDEA: calculer selon la vitesse et la précision des simulations, a
 _loop = None
 _simulations = {}
 
+_running_default = False
+_speed_default = 0
+
 
 async def _run_simulations(networks, wave):
     """Lancement de simulations"""
@@ -60,12 +63,11 @@ def run_app(port, networks, wave):
     "port = n° de port si on souhaite l'interface web (sinon -1)"
     "networks contient les réseaux préchargés"
     "wave contient la vitesse de tic de simulation"
+
+    Thread(target=lambda: run(_run_simulations(networks, wave))).start()
     if port != -1:  # utilisation de l'interface web
         from config_Flask import run_app
         run_app(port, networks, wave)
-    else:
-        Thread(target=lambda: run(_run_simulations(networks, wave))).start()
-
 
 
 def set_defaut(running, speed):

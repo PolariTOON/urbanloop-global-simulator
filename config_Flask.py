@@ -21,7 +21,6 @@ def _synchronize(key=None):
     """Synchronisation du serveur flask avec simpy, NE PAS TOUCHER"""
     if not isinstance(key, str):
         key = None
-
     def synchronize(coroutine):
         @wraps(coroutine)
         def routine(*args, **kwargs):
@@ -36,9 +35,7 @@ def _synchronize(key=None):
             else:
                 result = future.result()
             return jsonify(result)
-
         return routine
-
     return synchronize
 
 
@@ -63,7 +60,7 @@ async def _post_network(simulations, network_index, network_item):
     """Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json"""
     "network_item contient toutes les informations du fichier JSON"
     if network_item is not None:
-        network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations
+        network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations si besoin
         if "id" in network_item:
             del network_item["id"]
         from app import _wave
@@ -177,6 +174,5 @@ def run_app(port, networks, wave):
     "networks contient les réseaux préchargés"
     "wave contient la vitesse de tic de simulation"
 
-    Thread(target=lambda: run(_run_simulations(networks, wave))).start()
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
     _app.run(port=port)

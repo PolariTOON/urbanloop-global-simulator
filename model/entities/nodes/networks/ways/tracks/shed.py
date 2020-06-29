@@ -19,9 +19,9 @@ class Shed(Step):
         }
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
-        self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
+        self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._departure_pods = departure_pods or []
         for dico in self._departure_pods:
             p = dico["pod"]

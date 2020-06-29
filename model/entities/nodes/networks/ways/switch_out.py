@@ -5,7 +5,9 @@ class SwitchOut(Switch):
     """Classe modélisant un aiguillage sortant
     Elle gère une partie de l'algorithme d'aiguillage"""
     def __init__(self, env, id, margin_min, pod_size, max_speed, stat_or_shed=None, **kwargs):
-        super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
+        if "pods" in kwargs:
+            kwargs["pods"] = []
+        super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs) # todo error : __init__() got multiple values for argument 'id'
         self._switch_in = None
         self._routing_table = None
         # Liaison de la route et des sections du pont

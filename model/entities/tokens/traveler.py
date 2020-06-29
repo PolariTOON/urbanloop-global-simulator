@@ -1,7 +1,7 @@
 from .token import Token
 
 class Traveler(Token):
-    def __init__(self, env, generation_time=None, waiting_time=None, boarding_time=None, real_user=False, **kwargs):
+    def __init__(self, env, /, *, generation_time=None, waiting_time=None, boarding_time=None, real_user=False, **kwargs):
         super().__init__(env, **kwargs)
         self._waiting_time = waiting_time or 0
         self._generation_time = generation_time or 0
@@ -21,7 +21,7 @@ class Traveler(Token):
     @property
     def boarding_time(self):
         return self._boarding_time
-        
+
     @property
     def real_user(self):
         return self._real_user
@@ -67,4 +67,3 @@ class Traveler(Token):
 
     def call_emergency_exit(self):
         self._called_emergency_exit = True
-

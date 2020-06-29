@@ -5,7 +5,7 @@ from ....tokens.pod import Pod
 class SwitchIn(Switch):
     """Cette classe modélise un aiguillage entrant
     Elle gère une une partie de l'algorithme d'aiguillage (ce qui se passe sur sa portion)"""
-    def __init__(self, env, id, margin_min, pod_size, max_speed, places_number, cursor=None, discrete_places=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, max_speed, places_number, /, *, cursor=None, discrete_places=None, **kwargs):
         if "pods" in kwargs:                                    #  lors du chargement d'un réseau des pods peuvent être dans un switch_in
             kwargs["pods"] = self.init_pods(env, kwargs["pods"])     #  on les initialise ici
         super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)

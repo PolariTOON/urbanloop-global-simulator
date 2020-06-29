@@ -6,7 +6,7 @@ from .line import Line
 
 
 class Bridge(Line):
-    def __init__(self, id, roads=None, switch_out=None, switch_in=None, **kwargs):
+    def __init__(self, id, /, *, roads=None, switch_out=None, switch_in=None, **kwargs):
         """
         Instancie un pont
         :param id: id du pont

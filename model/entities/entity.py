@@ -3,7 +3,7 @@ from simpy.events import Process, Timeout
 from simpy.resources.store import Store, StoreGet, StorePut
 
 class Entity:
-    def __init__(self, env, id, name=None, **kwargs):
+    def __init__(self, env, id, /, *, name=None, **kwargs):
         self._env = env
         self._id = id
         self._name = name or ""

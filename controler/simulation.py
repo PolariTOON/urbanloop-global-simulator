@@ -9,7 +9,7 @@ from queue import SimpleQueue
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, wave, remove_travelers=False, traveler=None, boarding_time=None, prob=None, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+    def __init__(self, id, wave, /, *, remove_travelers=False, traveler=None, boarding_time=None, prob=None, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
         """
         "id" (entier positif) id du réseau
         "wave" (flottant positif) pas de simulation
@@ -49,7 +49,7 @@ class Simulation:
         self._env.messages = []
         self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
         self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
-        
+
         self._wave = wave
         self._running = running
         self._showing_travelers_waiting = False
@@ -67,7 +67,7 @@ class Simulation:
         self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
 
         self._network = Network(self._env, id, **kwargs)
-        
+
         self._travelers_per_day = traveler["travelers_per_day"]
         self._probability = Probability(prob, traveler, self._network.stations, self._network.statistiques, self._env.tick)
 
@@ -124,7 +124,7 @@ class Simulation:
     def update(self):
         if not self._running:  # simulation en pause
             return
-        
+
         times = 1
         tick = self._wave
         if self._jerky:  # mode jerky
@@ -134,10 +134,10 @@ class Simulation:
             print("\u001B[31m", "la génération des travelers a été corrigée,"
                                 " utiliser le mode jerky pour ne pas avoir de problème"
                                 " (mettre 'jerky = true' dans le fichier json) ", "\u001B[0m")
-        
+
         self._env.tick = tick
         for i in range(times):  # dans le mode jerky, on calcule plusieurs ticks à la fois
-            
+
             if self._env.with_messages == False:
                 updatables = self._env.updatable_entities[:] # 'self._env.messages' will be modified, so we need a copy
                 # updates
@@ -145,7 +145,7 @@ class Simulation:
                     entity.update()
                 # messages
                 while self._env.messages_queue.empty() == False:
-                    # Attention, ici on fait l'hypothèse que tous les messages seront traités dans l'intervalle du tick            
+                    # Attention, ici on fait l'hypothèse que tous les messages seront traités dans l'intervalle du tick
                     # (y compris les nouveaux messages créés suite à la réception d'autres messages)
                     receiver, message = self._env.messages_queue.get()
                     receiver.read(message)
@@ -197,6 +197,5 @@ class Simulation:
                 #print("station trouvee !")
                 self._network.statistiques.add_waiting_traveler(s.name)
                 s._all_time_count += 1
-        
-        #print("add_traveler d'identifiant " + new_traveler.id)
 
+        #print("add_traveler d'identifiant " + new_traveler.id)

@@ -5,7 +5,7 @@ from .step import Step
 class Shed(Step):
     """ Classe modélisant un dépôt, y est géré le départ des capsules, le réapprovisionnement et
     les interactions avec les autres éléments du réseau"""
-    def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None, **kwargs):
+    def __init__(self, env, id, /, *, departure_pods=None, pods=None, element_of_loop=None, **kwargs):
         super().__init__(env, id, **kwargs)
         pods = pods or {
             "count": 0,

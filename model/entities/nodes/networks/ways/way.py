@@ -5,7 +5,7 @@ from ...node import Node
 
 
 class Way(Node):
-    def __init__(self, env, id, pod_size, **kwargs):
+    def __init__(self, env, id, pod_size, /, **kwargs):
         super().__init__(env, id, **kwargs)
         self._parent = None
         self._pod_size = pod_size

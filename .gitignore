@@ -6,6 +6,7 @@
 __pycache__/
 sortie.json
 test_project/sortie.json
+venv/
 stats/
 stat_log.csv
 save/*.json

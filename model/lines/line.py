@@ -1,5 +1,5 @@
 class Line:
-    def __init__(self, id, name=None, **kwargs):
+    def __init__(self, id, /, *, name=None, **kwargs):
         self._id = id
         self._name = name or ""
 

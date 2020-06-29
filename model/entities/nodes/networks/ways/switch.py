@@ -4,7 +4,7 @@ from .way import Way
 
 class Switch(Way):
     """Classe mère des aiguillages sortant et entrant"""
-    def __init__(self, env, id, margin_min, pod_size, max_speed, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, max_speed, /, *, x=None, y=None, previous=None, next=None, beside=None, pods=None, id_bridge=None, **kwargs):
         super().__init__(env, id, pod_size, **kwargs)
         self._x = x or 0
         self._y = y or 0

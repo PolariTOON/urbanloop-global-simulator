@@ -12,7 +12,7 @@ class Road(Way):
     """Classe modélisant une route du réseau, c'est une entitée intermédiaire au même niveau que les aiguillages
     Cette entité est aussi vue comme un sous graphe."""
 
-    def __init__(self, env, id, margin_min, pod_size, is_bridge, steps=None, sections=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, is_bridge, /, *, steps=None, sections=None, **kwargs):
         super().__init__(env, id, pod_size, **kwargs)
         self._steps = steps or []  # sheds, capteurs et stations
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)

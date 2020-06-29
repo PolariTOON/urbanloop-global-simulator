@@ -3,7 +3,7 @@ from uuid import uuid4
 from ..entity import Entity
 
 class Token(Entity):
-    def __init__(self, env, source=None, destination=None, **kwargs):
+    def __init__(self, env, /, *, source=None, destination=None, **kwargs):
         if "id" in kwargs.keys():  # lorsqu'on recharge un pod on remet l'ancien id
             id0 = kwargs["id"]
             del kwargs["id"]

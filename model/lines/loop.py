@@ -7,7 +7,7 @@ from .line import Line
 
 
 class Loop(Line):
-    def __init__(self, id, roads=None, switches=None, **kwargs):
+    def __init__(self, id, /, *, roads=None, switches=None, **kwargs):
         """
         Instancie une boucle
         :param id: id de la boucle

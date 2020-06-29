@@ -4,7 +4,7 @@ from .switch import Switch
 class SwitchOut(Switch):
     """Classe modélisant un aiguillage sortant
     Elle gère une partie de l'algorithme d'aiguillage"""
-    def __init__(self, env, id, margin_min, pod_size, max_speed, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, max_speed, /, *, **kwargs):
         if "pods" in kwargs:
             kwargs["pods"] = []
         super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
@@ -79,7 +79,7 @@ class SwitchOut(Switch):
         :return: True si la capsule doit être aiguillée, False sinon
         """
         return pod.destination in self._routing_table
-    
+
     @property
     def updatable(self):
         return False

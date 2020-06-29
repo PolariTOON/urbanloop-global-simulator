@@ -8,7 +8,7 @@ from .track import Track
 
 class Section(Track):
     """Classe modélisant une section du réseau"""
-    def __init__(self, env, id, margin_min, pod_size, is_bridge, speed=None, path=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, is_bridge, /, *, speed=None, path=None, **kwargs):
         super().__init__(env, id, **kwargs)
         speed = speed or 0
         path = path or {
@@ -107,7 +107,6 @@ class Section(Track):
         return
 
     def handle_message(self, message):
-        
         if "pod_exit" == message["type"]:
             # Une capsule n'est plus dans la section
             pod = message["pod"]
@@ -115,7 +114,7 @@ class Section(Track):
                 self._pods.remove(pod)
             else:
                 print("\u001B[31m [erreur pod non trouvé]", pod.name[:9], self.name, " (section l.103)\u001B[0m")
-                
+
         elif "pod_entry" == message["type"]:
             # Une capsule entre dans la section : il faut lui donner la bonne vitesse
             pod = message["pod"]
@@ -133,6 +132,36 @@ class Section(Track):
             })
         else:
             raise ValueError("Invalid message")
+        # while True:
+        #     while True:
+        #         message = yield from self.read()
+        #         if message is None:
+        #             break
+        #         elif "pod_exit" == message["type"]:
+        #             # Une capsule n'est plus dans la section
+        #             pod = message["pod"]
+        #             if pod in self._pods:
+        #                 self._pods.remove(pod)
+        #             else:
+        #                 print(len(self._pods), pod.name, self.name)
+
+        #         elif "pod_entry" == message["type"]:
+        #             # Une capsule entre dans la section : il faut lui donner la bonne vitesse
+        #             # et il faut notifier le parent pour qu'il prévienne la piste/l'aiguillage précédente
+        #             pod = message["pod"]
+        #             self._pods.append(pod)
+        #             yield from self._parent.write({
+        #                 "author": self,
+        #                 "type": "pod_entry",
+        #                 "pod": pod
+        #             })
+        #             yield from pod.write({
+        #                 "author": self,
+        #                 "type": "speed",
+        #                 "speed": self._speed
+        #             })
+        #         else:
+        #             raise ValueError("Invalid message")
 
     def serialize(self):
         dict = super().serialize()

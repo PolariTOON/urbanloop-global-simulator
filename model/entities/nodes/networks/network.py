@@ -40,28 +40,10 @@ class Network(Node):
         self._init_weights()
         self._statistiques = Statistiques()
         # Initialisation de la table de routage de chaque aiguillage
-        # C'est une liste de ditcionnaire de la forme {"switch": s, "table": t}
+        # C'est une liste de dictionnaires de la forme {"switch": s, "table": t}
         # où t contient les destinations pour lesquelles il faut tourner en s1
-        self._routing_table = []
-        for s1 in self._switches:
-            if isinstance(s1, SwitchOut):
-                table = []
-                for s2 in self._switches:
-                    if isinstance(s2, SwitchOut):
-                        way = shorter_way(s1, s2)
-                        for index in range(len(way) - 1):
-                            s = way[index]
-                            if s.next.next in way:
-                                road = s.next
-                            else:
-                                road = s.beside
-                            for step in road.steps:
-                                table.append(step)
-                self._routing_table.append({"switch": s1, "table": table})
-        # Initialisation des tables de routage des aiguillages
-        for switch in self._switches:
-            if isinstance(switch, SwitchOut):
-                switch.routing_table = self._get_switch_table(switch)
+        self._routing_table0 = {}
+        self._update_routing(init=True)  # création des tables de routage
 
     @property
     def name(self):
@@ -147,7 +129,6 @@ class Network(Node):
         width = max_x - min_x
         height = max_y - min_y
         return {"x": 0, "y": 0, "width": width, "height": height}
-
 
     def serialize(self):
         bridges = [bridge.serialize() for bridge in self._bridges]
@@ -284,7 +265,6 @@ class Network(Node):
                 del loop["id"]
             self._loops[b] = Loop(b, **loop)
 
-
     def _init_parent_of_children(self):
         """
         Initialise le parent des routes et aiguillages comme étant le réseau
@@ -336,41 +316,56 @@ class Network(Node):
                 weight += section.weight
             road.weight = weight
 
-    def _update_routing(self):
+    def _update_routing(self, init=False):
         """
         Envoie aux aiguillages sortant une nouvelle table de routage
         :return: void
         """
-        # Maj des tables
+        """
+        On construit la table de routage de chaque switch du réseau:
+            la table de routage d'un switch indique si pour une destination donnée on doit tourner pour atteindre la desination
+            la table contient donc une liste de destinations pour lesquelles il faut tourner
+            les destinations restantes sont celles pour lesquelles il faut continuer dans la boucle
+
+        Pour construire les tables:
+            On calcule les plus courts chemins entre les switchs du réseau
+                Pour chaque dépot/station à l'arrivée d'un chemin (destination),
+                Pour chaque switch de ce chemin, s'il faut tourner pour atteindre la destination,
+                 on ajoute la destination à la table de ce switch
+        """
+        for s0 in self._switches:   # initialisation d'une table globale
+            if isinstance(s0, SwitchOut):
+                self._routing_table0[s0.name] = []
+        # Remplissage
         for s1 in self._switches:
-            if isinstance(s1, SwitchOut):
-                table = []
+            if isinstance(s1, SwitchIn):
                 for s2 in self._switches:
-                    if isinstance(s2, SwitchOut):
-                        way = shorter_way(s1, s2)
-                        for index in range(len(way) - 1):
-                            s = way[index]
-                            if s.next.next in way:
-                                road = s.next
-                            else:
-                                road = s.beside
-                            for step in road.steps:
-                                table.append(step)
-                self._routing_table.append({"switch": s1, "table": table})
-        # Envoie des tables
-        for switch in self._switches:
+                    if isinstance(s2, SwitchIn):
+                        way = shorter_way(s1, s2)   # on calcul le plus court chemin entre nos 2 switchs
+                        last_switch = way[-1]
+                        steps = last_switch.next.steps
+                        if steps != []:
+                            for index in range(len(way)-1):
+                                s = way[index]
+                                if s.next.next != way[(index+1) % len(way)]:
+                                    if steps[0].name not in self._routing_table0[s.name]:
+                                        self._routing_table0[s.name].append(steps[0].name)
+        if init:  # Envoie des tables
+            # Initialisation des tables de routage des aiguillages
+            for switch in self._switches:
+                if isinstance(switch, SwitchOut):
+                    switch.routing_table = self._routing_table0[switch.name]
+
+    def maj_routing_tables(self):
+        """pour mettre à jour les tables de routage"""
+        self._update_routing(init=False)  # calcul des nouvelles tables
+        for switch in self._switches:     # envoie des messages pour mettre à jour
             if isinstance(switch, SwitchOut):
                 yield from switch.write({
                     "author": self,
                     "type": "update_routing",
-                    "table": self._get_switch_table(switch)
+                    "table": self._routing_table0[switch.name]
                 })
-
-    def _get_switch_table(self, switch):
-        for dico in self._routing_table:
-            if dico["switch"] == switch:
-                return dico["table"]
-        raise ValueError("Switch not in the routing table")
 
     def find(self, step):
         for road in self._roads:
@@ -390,7 +385,7 @@ class Network(Node):
             #print("-------------------------------------------------------------")
             if self._dynamic_routing and int(int(self.env.now) % (30 / self.env.tick)) == 0:  # TODO: utilise self.env.time plutôt que self.env.tick
                 # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
-                yield from self._update_routing()
+                yield from self.maj_routing_tables()
             while True:
                 message = yield from self.read()
                 if message is None:
@@ -398,12 +393,13 @@ class Network(Node):
                 elif "docked" == message["type"]:
                     # Une capsule stationne
                     timestamp = message["timestamp"]
+                    print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) + "] Arrival\u001B[0m", message["pod"].destination, end='')
+                    print("\t\t\t\t\t\t\t\t", message["pod"].name[:8], "(network l.396)\n")
                     self._statistiques.remove_traveling_pod(message["pod"], timestamp)
                     pass
                 elif "refill" == message["type"]:
                     # On demande à un dépôt d'envoyer une capsule à la station qui le demande
                     # TODO:  ne pas choisir aléatoirement
-                    print("test refill network l.412")
                     sheds = self.sheds
                     if sheds:
                         station = message["station"]
@@ -416,7 +412,6 @@ class Network(Node):
                 elif "empty" == message["type"]:
                     # On demande à un dépôt d'envoyer une capsule à la station qui le demande
                     # TODO:  ne pas choisir aléatoirement
-                    print("test empty network l.425")
                     sheds = self.sheds
                     if sheds:
                         station = message["station"]
@@ -434,7 +429,8 @@ class Network(Node):
                     traveler = message["traveler"]
                     if traveler:
                         self._statistiques.add_waiting_time(timestamp, waiting_time)
-                    # print("["+ str(datetime.timedelta(seconds=round(timestamp))) + "] Departure: " + origin+ " -> " + destination.name)
+                    print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp))) + "] Departure\u001B[0m " + origin + " -> ", destination, end='')
+                    print("\t\t\t\t\t\t\t\t", message["pod"].name[:8], "(network l.432)\n")
                     # print("waiting time: " + str(round(waiting_time)) + " seconds")
                     # print("traveler: " + str(traveler))
                     # print("\n")

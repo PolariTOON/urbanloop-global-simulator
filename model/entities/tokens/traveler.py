@@ -10,7 +10,7 @@ class Traveler(Token):
 
     @property
     def name(self):
-        return super().name or "Traveler %d" % self.id
+        return super().name or "Traveler %s" % self.id
 
     @property
     def waiting_time(self):

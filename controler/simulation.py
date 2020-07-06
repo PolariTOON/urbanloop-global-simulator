@@ -3,9 +3,8 @@ from math import floor
 from random import random, seed, randint
 from simpy import Environment
 from model.entities.tokens.traveler import Traveler
-
 from model.entities.nodes.networks.network import Network
-
+from random import choice
 from .probability import Probability, generate_traveler_poisson
 
 
@@ -113,7 +112,13 @@ class Simulation:
             s = self._network.stations[ri-1]
             r = random()
             if r <= self._probability.station_probability(s.station_type, second, False):  # si le nombre aléatoire généré est inférieur à la probabilité d'appartion
-                s._travelers.append(Traveler(self._env, self._env.time))  # alors un voyageur est généré
+                # la source est là où le traveler est généré
+                # la destination une des autres stations
+                traveler_source = s.name
+                stations = self._network.stations_names.copy()
+                stations.remove(s.name)
+                traveler_destination = choice(stations)
+                s.travelers.append(Traveler(self._env, self._env.time, source=traveler_source, destination=traveler_destination))  # alors un voyageur est généré
                 s._all_time_count += 1
 
     def serialize(self):

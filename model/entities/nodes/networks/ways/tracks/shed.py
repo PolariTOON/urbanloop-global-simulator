@@ -23,17 +23,15 @@ class Shed(Step):
         self._element_of_loop = element_of_loop
         self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._departure_pods = departure_pods or []
-        for dico in self._departure_pods:
+        for dico in self._departure_pods:  # pour initialiser des pods quand on charge un réseau
             p = dico["pod"]
-            dest = self.find(dico["destination"])
             dico["pod"] = Pod(env, self, 0, p)
-            dico["destination"] = dest
         self._wait = -1
 
     def serialize(self):
         """sérialise les informations du dépôt"""
         dict = super().serialize()
-        departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
+        departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"]} for dico in self._departure_pods]
         self.element_of_loop.update({
             "name": self.name
         })
@@ -113,7 +111,7 @@ class Shed(Step):
                         "type": "pod_entry",
                         "pod": pod
                     })
-                    if pod.destination == self:
+                    if pod.destination == self.name:
                         self._pods.append(pod)
                         yield from pod.write({
                             "author": self,

@@ -25,8 +25,8 @@ class Pod(Token):
         self._travelers = [Traveler(env, 0) for _ in range(travelers["count"])]
         self._capacity = travelers["max"]
         self._track_or_switch = track_or_switch
-        self.source = self.source or self._track_or_switch.element_of_loop or None  # si la capsule a déjà été créée mais change de voie, source n'est pas changé, sinon on setup via track_or_switch
-        self.destination = self.destination or self._track_or_switch.element_of_loop or None
+        self.source = self.source or None  # si la capsule a déjà été créée mais change de voie, source n'est pas changé, sinon on setup via track_or_switch
+        self.destination = self.destination or None
         self._speed = pod_speed
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
@@ -297,15 +297,21 @@ class Pod(Token):
                     self._endSpeed = 0
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner:
-                    #ATTENTION C'EST ALEATOIRE IL FAUDRA CORRIGER # todo corriger ici
-                    if self._track_or_switch.stat_or_shed:
-                        self._turn = not self._track_or_switch.stat_or_shed or self._track_or_switch.stat_or_shed == self._destination.name
-                        if self._track_or_switch.stat_or_shed:
-                            stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
-                            if stat_or_shed.isFull():
-                                self._turn = False
+                    # ATTENTION C'EST ALEATOIRE IL FAUDRA CORRIGER # todo corriger ici
+                    if self._track_or_switch.stat_or_shed:  # si c'est un dépot ou station
+                        self._turn = self._track_or_switch.stat_or_shed == self._destination   # self.turn est vrai si c'est l'arrivée
+                        stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
+                        if stat_or_shed.isFull():
+                            print("pod l.305: Full ", stat_or_shed.name, len(stat_or_shed.pods), "/", stat_or_shed.capacity)
+                            for pod in stat_or_shed.pods:
+                                if pod is not None:
+                                    print(pod.name[:8], end='  ')
+                                else:
+                                    print(pod, end='  ')
+                            print("\n")
+                            self._turn = False
                     else:
-                        self._turn = rd() > 0.5
+                        self._turn = True
                 elif "speed_a_while" == message["type"]:
                     # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
                     # Ou lors d'une discrétisation
@@ -316,8 +322,9 @@ class Pod(Token):
                 elif "departure" == message["type"]:
                     # La capsule part d'un dépôt ou d'une gare
                     destination = message["destination"]
-                    self._destination = destination.element_of_loop
-                    self._source = self._track_or_switch.element_of_loop
-                    self.speed = self._track_or_switch.next.speed
+                    source = message["author"].name
+                    self._destination = destination
+                    self._source = source
+                    self.speed = self._track_or_switch.speed
                 else:
                     raise ValueError("Invalid message: ", message)

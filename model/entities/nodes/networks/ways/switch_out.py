@@ -7,7 +7,7 @@ class SwitchOut(Switch):
     def __init__(self, env, id, margin_min, pod_size, max_speed, stat_or_shed=None, **kwargs):
         if "pods" in kwargs:
             kwargs["pods"] = []
-        super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs) # todo error : __init__() got multiple values for argument 'id'
+        super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
         self._switch_in = None
         self._routing_table = None
         # Liaison de la route et des sections du pont
@@ -108,6 +108,7 @@ class SwitchOut(Switch):
                         first_place = self._switch_in.first_place
                         if index == first_place or index == -1:
                             # On ne peut pas insérer la capsule
+                            print("switchout l.111 On ne peut pas insérer la capsule", pod.name)
                             pass
                         elif index == first_place - 1:
                             # On insert la capsule sur la dernière place

@@ -19,7 +19,7 @@
       "name": "Boucle 1",
       "elements": [
         {"type": "switch_out", "x": 250, "y": 235, "id_bridge": 0, "pods": []},
-        {"type": "station", "name": "Gare b1", "x": 100, "y": 100, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Gare b1", "x": 200, "y": 150, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "switch_in", "x": 150, "y": 235, "id_bridge": 1, "pods": []}
       ],
       "sections": [

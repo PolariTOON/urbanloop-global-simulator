@@ -100,7 +100,7 @@ class Section(Track):
                     if pod in self._pods:
                         self._pods.remove(pod)
                     else:
-                        print(len(self._pods), pod.name, self.name)
+                        print(len(self._pods), pod.name, self.name)  # pour détecter l'erreur quand on accélère la simulation
                         
                 elif "pod_entry" == message["type"]:
                     # Une capsule entre dans la section : il faut lui donner la bonne vitesse

@@ -429,7 +429,9 @@ class Network(Node):
                     traveler = message["traveler"]
                     if traveler:
                         self._statistiques.add_waiting_time(timestamp, waiting_time)
-                    print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp))) + "] Departure\u001B[0m " + origin + " -> ", destination, end='')
+                        print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp))) + "] Departure\u001B[0m " + origin + " -> ", destination, end='')
+                    else:
+                        print("["+str(datetime.timedelta(seconds=round(timestamp))) + "] Departure " + origin + " -> ", destination, end='')
                     print("\t\t\t\t\t\t\t\t", message["pod"].name[:8], "(network l.432)\n")
                     # print("waiting time: " + str(round(waiting_time)) + " seconds")
                     # print("traveler: " + str(traveler))
@@ -467,7 +469,6 @@ def shorter_way_tracks(start_track, destination_track):
     else:
         return shorter_way(next_switch_out(start_track), previous_switch_out(destination_track))
 
-
 def shorter_way(start_switch, destination_switch):
     """
     Calcul du plus court chemin entre deux aiguillages avec l'algorithme de Dijkstra
@@ -475,43 +476,45 @@ def shorter_way(start_switch, destination_switch):
     :param destination_switch: aiguillage d'arrivé
     :return: liste d'aiguillages représentant le plus court chemin pour aller de star_switch à destination_switch
     """
-    way = [(0, start_switch)]
-    best_weight = {start_switch: 0}
-    previouses = {}
-    visited = set()
+    best_weight = {}                    # set des chemins le plus court (mis à jour pendant l'algorithme)
+    best_weight[start_switch] = 0       # le coût d'atteinte du premier noeud est 0
+    previouses = {}                     # switchs précédents (pour remonter l'algorithme -> indique l'origine des switchs')
+    visited = set()                     # init ensemble des éléments visités (set est une "liste sans doublon")
+    current_switch = start_switch
     while True:
-        if way:
-            entry = way.pop()
+        if current_switch in best_weight.keys():
+            weight = best_weight[current_switch]
         else:
             break
-        weight, switch = entry
+        switch = current_switch
         if switch not in visited:
             visited.add(switch)
             if switch == destination_switch:
                 break
-            # On a toujours le next comme successeur
-            new_weight = weight + switch.next.weight
-            min_weight = best_weight.get(switch.next.next)
-            if min_weight is None or new_weight < min_weight:
-                best_weight[switch.next.next] = new_weight
-                previouses[switch.next.next] = switch
-                way.append((new_weight, switch.next.next))
+            new_weight = weight + switch.next.weight            # pour établir le poids du chemin actuel
+            if switch.next.next not in best_weight.keys() or new_weight < best_weight[switch.next.next]:  # si aucun chemin n'existe ou que celui-ci est plus court
+                best_weight[switch.next.next] = new_weight  # on change la valeur dans la table
+                previouses[switch.next.next] = switch       # on note que le prédécessur du switch.next.next est le switch actuel
             if isinstance(switch, SwitchOut):  # Pour un out on a aussi le beside comme successeur
                 new_weight = weight + switch.beside.weight
-                min_weight = best_weight.get(switch.beside.next)
-                if min_weight is None or new_weight < min_weight:
+                if switch.beside.next not in best_weight.keys() or new_weight < best_weight[switch.beside.next]:
                     best_weight[switch.beside.next] = new_weight
                     previouses[switch.beside.next] = switch
-                    way.append((new_weight, switch.beside.next))
-    weight = best_weight.get(destination_switch)
-    way = []
+
+            # sélection du prochain noeud pour poursuivre l'algorithme (noeud le moins loin non-visité)
+            weight0 = float("inf")
+            for switch0 in best_weight.keys():
+                if switch0 not in visited and best_weight[switch0] < weight0:
+                    weight0 = best_weight[switch0]
+                    current_switch = switch0
+    weight = best_weight[destination_switch]  # taille minimale du chemin
+    way = []                                  # construction du chemin
     if weight is not None:
         switch = destination_switch
         while switch is not None:
             way = [switch] + way
             switch = previouses.get(switch)
     return way
-
 
 def next_switch_out(track):
     """

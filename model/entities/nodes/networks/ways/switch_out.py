@@ -108,7 +108,8 @@ class SwitchOut(Switch):
                         first_place = self._switch_in.first_place
                         if index == first_place or index == -1:
                             # On ne peut pas insérer la capsule
-                            print("switchout l.111 On ne peut pas insérer la capsule", pod.name)
+                            print("\033[4;31mOn ne peut pas insérer la capsule\u001B[0m", pod.name,
+                                  "\t\t\t\t\t\t\t\t\t\t\t\t\t\t(switchout l.111)\n")
                             pass
                         elif index == first_place - 1:
                             # On insert la capsule sur la dernière place

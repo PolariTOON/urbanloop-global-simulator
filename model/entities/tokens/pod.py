@@ -296,19 +296,18 @@ class Pod(Token):
                     self._speed = 0
                     self._endSpeed = 0
                 elif "insert" == message["type"]:
-                    # Ordre d'insertion, la capsule est autorisée à tourner:
-                    # ATTENTION C'EST ALEATOIRE IL FAUDRA CORRIGER # todo corriger ici
+                    # Ordre d'insertion, la capsule est autorisée à tourner
                     if self._track_or_switch.stat_or_shed:  # si c'est un dépot ou station
                         self._turn = self._track_or_switch.stat_or_shed == self._destination   # self.turn est vrai si c'est l'arrivée
                         stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
                         if stat_or_shed.isFull():
-                            print("pod l.305: Full ", stat_or_shed.name, len(stat_or_shed.pods), "/", stat_or_shed.capacity)
+                            print("\033[4;31mpod l.305: Full\u001B[0m", stat_or_shed.name, "\t\t", len(stat_or_shed.pods), "/", stat_or_shed.capacity, end=' [')
                             for pod in stat_or_shed.pods:
                                 if pod is not None:
-                                    print(pod.name[:8], end='  ')
+                                    print(pod.name[:8], end='')
                                 else:
-                                    print(pod, end='  ')
-                            print("\n")
+                                    print(pod, end='')
+                            print("]\n")
                             self._turn = False
                     else:
                         self._turn = True

@@ -59,6 +59,7 @@ class Station(Step):
             dest = self.find(dico["destination"])
             dico["pod"] = Pod(env, self, 0, p)
             dico["destination"] = dest
+        self._incoming_pods = 0  # à serialiser si on veut télécharger/rechager le réseau, c'est le nombre de pods en chemin vers la station
 
     def serialize(self):
         """Permet la serialisation des informations"""
@@ -88,6 +89,9 @@ class Station(Step):
             "element_of_loop": self.element_of_loop
         })
         return dict
+
+    def up_incoming_pods(self):
+        self._incoming_pods += 1
 
     @property
     def element_of_loop(self):
@@ -160,7 +164,7 @@ class Station(Step):
 
     def shift_pods(self, indice_du_pod_envoye):
         """Quand un pod est envoyé, on décale les autres pods vers l'avant"""
-        for i in range(1, indice_du_pod_envoye + 1):
+        for i in range(indice_du_pod_envoye, 0, -1):
             self._pods[i] = self._pods[i-1]
             self._boarding[i] = self._boarding[i-1]
             self._pods_ready[i] = self._pods_ready[i-1]
@@ -170,9 +174,8 @@ class Station(Step):
 
     def update(self):
         """Fonction gérant le processus gare"""
-        refill = False  # True quand la station est vide pour appeler de nouvelles capsules
-        empty = False   # True quand il y a trop de capsules vides dans la station
         wait = -1       # pour décompter le départ entre 2 capsules
+        send_one_time = True
         while True:
             # On charge les voyageurs s'il y a de la place
             if len(self._travelers) > 0 and self.pods_size > 0:
@@ -203,13 +206,10 @@ class Station(Step):
                         for i in self._pods_ready:
                             if i:
                                 self.send_pod(self._pods[i], self._pods[i].travelers[0].destination, True)  # départ du pod
-                                self.shift_pods(i)   # décalage des autres pods dans la file
                                 wait = -1
-
-                    else :              # en série seul le premier pod peut partir
+                    else:              # en série seul le premier pod peut partir
                         if self._pods_ready[-1]:
                             self.send_pod(self._pods[-1], self._pods[-1].travelers[0].destination, True)    # départ du pod
-                            self.shift_pods(self._capacity-1)
                             wait = -1
 
 
@@ -217,9 +217,14 @@ class Station(Step):
             if wait == -1:             # wait == -1 indique que l'on envoie une capsule
                 wait = 0
                 if len(self._departure_pods) > 0:
+                    indice_pod = -1
+                    for indice0 in range(len(self._pods_ready)-1, -1, -1):
+                        if self._pods_ready[indice0]:
+                            indice_pod = indice0
+                            break
+                    self.shift_pods(indice_pod)  # décalage des autres pods dans la file
                     dico = self._departure_pods.pop()
                     pod = dico["pod"]
-                    pod.ready = False
                     destination = dico["destination"]
                     yield from pod.write({
                         "author": self,
@@ -237,24 +242,27 @@ class Station(Step):
                         "traveler": dico["traveler"]
                     })
 
-            if not refill and self.pods_size < self._capacity / 2:
+            if self.pods_size < self._capacity / 2 \
+                    and self._capacity * (3/4) > (self._incoming_pods + self.pods_size - len(self.travelers)) \
+                    and self._capacity - 1 > (self._incoming_pods + self.pods_size - len(self.travelers)):
                 # Re-approvisionnement des capsules
-                refill = True
                 yield from self.parent.write({
                     "author": self,
                     "type": "refill",
                     "station": self.name
                 })
-                
-            if not empty and self.pods_size > self._capacity / 2 and len(self._travelers) == 0:
+                self.up_incoming_pods()     # un pod sera envoyé pour combler l'espace,
+                                            # on incrémente ici pour éviter le spamming
+                                            # des messages le temps que le pod soit envoyé
+            if self.pods_size > self._capacity - 1 and len(self._travelers) == 0 \
+                    and len(self._departure_pods) == 0 and send_one_time:
+                send_one_time = False
                 # Vide la station de capsules
-                empty = True
                 yield from self.parent.write({
                     "author": self,
                     "type": "empty",
                     "station": self
                 })
-
             while True:
                 message = yield from self.read()
                 if message is None:
@@ -272,10 +280,13 @@ class Station(Step):
                         if i < self.capacity:
                             self._pods[self.capacity - i -1] = pod
                             self._pods_size += 1
+                            self._incoming_pods -= 1
+                            if self._incoming_pods < 0:
+                                print("\033[4;31merreur comptage incoming pods\u001B[0m", self._incoming_pods,
+                                      "(station l.284)", self.name,"\n")
                         else:
-                            raise Exception("pod entry but full station l.277")  # le pod vérifie déjà s'il peut s'insérer "not self.pods[0]
+                            raise Exception("pod entry but full station l.277")  # le pod vérifie déjà s'il peut s'insérer "not self.pods[0]"
                         pod.travelers = []
-                        refill = False
                         yield from pod.write({
                             "author": self,
                             "type": "docked"
@@ -292,13 +303,11 @@ class Station(Step):
                             "type": "passing"
                         })
                 elif "pod_exit" == message["type"]:
-                    empty = False
+                    send_one_time = False
                 elif "empty" == message["type"]:
                     if self._pods[-1]:
                         if self._boarding[-1] == -1:
                             self.send_pod(self._pods[-1], message["shed"].name)
-                    else:
-                        empty = False
-                    pass;
+                    pass
                 else:
-                    raise ValueError("Invalid message station l.306")
+                    raise ValueError("Invalid message station l.306", message)

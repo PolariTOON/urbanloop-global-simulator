@@ -6,6 +6,7 @@ from model.entities.tokens.traveler import Traveler
 from model.entities.nodes.networks.network import Network
 from random import choice
 from .probability import Probability, generate_traveler_poisson
+import datetime
 
 
 class Simulation:
@@ -119,6 +120,9 @@ class Simulation:
                 stations.remove(s.name)
                 traveler_destination = choice(stations)
                 s.travelers.append(Traveler(self._env, self._env.time, source=traveler_source, destination=traveler_destination))  # alors un voyageur est généré
+                print("\u001B[32mNew Traveler", "\u001B[0m", traveler_source, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(simulation l.123)",
+                                        "\n\t\t\u001B[32m|\u001B[0m nombre de travelers dans la station:", len(s.travelers),
+                                        "\n\t\t\u001B[32m|\u001B[0m taille de la station:", s.capacity, "\n")
                 s._all_time_count += 1
 
     def serialize(self):

@@ -52,6 +52,7 @@ class Station(Step):
         self._station_type = station_type
         self._element_of_loop = element_of_loop
         self._pods = [None for _ in range(self._capacity)]
+        self._pods_size = 0
         self._departure_pods = departure_pods or []                     # dictionnaire des pods sur le point de partir
         for dico in self._departure_pods:
             p = dico["pod"]
@@ -269,7 +270,8 @@ class Station(Step):
                     if pod.destination == self.name and not self._pods[0]:
                         i = self.pods_size
                         if i < self.capacity:
-                            self._pods[1-i] = pod
+                            self._pods[self.capacity - i -1] = pod
+                            self._pods_size += 1
                         else:
                             raise Exception("pod entry but full station l.277")  # le pod vérifie déjà s'il peut s'insérer "not self.pods[0]
                         pod.travelers = []

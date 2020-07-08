@@ -1,12 +1,6 @@
-from random import choice
-
 from .....tokens.pod import Pod
 from .....tokens.traveler import Traveler
 from .step import Step
-import datetime
-import time
-from controler import probability
-from ast import literal_eval
 
 station_types = {
     "city": 0,
@@ -71,7 +65,7 @@ class Station(Step):
         dict.update({
             "type": "station",
             "pods": {
-                "count": self.pods_size,
+                "count": self._pods_size,
                 "max": self.capacity,
                 "pos": [True if pod else False for pod in self._pods],
                 "boarding": [self._boarding[i] != -1 for i in range(self._capacity)],
@@ -138,10 +132,6 @@ class Station(Step):
     @property
     def capacity(self):
         return self._capacity
-        
-    @property
-    def pods_size(self):
-        return sum(pod is not None for pod in self._pods)
 
     def isFull(self):
         return self._pods[0] != None
@@ -178,7 +168,7 @@ class Station(Step):
         send_one_time = True
         while True:
             # On charge les voyageurs s'il y a de la place
-            if len(self._travelers) > 0 and self.pods_size > 0:
+            if len(self._travelers) > 0 and self._pods_size > 0:
                 for i in range(self._capacity - 1, -1, -1):  # on commence par les premières capsules à partir
                     pod = self._pods[i]
                     if len(self._travelers) > 0 and pod and pod.isEmpty():  # s'il y a un traveler en attente, un pod avec de la place
@@ -223,6 +213,7 @@ class Station(Step):
                             indice_pod = indice0
                             break
                     self.shift_pods(indice_pod)  # décalage des autres pods dans la file
+                    self._pods_size -= 1
                     dico = self._departure_pods.pop()
                     pod = dico["pod"]
                     destination = dico["destination"]
@@ -242,9 +233,9 @@ class Station(Step):
                         "traveler": dico["traveler"]
                     })
 
-            if self.pods_size < self._capacity / 2 \
-                    and self._capacity * (3/4) > (self._incoming_pods + self.pods_size - len(self.travelers)) \
-                    and self._capacity - 1 > (self._incoming_pods + self.pods_size - len(self.travelers)):
+            if self._pods_size < self._capacity / 2 \
+                    and self._capacity * (3/4) > (self._incoming_pods + self._pods_size - len(self.travelers)) \
+                    and self._capacity - 1 > (self._incoming_pods + self._pods_size - len(self.travelers)):
                 # Re-approvisionnement des capsules
                 yield from self.parent.write({
                     "author": self,
@@ -254,7 +245,7 @@ class Station(Step):
                 self.up_incoming_pods()     # un pod sera envoyé pour combler l'espace,
                                             # on incrémente ici pour éviter le spamming
                                             # des messages le temps que le pod soit envoyé
-            if self.pods_size > self._capacity - 1 and len(self._travelers) == 0 \
+            if self._pods_size > self._capacity - 1 and len(self._travelers) == 0 \
                     and len(self._departure_pods) == 0 and send_one_time:
                 send_one_time = False
                 # Vide la station de capsules
@@ -276,14 +267,14 @@ class Station(Step):
                     })
                     # la capsule va se garer dans la station s'il y a de la place
                     if pod.destination == self.name and not self._pods[0]:
-                        i = self.pods_size
+                        i = self._pods_size
                         if i < self.capacity:
                             self._pods[self.capacity - i -1] = pod
                             self._pods_size += 1
                             self._incoming_pods -= 1
                             if self._incoming_pods < 0:
                                 print("\033[4;31merreur comptage incoming pods\u001B[0m", self._incoming_pods,
-                                      "(station l.284)", self.name,"\n")
+                                      "(station l.277)", self.name,"\n")
                         else:
                             raise Exception("pod entry but full station l.277")  # le pod vérifie déjà s'il peut s'insérer "not self.pods[0]"
                         pod.travelers = []

@@ -1,4 +1,3 @@
-corriger le routage (les capsules ne s'insèrent jamais)
 corriger la sauvegarde/reutilisation d'un reseau en cours de simulation (voir l'application de modifjson):
     - station.py : pouvoir retrouver les temps d'attente quand on recharge le fichier pour ne pas fausser les stats (average_waiting_time) (ajouter dans serialize)
     - voir si d'autres paramètres du PI ne sont pas pris en compte
@@ -9,4 +8,3 @@ Déployer le simulateur & l'éditeur
 considérer l'accélération dans les calculs d'insertion
 rajouter des paramètres dans l'éditeur
 corriger le téléchargement de json dans l'éditeur (des réseaux valides ne peuvent être téléchargés et pas de message d'erreur)
-(voir coefficient de défaillance capsule)

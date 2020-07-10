@@ -294,7 +294,7 @@ class Station(Step):
                             "type": "passing"
                         })
                 elif "pod_exit" == message["type"]:
-                    send_one_time = False
+                    send_one_time = True
                 elif "empty" == message["type"]:
                     if self._pods[-1]:
                         if self._boarding[-1] == -1:

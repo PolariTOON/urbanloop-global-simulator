@@ -21,6 +21,7 @@ class Section(Track):
         self._next = None
         self._pods = []
         self._margin = self._speed * (margin_min + pod_size) / 8.33 - pod_size  # 8.33 m/s = 30 km/h est la vitesse des plus petites boucles
+        self._speed2 = speed
 
     @property
     def speed(self):
@@ -87,6 +88,13 @@ class Section(Track):
     @property
     def margin(self):
         return self._margin
+
+    def fermeture_ouverture(self):
+        """ fonction pour la fermeture de voie via l'interface web"""
+        if self._speed == 0.0001:
+            self._speed = self._speed2
+        else:
+            self._speed = 0.0001
 
     def update(self):
         while True:

@@ -168,6 +168,22 @@ async def _get_section(simulations, network_index, road_index, section_index):
     return simulations[network_index]._network.roads[road_index].sections[section_index].serialize()
 
 
+@_app.route("/networks/<int:network_index>/close/<section_name>/", methods=["POST"])
+@_synchronize()
+async def _close(simulations, network_index, section_name):
+    """Requête post pour fermer une section depuis la vue"""
+    if network_index in simulations:
+        simulation = simulations[network_index]
+        network = simulation.get_network()
+        for road in network.roads:
+            for section in road.sections:
+                if section.name == section_name:
+                    section.fermeture_ouverture()
+        network._update_routing()  # mise à jour des tables de routage
+        return True
+    return False
+
+
 def run_app(port, networks, wave):
     """Fonction permettant de lancer l'application"""
     "port = n° de port si on souhaite l'interface web (sinon -1)"

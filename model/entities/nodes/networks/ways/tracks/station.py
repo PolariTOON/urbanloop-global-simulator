@@ -274,7 +274,7 @@ class Station(Step):
                             self._incoming_pods -= 1
                             if self._incoming_pods < 0:
                                 print("\033[4;31merreur comptage incoming pods\u001B[0m", self._incoming_pods,
-                                      "(station l.277)", self.name,"\n")
+                                      "(station l.277)", self.name, "\n")
                         else:
                             raise Exception("pod entry but full station l.277")  # le pod vérifie déjà s'il peut s'insérer "not self.pods[0]"
                         pod.travelers = []

@@ -1,4 +1,4 @@
-from argparse import ArgumentParser, ArgumentTypeError #bibliothèque pour récupérer les arguments du main afin d'établir la simulation avec les paramètres en entrée
+from argparse import ArgumentParser, ArgumentTypeError # bibliothèque pour récupérer les arguments du main afin d'établir la simulation avec les paramètres en entrée
 from math import isfinite
 from app import run_app
 
@@ -52,5 +52,4 @@ if __name__ == '__main__':
     if arguments.networks != {}:
         arguments.networks = arguments.networks[0]  # à cause de nargs= '+' on a une liste en sortie, donc je ne garde que le dictionnaire des réseaux
 
-    print("test")
     run_app(arguments.port, arguments.networks, arguments.wave)

@@ -25,7 +25,7 @@ class Network(Node):
     def __init__(self, env, id, bridges=None, loops=None, switches=None, roads=None, view_box=None, margin_min=None,
                  pod_size=None, max_speed=None, places_number=None, dynamic_routing=None, **kwargs):
         super().__init__(env, id, **kwargs)
-        self._dynamic_routing = dynamic_routing or False
+        self._dynamic_routing = dynamic_routing or True
         self._margin_min = margin_min or 2
         self._pod_size = pod_size or 2
         self._bridges = bridges or []

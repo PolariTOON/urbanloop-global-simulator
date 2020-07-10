@@ -54,6 +54,9 @@ class Simulation:
         self._env.time = time  # Temps réel actuel en seconde
         self._travelers_per_hour = traveler["travelers_per_hour"]
 
+    def get_network(self):
+        return self._network
+
     @property
     def running(self):
         return self._running

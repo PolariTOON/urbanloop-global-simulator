@@ -12,9 +12,9 @@ from ..node import Node
 from .ways.road import Road
 from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
-from .ways.tracks.station import Station
-from .ways.tracks.section import Section
 from .Statistiques import *
+
+tour_de_boucle = 0
 
 # TODO : Gérer les timers des capsules (temps de trajets)
 # TODO : Gérer les stats
@@ -44,6 +44,7 @@ class Network(Node):
         # où t contient les destinations pour lesquelles il faut tourner en s1
         self._routing_table0 = {}
         self._update_routing(init=True)  # création des tables de routage
+        self.departure_arrival_printer = True  # mettre à vrai pour afficher des informations dans le terminal
 
     @property
     def name(self):
@@ -379,7 +380,12 @@ class Network(Node):
         Gestion du processus du réseau à chaque boucle d'événement simpy
         :return: void
         """
+        global tour_de_boucle
         while True:
+            tour_de_boucle += 1
+            if tour_de_boucle % 360 == 0:
+                print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
+                      "]\u001B[0m")
             #print("-------------------------------------------------------------")
             #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
             #print("-------------------------------------------------------------")
@@ -393,9 +399,10 @@ class Network(Node):
                 elif "docked" == message["type"]:
                     # Une capsule stationne
                     timestamp = message["timestamp"]
-                    print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) +
-                          "] Arrival\u001B[0m", message["pod"].destination, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.396)", end='')
-                    print("\n\t\t\u001B[35m|\u001B[0m nom du pod:", message["pod"].name[:8], "\n")
+                    if self.departure_arrival_printer:
+                        print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) +
+                              "] Arrival\u001B[0m", message["pod"].destination, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.396)", end='')
+                        print("\n\t\t\u001B[35m|\u001B[0m nom du pod:", message["pod"].name[:8], "\n")
                     self._statistiques.remove_traveling_pod(message["pod"], timestamp)
                     pass
                 elif "refill" == message["type"]:
@@ -429,12 +436,13 @@ class Network(Node):
                     waiting_time = message["waiting_time"]
                     traveler = message["traveler"]
                     self._statistiques.add_waiting_time(timestamp, waiting_time)
-                    print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp)))
-                          + "] Departure\u001B[0m ", origin, " -> ", destination,
-                          "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.432)")
-                    print("\t\t\u001B[36m|\u001B[0m nom du pod:\t", message["pod"].name[:8])
-                    print("\t\t\u001B[36m|\u001B[0m waiting time:\t", str(round(waiting_time)) + " seconds")
-                    print("\t\t\u001B[36m|\u001B[0m traveler:\t\t", str(traveler), "\n")
+                    if self.departure_arrival_printer:
+                        print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp)))
+                              + "] Departure\u001B[0m ", origin, " -> ", destination,
+                              "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.432)")
+                        print("\t\t\u001B[36m|\u001B[0m nom du pod:\t", message["pod"].name[:8])
+                        print("\t\t\u001B[36m|\u001B[0m waiting time:\t", str(round(waiting_time)) + " seconds")
+                        print("\t\t\u001B[36m|\u001B[0m traveler:\t\t", str(traveler), "\n")
                     self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler)
                     if traveler:
                         # dans le cas d'un voyage,

@@ -212,26 +212,27 @@ class Station(Step):
                         if self._pods_ready[indice0]:
                             indice_pod = indice0
                             break
-                    self.shift_pods(indice_pod)  # décalage des autres pods dans la file
-                    self._pods_size -= 1
-                    dico = self._departure_pods.pop()
-                    pod = dico["pod"]
-                    destination = dico["destination"]
-                    yield from pod.write({
-                        "author": self,
-                        "type": "departure",
-                        "destination": destination
-                    })
-                    # prévient le parent
-                    yield from self.parent.write({
-                        "author": self,
-                        "pod": pod,
-                        "type": "departure",
-                        "destination": destination,
-                        "timestamp": dico["timestamp"],
-                        "waiting_time": dico["waiting_time"],
-                        "traveler": dico["traveler"]
-                    })
+                    if indice0 != -1:  # un pod est prêt à partir
+                        self.shift_pods(indice_pod)  # décalage des autres pods dans la file
+                        self._pods_size -= 1
+                        dico = self._departure_pods.pop()
+                        pod = dico["pod"]
+                        destination = dico["destination"]
+                        yield from pod.write({
+                            "author": self,
+                            "type": "departure",
+                            "destination": destination
+                        })
+                        # prévient le parent
+                        yield from self.parent.write({
+                            "author": self,
+                            "pod": pod,
+                            "type": "departure",
+                            "destination": destination,
+                            "timestamp": dico["timestamp"],
+                            "waiting_time": dico["waiting_time"],
+                            "traveler": dico["traveler"]
+                        })
 
             if self._pods_size < self._capacity / 2 \
                     and self._capacity * (3/4) > (self._incoming_pods + self._pods_size - len(self.travelers)) \

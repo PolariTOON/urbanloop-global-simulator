@@ -304,7 +304,7 @@ class Pod(Token):
                             print("\033[4;31mpod l.305: Full\u001B[0m", stat_or_shed.name, "\t\t", len(stat_or_shed.pods), "/", stat_or_shed.capacity, end=' [')
                             for pod in stat_or_shed.pods:
                                 if pod is not None:
-                                    print(pod.name[:8], end='')
+                                    print(pod.name[:8], end=' ')
                                 else:
                                     print(pod, end='')
                             print("]\n")

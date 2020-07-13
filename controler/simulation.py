@@ -1,4 +1,3 @@
-import sys
 from math import floor
 from random import random, seed, randint
 from simpy import Environment
@@ -6,7 +5,6 @@ from model.entities.tokens.traveler import Traveler
 from model.entities.nodes.networks.network import Network
 from random import choice
 from .probability import Probability, generate_traveler_poisson
-import datetime
 
 
 class Simulation:

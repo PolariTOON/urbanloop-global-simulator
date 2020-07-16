@@ -10,12 +10,14 @@ class Switch(Way):
         self._y = y or 0
         self._previous = previous
         self._next = next
+        self._max_speed = max_speed
+        self._speed = self._next.sections[0].speed
         self._beside = beside
         self._pods = pods or []
         self._id_bridge = id_bridge
         self._rules = []
         self._margin = self.speed * (margin_min + pod_size) / 8.33 - pod_size # Ce 8.33 est actuellement la vitesse minimal d'un réseau urbanloop en m/s (30 km/h) peut etre à changer
-        self._max_speed = max_speed
+        print("test speed", self.name, self.speed)
 
         # Ajout des capsules
         for pod in pods:
@@ -58,7 +60,7 @@ class Switch(Way):
     @property
     def speed(self):
         """Vitesse moyenne au sein de l'aiguillage"""
-        return self._next.sections[0].speed
+        return self._speed
 
     @property
     def max_speed(self):

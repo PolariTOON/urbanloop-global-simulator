@@ -95,6 +95,7 @@ class Section(Track):
             self._speed = self._speed2
         else:
             self._speed = 0.0001
+        self.weight = self._length / self._speed
 
     def update(self):
         while True:

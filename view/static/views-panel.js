@@ -105,6 +105,7 @@ const line5 = new Line({
     stroke: 'black',
     strokeWidth: 2
 });
+
 stage.add(layerStation);
 layerStation.add(line1);
 layerStation.add(line2);
@@ -266,8 +267,18 @@ state.addEventListener("update", (event) => {
       for (const loop of networkJSON["loops"]) {
         for (const elt of loop["elements"]) {
           if (selected._name === elt["name"]) {
+            for (let i = selected._podMax; i < 10; i++) {
+                if (podsStation[i]){
+                    podsStation[i]["outer"].destroy();
+                    podsStation[i]["inner"].destroy();
+                    podsStation[i] = null;
+                }
+                if (travelers[i]){
+                    travelers[i].remove()
+                }
+            }
             for (let i = 0; i < selected._podMax; i++) {
-              if (selected._podPos[i]) {
+              if (selected._podPos[i]) {  // affichage des pods vides ou pleins de la station
                 if (podsStation[i] == null) {
                   const outerShape = new Circle({
                     x: firstPlaceX + i * radius * 2.5,
@@ -291,13 +302,18 @@ state.addEventListener("update", (event) => {
                   };
                   layerStation.add(outerShape);
                   layerStation.add(innerShape);
+                  if (travelers[i] != null) {
+                      travelers[i] = null
+                  }
                 } else if (selected._podFull[i] && !selected._podBoarding[i]) {
                   podsStation[i]["inner"].fill('black');
+                } else {
+                  podsStation[i]["inner"].fill('white');
                 }
-                
+
                 if (selected._podBoarding[i]) {
                   if (travelers[i] == null) {
-                      const traveler = new Circle({
+                      const traveler = new Circle({     // points des passagers en embarquement
                           x: firstPlaceX + i * radius * 2.5,
                           y: firstPlaceY + radius + travelLength,
                           radius: 5,
@@ -323,6 +339,9 @@ state.addEventListener("update", (event) => {
                   podsStation[i]["outer"].destroy();
                   podsStation[i]["inner"].destroy();
                   podsStation[i] = null;
+                  if (travelers[i] != null){
+                      travelers[i].remove();
+                  }
                 }
               }
             }

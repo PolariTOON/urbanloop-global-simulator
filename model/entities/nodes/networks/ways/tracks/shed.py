@@ -31,7 +31,7 @@ class Shed(Step):
     def serialize(self):
         """sérialise les informations du dépôt"""
         dict = super().serialize()
-        departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"]} for dico in self._departure_pods]
+        departure_pods = [{"pod": pod.serialize(), "destination": pod.destination} for pod in self._departure_pods]
         self.element_of_loop.update({
             "name": self.name
         })
@@ -81,9 +81,9 @@ class Shed(Step):
             # Départ d'une capsule
             if self._departure_pods and self._wait == -1:
                 self._wait = 0
-                dico = self._departure_pods.pop(0)
-                pod = dico["pod"]
-                destination = dico["destination"]
+                pod = self._departure_pods.pop(0)
+                destination = pod.destination
+                print(">>>", pod.name, "message departure")
                 yield from pod.write({
                     "author": self,
                     "type": "departure",
@@ -98,7 +98,9 @@ class Shed(Step):
                     "timestamp": self.env.time,
                     "waiting_time": 0,
                     "traveler": False
-                    })
+                })
+                print("remove ", pod.name)
+                self._pods.remove(pod)
 
             while True:
                 message = yield from self.read()
@@ -134,8 +136,13 @@ class Shed(Step):
                 elif "refill" == message["type"]:
                     station = message["station"]
                     if len(self._pods) > 0:
-                        pod = self._pods.pop(0)
-                        self._departure_pods.append({"pod": pod, "destination": station})
+                        i = 0
+                        while self._pods[i] in self._departure_pods:
+                            i += 1
+                        pod = self._pods[i]
+                        pod.destination = station
+                        self._departure_pods.append(pod)
+                        print(">> add ", pod.name)
                     else:
                         print("\u001B[31m", self.name, "envoie de pod impossible, shed vide", len(self._pods), "\u001B[0m", "(shed l.141)\n")
                         for station0 in self.parent.parent.stations:

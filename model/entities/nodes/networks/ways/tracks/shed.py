@@ -83,7 +83,6 @@ class Shed(Step):
                 self._wait = 0
                 pod = self._departure_pods.pop(0)
                 destination = pod.destination
-                print(">>>", pod.name, "message departure")
                 yield from pod.write({
                     "author": self,
                     "type": "departure",
@@ -115,7 +114,6 @@ class Shed(Step):
                     })
                     if pod.destination == self.name:
                         self._pods.append(pod)
-                        print("pods en stock :", self.name, len(self._pods), "(shed l.116)")
                         yield from pod.write({
                             "author": self,
                             "type": "docked"
@@ -142,7 +140,6 @@ class Shed(Step):
                         pod = self._pods[i]
                         pod.destination = station
                         self._departure_pods.append(pod)
-                        print(">> add ", pod.name)
                     else:
                         print("\u001B[31m", self.name, "envoie de pod impossible, shed vide", len(self._pods), "\u001B[0m", "(shed l.141)\n")
                         for station0 in self.parent.parent.stations:

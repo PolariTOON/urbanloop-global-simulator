@@ -1,3 +1,9 @@
+revoir les appels refill dans les stations
+Refill non-aléatoire de capsule à partir des sheds
+Faire une API web pour générer des passagers dans la simulation présentant les fonctions:
+    - getpod -> return podid
+    - gettravelinfo(podid) -> json (position, temps avant arrivée, ...)
+    - injectpassenger(ID,station_ orig, station_dest)
 corriger la sauvegarde/reutilisation d'un reseau en cours de simulation (voir l'application de modifjson):
     - station.py : pouvoir retrouver les temps d'attente quand on recharge le fichier pour ne pas fausser les stats (average_waiting_time) (ajouter dans serialize)
     - voir si d'autres paramètres du PI ne sont pas pris en compte

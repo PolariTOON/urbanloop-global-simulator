@@ -2,6 +2,8 @@ from math import hypot, nan
 import sys
 
 from .....tokens.pod import Pod
+from .shed import Shed
+from .station import Station
 from .track import Track
 
 class Section(Track):
@@ -116,6 +118,14 @@ class Section(Track):
                     # et il faut notifier le parent pour qu'il prévienne la piste/l'aiguillage précédente
                     pod = message["pod"]
                     self._pods.append(pod)
+                    if isinstance(self.previous, Shed):  # suppression de la capsule dans le shed d'envoie
+                        if self.previous.pods[0] == message["author"]:
+                            self.previous.pods.remove(pod)
+                    if isinstance(self.previous, Station):  # suppression de la capsule de la station d'envoie
+                        if self.previous.pods[0] == message["author"]:
+                            self.previous.pods[0] = None        # une capsule par à la fois elle a été placée à la fin
+                                                                # on empêche en même temps d'insérer un nouveau pod alors
+                                                                # que le précédent n'est pas encore parti
                     yield from self._parent.write({
                         "author": self,
                         "type": "pod_entry",

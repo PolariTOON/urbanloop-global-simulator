@@ -44,7 +44,7 @@ class Network(Node):
         # où t contient les destinations pour lesquelles il faut tourner en s1
         self._routing_table0 = {}
         self._update_routing(init=True)  # création des tables de routage
-        self.departure_arrival_printer = True  # mettre à vrai pour afficher des informations dans le terminal
+        self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
 
     @property
     def name(self):
@@ -380,12 +380,15 @@ class Network(Node):
         Gestion du processus du réseau à chaque boucle d'événement simpy
         :return: void
         """
+        last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
+        last_pods = {}
         global tour_de_boucle
         while True:
             tour_de_boucle += 1
-            if tour_de_boucle % 360 == 0:
+            if tour_de_boucle % 1080 == 0:
                 print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
-                      "]\u001B[0m")
+                      "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.390)\n")
+            last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
             #print("-------------------------------------------------------------")
             #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
             #print("-------------------------------------------------------------")
@@ -453,6 +456,45 @@ class Network(Node):
                                 station0.up_incoming_pods()
                 else:
                     raise ValueError("Invalid message")
+
+    def pods_du_reseau(self, last_count, last_pods):
+        """ permet d'afficher dans le terminal les pods du réseau, leur position et les compter quand un pod est manquant"""
+        pods_du_reseau = {}
+        nb_pods = 0
+        for switch in self.switches:
+            if len(switch.pods) != 0:
+                pods_du_reseau[switch.name] = str(len(switch.pods))
+            nb_pods += len(switch.pods)
+        for road in self.roads:
+            nb_pod_road = 0
+            for pod in road.pods:
+                if pod is not None:
+                    nb_pod_road += 1
+            if nb_pod_road != 0:
+                if len(road.steps) != 0:
+                    step_pods = " ["
+                    for pod in road.steps[0].pods:
+                        if pod is None:
+                            step_pods += "None "
+                        else:
+                            step_pods += pod.name[:8] + " "
+                    step_pods += "]"
+                    pods_du_reseau[road.name] = str(nb_pod_road) + " (" + road.steps[0].name + step_pods + ")"
+                else:
+                    pods_du_reseau[road.name] = str(nb_pod_road)
+            nb_pods += nb_pod_road
+        if nb_pods != last_count and last_count != -1:
+            print("\t\u001B[31mmodif nombre de pods:", last_count, "->", nb_pods, "\u001B[0m\t\t\t\t\t\t (network l.480)")
+            for key in last_pods.keys():
+                if key not in pods_du_reseau.keys():
+                    print("\t|\t\t\u001B[31m", key, last_pods[key], ">>>", "--", "\u001B[0m")
+            for key in pods_du_reseau.keys():
+                if key not in last_pods.keys():
+                    print("\t|\t\t\u001B[31m", key, " -- ", ">>>", pods_du_reseau[key], "\u001B[0m")
+                elif last_pods[key] != pods_du_reseau[key]:
+                    print("\t|\t\t\u001B[31m", key, last_pods[key], ">>>", pods_du_reseau[key], "\u001B[0m")
+            print("\n")
+        return nb_pods, pods_du_reseau
 
 
 def _init_pod_of_line(line, pod):

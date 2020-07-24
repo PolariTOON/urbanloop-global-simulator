@@ -139,7 +139,7 @@ def mod_station(item):
 						data["loops"].append({"name": loop_name,
 							"elements": [
 								{"type": "switch_in", "x": x_in2, "y": y_in2, "id_bridge": id_bridge, "pods": []},
-        						{"type": "shed", "name": station_name, "x": x_s, "y": y_s, "pods": {"max": 100, "count": 100}},
+        						{"type": "shed", "name": station_name, "x": x_s, "y": y_s, "pods": pods},
 								{"type": "switch_out", "x": x_out2, "y": y_out2, "id_bridge": id_bridge+1, "pods": []}
 							],
 							"sections": [

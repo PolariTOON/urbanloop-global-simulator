@@ -227,7 +227,6 @@ class Pod(Token):
             # La capsule s'insère et tourne si elle en a reçu l'ordre
 
             if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._track_or_switch.length :
-                checked = False
                 self.position -= self._track_or_switch.length
                 self._track_or_switch = self._track_or_switch.beside.sections[0]
                 yield from self._track_or_switch.write({
@@ -301,13 +300,13 @@ class Pod(Token):
                         self._turn = self._track_or_switch.stat_or_shed == self._destination   # self.turn est vrai si c'est l'arrivée
                         stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
                         if stat_or_shed.isFull():
-                            print("\033[4;31mpod l.305: Full\u001B[0m", stat_or_shed.name, "\t\t", len(stat_or_shed.pods), "/", stat_or_shed.capacity, end=' [')
+                            print("\033[4;31mFull\u001B[0m", stat_or_shed.name, "\t\t", len(stat_or_shed.pods), "/", stat_or_shed.capacity, end=' [')
                             for pod in stat_or_shed.pods:
                                 if pod is not None:
                                     print(pod.name[:8], end=' ')
                                 else:
-                                    print(pod, end='')
-                            print("]\n")
+                                    print(pod, end=' ')
+                            print("]\t\t\t\t (pod l.305)\n")
                             self._turn = False
                     else:
                         self._turn = True

@@ -119,6 +119,8 @@ class Section(Track):
                     pod = message["pod"]
                     self._pods.append(pod)
                     if isinstance(self.previous, Shed):  # suppression de la capsule dans le shed d'envoie
+                        if len(self.previous.pods) == 0:
+                            print("\t\t\t\t", self.previous.name, "est vide", "(section l.122)")
                         if self.previous.pods[0] == message["author"]:
                             self.previous.pods.remove(pod)
                     if isinstance(self.previous, Station):  # suppression de la capsule de la station d'envoie

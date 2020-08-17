@@ -307,6 +307,11 @@ class Pod(Token):
                                 else:
                                     print(pod, end=' ')
                             print("]\t\t\t\t (pod l.305)\n")
+                            print("\tpods_size = ", stat_or_shed._pods_size, "/", stat_or_shed.capacity, "\n\tlen departure_pods", len(stat_or_shed._departure_pods), "> departure pods = [", end=' ')
+                            for pod in stat_or_shed._departure_pods:
+                                if pod is not None:
+                                    print(pod.name[:8], end=' ')
+                            print("]\n")
                             self._turn = False
                     else:
                         self._turn = True

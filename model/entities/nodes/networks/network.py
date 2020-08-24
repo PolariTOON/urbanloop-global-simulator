@@ -14,11 +14,9 @@ from .ways.switch_in import SwitchIn
 from .ways.switch_out import SwitchOut
 from .Statistiques import *
 
-tour_de_boucle = 0
 
 # TODO : Gérer les timers des capsules (temps de trajets)
 # TODO : Gérer les stats
-# TODO : drain des capsules superflues dans les gares
 
 
 class Network(Node):
@@ -109,6 +107,10 @@ class Network(Node):
     @property
     def dynamic_routing(self):
         return self._dynamic_routing
+
+    @property
+    def statistiques(self):
+        return self._statistiques
 
     @property
     def view_box(self):
@@ -382,12 +384,18 @@ class Network(Node):
         """
         last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
         last_pods = {}
-        global tour_de_boucle
+        one_print = True
         while True:
-            tour_de_boucle += 1
-            if tour_de_boucle % 1080 == 0:
+            if round(self.env.time) % 60 == 1:  # pour éviter d'écrire plusieurs lignes pour un temps donné si le pas est bas
+                one_print = True
+            if round(self.env.time) % 60 == 0 and one_print:  # affichage et écriture en fichier toutes les minutes de simulations
+                one_print = False
                 print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
-                      "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.390)\n")
+                      "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.390)")
+                if self.departure_arrival_printer:
+                    self.statistiques.print_stats()
+                self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
+                print("\n")
             last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
             #print("-------------------------------------------------------------")
             #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
@@ -446,7 +454,7 @@ class Network(Node):
                         print("\t\t\u001B[36m|\u001B[0m nom du pod:\t", message["pod"].name[:8])
                         print("\t\t\u001B[36m|\u001B[0m waiting time:\t", str(round(waiting_time)) + " seconds")
                         print("\t\t\u001B[36m|\u001B[0m traveler:\t\t", str(traveler), "\n")
-                    self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler)
+                    self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler, origin)
                     if traveler:
                         # dans le cas d'un voyage,
                         # ce n'est pas une capsule appelée par la station pour combler l'espace

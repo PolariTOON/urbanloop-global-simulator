@@ -1,5 +1,6 @@
 from numpy import floor, sum
-import random
+from random import randint, random, choice
+from model.entities.tokens.traveler import Traveler
 from scipy.stats import norm
 import math
 
@@ -8,27 +9,26 @@ from model.entities.nodes.networks.ways.tracks import station
 
 class Probability:
     """
-    TODO : la génération de voyageur est à faire dans chaque gare en s'inspirant de la génération globale faite dans l'ancien simulateur
     Modélise la prbabilité d'apparition d'un voyageur dans une gare
     """
 
-    def __init__(self, prob, traveler):
+    def __init__(self, prob, traveler, stations, statistiques, tick):
         self._city_percent = int(prob['city_percent'])
         self._activity_and_residential_percent = int(prob['activity_and_residential_percent'])
         self._activity_and_residential_fluctuation = int(prob['activity_and_residential_fluctuation'])
+        if None in (self._city_percent, self._activity_and_residential_percent, self._activity_and_residential_fluctuation):
+            raise ValueError("Converter hasn't been loaded (probability l.20)")
         self._morning_peak_hour = int(traveler['morning_peak_hour'])
         self._evening_peak_hour = int(traveler['evening_peak_hour'])
         if self._activity_and_residential_fluctuation < 0 or self._activity_and_residential_fluctuation >= self._activity_and_residential_percent:
             self._activity_and_residential_fluctuation = floor(self._activity_and_residential_percent / 2)
-
-    def random_ascent_descent_duration(self, tick_per_second):
-        """
-        :param tick_per_second: number of tick per second of the simulation
-        :return: A value between [|time-2, time+2|]. time is the defined duration (in the config file)
-        for ascent and descent events.
-        """
-        random_seconds = randrange(self._ascent_descent_duration - 2, self._ascent_descent_duration + 2, 1)
-        return random_seconds * tick_per_second
+        self.stations = stations
+        self.statistiques = statistiques
+        peak_hours_coefficient = [1, 1, 1, 1, 1, 1, 7, 40, 20, 15, 15, 10, 20, 20, 15, 7, 15, 20, 20, 10, 7, 3, 2, 2]  # coefficient de fréquentation selon l'heure de la journée
+        somme_coefficient = int(sum(peak_hours_coefficient))  # total des coefficients
+        travelers_per_day = int(traveler["travelers_per_day"])  # on récupère le nombre moyen de voyageurs par jour
+        traveler_lambda_per_hour = [travelers_per_day * coefficient / somme_coefficient for coefficient in peak_hours_coefficient]  # liste du nombre de passagers générés pour chaque heure de la journée
+        self.traveler_per_tick = [traveler0 / (3600 / tick) for traveler0 in traveler_lambda_per_hour]  # nombre moyen de passagers générés par tick selon l'heure
 
     def station_probability(self, station_type, second, is_arrival=True):
         """
@@ -39,11 +39,7 @@ class Probability:
         :param second: The time in second
         :param is_arrival: If the station is a departure or destination station
         :return: The probability to lead a traveler to the chosen station_type at the given time
-        """ 
-        if None in (
-                self._city_percent, self._activity_and_residential_percent, self._activity_and_residential_fluctuation):
-            print("Converter hasn't been loaded")
-            return 0
+        """
         second = second % 86400
         gaussian_factor = 250 * (self._activity_and_residential_fluctuation / 100)
         result = 0
@@ -76,24 +72,34 @@ class Probability:
                     result = self._activity_and_residential_percent - gaussian_factor * norm_eph
         return round(result / 100, 2)
 
+    def generate_traveler_poisson(self, hour, time, env):
+        """
+        genere des voyageurs de manière aléatoire à chaque tick
+        :param traveler_per_hour: number of traveler per day
+        :param hour: The hour at which you want to create a traveler
+        :param tick_per_second : number of tick per second
+        :return: amount of generated traveler (0 or 1).
+        """
+        prob = 1 - math.exp(-self.traveler_per_tick[hour])
+        if random() <= prob:
+            ri = randint(1, len(self.stations))
+            s = self.stations[ri - 1]
+            r = random()
+            # todo - trouver comment marche station_probability
+            # todo comprendre le truc en dessous...
+            # todo augmenter les chances d'aller vers une station plus fréquentée plutôt qu'un tirage au sort pour la destination
 
-def generate_traveler_poisson(traveler_per_hour, hour, tick_per_second):
-    """
-    genere des voyageurs de manière aléatoire à chaque tick
-    :param traveler_per_hour: number of traveler per hour
-    :param hour: The hour at which you want to create a traveler
-    :param tick_per_second : number of tick per second
-    :return: amount of generated traveler (0 or 1).
-    """
-    peak_hours_coefficient = [1, 1, 1, 1, 2, 3, 3, 6, 8, 8, 7, 4, 5, 5, 4, 4, 6, 7, 8, 6, 4, 3, 2, 2]
-    somme_coefficient = int(sum(peak_hours_coefficient))
-    traveler_per_hour = int(traveler_per_hour)
-    traveler_lambda_per_hour = [traveler_per_hour * coefficient / (24 * somme_coefficient) for coefficient in
-                                peak_hours_coefficient]
-    traveler_per_tick = traveler_lambda_per_hour[hour] / (3600 * tick_per_second)
-    prob = 1 - math.exp(-traveler_per_tick)
-    if random.random() <= prob:
-        return 1
-    else:
-        return 0 
-
+            if r <= self.station_probability(s.station_type, time, False):  # si le nombre aléatoire généré est inférieur à la probabilité d'appartion
+                # pass
+                traveler_source = s.name                    # la source est là où le traveler est généré
+                self.statistiques.add_waiting_traveler(s.name)
+                stations = []
+                for station0 in self.stations:
+                    stations.append(station0.name)
+                stations.remove(s.name)
+                traveler_destination = choice(stations)     # la destination une des autres stations
+                s.travelers.append(Traveler(env, time, source=traveler_source, destination=traveler_destination))  # alors un voyageur est généré
+                """print("\u001B[32mNew Traveler", "\u001B[0m", traveler_source, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(simulation l.123)",
+                                        "\n\t\t\u001B[32m|\u001B[0m nombre de travelers dans la station:", len(s.travelers),
+                                        "\n\t\t\u001B[32m|\u001B[0m taille de la station:", s.capacity, "\n")"""
+                s._all_time_count += 1

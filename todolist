@@ -1,16 +1,15 @@
-revoir les appels refill dans les stations
+Corriger la génération des passagers/ vérifier la pertinence des valeurs
+Créer un réseau à l'échelle de Nancy + fond
 Refill non-aléatoire de capsule à partir des sheds
 Faire une API web pour générer des passagers dans la simulation présentant les fonctions:
     - getpod -> return podid
     - gettravelinfo(podid) -> json (position, temps avant arrivée, ...)
     - injectpassenger(ID,station_ orig, station_dest)
-corriger la sauvegarde/reutilisation d'un reseau en cours de simulation (voir l'application de modifjson):
+Corriger la sauvegarde/reutilisation d'un reseau en cours de simulation (voir l'application de modifjson):
     - station.py : pouvoir retrouver les temps d'attente quand on recharge le fichier pour ne pas fausser les stats (average_waiting_time) (ajouter dans serialize)
     - voir si d'autres paramètres du PI ne sont pas pris en compte
-Ajouter des statistiques/ corriger nb of traveler
-corriger l'accélération de vitesse de simulation
-créer un réseau à l'échelle de Nancy + fond
+Corriger l'accélération de vitesse de simulation (il y a des problèmes mais très peu en mode jerky)
 Déployer le simulateur & l'éditeur
-considérer l'accélération dans les calculs d'insertion
-rajouter des paramètres dans l'éditeur
-corriger le téléchargement de json dans l'éditeur (des réseaux valides ne peuvent être téléchargés et pas de message d'erreur)
+Considérer l'accélération dans les calculs d'insertion
+Rajouter des paramètres dans l'éditeur
+Corriger le téléchargement de json dans l'éditeur (des réseaux valides ne peuvent être téléchargés et pas de message d'erreur)

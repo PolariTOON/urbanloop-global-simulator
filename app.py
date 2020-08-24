@@ -1,8 +1,5 @@
-from asyncio import get_running_loop, run, run_coroutine_threadsafe, sleep
-from flask import Flask, jsonify, request
-from functools import wraps
+from asyncio import get_running_loop, run, sleep
 from json import load
-from logging import ERROR, getLogger
 from threading import Thread
 from traceback import print_exc
 
@@ -45,7 +42,8 @@ async def _run_simulations(networks, wave):
                 print_exc()
     _loop = get_running_loop()
     while True:
-        await sleep(_wave)
+        # await sleep(_wave)
+        await sleep(0.0000000001)
         crashed_simulations = []
         for key in _simulations:
             simulation = _simulations[key]

@@ -15,10 +15,6 @@ from .ways.switch_out import SwitchOut
 from .Statistiques import *
 
 
-# TODO : Gérer les timers des capsules (temps de trajets)
-# TODO : Gérer les stats
-
-
 class Network(Node):
     def __init__(self, env, id, bridges=None, loops=None, switches=None, roads=None, view_box=None, margin_min=None,
                  pod_size=None, max_speed=None, places_number=None, dynamic_routing=None, **kwargs):
@@ -175,14 +171,16 @@ class Network(Node):
                     id_bridge = n["id_bridge"]
                     if n["type"] == "switch_in":
                         if "switch_in" in self._bridges[id_bridge]:
-                            raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN")
+                            print("error id =", id_bridge)
+                            raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN (network l.178)")
                         self._bridges[id_bridge]["switch_in"] = {
                             "loop": b,
                             "element": node
                         }
                     else:
                         if "switch_out" in self._bridges[id_bridge]:
-                            raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN")
+                            print("error id =", id_bridge)
+                            raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN (network l.185)")
                         self._bridges[id_bridge]["switch_out"] = {
                             "loop": b,
                             "element": node

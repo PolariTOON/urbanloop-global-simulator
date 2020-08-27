@@ -1,0 +1,103 @@
+Switch In 1-2,48.6635025,6.155294,1,Switch_In,0
+Le Reclus,48.6625025,6.153294,1,True,
+Saint-Andre,48.6602563,6.1508263,1,True,
+Faisanderie,48.6539337,6.1435787,1,True,
+Vandoeuvre CHU Brabois,48.6493734,6.1375504,1,True,
+Depot 1,48.65,6.15,1,False,
+Doyen Roubault,48.656734466552734,6.154836177825928,1,True,
+Switch Out 1-2,48.6635025,6.158294,1,Switch_Out,1
+
+Switch In 2-1,48.6651491394043,6.160393690490723,2,Switch_In,1
+Callot,48.6661491394043,6.165993690490723,2,True,
+Campus Artem,48.672080993652344,6.172549724578857,2,True,
+Switch Out 2-4,48.6793937,6.1751577,2,Switch_Out,2
+Switch In 2-4,48.6803937,6.1715767,2,Switch_In,3
+Jean Jaures,48.6783937,6.1710767,2,True,
+Exelmans,48.6751027,6.1671907,2,True,
+Montet Octroi,48.6684305,6.1599525,2,True,
+Velodrome,48.6669451,6.1582395,2,True,
+Switch Out 2-1,48.6659451,6.1582395,2,Switch_Out,0
+
+Switch In 3-5,48.6876902,6.1520069,3,Switch_In,4
+Messier,48.6895327,6.1513887,3,True,
+Switch In 3-6,48.6903598,6.1500098,3,Switch_In,7
+Switch Out 3-6,48.6903598,6.1491098,3,Switch_Out,6
+chemin blanc,48.6903598,6.1473098,3,True,
+Arret Gare Saint-Leon ,48.6870897,6.1414225,3,True,
+europe,48.680336,6.1438003,3,True,
+medreville,48.6852987,6.1515117,3,True,
+gridel,48.6866902,6.1520069,3,True,
+Switch Out 3-5,48.6881902,6.1520069,3,Switch_Out,5
+
+Switch In 4-2,48.6823937,6.1735767,4,Switch_In,2
+Varsovie,48.6834177,6.1751577,4,True,
+Depot 3,48.685,6.18,4,False,
+quartier saint-nicolas,48.6860917,6.1757227,4,True,
+Switch Out 4-7,48.6860917,6.1732227,4,Switch_Out,13
+Switch In 4-7,48.6860917,6.1707227,4,Switch_In,12
+Mon Desert,48.6843401,6.1677888,4,True,
+Switch In 4-5,48.684759,6.1658613,4,Switch_In,10
+Switch Out 4-5,48.684259,6.1644613,4,Switch_Out,11
+jeanne d'arc,48.6833947,6.1636717,4,True,
+Garenne,48.6811921,6.1698354,4,True,
+Switch Out 4-2,48.6813937,6.1715767,4,Switch_Out,3
+
+Switch In 5-4,48.6845199,6.1635613,5,Switch_In,11
+kleber,48.683899,6.1608613,5,True,
+Switch Out 5-3,48.6855347,6.1592417,5,Switch_Out,4
+commanderie,48.6865347,6.1592417,5,True,
+Switch In 5-3,48.6875347,6.1592417,5,Switch_In,5
+poincare,48.6892807,6.1603277,5,True,
+domremy,48.6882397,6.1614057,5,True,
+Switch Out 5-7,48.6882897,6.1633187,5,Switch_Out,9
+Saint-leon,48.6882897,6.1643187,5,True,
+Switch In 5-7,48.6872897,6.1653687,5,Switch_In,8
+Kennedy,48.6865172,6.1660384,5,True,
+Switch Out 5-4,48.685599,6.1658613,5,Switch_Out,10
+
+Switch In 6-3,48.6962317,6.1477497,6,Switch_In,6
+Saint-mansuy,48.6973088,6.1464229,6,True,
+Depot 2,48.70,6.15,6,False,
+alix le clerc,48.7020364,6.1553539,6,True,
+Pierson,48.7030656,6.1665893,6,True,
+citadelle,48.7003627,6.1686157,6,True,
+simon,48.7005347,6.1676967,6,True,
+Switch In 6-7,48.7005347,6.1656967,6,Switch_In,16
+place aime morot,48.6992567,6.1570797,6,True,
+Switch Out 6-7,48.6972567,6.1560797,6,Switch_Out,17
+cite universitaire,48.6962317,6.1537497,6,True,
+Switch Out 6-3,48.6962317,6.1507497,6,Switch_Out,7
+
+Switch In 7-6,48.6918517,6.1655167,7,Switch_In,17
+Switch In 7-5,48.6912517,6.1655167,7,Switch_In,9
+tour thiers gare,48.6908567,6.1658267,7,True,
+poirel,48.6904027,6.1671117,7,True,
+Maginot,48.6892817,6.1689072,7,True,
+Nancy Gare,48.6890946,6.1671714,7,True,
+Switch Out 7-5,48.6882817,6.1689072,7,Switch_Out,8
+Switch Out 7-4,48.6882817,6.1699072,7,Switch_Out,12
+saint sebastien,48.68817,6.170912,7,True,
+Switch In 7-4,48.6882817,6.1725072,7,Switch_In,13
+marche central,48.6886687,6.1738327,7,True,
+place charles III point central,48.6897399,6.1746102,7,True,
+Point Central,48.6909748,6.1741355,7,True,
+Switch Out 7-8,48.6916747,6.1738277,7,Switch_Out,14
+place stanilas - dom calmet,48.6919747,6.1728277,7,True,
+Switch In 7-8,48.6929747,6.1718277,7,Switch_In,15
+place dombasle,48.6921647,6.1699197,7,False,
+place carnot,48.6928517,6.1682167,7,True,
+Switch Out 7-6,48.6928517,6.1672167,7,Switch_Out,16
+
+Switch In 8-7,48.69321442260742,6.185602188110352,8,Switch_In,14
+Cathedrale,48.69181442260742,6.185602188110352,8,True,
+Division de Fer,48.693138122558594,6.190464496612549,8,True,
+Cristalleries,48.69761657714844,6.1977458000183105,8,True,
+Depot 4,48.70,6.21,8,False,
+Essey Mouzimpre,48.7016747,6.2162397,8,True,
+Clinique Pasteur,48.70321273803711,6.216973304748535,8,True,
+Essey Roosevelt,48.7037611,6.2124129,8,True,
+Washington Foch,48.702072,6.2046528,8,True,
+Saint-Livier,48.7008349,6.2002038,8,True,
+Gerard Barrois,48.6996482,6.1958677,8,True,
+Saint-Georges,48.6956144,6.1865317,8,True,
+Switch Out 8-7,48.69421442260742,6.185602188110352,8,Switch_Out,15

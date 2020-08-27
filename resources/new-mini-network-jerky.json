@@ -30,9 +30,9 @@
       "name": "Nancy",
       "elements": [
         {"type": "switch_in", "x": 365, "y": 310, "id_bridge": 0, "pods": []},
-        {"type": "station", "name": "Gare", "x": 480, "y": 290, "pods": {"max": 4, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-        {"type": "station", "name": "Stanislas", "x": 560, "y": 370, "pods": {"max": 4, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-        {"type": "station", "name": "Campus_ARTEM", "x": 507, "y": 445, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Gare", "x": 480, "y": 290, "pods": {"max": 4, "count": 2}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Stanislas", "x": 560, "y": 370, "pods": {"max": 4, "count": 2}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Campus_ARTEM", "x": 507, "y": 445, "pods": {"max": 4, "count": 2}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "switch_out", "x": 436, "y": 459, "id_bridge": 1, "pods": []},
         {"type": "switch_out", "x": 360, "y": 417, "id_bridge": 2, "pods": []}
       ],
@@ -51,15 +51,13 @@
       "name": "Villers-les-Nancy",
       "elements": [
         {"type": "switch_in", "x": 415, "y": 474, "id_bridge": 1, "pods": []},
-        {"type": "station", "name": "Velodrome", "x": 411, "y": 570, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-        {"type": "station", "name": "Telecom Nancy", "x": 371, "y": 655, "pods": {"max": 4, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-        {"type": "station", "name": "Eglise", "x": 222, "y": 658, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Velodrome", "x": 411, "y": 570, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Telecom Nancy", "x": 371, "y": 655, "pods": {"max": 4, "count": 2}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Eglise", "x": 222, "y": 658, "pods": {"max": 3, "count": 1}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "shed", "name": "Jean-paul", "x": 189, "y": 550, "pods": {"max": 40, "count": 20}},
-        {"type": "switch_out", "x": 215, "y": 469, "id_bridge": 3, "pods": []},
-        {"type": "sensor", "x": 280, "y": 470}
+        {"type": "switch_out", "x": 215, "y": 469, "id_bridge": 3, "pods": []}
       ],
       "sections": [
-        {"speed": 16.67, "path": {"type": "line"}},
         {"speed": 16.67, "path": {"type": "line"}},
         {"speed": 16.67, "path": {"type": "line"}},
         {"speed": 16.67, "path": {"type": "line"}},
@@ -74,8 +72,8 @@
       "elements": [
         {"type": "switch_in", "x": 345, "y": 420, "id_bridge": 2, "pods": []},
         {"type": "switch_in", "x": 200, "y": 450, "id_bridge": 3, "pods": []},
-        {"type": "station", "name": "Auchan", "x": 90, "y": 370, "pods": {"max": 3, "count": 0}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-        {"type": "station", "name": "Sapiniere", "x": 121, "y": 235, "pods": {"max": 3, "count": 0}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Auchan", "x": 90, "y": 370, "pods": {"max": 3, "count": 1}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+        {"type": "station", "name": "Sapiniere", "x": 121, "y": 235, "pods": {"max": 3, "count": 1}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "shed", "name": "Marie-Jeanne", "x": 212, "y": 229, "pods": {"max": 40, "count": 20}},
         {"type": "switch_out", "x": 339, "y": 295, "id_bridge": 0, "pods": []},
         {"type": "sensor", "x": 300, "y": 370}

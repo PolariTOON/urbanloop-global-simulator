@@ -1,5 +1,4 @@
-Corriger la génération des passagers/ vérifier la pertinence des valeurs
-Créer un réseau à l'échelle de Nancy + fond
+Vérifier la pertinence des valeurs (taille des routes, vitesse des capsules, génération des passagers)
 Refill non-aléatoire de capsule à partir des sheds
 Faire une API web pour générer des passagers dans la simulation présentant les fonctions:
     - getpod -> return podid

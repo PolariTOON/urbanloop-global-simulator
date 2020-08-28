@@ -53,6 +53,9 @@ class Station(Step):
         self._incoming_pods = 0  # à serialiser si on veut télécharger/rechager le réseau, c'est le nombre de pods en chemin vers la station
         self.indice_test = 0
 
+    def up_all_time_count(self):
+        self._all_time_count += 1
+
     def serialize(self):
         """Permet la serialisation des informations"""
         dict = super().serialize()

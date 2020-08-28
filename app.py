@@ -42,8 +42,8 @@ async def _run_simulations(networks, wave):
                 print_exc()
     _loop = get_running_loop()
     while True:
-        # await sleep(_wave)
-        await sleep(0.0000000001)
+        # await sleep(_wave)  # utile pour ralentir une simulation pour utiliser l'interface
+        await sleep(0.000001)
         crashed_simulations = []
         for key in _simulations:
             simulation = _simulations[key]

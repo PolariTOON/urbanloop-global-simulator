@@ -17,7 +17,9 @@ def mod_station(item):
 
 					station_name = loop["elements"][i]["name"]
 					pods = loop["elements"][i]["pods"]
-
+					station_type = 0
+					if type == "station":
+						station_type = loop["elements"][i]["station_type"]
 					bridge_name1 = " "
 					bridge_name2 = " "
 
@@ -124,7 +126,7 @@ def mod_station(item):
 						data["loops"].append({"name": loop_name,
 							"elements": [
 								{"type": "switch_in", "x": x_in2, "y": y_in2, "id_bridge": id_bridge, "pods": []},
-								{"type": "station", "name": station_name, "x": x_s, "y": y_s, "pods": pods, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+								{"type": "station", "name": station_name, "x": x_s, "y": y_s, "pods": pods, "station_type": station_type, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 								{"type": "switch_out", "x": x_out2, "y": y_out2, "id_bridge": id_bridge+1, "pods": []}
 							],
 							"sections": [

@@ -3,6 +3,7 @@ from random import randint, random, choice
 from model.entities.tokens.traveler import Traveler
 from scipy.stats import norm
 import math
+from numpy.random import poisson
 
 from model.entities.nodes.networks.ways.tracks import station
 
@@ -29,6 +30,21 @@ class Probability:
         travelers_per_day = int(traveler["travelers_per_day"])  # on récupère le nombre moyen de voyageurs par jour
         traveler_lambda_per_hour = [travelers_per_day * coefficient / somme_coefficient for coefficient in peak_hours_coefficient]  # liste du nombre de passagers générés pour chaque heure de la journée
         self.traveler_per_tick = [traveler0 / (3600 / tick) for traveler0 in traveler_lambda_per_hour]  # nombre moyen de passagers générés par tick selon l'heure
+        coef_station = []
+        """ - zone d’activité : 0
+                    - zone résidentielle : 1
+                    - ville : 2"""
+        for station0 in self.stations:
+            if station0._station_type == 0:
+                coef_station.append(0.1)
+            elif station0._station_type == 1:
+                coef_station.append(0.3)
+            else:
+                coef_station.append(0.5)
+        tot_coef = sum(coef_station)
+        for i in range(len(coef_station)):
+            coef_station[i] = coef_station[i]/tot_coef
+        self.coef_station = coef_station       # répartition des voyageurs dans le réseau
 
     def station_probability(self, station_type, second, is_arrival=True):
         """
@@ -72,6 +88,8 @@ class Probability:
                     result = self._activity_and_residential_percent - gaussian_factor * norm_eph
         return round(result / 100, 2)
 
+    # todo - trouver comment corriger cette fonction,
+    #  je n'ai pas eu le temps de comprendre j'ai refait une autre fonction
     def generate_traveler_poisson(self, hour, time, env):
         """
         genere des voyageurs de manière aléatoire à chaque tick
@@ -80,15 +98,12 @@ class Probability:
         :param tick_per_second : number of tick per second
         :return: amount of generated traveler (0 or 1).
         """
+        self.generate_traveler_2(time, env)
         prob = 1 - math.exp(-self.traveler_per_tick[hour])
         if random() <= prob:
             ri = randint(1, len(self.stations))
             s = self.stations[ri - 1]
             r = random()
-            # todo - trouver comment marche station_probability
-            # todo comprendre le truc en dessous...
-            # todo augmenter les chances d'aller vers une station plus fréquentée plutôt qu'un tirage au sort pour la destination
-
             if r <= self.station_probability(s.station_type, time, False):  # si le nombre aléatoire généré est inférieur à la probabilité d'appartion
                 # pass
                 traveler_source = s.name                    # la source est là où le traveler est généré
@@ -103,3 +118,25 @@ class Probability:
                                         "\n\t\t\u001B[32m|\u001B[0m nombre de travelers dans la station:", len(s.travelers),
                                         "\n\t\t\u001B[32m|\u001B[0m taille de la station:", s.capacity, "\n")"""
                 s._all_time_count += 1
+
+    def generate_traveler_2(self, time, env):
+        """utilisation de la loi de Poisson"""
+        hour = int(round(time / 3600, 2))%24
+        travelers_to_generate = self.traveler_per_tick[hour]    # nb de voyageurs que l'on génère au tick présent
+        travelers_to_generate_per_station = []
+        for coef0 in self.coef_station:
+            travelers_to_generate_per_station.append(coef0*travelers_to_generate)   # répartion des passagers à générer selon le type de station
+        for i in range(len(self.stations)):     # pour chaque station on génère ou non des voyageurs
+            station0 = self.stations[i]
+            for i in range(poisson(travelers_to_generate_per_station[i], 1)[0]):  # génération selon une loi de poisson
+                self.statistiques.add_waiting_traveler(station0.name)
+                rand_x = random()
+                i = 0
+                traveler_destination = None
+                for j in range(len(self.coef_station)):
+                    if i > rand_x:
+                        traveler_destination = self.stations[j].name
+                        break
+                    i += self.coef_station[j]
+                station0.travelers.append(Traveler(env, time, source=station0.name, destination=traveler_destination))
+                station0.up_all_time_count()

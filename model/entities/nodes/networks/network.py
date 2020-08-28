@@ -609,7 +609,7 @@ def update_weight(switch1, switch2, travel_time):
     :param switch2: switch suivant la route empruntée par la capsule
     :return: boolean indiquant si il y a congestion
     """
-    # TODO : à gérer lorsque les capsules se gare
+    # TODO : à gérer lorsque les capsules se garent
     if switch1.next.next == switch2:
         road = switch1.next
     elif switch1.beside.next == switch2:
@@ -626,7 +626,7 @@ def no_more_congestion(previous_switch, current_switch):
     :param current_switch: aiguillage actuel
     :return: boolean étant true s'il n'y a plus de congestion sur la route entre les deux aiguillages et false sinon
     """
-    # TODO : liée à la congestion TCP si dans l'avenir c'est à remettre
+    # liée à la congestion TCP si dans l'avenir c'est à remettre
     if previous_switch.next.next == current_switch:
         road = previous_switch.next
     elif previous_switch.beside.next == current_switch:
@@ -634,37 +634,3 @@ def no_more_congestion(previous_switch, current_switch):
     else:
         return True
     return road.weight < 2 * road.expected_weight
-
-
-def disable_road(previous_switch, current_switch):
-    """
-    Rend impossible le passage par une route, ie met le poids de celle-ci à l'infini
-    :param previous_switch: aiguillage de début de route
-    :param current_switch: aiguillage de fin de route
-    """
-    # TODO : peut etre utile pour une futur coupure de voie
-    if previous_switch.next.next == current_switch:
-        road = previous_switch.next
-    elif previous_switch.beside.next == current_switch:
-        road = previous_switch.beside
-    else:
-        return
-    road.weight = inf
-
-
-def get_time_max(previous_switch, current_switch):
-    """
-    Retourne le temps à partir duquel on considère une route comme coupée. On prend comme limite
-    10 * le temps de parcours en conditions normales
-    :param previous_switch: aiguillage précédent la route
-    :param current_switch: aiguillage suivant la route
-    :return: temps à partir duquel on considère une route comme coupée
-    """
-    # TODO : peut etre utile pour une futur coupure de voie
-    if previous_switch.next.next == current_switch:
-        road = previous_switch.next
-    elif previous_switch.beside.next == current_switch:
-        road = previous_switch.beside
-    else:
-        return -1
-    return 10 * road.expected_weight

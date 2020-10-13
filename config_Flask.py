@@ -16,7 +16,6 @@ getLogger("werkzeug").setLevel(ERROR)
 _running_default = False    # par défaut on ne lance pas les simulations
 _speed_default = 0          # par défaut la vitesse de simulation est x1
 
-
 def _synchronize(key=None):
     """Synchronisation du serveur flask avec simpy, NE PAS TOUCHER"""
     if not isinstance(key, str):
@@ -52,7 +51,6 @@ def get_root():
     """page de base de la vue"""
     global _app
     return _app.send_static_file("index.html")
-
 
 @_app.route("/networks/<int:network_index>/", methods=["POST"])
 @_synchronize("network_item")
@@ -192,3 +190,26 @@ def run_app(port, networks, wave):
 
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
     _app.run(port=port)
+
+
+
+
+# API FLASK POUR APPLIS MOBILE
+
+@_app.route('/msg', methods=['GET'])
+def get():
+    return jsonify({ 'msg': '<h1>Hello visiteur' })
+
+# POST
+@_app.route('/trip', methods=['POST'])
+def add_trip():
+    idCapsule = request.json['id']
+    departure = request.json['departure']
+    arrival = request.json['arrival']
+    return jsonify({ 'msg': 'Le trip id ' + idCapsule + " part de " + departure + " et arrive a " + arrival})
+#Argument : 
+#{
+    #"id": "1321",
+    #"departure": "TNCY",
+    #"arrival": "commanderie"
+#}

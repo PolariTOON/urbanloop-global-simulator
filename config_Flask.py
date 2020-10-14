@@ -63,6 +63,13 @@ async def _post_network(simulations, network_index, network_item):
             del network_item["id"]
         from app import _wave
         simulation = Simulation(network_index, _wave, **network_item)
+
+        # Pour utiliser la simulation dans l'API
+        print("Creation simulation en tant que variable global (pour utiliser dans l'API)")
+        global simulation_for_api                   #Variable non locale a cette fonction
+        # Je ne sais pas pk declarer en dehors de cette fonction "simulation_for_api = None" ne marche pas, cela ne change la valeur de la var que localement ...
+        simulation_for_api = simulation
+
         simulations[network_index] = simulation
         return simulation.serialize()
     if network_index in simulations:
@@ -194,22 +201,86 @@ def run_app(port, networks, wave):
 
 
 
-# API FLASK POUR APPLIS MOBILE
+# RESTFUL API FLASK POUR APPLIS MOBILE
 
-@_app.route('/msg', methods=['GET'])
-def get():
-    return jsonify({ 'msg': '<h1>Hello visiteur' })
+#networks/<int:network_index>/
+
+@_app.route('/msg/<int:age>/', methods=['GET'])
+def getAge(age):
+    return jsonify({ 'msg': 'Hello visiteur, tu as ' + str(age) + ' ans' })
 
 # POST
-@_app.route('/trip', methods=['POST'])
+@_app.route('/new_trip', methods=['POST'])
 def add_trip():
-    idCapsule = request.json['id']
+    """Fonction permettant de donner un nouveau trajet"""
+    idUser = request.json['user']
     departure = request.json['departure']
     arrival = request.json['arrival']
-    return jsonify({ 'msg': 'Le trip id ' + idCapsule + " part de " + departure + " et arrive a " + arrival})
+    typeCapsule = request.json['typeCaps']
+    return jsonify({ 'msg': 'Le trip de l\'utilisateur d\'id ' + idUser + " part de " + departure + " et arrive a " + arrival + " , type de capsule : " + typeCapsule})
 #Argument : 
 #{
     #"id": "1321",
     #"departure": "TNCY",
     #"arrival": "commanderie"
+    #"typeCaps" : "solo"
 #}
+
+#Donnees recues par l'application mobile : 
+# User :            Id
+# Depart :          String
+# Destination :     String
+# Type capsule :    String
+
+
+@_app.route('/simul', methods=['GET'])
+def is_simul_running():
+    try:
+        simulation_for_api
+    except NameError:
+        return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
+    else:
+        is_running = simulation_for_api.running
+        if (is_running):
+            return jsonify({ 'msg': 'La simulation est en cours' })
+        else:
+            return jsonify({ 'msg': 'La simulation est en pause' })
+
+
+@_app.route('/pod', methods=['GET'])
+def get_first_pod():
+    try:
+        simulation_for_api
+    except NameError:
+        return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
+    else:
+        pods = simulation_for_api.get_network().pods
+        first_pod = pods[0]
+        if (first_pod is None):
+            return jsonify({ 'msg': 'La simulation n\'a jamais commence -_-' })
+        else :
+            return first_pod.serialize()
+
+@_app.route('/nb_pods', methods=['GET'])
+def get_number_pods():
+    try:
+        simulation_for_api
+    except NameError:
+        return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
+    else:
+        pods = simulation_for_api.get_network().pods
+        first_pod = pods[0]
+        if (first_pod is None):
+            return jsonify({ 'msg': 'La simulation n\'a jamais commence -_-' })
+        else :
+            return jsonify({ 'msg': 'Nombre de capsules dans le reseau : ' + str(len(pods)) })
+
+@_app.route('/network', methods=['GET'])
+def get_netork():
+    try:
+        simulation_for_api
+    except NameError:
+        return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
+    else:
+        network_for_API = simulation_for_api.get_network()
+        return network_for_API.serialize()

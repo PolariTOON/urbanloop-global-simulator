@@ -280,7 +280,7 @@ def get_netork():
     try:
         simulation_for_api
     except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
+        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
     else:
         network_for_API = simulation_for_api.get_network()
         return network_for_API.serialize()

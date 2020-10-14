@@ -31,7 +31,7 @@ class Pod(Token):
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
-        self._coef = normal(1, 5/300) # Gaussienne à 5%
+        self._coef = normal(1, 0.05/2) # Gaussienne à 95% de confiance (car pour avoir "moy +/- 2*sigma = [0.95,1.05]" il faut sigma = 0.05/2) (et pour 99.7% de confiance : 0.05/3)
         if self._coef > 1.05:
             self._coef = 1.05
             self._failing = True

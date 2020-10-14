@@ -12,3 +12,4 @@ Déployer le simulateur & l'éditeur
 Considérer l'accélération dans les calculs d'insertion
 Rajouter des paramètres dans l'éditeur
 Corriger le téléchargement de json dans l'éditeur (des réseaux valides ne peuvent être téléchargés et pas de message d'erreur)
+Voir pourquoi il y a des messages d'erreurs côté navigateur après quelques instants de simulation (json.destination est null dans pod.js)

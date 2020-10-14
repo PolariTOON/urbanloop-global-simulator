@@ -107,7 +107,7 @@ Pour visualiser un réseau il vous faut en charger un ; cliquez sur l'icône ![]
 
 N'hésitez pas à y ajouter les réseaux que vous aurez créé.
 
-Après cela, l'interface resssemblera à ceci :
+Après cela, l'interface ressemblera à ceci :
 
 ![](pictures/int.png)
 

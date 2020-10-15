@@ -140,14 +140,3 @@ class Probability:
                     i += self.coef_station[j]
                 station0.travelers.append(Traveler(env, time, source=station0.name, destination=traveler_destination))
                 station0.up_all_time_count()
-
-
-
-    def add_traveler(self, new_traveler):
-        """
-        ajoute un voyageur au reseau
-        fonction appelee quand un utilisateur scan sur l'application reader son ticket, et non pas quand il en reserve un
-        """
-        # A FAIRE
-        #recuperer infos du ticket, depuis un POST dans config_Flask.py, puis cree un objet traveler et appeler 
-        #cette fonction depuis l'objet simulation_for_api (ajouter une fonction pour cela) de config_Flask.py

@@ -503,6 +503,30 @@ class Network(Node):
         return nb_pods, pods_du_reseau
 
 
+    def get_pod_of_user(self, user_id):
+        """ Renvoie un objet pod qui est celui de l'user, si celui-ci est dans une capsule """
+
+        current_pods = self.pods
+        for a_pod in current_pods:
+            if (a_pod is not None):
+                for a_traveler in a_pod.travelers:
+                    if (a_traveler.id == user_id):
+                        print("User trouve !")
+                        return a_pod
+        
+        return None         # Le voyageur n'est pas encore dans une capsule
+
+
+####################    Fin classe
+
+
+
+
+
+
+
+
+
 def _init_pod_of_line(line, pod):
     position = pod["position"]
     if position < 0:
@@ -598,6 +622,7 @@ def previous_switch_out(track):
     while not isinstance(current, SwitchOut):
         current = current.previous
     return current
+
 
 
 def update_weight(switch1, switch2, travel_time):

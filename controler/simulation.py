@@ -2,6 +2,7 @@ from math import floor
 from random import random, seed
 from simpy import Environment
 from model.entities.nodes.networks.network import Network
+from model.entities.tokens.traveler import Traveler
 from .probability import Probability
 
 
@@ -110,7 +111,7 @@ class Simulation:
             self._state = random() * 2 ** 53
         second = self._env.time
 
-        self._probability.generate_traveler_poisson(int(round(second / 3600, 2)), second, self._env)
+        #self._probability.generate_traveler_poisson(int(round(second / 3600, 2)), second, self._env)
 
     def serialize(self):
         dict = self._network.serialize()
@@ -124,3 +125,18 @@ class Simulation:
             "modified": True,
         })
         return dict
+
+    def add_traveler(self, new_traveler_source, new_traveler_destination, user_id):
+        """Ajout d'un voyageur dans la simulation 
+        fonction appelee quand un utilisateur scan sur l'application reader son ticket, et non pas quand il en reserve un"""
+
+        # Creation de l'objet Traveler
+        new_traveler = Traveler(self._env, generation_time=self.time, source=new_traveler_source, destination=new_traveler_destination, id=user_id)
+
+        for s in self._network.stations:
+            if (new_traveler.source == s.name):
+                s.travelers.append(new_traveler)
+                print("station trouvee !")
+                self._network.statistiques.add_waiting_traveler(s.name)
+        
+        print("add_traveler d'identifiant " + new_traveler.id)

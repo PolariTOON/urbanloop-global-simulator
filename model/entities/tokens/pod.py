@@ -331,3 +331,103 @@ class Pod(Token):
                     self.speed = self._track_or_switch.speed
                 else:
                     raise ValueError("Invalid message: ", message)
+
+
+
+
+                    # Fctions de celacul de prochaines/precedentes stations et temps
+    
+    # A MODIF SI SUPPRESSION MINI BOUCLES
+    def getPreviousStation(self):   # Pas de table de routage pr celui-ci
+        """ Donne la prochaine station traversee par la capsule """ 
+        eltOfNetwork = self._track_or_switch
+
+        while (type(eltOfNetwork).__name__ != "SwitchIn"):     # On cherche le SwitchIn le plus proche
+            eltOfNetwork = eltOfNetwork.previous
+
+        previousStation = self.getStationsOnMiniLoop(eltOfNetwork)          # Peut etre null, pr eviter il faudrait utiliser un tableau des gares traversees
+            
+        return previousStation
+
+
+
+    # A MODIF SI SUPPRESSION MINI BOUCLES
+    def getNextStation(self): 
+        """ Donne la prochaine station traversee par la capsule """ 
+        eltOfNetwork = self._track_or_switch
+
+        nbIter = 0              # Pour eviter une boucle infinie
+        nextStation = None
+
+        while (nextStation is None and nbIter < 100):   
+            while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOn le plus proche
+                eltOfNetwork = eltOfNetwork.next
+
+            nextStation = self.getStationsOnMiniLoop(eltOfNetwork)
+            if (nextStation is None): # On a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
+                if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
+                    eltOfNetwork = eltOfNetwork.beside
+                else:                                   # sinon on regarde le trajet normal du switch
+                    eltOfNetwork = eltOfNetwork.next
+            nbIter += 1
+        return nextStation
+
+
+    # A MODIF SI SUPPRESSION MINI BOUCLES
+    def getTimeBeforeArrival(self):
+        eltOfNetwork = self._track_or_switch
+
+        nbIter = 0              # Pour eviter une boucle infinie
+        stationConsidered = None
+        lengthToDestination = eltOfNetwork.length - self._position     # Distance a la fin du bout de network ou la capsule se trouve
+
+        while ( (stationConsidered != self._destination) and (nbIter < 200) ):   
+            while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOn le plus proche
+                #if (type(eltOfNetwork).__name__ != "Section"):
+                #    lengthToDestination += eltOfNetwork.length
+                lengthToDestination += eltOfNetwork.next.length
+                eltOfNetwork = eltOfNetwork.next
+
+            stationConsidered = self.getStationsOnMiniLoop(eltOfNetwork)
+            if (stationConsidered is None):  # On a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
+                if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
+                    eltOfNetwork = eltOfNetwork.beside
+                    lengthToDestination += eltOfNetwork.beside.length
+                else:                                   # sinon on regarde le trajet normal du switch
+                    eltOfNetwork = eltOfNetwork.next
+                    lengthToDestination += eltOfNetwork.next.length
+            elif (stationConsidered != self._destination):    # On a trouve une mini boucle, mais pas avec la station destination
+                eltOfNetwork = eltOfNetwork.next    # On passe notre chemin
+
+            nbIter += 1
+
+            print("Encore des erreurs : ERROR in config_Flask: 'Road' object has no attribute 'beside'")
+            # Actuellement, on ne considere pas le temps de parcours de la mini-boucle contenant la station destination")
+            # Faire que getStationsOnMiniLoop et getStationsOfRoad renvoient en plus un temps pour faire cela
+
+        return "Distance = " + str(lengthToDestination) + " (a developper pr avoir le temps"
+
+    
+
+    def getStationsOnMiniLoop(self, eltOfNetwork):
+        if (type(eltOfNetwork).__name__ == "SwitchOut"):
+            return self.getStationsOfRoad(eltOfNetwork.beside.next.next)
+        elif (type(eltOfNetwork).__name__ == "SwitchIn"):
+            return self.getStationsOfRoad(eltOfNetwork.beside.previous.previous)
+        else :
+            return None
+
+    def getStationsOfRoad(self, aRoad):
+        if (type(aRoad).__name__ == "Road"):
+            if (len(aRoad.stations) > 0):      
+                for station in aRoad.stations:
+                    return station.name      # On renvoie direct car on considere qu'il n'y a qu'une station au max par road (potentiellement a changer plus tard)
+            return None
+
+       
+
+
+
+#switch in affiché -> stanislas en previous
+
+#sections afiche

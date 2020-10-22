@@ -506,13 +506,16 @@ class Network(Node):
     def get_pod_of_user(self, user_id):
         """ Renvoie un objet pod qui est celui de l'user, si celui-ci est dans une capsule """
 
-        current_pods = self.pods
-        for a_pod in current_pods:
-            if (a_pod is not None):
-                for a_traveler in a_pod.travelers:
-                    if (a_traveler.id == user_id):
+        moving_pods = self._statistiques.traveling_pods()
+
+        for key in moving_pods:
+            a_moving_pod = moving_pods[key]
+            if (len(a_moving_pod) > 0):
+                for a_traveler in a_moving_pod[0].travelers:
+                    if (int(a_traveler.id) == user_id):
                         print("User trouve !")
-                        return a_pod
+                        print("\n")
+                        return a_moving_pod[0]
         
         return None         # Le voyageur n'est pas encore dans une capsule
 

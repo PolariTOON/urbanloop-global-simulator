@@ -206,52 +206,26 @@ def run_app(port, networks, wave):
 ###############################################
 # RESTFUL API FLASK POUR APPLIS MOBILE
 
-@_app.route('/simul', methods=['GET'])
-def is_simul_running():
-    """Renseigne l'etat de la simulation   TEMPORAIRE """
-    try:
-        simulation_for_api
-    except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
-
-    is_running = simulation_for_api.running
-    if (is_running):
-        return jsonify({ 'msg': 'La simulation est en cours' })
-    else:
-        return jsonify({ 'msg': 'La simulation est en pause' })
-
-
-@_app.route('/pod', methods=['GET'])
-def get_first_pod():
-    """Donne les infos de la premiere capsule du newtork   TEMPORAIRE """
-    try:
-        simulation_for_api
-    except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
-
-    pods = simulation_for_api.get_network().pods
-    first_pod = pods[0]
-    if (first_pod is None):
-        return jsonify({ 'msg': 'La simulation n\'a jamais commence -_-' })
-    else :
-        return first_pod.serialize()
-
 
 @_app.route('/nb_pods', methods=['GET'])
 def get_number_pods():
-    """Donne le nombre de pods (varie en fction du temps) du network   TEMPORAIRE """
+    """Donne le nombre de pods (varie en fction du temps) du network    TEMPORAIRE """
     try:
         simulation_for_api
     except NameError:
         return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
 
     pods = simulation_for_api.get_network().pods
-    first_pod = pods[0]
-    if (first_pod is None):
-        return jsonify({ 'msg': 'La simulation n\'a jamais commence -_-' })
-    else :
-        return jsonify({ 'msg': 'Nombre de capsules dans le reseau : ' + str(len(pods)) })
 
+    return jsonify({ 'msg': 'Nombre de capsules dans le reseau : ' + str(len(pods)) })
+
+
+# 205 avec rien
+# ds /network -> 95 et 99
+# lancement trajet : 206 puis 204 (et reste a 204)
+# lancement trajet : 205 puis 204 puis 205 (et reste a 205)
+# lancement trajet : 205 puis 206 puis 204 (et reste a 205)
+# ds /network -> 95 et 99
 
 @_app.route('/network', methods=['GET'])
 def get_netork():
@@ -276,16 +250,18 @@ def getUserPosition(user_id):
     except NameError:
         return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
 
-    status_user = "Dans une capsule"
+    # Utiliser new-mini-network-jerky.json, de Gare a Eglise par exple
+
     pod_of_user = simulation_for_api.get_network().get_pod_of_user(user_id)
 
     if (pod_of_user == None):
-        status_user = "En attente d'une capsule"
-
-    return jsonify({ 'status_user': status_user,
-                     'previous_station': 'a faire',
-                     'next_station': 'a faire',
-                     'time_before_arrival': 'a faire'})
+        return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
+    else :
+        #print(pod_of_user.getPreviousStation())
+        return jsonify({ 'source': pod_of_user.source,
+                         'next_station': pod_of_user.getNextStation(),
+                         'destination': pod_of_user.destination,
+                         'time_before_arrival': pod_of_user.getTimeBeforeArrival()})
 
 
 
@@ -297,7 +273,7 @@ def add_trip():
     try:
         simulation_for_api
     except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
+        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee' })
 
     user_id = request.json['user_id']
     departure = request.json['departure']

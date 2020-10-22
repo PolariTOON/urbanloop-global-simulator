@@ -111,6 +111,7 @@ class Simulation:
             self._state = random() * 2 ** 53
         second = self._env.time
 
+        # Decommenter la ligne suivante pour voir une simulation du reseau. Laisser commenter pr voir les creations de voyage avec l'appli mobile
         #self._probability.generate_traveler_poisson(int(round(second / 3600, 2)), second, self._env)
 
     def serialize(self):

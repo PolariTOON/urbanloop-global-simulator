@@ -100,3 +100,10 @@ class Statistiques:
 		csvfile = open('stat_log.csv', 'a')
 		csvfile.write(row)
 		csvfile.close()
+
+
+	def traveling_pods(self):
+		""" Renvoie les pods en mouvement du reseau
+		Appele par la fonction get_pod_of_user de network
+		"""
+		return self._traveling_pods

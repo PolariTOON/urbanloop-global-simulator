@@ -207,39 +207,6 @@ def run_app(port, networks, wave):
 # RESTFUL API FLASK POUR APPLIS MOBILE
 
 
-@_app.route('/nb_pods', methods=['GET'])
-def get_number_pods():
-    """Donne le nombre de pods (varie en fction du temps) du network    TEMPORAIRE """
-    try:
-        simulation_for_api
-    except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete charge -_-' })
-
-    pods = simulation_for_api.get_network().pods
-
-    return jsonify({ 'msg': 'Nombre de capsules dans le reseau : ' + str(len(pods)) })
-
-
-# 205 avec rien
-# ds /network -> 95 et 99
-# lancement trajet : 206 puis 204 (et reste a 204)
-# lancement trajet : 205 puis 204 puis 205 (et reste a 205)
-# lancement trajet : 205 puis 206 puis 204 (et reste a 205)
-# ds /network -> 95 et 99
-
-@_app.route('/network', methods=['GET'])
-def get_netork():
-    """Renvoie les infos de tout le network   TEMPORAIRE """
-    try:
-        simulation_for_api
-    except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
-
-    network_for_API = simulation_for_api.get_network()
-    return network_for_API.serialize()
-
-
-
 # INFOS D'UNE CAPSULE
 @_app.route('/capsule/<int:user_id>/', methods=['GET'])
 def getUserPosition(user_id):
@@ -278,7 +245,7 @@ def add_trip():
     user_id = request.json['user_id']
     departure = request.json['departure']
     arrival = request.json['arrival']
-    typeCapsule = request.json['typeCapsule']
+    #typeCapsule = request.json['typeCapsule']
 
     #Lien infos recues-simulateur
     simulation_for_api.add_traveler(departure, arrival, user_id)

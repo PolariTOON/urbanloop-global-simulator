@@ -361,6 +361,8 @@ class Pod(Token):
 
         while (nextStation is None and nbIter < 100):   
             while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOn le plus proche
+                if ((type(eltOfNetwork).__name__ == "Road") and (len(eltOfNetwork.stations) > 0)):  # Route contenant la station
+                    return self.getStationsOfRoad(eltOfNetwork)
                 eltOfNetwork = eltOfNetwork.next
 
             nextStation = self.getStationsOnMiniLoop(eltOfNetwork)
@@ -370,6 +372,7 @@ class Pod(Token):
                 else:                                   # sinon on regarde le trajet normal du switch
                     eltOfNetwork = eltOfNetwork.next
             nbIter += 1
+        
         return nextStation
 
 
@@ -382,30 +385,45 @@ class Pod(Token):
         lengthToDestination = eltOfNetwork.length - self._position     # Distance a la fin du bout de network ou la capsule se trouve
 
         while ( (stationConsidered != self._destination) and (nbIter < 200) ):   
-            while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOn le plus proche
-                #if (type(eltOfNetwork).__name__ != "Section"):
-                #    lengthToDestination += eltOfNetwork.length
+            while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOut le plus proche
+                if ((type(eltOfNetwork).__name__ == "Road") and (len(eltOfNetwork.stations) > 0)):  # Route contenant la station
+                    lengthToDestination += eltOfNetwork.next.length     # On oublie pas d'ajouter
+
+                    for station in eltOfNetwork.stations:
+                        stationConsidered = station.name        
+                        break  # On recupere juste la premiere station (on ne considere pas le cas ou il y en a plusieurs)
+                    
+                    # A ce stade-la, stationConsidered == self._destination
+                    # En effet, une capsule ne peut (et ne doit) pas aller ds une mini-boucle ne menant pas a sa destination
+
+                    break       # On ne va pas continuer a chercher un SwitchOut, car on est arrive a la destination (a la route pres)
+
                 lengthToDestination += eltOfNetwork.next.length
                 eltOfNetwork = eltOfNetwork.next
 
-            stationConsidered = self.getStationsOnMiniLoop(eltOfNetwork)
-            if (stationConsidered is None):  # On a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
-                if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
-                    eltOfNetwork = eltOfNetwork.beside
-                    lengthToDestination += eltOfNetwork.beside.length
-                else:                                   # sinon on regarde le trajet normal du switch
-                    eltOfNetwork = eltOfNetwork.next
-                    lengthToDestination += eltOfNetwork.next.length
-            elif (stationConsidered != self._destination):    # On a trouve une mini boucle, mais pas avec la station destination
-                eltOfNetwork = eltOfNetwork.next    # On passe notre chemin
+            if (stationConsidered == self._destination):        # Dans le cas on l'on a trouve grace au "for station"
+                break        # On sort du while (break aurait eu le meme effet)
 
+            stationConsidered = self.getStationsOnMiniLoop(eltOfNetwork)
+            if (stationConsidered is None):  # On n'a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
+                if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
+                    lengthToDestination += eltOfNetwork.beside.length
+                    eltOfNetwork = eltOfNetwork.beside
+                else:                                   # sinon on regarde le trajet normal du switch
+                    lengthToDestination += eltOfNetwork.next.length
+                    eltOfNetwork = eltOfNetwork.next
+            elif (stationConsidered != self._destination):    # On a trouve une mini boucle, mais pas avec la station destination
+                lengthToDestination += eltOfNetwork.next.length
+                eltOfNetwork = eltOfNetwork.next    # On passe notre chemin
+                
             nbIter += 1
 
-            print("Encore des erreurs : ERROR in config_Flask: 'Road' object has no attribute 'beside'")
-            # Actuellement, on ne considere pas le temps de parcours de la mini-boucle contenant la station destination")
-            # Faire que getStationsOnMiniLoop et getStationsOfRoad renvoient en plus un temps pour faire cela
+            print(type(eltOfNetwork).__name__)
 
-        return "Distance = " + str(lengthToDestination) + " (a developper pr avoir le temps"
+        # Actuellement, on ne considere pas le temps de parcours de la mini-boucle contenant la station destination")
+        # Faire que getStationsOnMiniLoop et getStationsOfRoad renvoient en plus un temps pour faire cela
+
+        return "Dist = " + str(lengthToDestination) + " (a dvlp pr le temps)(dist ne considere pas bien les mini-boucles)"
 
     
 
@@ -423,11 +441,3 @@ class Pod(Token):
                 for station in aRoad.stations:
                     return station.name      # On renvoie direct car on considere qu'il n'y a qu'une station au max par road (potentiellement a changer plus tard)
             return None
-
-       
-
-
-
-#switch in affiché -> stanislas en previous
-
-#sections afiche

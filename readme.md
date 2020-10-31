@@ -79,7 +79,7 @@ $ python3.7 main.py -p -n path/to/network0.json path/to/network42.json
 Ajouter le paramètre `-e` permet de supprimer tous les voyageurs de la simulation (utile pour tester l'application mobile) :
 
 ```sh
-$ python3.7 main.py -e [...]
+$ python3.7 main.py -e \[...\]
 ```
 
 Pour plus d'informations, utilisez la commande suivante :
@@ -128,6 +128,8 @@ Vous pouvez visualiser ce qu'il se passe à un aiguillage lorsqu'il est sélecti
 ![](pictures/aig.png)
 
 Avec le bouton ![](pictures/poubelle.png) vous pouvez supprimer le réseau choisi, pour ensuite en choisir un différent.
+
+Pour se connecter à l'interface web depuis une autre machine du réseau local, il suffit d'accéder à \[IP hôte\]:\[port\] (\[IP hôte\] peut être obtenu avec `ipconfig` sur Windows et `ifconfig` sur Linux et Mac).
 
 ### Editeur
 

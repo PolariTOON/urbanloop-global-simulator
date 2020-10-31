@@ -35,14 +35,12 @@ def _synchronize(key=None):
         return routine
     return synchronize
 
-
 @_app.errorhandler(Exception)
 def send_error(error):
     """Gestion d'une mauvaise requête"""
     global _app
     _app.logger.error(error)
     return "", 404
-
 
 @_app.route("/")
 def get_root():
@@ -195,10 +193,7 @@ def run_app(port, networks, wave):
     "wave contient la vitesse de tic de simulation"
 
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
-    _app.run(port=port)
-
-
-
+    _app.run(host="0.0.0.0", port=port)
 
 
 

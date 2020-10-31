@@ -11,18 +11,22 @@ import modifjson
 _wave = 0  # IDEA: calculer selon la vitesse et la précision des simulations, ainsi que l'occupation du serveur
 _loop = None
 _simulations = {}
+_remove_travelers = False
 
 _running_default = False
 _speed_default = 0
 
 
-async def _run_simulations(networks, wave):
+async def _run_simulations(networks, wave, remove_travelers):
     """Lancement de simulations"""
     print("Log format : receiver  --  author  --  message type")
     global _wave
     global _loop
     global _simulations
+    global _remove_travelers
+
     _wave = wave
+    _remove_travelers = remove_travelers
     for network_index in networks: # lancement des simulations avec les réseaux préchargés
         network_file = networks[network_index]
         with open(network_file) as file:
@@ -32,7 +36,7 @@ async def _run_simulations(networks, wave):
             if "id" in network_item:
                 del network_item["id"]
             try:
-                simulation = Simulation(network_index, _wave, **network_item)
+                simulation = Simulation(network_index, _wave, _remove_travelers, **network_item)
                 _simulations[network_index] = simulation
                 global _running_default
                 simulation.running = _running_default
@@ -56,13 +60,13 @@ async def _run_simulations(networks, wave):
             del _simulations[key]
 
 
-def run_app(port, networks, wave):
+def run_app(port, networks, wave, remove_travelers):
     """Fonction permettant de lancer l'application"""
     "port = n° de port si on souhaite l'interface web (sinon -1)"
     "networks contient les réseaux préchargés"
     "wave contient la vitesse de tic de simulation"
 
-    Thread(target=lambda: run(_run_simulations(networks, wave))).start()
+    Thread(target=lambda: run(_run_simulations(networks, wave, remove_travelers))).start()
     if port != -1:  # utilisation de l'interface web
         from config_Flask import run_app
         run_app(port, networks, wave)

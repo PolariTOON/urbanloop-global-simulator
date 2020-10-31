@@ -59,6 +59,8 @@ Ce dépôt comprend différents dossiers et fichiers correspondant à la réalis
 
 * `simpy`
 * `flask`
+* `numpy`
+* `scipy`
 
 ### Lancement
 
@@ -74,13 +76,19 @@ Il est aussi possible de charger des réseaux dès le lancement comme ceci, les 
 $ python3.7 main.py -p -n path/to/network0.json path/to/network42.json
 ```
 
+Ajouter le paramètre `-e` permet de supprimer tous les voyageurs de la simulation (utile pour tester l'application mobile) :
+
+```sh
+$ python3.7 main.py -e [...]
+```
+
 Pour plus d'informations, utilisez la commande suivante :
 
 ```sh
 $ python3.7 main.py -h
 ```
 
-Il est aussi possible de lancer plusieurs fois la même simulation via la commande:
+Il est possible de lancer plusieurs fois la même simulation via la commande:
 ```sh
 $ python3.7 test_project/lauch_simulators.py -o True -r True -nb 10 -s 1 -p 8088 -n path/to/network0.json
 ```

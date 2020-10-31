@@ -44,12 +44,13 @@ def wave(value):
 
 if __name__ == '__main__':
     argument_parser = ArgumentParser(description="Run the UrbanLoop simulator")
-    argument_parser.add_argument("-n", "--networks", nargs= '+', type=networks, default="{}", help="load the given networks or none by default, the path should be given for each network")
+    argument_parser.add_argument("-n", "--networks", nargs='+', type=networks, default="{}", help="load the given networks or none by default, the path should be given for each network")
     argument_parser.add_argument("-p", "--port", type=port, default=-1, const=8090, nargs='?', help="run a web application on the given port or 8090 by default")
     argument_parser.add_argument("-w", "--wave", type=wave, default=.042, help="set the duration of each wave to the given value (in seconds) or .042 seconds by default")
+    argument_parser.add_argument("-e", "--empty", action="store_true", help="remove all the travelers (useful to test the mobile app)")
     arguments = argument_parser.parse_args()
 
     if arguments.networks != {}:
         arguments.networks = arguments.networks[0]  # à cause de nargs= '+' on a une liste en sortie, donc je ne garde que le dictionnaire des réseaux
 
-    run_app(arguments.port, arguments.networks, arguments.wave)
+    run_app(arguments.port, arguments.networks, arguments.wave, arguments.empty)

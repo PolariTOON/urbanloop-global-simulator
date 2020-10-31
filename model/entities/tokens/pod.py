@@ -25,8 +25,8 @@ class Pod(Token):
         self._travelers = [Traveler(env, 0) for _ in range(travelers["count"])]
         self._capacity = travelers["max"]
         self._track_or_switch = track_or_switch
-        self.source = self.source or None  # si la capsule a déjà été créée mais change de voie, source n'est pas changé, sinon on setup via track_or_switch
-        self.destination = self.destination or None
+        self._source = self.source or None  # si la capsule a déjà été créée mais change de voie, source n'est pas changé, sinon on setup via track_or_switch
+        self._destination = self.destination or None
         self._speed = pod_speed
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
@@ -53,7 +53,7 @@ class Pod(Token):
         Position de la capsule depuis le début de la section où elle se trouve
         Si pas sur une section alors ça vaut 0
         Si sur un aiguillage, alors comme il a une taille c'est != 0
-        Attention, pour un fichier complet d'un d'un réseau on indique la position depuis le début de la boucle
+        Attention, pour un fichier complet d'un réseau on indique la position depuis le début de la boucle
         """
         return self._position
 
@@ -93,13 +93,31 @@ class Pod(Token):
 
     @property
     def track_or_switch(self):
-        """setter de l'attribut capacity"""
+        """setter de l'attribut track_or_switch"""
         return self._track_or_switch
 
     @track_or_switch.setter
     def track_or_switch(self, value):
         """piste (section ou étape) ou aiguillage où se trouve la capsule"""
         self._track_or_switch = value
+
+    @property
+    def source(self):
+        """setter de l'attribut source"""
+        return self._source
+
+    @source.setter
+    def source(self, value):
+        self._source = value
+
+    @property
+    def destination(self):
+        """setter de l'attribut destination"""
+        return self._destination
+
+    @destination.setter
+    def destination(self, value):
+        self._destination = value
 
     @property
     def name(self):
@@ -237,7 +255,7 @@ class Pod(Token):
                 self._turn = False
 
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
-            # capsule indique à la piste/l'aiguillage sur laquelle/lequel elle rentre
+            # capsule indique la piste/l'aiguillage sur laquelle/lequel elle rentre
 
             if self._position > self._track_or_switch.length and self._speed != 0:
                 bridge_to_switch = False
@@ -324,19 +342,15 @@ class Pod(Token):
                     self._speed_restore = message["speed_restore"]
                 elif "departure" == message["type"]:
                     # La capsule part d'un dépôt ou d'une gare
-                    destination = message["destination"]
-                    source = message["author"].name
-                    self._destination = destination
-                    self._source = source
+                    self._source = message["author"].name
+                    self._destination = message["destination"]
                     self.speed = self._track_or_switch.speed
                 else:
                     raise ValueError("Invalid message: ", message)
 
 
+    # Fonctions de calcul de prochaines/precedentes stations et temps
 
-
-                    # Fctions de celacul de prochaines/precedentes stations et temps
-    
     # A MODIF SI SUPPRESSION MINI BOUCLES
     def getPreviousStation(self):   # Pas de table de routage pr celui-ci
         """ Donne la prochaine station traversee par la capsule """ 
@@ -348,8 +362,6 @@ class Pod(Token):
         previousStation = self.getStationsOnMiniLoop(eltOfNetwork)          # Peut etre null, pr eviter il faudrait utiliser un tableau des gares traversees
             
         return previousStation
-
-
 
     # A MODIF SI SUPPRESSION MINI BOUCLES
     def getNextStation(self): 
@@ -374,7 +386,6 @@ class Pod(Token):
             nbIter += 1
         
         return nextStation
-
 
     # A MODIF SI SUPPRESSION MINI BOUCLES
     def getTimeBeforeArrival(self):
@@ -424,8 +435,6 @@ class Pod(Token):
         # Faire que getStationsOnMiniLoop et getStationsOfRoad renvoient en plus un temps pour faire cela
 
         return "Dist = " + str(lengthToDestination) + " (a dvlp pr le temps)(dist ne considere pas bien les mini-boucles)"
-
-    
 
     def getStationsOnMiniLoop(self, eltOfNetwork):
         if (type(eltOfNetwork).__name__ == "SwitchOut"):

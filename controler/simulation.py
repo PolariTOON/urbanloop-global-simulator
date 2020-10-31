@@ -8,7 +8,7 @@ from .probability import Probability
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, wave, traveler=None, prob=None, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+    def __init__(self, id, wave, remove_travelers=False, traveler=None, prob=None, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
         """
         "id" (entier positif) id du réseau
         "wave" (flottant positif) pas de simulation
@@ -29,6 +29,10 @@ class Simulation:
         state = state or (seed(), random() * 2 ** 53)[1]
         traveler = traveler or {
             "travelers_per_day": 10000,
+            "morning_peak_hour": 8,
+            "evening_peak_hour": 18
+        } if not remove_travelers else {
+            "travelers_per_day": 0,
             "morning_peak_hour": 8,
             "evening_peak_hour": 18
         }
@@ -111,8 +115,9 @@ class Simulation:
             self._state = random() * 2 ** 53
         second = self._env.time
 
-        # Decommenter la ligne suivante pour voir une simulation du reseau. Laisser commenter pr voir les creations de voyage avec l'appli mobile
-        #self._probability.generate_traveler_poisson(int(round(second / 3600, 2)), second, self._env)
+        # TODO : correctement prendre en compte 'self._travelers_per_day'
+        if self._travelers_per_day > 0:
+            self._probability.generate_traveler_poisson(int(round(second / 3600, 2)), second, self._env)
 
     def serialize(self):
         dict = self._network.serialize()

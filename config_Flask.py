@@ -2,8 +2,6 @@ from asyncio import run, run_coroutine_threadsafe, sleep
 from flask import Flask, jsonify, request
 from functools import wraps
 from logging import ERROR, getLogger
-from threading import Thread
-from app import _run_simulations
 from controler.simulation import Simulation
 import modifjson
 
@@ -55,14 +53,15 @@ def get_root():
 @_app.route("/networks/<int:network_index>/", methods=["POST"])
 @_synchronize("network_item")
 async def _post_network(simulations, network_index, network_item):
-    """Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json"""
-    "network_item contient toutes les informations du fichier JSON"
+    """ Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json
+        network_item contient toutes les informations du fichier JSON
+    """
     if network_item is not None:
         network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations si besoin
         if "id" in network_item:
             del network_item["id"]
-        from app import _wave
-        simulation = Simulation(network_index, _wave, **network_item)
+        from app import _wave, _remove_travelers
+        simulation = Simulation(network_index, _wave, remove_travelers=_remove_travelers, **network_item)
 
         # Pour utiliser la simulation dans l'API
         print("Creation simulation en tant que variable global (pour utiliser dans l'API)")

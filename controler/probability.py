@@ -31,9 +31,11 @@ class Probability:
         traveler_lambda_per_hour = [travelers_per_day * coefficient / somme_coefficient for coefficient in peak_hours_coefficient]  # liste du nombre de passagers générés pour chaque heure de la journée
         self.traveler_per_tick = [traveler0 / (3600 / tick) for traveler0 in traveler_lambda_per_hour]  # nombre moyen de passagers générés par tick selon l'heure
         coef_station = []
-        """ - zone d’activité : 0
-                    - zone résidentielle : 1
-                    - ville : 2"""
+        """
+            - zone d’activité : 0
+            - zone résidentielle : 1
+            - ville : 2
+        """
         for station0 in self.stations:
             if station0._station_type == 0:
                 coef_station.append(0.1)

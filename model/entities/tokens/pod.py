@@ -437,14 +437,11 @@ class Pod(Token):
         # Faire que getStationsOnMiniLoop et getStationsOfRoad renvoient en plus un temps pour faire cela
         # Rectification : comme on compte supprimer les mini-boucles, ne pas le faire
 
-        realTime = timeToDest / 3.3
-        # 3.3 trouve apres tests sur ordi perso de Tristan (sans doute a changer)
-
-        return " Time = " + str(realTime) + " (Time incorrect) (ne considere pas les mini-boucles) (considere juste la vitesse de la section/switch ou la capsule se trouve, mais pas sa vitesse actuelle/vitesse future reelle en fction du traffic)"
+        return " Time = " + str(timeToDest) + " (ne considere pas les mini-boucles) (considere juste la vitesse de la section/switch ou la capsule se trouve, mais pas sa vitesse actuelle/vitesse future reelle en fction du traffic)(surement faux quand traffic)"
 
 
     def getTimeOfEltOfNetwork(self, eltOfNetwork):
-        """ Renvoie la duree necessaire pr parcourirr un element du reseau, ou nous sommes pas dessus """
+        """ Renvoie la duree necessaire pr parcourirr un element du reseau, ou le pod ne se trouve pas """
         timeOfElt = 0
 
         if (type(eltOfNetwork).__name__ == "Road"):     # Road n'a pas d'attribut speed, mais possede des sections
@@ -458,6 +455,7 @@ class Pod(Token):
 
 
     def getStationsOnMiniLoop(self, eltOfNetwork):
+        """ Renvoie le nom de la station sur la mini-boucle actuel, en partant d'un Switch """
         if (type(eltOfNetwork).__name__ == "SwitchOut"):
             return self.getStationsOfRoad(eltOfNetwork.beside.next.next)
         elif (type(eltOfNetwork).__name__ == "SwitchIn"):
@@ -466,6 +464,7 @@ class Pod(Token):
             return None
 
     def getStationsOfRoad(self, aRoad):
+        """ Renvoie le nom de la station (qu'une seule normalement) sur la road """
         if (type(aRoad).__name__ == "Road"):
             if (len(aRoad.stations) > 0):      
                 for station in aRoad.stations:

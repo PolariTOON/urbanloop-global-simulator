@@ -383,13 +383,22 @@ class Network(Node):
         last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
         last_pods = {}
         one_print = True
+        #last_sec = 1
+
         while True:
+            #       Affichage des secondes de la simul si besoin de tester GET de l'API pr les durees de trajet
+            #if ( round(self.env.time) % 60 == last_sec):
+            #    print("last_sec = " + str(last_sec))       
+            #    last_sec += 1
+            #    if (last_sec == 60):
+            #        last_sec = 0
+
             if round(self.env.time) % 60 == 1:  # pour éviter d'écrire plusieurs lignes pour un temps donné si le pas est bas
                 one_print = True
             if round(self.env.time) % 60 == 0 and one_print:  # affichage et écriture en fichier toutes les minutes de simulations
                 one_print = False
                 print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
-                      "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.390)")
+                      "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
                 if self.departure_arrival_printer:
                     self.statistiques.print_stats()
                 self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))

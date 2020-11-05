@@ -523,13 +523,6 @@ class Network(Node):
 ####################    Fin classe
 
 
-
-
-
-
-
-
-
 def _init_pod_of_line(line, pod):
     position = pod["position"]
     if position < 0:
@@ -543,7 +536,6 @@ def _init_pod_of_line(line, pod):
                 return
             position -= length
     raise ValueError("Element's position out of range")
-
 
 def shorter_way_tracks(start_track, destination_track):
     """
@@ -615,7 +607,6 @@ def next_switch_out(track):
         current = current.next
     return current
 
-
 def previous_switch_out(track):
     """
     :param track: piste dont on veut connaître l'aiguillage sortant précédent le plus proche
@@ -625,8 +616,6 @@ def previous_switch_out(track):
     while not isinstance(current, SwitchOut):
         current = current.previous
     return current
-
-
 
 def update_weight(switch1, switch2, travel_time):
     """
@@ -662,3 +651,35 @@ def no_more_congestion(previous_switch, current_switch):
     else:
         return True
     return road.weight < 2 * road.expected_weight
+
+def disable_road(previous_switch, current_switch):
+    """
+    Rend impossible le passage par une route, ie met le poids de celle-ci à l'infini
+    :param previous_switch: aiguillage de début de route
+    :param current_switch: aiguillage de fin de route
+    """
+    # TODO : peut etre utile pour une futur coupure de voie
+    if previous_switch.next.next == current_switch:
+        road = previous_switch.next
+    elif previous_switch.beside.next == current_switch:
+        road = previous_switch.beside
+    else:
+        return
+    road.weight = inf
+
+def get_time_max(previous_switch, current_switch):
+    """
+    Retourne le temps à partir duquel on considère une route comme coupée. On prend comme limite
+    10 * le temps de parcours en conditions normales
+    :param previous_switch: aiguillage précédent la route
+    :param current_switch: aiguillage suivant la route
+    :return: temps à partir duquel on considère une route comme coupée
+    """
+    # TODO : peut etre utile pour une futur coupure de voie
+    if previous_switch.next.next == current_switch:
+        road = previous_switch.next
+    elif previous_switch.beside.next == current_switch:
+        road = previous_switch.beside
+    else:
+        return -1
+    return 10 * road.expected_weight

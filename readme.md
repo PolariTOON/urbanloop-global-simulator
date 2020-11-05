@@ -79,7 +79,7 @@ $ python3.7 main.py -p -n path/to/network0.json path/to/network42.json
 Ajouter le paramètre `-e` permet de supprimer tous les voyageurs de la simulation (utile pour tester l'application mobile) :
 
 ```sh
-$ python3.7 main.py -e \[...\]
+$ python3.7 main.py -e [...]
 ```
 
 Pour plus d'informations, utilisez la commande suivante :

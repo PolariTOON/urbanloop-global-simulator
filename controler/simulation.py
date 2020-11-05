@@ -117,7 +117,7 @@ class Simulation:
 
         # TODO : correctement prendre en compte 'self._travelers_per_day'
         if self._travelers_per_day > 0:
-            self._probability.generate_traveler_poisson(int(round(second / 3600, 2)), second, self._env)
+            self._probability.generate_traveler_2(second, self._env)
 
     def serialize(self):
         dict = self._network.serialize()

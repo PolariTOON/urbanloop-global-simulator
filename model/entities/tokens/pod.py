@@ -389,16 +389,19 @@ class Pod(Token):
 
     # A MODIF SI SUPPRESSION MINI BOUCLES
     def getTimeBeforeArrival(self):
+        """Renvoie la duree avant arrivee a destination"""
+
         eltOfNetwork = self._track_or_switch
 
         nbIter = 0              # Pour eviter une boucle infinie
         stationConsidered = None
-        lengthToDestination = eltOfNetwork.length - self._position     # Distance a la fin du bout de network ou la capsule se trouve
+        timeToDest = (eltOfNetwork.length - self._position) / self._track_or_switch.speed
+        # Pas de problemes pour chercher la speed, car self._track_or_switch ne peut etre une road (j'ai l'impression)
 
         while ( (stationConsidered != self._destination) and (nbIter < 200) ):   
             while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOut le plus proche
                 if ((type(eltOfNetwork).__name__ == "Road") and (len(eltOfNetwork.stations) > 0)):  # Route contenant la station
-                    lengthToDestination += eltOfNetwork.next.length     # On oublie pas d'ajouter
+                    timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.next)
 
                     for station in eltOfNetwork.stations:
                         stationConsidered = station.name        
@@ -409,34 +412,50 @@ class Pod(Token):
 
                     break       # On ne va pas continuer a chercher un SwitchOut, car on est arrive a la destination (a la route pres)
 
-                lengthToDestination += eltOfNetwork.next.length
+                timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.next)
                 eltOfNetwork = eltOfNetwork.next
 
             if (stationConsidered == self._destination):        # Dans le cas on l'on a trouve grace au "for station"
                 break        # On sort du while (break aurait eu le meme effet)
 
+            # On cherche la station mtn qu'on est a un switchOut, ou le prochain switchOut
             stationConsidered = self.getStationsOnMiniLoop(eltOfNetwork)
             if (stationConsidered is None):  # On n'a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
                 if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
-                    lengthToDestination += eltOfNetwork.beside.length
+                    timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.beside)
                     eltOfNetwork = eltOfNetwork.beside
                 else:                                   # sinon on regarde le trajet normal du switch
-                    lengthToDestination += eltOfNetwork.next.length
+                    timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.next)
                     eltOfNetwork = eltOfNetwork.next
             elif (stationConsidered != self._destination):    # On a trouve une mini boucle, mais pas avec la station destination
-                lengthToDestination += eltOfNetwork.next.length
+                timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.next)
                 eltOfNetwork = eltOfNetwork.next    # On passe notre chemin
                 
             nbIter += 1
 
-            print(type(eltOfNetwork).__name__)
-
         # Actuellement, on ne considere pas le temps de parcours de la mini-boucle contenant la station destination")
         # Faire que getStationsOnMiniLoop et getStationsOfRoad renvoient en plus un temps pour faire cela
+        # Rectification : comme on compte supprimer les mini-boucles, ne pas le faire
 
-        return "Dist = " + str(lengthToDestination) + " (a dvlp pr le temps)(dist ne considere pas bien les mini-boucles)"
+        return " Time = " + str(timeToDest) + " (ne considere pas les mini-boucles) (considere juste la vitesse de la section/switch ou la capsule se trouve, mais pas sa vitesse actuelle/vitesse future reelle en fction du traffic)(surement faux quand traffic)"
+
+
+    def getTimeOfEltOfNetwork(self, eltOfNetwork):
+        """ Renvoie la duree necessaire pr parcourirr un element du reseau, ou le pod ne se trouve pas """
+        timeOfElt = 0
+
+        if (type(eltOfNetwork).__name__ == "Road"):     # Road n'a pas d'attribut speed, mais possede des sections
+            # par contre j'ai l'impression qu'il y a toujours qu'une seule section par road ...
+            for section in eltOfNetwork.sections:
+                timeOfElt += (section.length / section.speed)
+        else:
+            timeOfElt = eltOfNetwork.length / eltOfNetwork.speed
+        
+        return timeOfElt
+
 
     def getStationsOnMiniLoop(self, eltOfNetwork):
+        """ Renvoie le nom de la station sur la mini-boucle actuel, en partant d'un Switch """
         if (type(eltOfNetwork).__name__ == "SwitchOut"):
             return self.getStationsOfRoad(eltOfNetwork.beside.next.next)
         elif (type(eltOfNetwork).__name__ == "SwitchIn"):
@@ -445,6 +464,7 @@ class Pod(Token):
             return None
 
     def getStationsOfRoad(self, aRoad):
+        """ Renvoie le nom de la station (qu'une seule normalement) sur la road """
         if (type(aRoad).__name__ == "Road"):
             if (len(aRoad.stations) > 0):      
                 for station in aRoad.stations:

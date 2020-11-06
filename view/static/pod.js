@@ -194,8 +194,8 @@ export class Pod extends Entity {
         const {x, y, position} = calcPosition(json, json2, json3);
         const travelerCount = json["travelers"]["count"];
         const travelerMax = json["travelers"]["max"];
-        const source = json["source"]["name"];
-        const destination = json["destination"]["name"];
+        const source = json["source"];
+        const destination = json["destination"];
         const failing = json["failing"];
         this._name = name;
         this._x = x;

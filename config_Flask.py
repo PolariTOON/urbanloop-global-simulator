@@ -211,8 +211,6 @@ def getUserPosition(user_id):
     except NameError:
         return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
 
-    # Utiliser new-mini-network-jerky.json, de Gare a Eglise par exple
-
     pod_of_user = simulation_for_api.get_network().get_pod_of_user(user_id)
 
     if (pod_of_user == None):

@@ -40,6 +40,7 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         this._origin = null;
         this._stats = null;
         this._chart = null;
+        //this._showingTravelersWaiting = false;
     }
     get chart(){
         return this._chart;
@@ -95,6 +96,12 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     get origin() {
         return this._origin;
     }
+    /*
+    get showingTravelersWaiting()
+    {
+        return this._showingTravelersWaiting;
+    }
+    */
     _load(detail) {
         this._unload();
         if (this._loaded || detail === null) {
@@ -181,9 +188,20 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
             document.body.removeChild(link);
         }, 100);
 
-
         //this.dispatchEvent(new CustomEvent("downloadStats"));
     }
+
+
+    // Show travelers number for each station
+    /*
+    _showTravelersWaiting()
+    {
+        alert('showTravelersWaiting');
+        this_showingTravelersWaiting = !this_showingTravelersWaiting;
+    }
+    */
+    // Show travelers number for each station
+    
 
     async reload() {
         const integer = /^(?:0|[1-9]\d*)$/;
@@ -281,6 +299,13 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
     async downloadStats(){
         this._downloadStats();
     }
+
+    // Show travelers number for each station
+    async showTravelersWaiting()
+    {
+        this._showTravelersWaiting();
+    }
+    // Show travelers number for each station
 }
 
 export const state = new State();

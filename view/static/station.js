@@ -1,5 +1,6 @@
 import {Entity} from "./entity.js";
 const {RegularPolygon} = Konva;
+const {Text} = Konva;
 
 const shadowColor = "#333"
 const outerColor = "#f03";
@@ -34,17 +35,32 @@ export class Station extends Entity {
             fill: innerColor,
             stroke: shadowColor,
         });
+        const textForTravelerCount = new Text({
+            text: 'Simple Text',
+            fontSize: 20,
+            fontFamily: 'Calibri',
+            fill: outerColor,
+        });
+
         super(hintsLayer);
         super.add(outerShape);
         super.add(innerShape);
+        super.add(textForTravelerCount);
+
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
+        this.__textForTravelerCount = textForTravelerCount;
+
         this.unselect();
     }
+
+
+
     set _x(value) {
         super._x = value;
         this.__outerShape.x(value);
         this.__innerShape.x(value);
+        this.__textForTravelerCount.x(value + 3);
     }
     get _x() {
         return super._x;
@@ -53,6 +69,7 @@ export class Station extends Entity {
         super._y = value;
         this.__outerShape.y(value);
         this.__innerShape.y(value);
+        this.__textForTravelerCount.y(value + 25);
     }
     get _y() {
         return super._y;
@@ -87,9 +104,16 @@ export class Station extends Entity {
     get _podFull() {
         return this.__podFull;
     }
-    set _travelerCount(value) {
+
+    set _travelerCount(value) 
+    {
         this.__travelerCount = value;
+        
+        // TODO ? : faire bouton pr activer/desactiver ca (deja commence dans state.js)
+        //this.__textForTravelerCount.setText(value + "");
+        this.__textForTravelerCount.setText("");
     }
+
     get _travelerCount() {
         return this.__travelerCount;
     }

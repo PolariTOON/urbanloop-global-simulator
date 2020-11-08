@@ -144,5 +144,6 @@ class Simulation:
                 s.travelers.append(new_traveler)
                 print("station trouvee !")
                 self._network.statistiques.add_waiting_traveler(s.name)
+                s._all_time_count += 1
         
         print("add_traveler d'identifiant " + new_traveler.id)

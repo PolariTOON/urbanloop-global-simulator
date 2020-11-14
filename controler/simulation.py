@@ -137,13 +137,13 @@ class Simulation:
         fonction appelee quand un utilisateur scan sur l'application reader son ticket, et non pas quand il en reserve un"""
 
         # Creation de l'objet Traveler
-        new_traveler = Traveler(self._env, generation_time=self.time, source=new_traveler_source, destination=new_traveler_destination, id=user_id)
+        new_traveler = Traveler(self._env, generation_time=self.time, source=new_traveler_source, destination=new_traveler_destination, id=user_id, real_user=True)
 
         for s in self._network.stations:
             if (new_traveler.source == s.name):
                 s.travelers.append(new_traveler)
-                print("station trouvee !")
+                #print("station trouvee !")
                 self._network.statistiques.add_waiting_traveler(s.name)
                 s._all_time_count += 1
         
-        print("add_traveler d'identifiant " + new_traveler.id)
+        #print("add_traveler d'identifiant " + new_traveler.id)

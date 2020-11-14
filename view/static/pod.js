@@ -3,6 +3,7 @@ const {Circle} = Konva;
 
 const shadowColor = "#333"
 const outerColor = "#fc0";
+const outerColorWhenCommandedByUser = "#f1a";       // pink
 const failingOuterColor = "#ff0707";
 const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
@@ -111,7 +112,9 @@ export class Pod extends Entity {
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
         this._outerColor = outerColor;
+        this._outerColorWhenCommandedByUser = outerColorWhenCommandedByUser;
         this._failing = false;
+        this._contain_real_user = false;
         this._keepFlag = keepFlag;
         this.unselect();
     }
@@ -137,7 +140,8 @@ export class Pod extends Entity {
     get _position() {
         return this.__position;
     }
-    set _travelerCount(value) {
+    set _travelerCount(value) 
+    {
         this.__travelerCount = value;
         if (value === 0) {
             this.__innerShape.fill(innerColor);
@@ -184,8 +188,17 @@ export class Pod extends Entity {
     unselect() {
         if (this._failing) {
             this.__outerShape.fill(failingOuterColor);
-        } else {
-            this.__outerShape.fill(outerColor); 
+        } 
+        else 
+        {
+            if (this._contain_real_user)
+            {
+                this.__outerShape.fill(outerColorWhenCommandedByUser); 
+            }
+            else
+            {
+                this.__outerShape.fill(outerColor); 
+            }
         }
     }
     update(json, json2, json3) {
@@ -197,6 +210,7 @@ export class Pod extends Entity {
         const source = json["source"];
         const destination = json["destination"];
         const failing = json["failing"];
+        this._contain_real_user = json["contain_real_user"];
         this._name = name;
         this._x = x;
         this._y = y;
@@ -210,5 +224,14 @@ export class Pod extends Entity {
             this.__outerShape.fill(failingOuterColor);
         }
         this._failing = failing;
+
+        if (this._contain_real_user)
+        {
+            this.__outerShape.fill(outerColorWhenCommandedByUser); 
+        }
+        else
+        {
+            this.__outerShape.fill(outerColor); 
+        }
     }
 }

@@ -40,6 +40,7 @@ class Pod(Token):
             self._failing = True
         else:
             self._failing = False
+        self._contain_real_user = False
         self._endSpeed = self._speed
         self._acceleration = acceleration or 2
         self._brake = brake or 5
@@ -180,6 +181,7 @@ class Pod(Token):
             "source": self.source,
             "destination": self.destination,
             "failing": self.failing,
+            "contain_real_user": self._contain_real_user,
             "coef": self._coef,
             "acceleration": self._acceleration,
             "brake": self._brake,
@@ -198,6 +200,12 @@ class Pod(Token):
         :return: void
         """
         while True:
+            has_real_traveler = False
+            for traveler in self._travelers:     # On regarde si un de nos passagers a ete genere avec un ticket
+                if (traveler.real_user):
+                    has_real_traveler = True         # c'est le cas
+            self._contain_real_user = has_real_traveler    
+
             # Gestion du décalage et de la discrétisation : on reprend la vitesse moyenne après avoir parcouru la bonne distance
             if self._length_before_restore is not None:
                 if self._length_before_restore > 0:

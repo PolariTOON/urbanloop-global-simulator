@@ -106,6 +106,29 @@ async def _pause_clock(simulations, network_index):
     return False
 
 
+
+@_app.route("/networks/<int:network_index>/travelersWaiting/show/", methods=["POST"])
+@_synchronize()
+async def _show_travelers_waiting(simulations, network_index):
+    """Requête post pour afficher le nombre de passagers attendant dans les stations depuis la vue"""
+    if network_index in simulations:
+        simulation = simulations[network_index]
+        simulation.showing_travelers_waiting = True
+        return True
+    return False
+
+@_app.route("/networks/<int:network_index>/travelersWaiting/hide/", methods=["POST"])
+@_synchronize()
+async def _hide_travelers_waiting(simulations, network_index):
+    """Requête post pour afficher le nombre de passagers attendant dans les stations depuis la vue"""
+    if network_index in simulations:
+        simulation = simulations[network_index]
+        simulation.showing_travelers_waiting = False
+        return True
+    return False
+
+
+
 @_app.route("/networks/<int:network_index>/clock/decelerate/", methods=["POST"])
 @_synchronize()
 async def _decelerate_clock(simulations, network_index):

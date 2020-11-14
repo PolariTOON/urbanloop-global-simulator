@@ -44,6 +44,7 @@ class Simulation:
         self._env = Environment()
         self._wave = wave
         self._running = running
+        self._showing_travelers_waiting = False
         self._rate = rate
         self._max_rate = max_rate
         self._jerky = jerky
@@ -65,6 +66,14 @@ class Simulation:
     @running.setter
     def running(self, value):
         self._running = value
+
+    @property
+    def showing_travelers_waiting(self):
+        return self._showing_travelers_waiting
+
+    @showing_travelers_waiting.setter
+    def showing_travelers_waiting(self, value):
+        self._showing_travelers_waiting = value
 
     @property
     def rate(self):
@@ -123,6 +132,7 @@ class Simulation:
         dict = self._network.serialize()
         dict.update({
             "running": self.running,
+            "showing_travelers_waiting": self._showing_travelers_waiting,
             "rate": self.rate,
             "max_rate": self.max_rate,
             "jerky": self.jerky,

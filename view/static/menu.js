@@ -11,7 +11,8 @@ const dataTab = document.getElementById("data-tab").control;
 const statsTab = document.getElementById("stats-tab").control;
 const viewsTab = document.getElementById("views-tab").control;
 const downloadStats = document.getElementById("download-stats");
-//const showTravelersWaiting = document.getElementById("show-travelers-waiting");
+const showTravelersWaitingButton = document.getElementById("show-travelers-waiting-button");
+let showingTravelersWaiting = false;
 
 
 state.addEventListener("downloadStats", (event) => {
@@ -21,18 +22,6 @@ state.addEventListener("downloadStats", (event) => {
 downloadStats.addEventListener("click", async (event) => {
     state.downloadStats();
 });
-
-
-// Show travelers number for each station
-// Le rendre different quand actif
-/*
-showTravelersWaiting.addEventListener("click", async (event) => 
-{
-    state.showTravelersWaiting();
-});
-*/
-// Show travelers number for each station
-
 
 
 state.addEventListener("load", (event) => {
@@ -121,6 +110,19 @@ decelerateButton.addEventListener("click", async (event) => {
 
 accelerateButton.addEventListener("click", async (event) => {
     state.accelerate();
+});
+
+showTravelersWaitingButton.addEventListener("click", async (event) => 
+{
+    if (showingTravelersWaiting)
+    {
+        state.hide_travelers_waiting();
+    }
+    else
+    {
+        state.show_travelers_waiting();
+    }
+    showingTravelersWaiting = !showingTravelersWaiting;
 });
 
 uploadButton.disabled = false;

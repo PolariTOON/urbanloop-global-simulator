@@ -50,17 +50,16 @@ export class Station extends Entity {
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
         this.__textForTravelerCount = textForTravelerCount;
+        this._showing_travelers_waiting = false;
 
         this.unselect();
     }
-
-
 
     set _x(value) {
         super._x = value;
         this.__outerShape.x(value);
         this.__innerShape.x(value);
-        this.__textForTravelerCount.x(value + 3);
+        this.__textForTravelerCount.x(value - 5);
     }
     get _x() {
         return super._x;
@@ -108,10 +107,14 @@ export class Station extends Entity {
     set _travelerCount(value) 
     {
         this.__travelerCount = value;
-        
-        // TODO ? : faire bouton pr activer/desactiver ca (deja commence dans state.js)
-        //this.__textForTravelerCount.setText(value + "");
-        this.__textForTravelerCount.setText("");
+        if (this._showing_travelers_waiting)
+        {
+            this.__textForTravelerCount.setText(value + "");
+        }
+        else
+        {
+            this.__textForTravelerCount.setText("");
+        }
     }
 
     get _travelerCount() {
@@ -147,7 +150,7 @@ export class Station extends Entity {
     unselect() {
         this.__outerShape.fill(outerColor);
     }
-    update(json) {
+    update(json, showing_travelers_waiting) {
         const name = json["name"];
         const x = json["x"];
         const y = json["y"];
@@ -174,5 +177,6 @@ export class Station extends Entity {
         this._travelerAverageWaitingTime = travelerAverageWaitingTime;
         this._travelerBoardingTimes = travelerBoardingTimes;
         this._stationType = stationType;
+        this._showing_travelers_waiting = showing_travelers_waiting;
     }
 }

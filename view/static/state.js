@@ -292,6 +292,24 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         }
         this._accelerate();
     }
+
+    async show_travelers_waiting() 
+    {
+        const output = await postJSON(`/networks/${this._networkIndex}/travelersWaiting/show/`);
+        if (!output) 
+        {
+            return;
+        }
+    }
+    async hide_travelers_waiting() 
+    {
+        const output = await postJSON(`/networks/${this._networkIndex}/travelersWaiting/hide/`);
+        if (!output) 
+        {
+            return;
+        }
+    }
+
     async resize() {
         this._resize();
     }
@@ -300,12 +318,6 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         this._downloadStats();
     }
 
-    // Show travelers number for each station
-    async showTravelersWaiting()
-    {
-        this._showTravelersWaiting();
-    }
-    // Show travelers number for each station
 }
 
 export const state = new State();

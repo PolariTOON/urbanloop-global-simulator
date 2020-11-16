@@ -29,7 +29,7 @@ def quit_func(sig, frame):
 signal.signal(signal.SIGINT, quit_func)
 
 # init and main loop
-async def _run_simulations(networks, wave, remove_travelers):
+async def _run_simulations(with_interface, networks, wave, remove_travelers):
     """ Lancement de simulation(s) """
     print("Log format : receiver  --  author  --  message type")
     global _wave
@@ -62,8 +62,10 @@ async def _run_simulations(networks, wave, remove_travelers):
     # main loop
     _loop = get_running_loop()
     while not _quit:
-        if _wave > 0:
-            await sleep(_wave) # ralentit la simulation pour utiliser l'interface
+        if with_interface:
+            await sleep(0.04) # ralentit la simulation pour utiliser l'interface (0.04s -> 25 images par secondes)
+        else:
+            await sleep(0) # à tester (remplacer par 0.000001 ?)
         crashed_simulations = []
         for key in _simulations:
             simulation = _simulations[key]
@@ -83,9 +85,13 @@ def run_app(port, networks, wave, remove_travelers):
      networks: contient les réseaux préchargés"
      wave: contient la vitesse de tic de simulation"
     """
-
-    Thread(target=lambda: run(_run_simulations(networks, wave, remove_travelers))).start()
-    if port != -1:  # utilisation de l'interface web
+    if port != -1:
+        with_interface = True
+    else:
+        with_interface = False
+    
+    Thread(target=lambda: run(_run_simulations(with_interface, networks, wave, remove_travelers))).start()
+    if with_interface:  # utilisation de l'interface web
         from config_Flask import run_app
         run_app(port, networks, wave)
 

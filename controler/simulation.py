@@ -23,7 +23,7 @@ class Simulation:
         """
         running = running or False
         max_rate = max_rate or 7
-        rate = rate or max_rate
+        rate = rate or 0
         jerky = jerky or False
         time = time or 0
         state = state or (seed(), random() * 2 ** 53)[1]
@@ -44,14 +44,15 @@ class Simulation:
         self._env = Environment()
         self._wave = wave
         self._running = running
+        self._showing_travelers_waiting = False
         self._max_rate = max_rate
         self._rate = rate
         self._jerky = jerky
-        self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
         self._state = state
         seed(self._state)  # à appeler avant d'utiliser random
         self._network = Network(self._env, id, **kwargs)
         self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
+        self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
         self._travelers_per_day = traveler["travelers_per_day"]
         self._probability = Probability(prob, traveler, self._network.stations, self._network.statistiques, self._env.tick)
 
@@ -65,6 +66,14 @@ class Simulation:
     @running.setter
     def running(self, value):
         self._running = value
+
+    @property
+    def showing_travelers_waiting(self):
+        return self._showing_travelers_waiting
+
+    @showing_travelers_waiting.setter
+    def showing_travelers_waiting(self, value):
+        self._showing_travelers_waiting = value
 
     @property
     def rate(self):
@@ -117,12 +126,13 @@ class Simulation:
 
         # TODO : correctement prendre en compte 'self._travelers_per_day'
         if self._travelers_per_day > 0:
-            self._probability.generate_traveler_poisson(int(round(second / 3600, 2)), second, self._env)
+            self._probability.generate_traveler_2(second, self._env)
 
     def serialize(self):
         dict = self._network.serialize()
         dict.update({
             "running": self.running,
+            "showing_travelers_waiting": self._showing_travelers_waiting,
             "rate": self.rate,
             "max_rate": self.max_rate,
             "jerky": self.jerky,
@@ -142,7 +152,9 @@ class Simulation:
         for s in self._network.stations:
             if (new_traveler.source == s.name):
                 s.travelers.append(new_traveler)
-                print("station trouvee !")
+                #print("station trouvee !")
                 self._network.statistiques.add_waiting_traveler(s.name)
+                s._all_time_count += 1
         
-        print("add_traveler d'identifiant " + new_traveler.id)
+        #print("add_traveler d'identifiant " + new_traveler.id)
+

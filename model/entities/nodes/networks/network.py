@@ -383,13 +383,22 @@ class Network(Node):
         last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
         last_pods = {}
         one_print = True
+        #last_sec = 1
+
         while True:
+            #       Affichage des secondes de la simul si besoin de tester GET de l'API pr les durees de trajet
+            #if ( round(self.env.time) % 60 == last_sec):
+            #    print("last_sec = " + str(last_sec))       
+            #    last_sec += 1
+            #    if (last_sec == 60):
+            #        last_sec = 0
+
             if round(self.env.time) % 60 == 1:  # pour éviter d'écrire plusieurs lignes pour un temps donné si le pas est bas
                 one_print = True
             if round(self.env.time) % 60 == 0 and one_print:  # affichage et écriture en fichier toutes les minutes de simulations
                 one_print = False
                 print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
-                      "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.390)")
+                      "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
                 if self.departure_arrival_printer:
                     self.statistiques.print_stats()
                 self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
@@ -523,13 +532,6 @@ class Network(Node):
 ####################    Fin classe
 
 
-
-
-
-
-
-
-
 def _init_pod_of_line(line, pod):
     position = pod["position"]
     if position < 0:
@@ -543,7 +545,6 @@ def _init_pod_of_line(line, pod):
                 return
             position -= length
     raise ValueError("Element's position out of range")
-
 
 def shorter_way_tracks(start_track, destination_track):
     """
@@ -615,7 +616,6 @@ def next_switch_out(track):
         current = current.next
     return current
 
-
 def previous_switch_out(track):
     """
     :param track: piste dont on veut connaître l'aiguillage sortant précédent le plus proche
@@ -625,8 +625,6 @@ def previous_switch_out(track):
     while not isinstance(current, SwitchOut):
         current = current.previous
     return current
-
-
 
 def update_weight(switch1, switch2, travel_time):
     """
@@ -662,3 +660,35 @@ def no_more_congestion(previous_switch, current_switch):
     else:
         return True
     return road.weight < 2 * road.expected_weight
+
+def disable_road(previous_switch, current_switch):
+    """
+    Rend impossible le passage par une route, ie met le poids de celle-ci à l'infini
+    :param previous_switch: aiguillage de début de route
+    :param current_switch: aiguillage de fin de route
+    """
+    # TODO : peut etre utile pour une futur coupure de voie
+    if previous_switch.next.next == current_switch:
+        road = previous_switch.next
+    elif previous_switch.beside.next == current_switch:
+        road = previous_switch.beside
+    else:
+        return
+    road.weight = inf
+
+def get_time_max(previous_switch, current_switch):
+    """
+    Retourne le temps à partir duquel on considère une route comme coupée. On prend comme limite
+    10 * le temps de parcours en conditions normales
+    :param previous_switch: aiguillage précédent la route
+    :param current_switch: aiguillage suivant la route
+    :return: temps à partir duquel on considère une route comme coupée
+    """
+    # TODO : peut etre utile pour une futur coupure de voie
+    if previous_switch.next.next == current_switch:
+        road = previous_switch.next
+    elif previous_switch.beside.next == current_switch:
+        road = previous_switch.beside
+    else:
+        return -1
+    return 10 * road.expected_weight

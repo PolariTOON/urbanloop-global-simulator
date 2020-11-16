@@ -54,6 +54,7 @@ Ce dépôt comprend différents dossiers et fichiers correspondant à la réalis
 ### Prérequis
 
 * `python3.7`
+* `pip3.7`
 
 ### Dépendances
 
@@ -62,15 +63,24 @@ Ce dépôt comprend différents dossiers et fichiers correspondant à la réalis
 * `numpy`
 * `scipy`
 
+(voir `requirements.txt`)
+
+Vous pouvez installer les dépendances avec :
+
+```sh
+$ pip3.7 install -r requirements.txt
+```
+
+
 ### Lancement
 
-Pour lancer le programme (après téléchargement des sources), exécuter la commande suivante :
+Pour lancer le programme, utilisez :
 
 ```sh
 $ python3.7 main.py -p
 ```
 
-Il est aussi possible de charger des réseaux dès le lancement comme ceci, les réseaux seront chargés à partir de l'id 0:
+Il est aussi possible de charger des réseaux dès le lancement :
 
 ```sh
 $ python3.7 main.py -p -n path/to/network0.json path/to/network42.json
@@ -128,6 +138,30 @@ Vous pouvez visualiser ce qu'il se passe à un aiguillage lorsqu'il est sélecti
 ![](pictures/aig.png)
 
 Avec le bouton ![](pictures/poubelle.png) vous pouvez supprimer le réseau choisi, pour ensuite en choisir un différent.
+
+Pour se connecter à l'interface web depuis une autre machine du réseau local, il suffit d'accéder à \[IP hôte\]:\[port\] (\[IP hôte\] peut être obtenu avec `ipconfig` sur Windows et `ifconfig` sur Linux et Mac).
+
+### Utilisation de *Docker*
+
+#### Prérequis
+
+* `docker`
+
+#### Conteurisation
+
+Le projet peut être embarqué dans un conteneur *Docker* en exécutant la commande suivante :
+
+```sh
+$ docker build -t urbanloop-simulator .
+```
+
+#### Lancement
+
+Le conteneur peut ensuite être utilisé comme ceci :
+
+```sh
+docker run -itp 80:8090 --env n='{"0": "path/to/network0.json", "42": "path/to/network42.json"}' urbanloop-simulator
+```
 
 ### Editeur
 

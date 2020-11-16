@@ -77,7 +77,7 @@ export class Loop extends Line {
     get _sections() {
         return this.__sections;
     }
-    update(json, podsLayer, hintsLayer) {
+    update(json, podsLayer, hintsLayer, showing_travelers_waiting) {
         const name = json["name"];
         const {x, y} = averagePoint(json["elements"]);
         this._name = name;
@@ -88,8 +88,17 @@ export class Loop extends Line {
         for (let i = 0, li = elementsJSON.length; i < li; i++) {
             if (this.__elements[i] instanceof Switch) {
                 this.__elements[i].update(elementsJSON[i], podsLayer, hintsLayer);
-            } else {
-                this.__elements[i].update(elementsJSON[i]);
+            } 
+            else 
+            {
+                if (this.__elements[i] instanceof Station)
+                {
+                    this.__elements[i].update(elementsJSON[i], showing_travelers_waiting);
+                }
+                else
+                {
+                    this.__elements[i].update(elementsJSON[i]);
+                }
             }
         }
         for (let i = 0, li = sectionsJSON.length; i < li; i++) {

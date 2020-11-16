@@ -42,7 +42,6 @@ def send_error(error):
     _app.logger.error(error)
     return "", 404
 
-
 @_app.route("/")
 def get_root():
     """page de base de la vue"""
@@ -105,6 +104,29 @@ async def _pause_clock(simulations, network_index):
         simulation.running = False
         return True
     return False
+
+
+
+@_app.route("/networks/<int:network_index>/travelersWaiting/show/", methods=["POST"])
+@_synchronize()
+async def _show_travelers_waiting(simulations, network_index):
+    """Requête post pour afficher le nombre de passagers attendant dans les stations depuis la vue"""
+    if network_index in simulations:
+        simulation = simulations[network_index]
+        simulation.showing_travelers_waiting = True
+        return True
+    return False
+
+@_app.route("/networks/<int:network_index>/travelersWaiting/hide/", methods=["POST"])
+@_synchronize()
+async def _hide_travelers_waiting(simulations, network_index):
+    """Requête post pour afficher le nombre de passagers attendant dans les stations depuis la vue"""
+    if network_index in simulations:
+        simulation = simulations[network_index]
+        simulation.showing_travelers_waiting = False
+        return True
+    return False
+
 
 
 @_app.route("/networks/<int:network_index>/clock/decelerate/", methods=["POST"])
@@ -194,10 +216,7 @@ def run_app(port, networks, wave):
     "wave contient la vitesse de tic de simulation"
 
     print("App running on port %d (http://127.0.0.1:%d)" % (port, port))
-    _app.run(port=port)
-
-
-
+    _app.run(host="0.0.0.0", port=port)
 
 
 
@@ -214,8 +233,6 @@ def getUserPosition(user_id):
         simulation_for_api
     except NameError:
         return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
-
-    # Utiliser new-mini-network-jerky.json, de Gare a Eglise par exple
 
     pod_of_user = simulation_for_api.get_network().get_pod_of_user(user_id)
 

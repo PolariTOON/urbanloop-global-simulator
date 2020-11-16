@@ -97,6 +97,7 @@ state.addEventListener("load", async (event) => {
     heading.textContent = name;
     const jerky = networkJSON["jerky"];
     const rate = networkJSON["rate"];
+    const showing_travelers_waiting = networkJSON["showing_travelers_waiting"];
     rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
     let datetime = Math.floor(networkJSON["time"]);
     const seconds = datetime % 60;
@@ -116,7 +117,7 @@ state.addEventListener("load", async (event) => {
     const bridgesJSON = networkJSON["bridges"];
     for (const json of loopsJSON) {
         const loop = new Loop(json, legendsLayer, elementsLayer, sectionsLayer, hintsLayer);
-        loop.update(json, podsLayer, hintsLayer);
+        loop.update(json, podsLayer, hintsLayer, showing_travelers_waiting);     // On oublie pas showing_travelers_waiting
         state.loops.push(loop);
     }
     for (const json of bridgesJSON) {
@@ -160,6 +161,7 @@ state.addEventListener("update", (event) => {
     heading.textContent = name;
     const jerky = networkJSON["jerky"];
     const rate = networkJSON["rate"];
+    const showing_travelers_waiting = networkJSON["showing_travelers_waiting"];
     rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
     let datetime = Math.floor(networkJSON["time"]);
 
@@ -180,7 +182,7 @@ state.addEventListener("update", (event) => {
     const bridgesJSON = networkJSON["bridges"];
     for (let i = 0, li = loopsJSON.length; i < li; i++) {
         const json = loopsJSON[i];
-        state.loops[i].update(json, podsLayer, hintsLayer);
+        state.loops[i].update(json, podsLayer, hintsLayer, showing_travelers_waiting);   // On oublie pas showing_travelers_waiting
     }
     for (let i = 0, li = bridgesJSON.length; i < li; i++) {
         const json = bridgesJSON[i];

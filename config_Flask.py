@@ -63,7 +63,7 @@ async def _post_network(simulations, network_index, network_item):
 
         # Pour utiliser la simulation dans l'API
         print("Creation simulation en tant que variable global (pour utiliser dans l'API)")
-        global simulation_for_api                   #Variable non locale a cette fonction
+        global simulation_for_api  # Variable non locale a cette fonction
         # Je ne sais pas pk declarer en dehors de cette fonction "simulation_for_api = None" ne marche pas, cela ne change la valeur de la var que localement ...
         simulation_for_api = simulation
 

@@ -22,8 +22,8 @@ class Simulation:
         "state" (flottant) un seed permettant de choisir le générateur pseudo-aléatoire utilisé et donc de relancer une même simulation dans les mêmes conditions
         """
         running = running or False
-        rate = rate or 0
         max_rate = max_rate or 7
+        rate = rate or 0
         jerky = jerky or False
         time = time or 0
         state = state or (seed(), random() * 2 ** 53)[1]
@@ -45,14 +45,14 @@ class Simulation:
         self._wave = wave
         self._running = running
         self._showing_travelers_waiting = False
-        self._rate = rate
         self._max_rate = max_rate
+        self._rate = rate
         self._jerky = jerky
-        self._time = time
         self._state = state
+        seed(self._state)  # à appeler avant d'utiliser random
         self._network = Network(self._env, id, **kwargs)
         self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
-        self._env.time = time  # Temps réel actuel en seconde
+        self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
         self._travelers_per_day = traveler["travelers_per_day"]
         self._probability = Probability(prob, traveler, self._network.stations, self._network.statistiques, self._env.tick)
 
@@ -84,7 +84,7 @@ class Simulation:
         if value < 0:
             self._rate = 0
         else:
-            self._rate = value
+            self._rate = min(value, self._max_rate)
 
     @property
     def max_rate(self):
@@ -96,15 +96,16 @@ class Simulation:
 
     @property
     def time(self):
-        return self._time
+        return self._env.time
 
     @property
     def state(self):
         return self._state
 
     def update(self):
-        if not self._running:   # simulation en pause
+        if not self._running:  # simulation en pause
             return
+        
         times = 1
         tick = self._wave
         if self._jerky:  # mode jerky
@@ -114,14 +115,13 @@ class Simulation:
             print("\u001B[31m", "la génération des travelers a été corrigée,"
                                 " utiliser le mode jerky pour ne pas avoir de problème"
                                 " (mettre 'jerky = true' dans le fichier json) ", "\u001B[0m")
+        
         self._env.tick = tick
         for i in range(times):  # dans le mode jerky, on calcule plusieurs ticks à la fois
-            self._env.time += self._env.tick  # on incrémente le temps
-            self._time = self._env.time
-            seed(self._state)  # à appeler avant d'utiliser random
-            until = floor(self._env.now) + 1  # durée de simulation calculée
-            self._env.run(until=until)
+            self._env.time += tick  # on incrémente le temps
+            self._env.run(until=self._env.now+1)
             self._state = random() * 2 ** 53
+            seed(self._state)
         second = self._env.time
 
         # TODO : correctement prendre en compte 'self._travelers_per_day'
@@ -143,11 +143,11 @@ class Simulation:
         return dict
 
     def add_traveler(self, new_traveler_source, new_traveler_destination, user_id):
-        """Ajout d'un voyageur dans la simulation 
-        fonction appelee quand un utilisateur scan sur l'application reader son ticket, et non pas quand il en reserve un"""
+        """ Ajout d'un voyageur dans la simulation .
+        fonction appelee quand un utilisateur scan sur l'application reader son ticket, et non pas quand il en reserve un """
 
         # Creation de l'objet Traveler
-        new_traveler = Traveler(self._env, generation_time=self.time, source=new_traveler_source, destination=new_traveler_destination, id=user_id, real_user=True)
+        new_traveler = Traveler(self._env, generation_time=self._env.time, source=new_traveler_source, destination=new_traveler_destination, id=user_id)
 
         for s in self._network.stations:
             if (new_traveler.source == s.name):
@@ -157,3 +157,4 @@ class Simulation:
                 s._all_time_count += 1
         
         #print("add_traveler d'identifiant " + new_traveler.id)
+

@@ -16,7 +16,7 @@ class Statistiques:
 		self._traveling_pods = {}  		# dictionnaire des capsules en voyage
 		# self._travels = []  			# tableau des voyages effectués
 		self._total_generated_travelers = 0
-		csvfile = open('stat_log.csv', 'w')
+		csvfile = open('stats/global/stat_log.csv', 'w')
 		csvfile.write('Time, total travelers, travelers in a pod, waiting travelers, traveling pods, average waiting time, average travel time, total generated travelers\n')
 		csvfile.close()
 

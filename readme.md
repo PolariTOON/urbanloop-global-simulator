@@ -115,6 +115,12 @@ Pour plus d'informations, utilisez la commande suivante :
 $ python3.7 test_project/lauch_simulators.py -h
 ```
 
+Pour lancer le calcul de statistiques finales et creer les figures des statistiques temporelles dans le dossier stats/, utilisez :
+
+```sh
+$ python3.7 make_statsAndGraphs.py
+```
+
 ### Utilisation
 
 L'interface se présente de la façon suivante :

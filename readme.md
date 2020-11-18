@@ -163,10 +163,10 @@ $ docker build -t urbanloop-simulator .
 
 #### Lancement
 
-Le conteneur peut ensuite être utilisé comme ceci :
+Le conteneur peut ensuite être utilisé comme ceci (par exemple) :
 
 ```sh
-docker run -itp 80:8090 --env n='{"0": "path/to/network0.json", "42": "path/to/network42.json"}' urbanloop-simulator
+docker run -itp 80:8090 --env n='resources/test2jerky.json' urbanloop-simulator
 ```
 
 ### Editeur

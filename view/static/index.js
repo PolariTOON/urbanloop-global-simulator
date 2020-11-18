@@ -34,10 +34,10 @@ state.addEventListener("update", (event) => {
         requestAnimationFrameId = 0;
     });
 });
+
 /*
-// mise à jour de l'affichage du réseau toutes les 100ms -> pas forcément nécessaire ? on dirait que l'affichage est déjà continu au début de la simulation (ça bloque après un bug)
+// if we want to increase framerate
 let delay = 100
-console.log("Foo")
 setInterval(function(){
     if (requestAnimationFrameId !== 0) {
         return;
@@ -48,4 +48,5 @@ setInterval(function(){
     });
 }, delay);
 */
+
 state.reload();

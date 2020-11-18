@@ -1,5 +1,5 @@
 from asyncio import run, run_coroutine_threadsafe, sleep
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from functools import wraps
 from logging import ERROR, getLogger
 from controler.simulation import Simulation
@@ -47,6 +47,16 @@ def get_root():
     """page de base de la vue"""
     global _app
     return _app.send_static_file("index.html")
+
+@_app.route("/<string:filename>.js")
+def return_javascript(filename):
+    """ javascript modules need to be sent with MIME type of : text/javascript
+        this function ensures that javascript files are sent with the right MIME type.
+    """
+    js_filename = 'view/static/' + filename + '.js'
+    with open(js_filename, 'r') as f:
+        content = f.read()
+    return Response(response=content, mimetype="text/javascript")
 
 @_app.route("/networks/<int:network_index>/", methods=["POST"])
 @_synchronize("network_item")

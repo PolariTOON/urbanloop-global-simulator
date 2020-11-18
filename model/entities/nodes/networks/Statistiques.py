@@ -97,7 +97,7 @@ class Statistiques:
 		row += str(self._average_travel_time) + ","
 		row += str(self._total_generated_travelers) + "\n"
 
-		csvfile = open('stat_log.csv', 'a')
+		csvfile = open('stats/global/stat_log.csv', 'a')
 		csvfile.write(row)
 		csvfile.close()
 

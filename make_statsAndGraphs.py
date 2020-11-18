@@ -17,6 +17,9 @@ def makeStatsAndGraphs():
     arrTravelersInAPod = []    # Array contenant le nb de voyageurs qu'il y a eu dans les capsules au cours de la simul
     arrWaitingTravelers = []              
     arrTravelingPods = []        
+    arrAverageWaitingTime = []              
+    arrAverageTravelTime = []       
+    arrTotalGeneratedTravelers = []       
 
     arrTime = [] 
     
@@ -41,28 +44,41 @@ def makeStatsAndGraphs():
         arrTravelingPods.append(int(arrLine[4]))
         if (int(arrLine[4]) > maxTravelingPods):
             maxTravelingPods = int(arrLine[4])
+
+        # arrLine[5] contient "traveling pods" a un moment donne
+        arrAverageWaitingTime.append(float(arrLine[5]))
+
+        # arrLine[6] contient "traveling pods" a un moment donne
+        arrAverageTravelTime.append(float(arrLine[6]))
+
+        # arrLine[7] contient "traveling pods" a un moment donne
+        arrTotalGeneratedTravelers.append(int(arrLine[7]))
     
     csvfileFinalStats.write('Maximum travelers in a pod, Maximum waiting travelers, Maximum traveling pods\n')
     csvfileFinalStats.write(str(maxTravelersInAPod) + ", ")
     csvfileFinalStats.write(str(maxWaitingTravelers) + ", ")
-    csvfileFinalStats.write(str(maxTravelingPods))
+    csvfileFinalStats.write(str(maxTravelingPods) + ", ")
 
     csvfileStats.close()
     csvfileFinalStats.close()
 
-    makeGraph(arrTime, arrTravelersInAPod, "Number of travelers in a pod", "arrTravelersInAPod")
-    makeGraph(arrTime, arrWaitingTravelers, "Number of waiting travelers", "arrWaitingTravelers")
-    makeGraph(arrTime, arrTravelingPods, "Number of traveling pods", "arrTravelingPods")
+    makeGraph(arrTime, arrTravelersInAPod, "Number of travelers in a pod", "arrTravelersInAPod", True)
+    makeGraph(arrTime, arrWaitingTravelers, "Number of waiting travelers", "arrWaitingTravelers", True)
+    makeGraph(arrTime, arrTravelingPods, "Number of traveling pods", "arrTravelingPods", True)
+    makeGraph(arrTime, arrAverageWaitingTime, "Average waiting time", "arrAverageWaitingTime", False)
+    makeGraph(arrTime, arrAverageTravelTime, "Average travel time", "arrAverageTravelTime", False)
+    makeGraph(arrTime, arrTotalGeneratedTravelers, "Total generated travelers", "arrTotalGeneratedTravelers", True)
 
 
 #https://www.kite.com/python/examples/4987/matplotlib-save-a-plot-as-an-%60png%60-image
-def makeGraph(x, y, title, fileNameSuf):
+def makeGraph(x, y, title, fileNameSuf, isXComposedOfInt):
     plt.plot(x, y)
     plt.title(title)
     fileName = "stats/global/" + fileNameSuf + ".png"
 
-    yint = range(min(y), math.ceil(max(y))+1)
-    plt.yticks(yint)
+    if (isXComposedOfInt):
+        yint = range(min(y), math.ceil(max(y))+1)
+        plt.yticks(yint)
 
     if os.path.exists(fileName):
         os.remove(fileName)

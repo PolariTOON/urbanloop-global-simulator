@@ -171,4 +171,4 @@ docker run -itp 80:8090 --env n='resources/test2jerky.json' urbanloop-simulator
 
 ### Editeur
 
-Pour utiliser l'éditeur, les instructions sont disponibles sur le ReadMe présent dans le dossier [`editeur-de-r-eseau-urbanloop`](editeur-de-r-eseau-urbanloop)
+Pour utiliser l'éditeur, les instructions sont disponibles sur le ReadMe présent dans le dossier [`editeur_reseau`](editeur_reseau).

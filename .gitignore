@@ -5,5 +5,5 @@
 .vscode/
 __pycache__/
 sortie.json
-stat_log.csv
 test_project/sortie.json
+stats/

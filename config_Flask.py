@@ -235,7 +235,7 @@ def run_app(port, networks, wave):
 
 
 # INFOS D'UNE CAPSULE
-@_app.route('/capsule/<int:user_id>/', methods=['GET'])
+@_app.route('/capsule/<string:user_id>/', methods=['GET'])
 def getUserPosition(user_id):
     """ Donne les infos de la capsule dont on a renseigne l'identifiant     A DEVELOPPER"""
 

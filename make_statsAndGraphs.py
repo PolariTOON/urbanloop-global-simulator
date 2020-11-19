@@ -1,7 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
-import math
-import os
+import math, os, glob
     
 
 def makeStatsAndGraphs():
@@ -70,7 +69,6 @@ def makeStatsAndGraphs():
     makeGraph(arrTime, arrTotalGeneratedTravelers, "Total generated travelers", "arrTotalGeneratedTravelers", True)
 
 
-#https://www.kite.com/python/examples/4987/matplotlib-save-a-plot-as-an-%60png%60-image
 def makeGraph(x, y, title, fileNameSuf, isXComposedOfInt):
     plt.plot(x, y)
     plt.title(title)
@@ -91,6 +89,7 @@ def makeGraph(x, y, title, fileNameSuf, isXComposedOfInt):
     
 def main():
     makeStatsAndGraphs()
+    
 
 if __name__ == "__main__":
     main()

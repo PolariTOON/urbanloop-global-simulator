@@ -1,4 +1,5 @@
 import statistics as s
+import os, shutil, glob
 
 """Classe permettant d'effectuer des statistiques sur les simulations"""
 
@@ -16,6 +17,8 @@ class Statistiques:
 		self._traveling_pods = {}  		# dictionnaire des capsules en voyage
 		# self._travels = []  			# tableau des voyages effectués
 		self._total_generated_travelers = 0
+		# Gestion fichiers 
+		self.delete_old_images_and_csv_files()
 		csvfile = open('stats/global/stat_log.csv', 'w')
 		csvfile.write('Time, total travelers, travelers in a pod, waiting travelers, traveling pods, average waiting time, average travel time, total generated travelers\n')
 		csvfile.close()
@@ -68,7 +71,6 @@ class Statistiques:
 		"nb_pod": self._nb_pod,
 		"nb_traveler": self._nb_traveler
 		}
-
 		return dict
 
 	def print_stats(self):
@@ -97,9 +99,47 @@ class Statistiques:
 		row += str(self._average_travel_time) + ","
 		row += str(self._total_generated_travelers) + "\n"
 
+		# Ecriture stats globales
 		csvfile = open('stats/global/stat_log.csv', 'a')
 		csvfile.write(row)
 		csvfile.close()
+
+
+	def write_columns_names_for_all_stations(self, stations):
+		for station in stations:
+			self.write_columns_names_for_station(station)
+
+
+	def write_stats_for_all_stations(self, time, stations):
+		# Ecriture stats pour chaque station
+		for station in stations:
+			self.write_stats_for_station(time, station)
+
+
+	def write_columns_names_for_station(self, station):
+		filename = 'stats/stations/' + station.name + ".csv"
+		csvfile = open(filename, 'a')
+		csvfile.write("Time, Average waiting duration (in s)\n")
+		csvfile.close()	
+			
+	def write_stats_for_station(self, time, station):
+		filename = 'stats/stations/' + station.name + ".csv"
+		csvfile = open(filename, 'a')
+		csvfile.write(time + ", ")
+		csvfile.write(str(station.average_waiting_time) + "\n")
+		csvfile.close()
+		
+		
+	def delete_old_images_and_csv_files(self):
+		files = glob.glob('stats/global/*')
+		for f in files:
+			if (f != "stats/global/infos.txt"):
+				os.remove(f)
+		files = glob.glob('stats/stations/*')
+		for f in files:
+			if (f != "stats/stations/infos.txt"):
+				os.remove(f)
+
 
 
 	def traveling_pods(self):

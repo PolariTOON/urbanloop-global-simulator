@@ -39,6 +39,8 @@ class Network(Node):
         self._routing_table0 = {}
         self._update_routing(init=True)  # création des tables de routage
         self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
+        # On cree les csv puis on ecrit les noms des colonne
+        self._statistiques.write_columns_names_for_all_stations(self.stations)
 
     @property
     def name(self):
@@ -401,8 +403,12 @@ class Network(Node):
                       "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
                 if self.departure_arrival_printer:
                     self.statistiques.print_stats()
+
+                # ECRITURE STATS
                 self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
+                self.statistiques.write_stats_for_all_stations(str(datetime.timedelta(seconds=round(self.env.time))), self.stations)
                 print("\n")
+
             last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
             #print("-------------------------------------------------------------")
             #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")

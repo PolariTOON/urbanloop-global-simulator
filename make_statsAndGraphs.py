@@ -67,14 +67,20 @@ def make_global_graphs(durationInterval):
 
     csvfileStats.close()
 
-    make_boxplot(arrTime, arrTravelersInAPod, "Travelers in a pod", "stats/global/arrTravelersInAPod")
-    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelersInAPod), "Average travelers in a pod", "stats/global", "arrTravelersInAPod", False)
+    make_boxplot(arrTime, arrTravelersInAPod, "Travelers in a pod", "stats/global/travelersInAPod")
+    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelersInAPod), "Average travelers in a pod", "stats/global", "travelersInAPod_average", False)
+    make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrTravelersInAPod), "Standard deviation travelers in a pod", "stats/global", "travelersInAPod_standardDeviation", False)
 
-    make_boxplot(arrTime, arrWaitingTravelers, "Waiting Travelers", "stats/global/arrWaitingTravelers")
-    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrWaitingTravelers), "Average waiting Travelers", "stats/global", "arrWaitingTravelers", False)
+    make_boxplot(arrTime, arrWaitingTravelers, "Waiting Travelers", "stats/global/waitingTravelers")
+    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrWaitingTravelers), "Average waiting Travelers", "stats/global", "waitingTravelers_average", False)
+    make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrWaitingTravelers), "Standard deviation waiting Travelers", "stats/global", "waitingTravelers_standardDeviation", False)
 
-    make_boxplot(arrTime, arrTravelingPods, "Traveling Pods", "stats/global/arrTravelingPods")
-    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelingPods), "Average traveling Pods", "stats/global", "arrTravelingPods", False)
+    make_boxplot(arrTime, arrTravelingPods, "Traveling Pods", "stats/global/travelingPods")
+    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelingPods), "Average traveling Pods", "stats/global", "travelingPods_average", False)
+    make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrTravelingPods), "Standard deviation traveling Pods", "stats/global", "travelingPods_standardDeviation", False)
+
+
+
 
 
 def make_stations_graphs(durationInterval):
@@ -127,8 +133,62 @@ def make_stations_graphs(durationInterval):
 
                                 # PS : si on veut afficher 10mn et qu'on regarde les intervalles de 3mn, on affichera pas la 10eme minute
 
-                        make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "arrWaitingTime", False)
+                        make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "waitingTime", False)
                         stationCsv.close()
+
+
+
+
+
+
+
+def make_global_graph_with_global_csv_containing_stats_from_all_stations(durationInterval, filename, title):   # mettre bool pr conversion int/float ?
+    csvfileStats = open("stats/global/" + filename + ".csv", 'r')
+
+    line = csvfileStats.readline()      # Pas de ligne avec les noms de colonnes dans ces csv-la
+
+    arrTime = [] 
+    arrStat = []    
+    arrTimeInInterval = [] 
+    arrStatInInterval = [] 
+      
+    comptMinutes = 0
+    
+    while (line):
+        arrLine = line.split(',')
+        line = csvfileStats.readline()
+
+        # On ajoute le time
+        arrTimeInInterval.append(arrLine[0])
+
+        # On ajoute les valeurs contenues dans le tableau
+        for i in range(1, len(arrLine)):
+            arrLineOfArrLine = arrLine[i].split('|')     
+            for elt in arrLineOfArrLine:
+                if (elt != "" and elt != " " and elt != "\n" and elt != " \n"):
+                    arrStatInInterval.append(float(elt))
+
+        comptMinutes += 1  
+
+        if (comptMinutes == durationInterval):
+            comptMinutes = 0
+            arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
+
+            # On ajoute les arrays de valeurs
+            if (len(arrStatInInterval) > 0):
+                arrStat.append(arrStatInInterval)
+            else:           # Pas de valeurs ds l'array
+                arrStat.append(0)
+
+            arrTimeInInterval = [] 
+            arrStatInInterval = []        
+
+    csvfileStats.close()
+
+    make_boxplot(arrTime, arrStat, title, "stats/global/" + filename)
+    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrStat), "Average " + title, "stats/global",  filename + "_average", False)
+    make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrStat), "Standard deviation " + title, "stats/global", filename + "_standardDeviation", False)
+
 
 
 
@@ -147,11 +207,23 @@ def make_boxplot(array_time, array_of_array, title, filename):
     plt.clf()
 
 
+def get_array_of_standard_deviation_from_array_of_array(array):
+    arr_of_mean = []
+    for elt in array:
+        if (elt == 0):
+            arr_of_mean.append(0)
+        else:
+            arr_of_mean.append(statistics.stdev(elt))
+    return arr_of_mean
+
 
 def get_array_of_mean_from_array_of_array(array):
     arr_of_mean = []
     for elt in array:
-        arr_of_mean.append(statistics.mean(elt))
+        if (elt == 0):
+            arr_of_mean.append(0)
+        else:
+            arr_of_mean.append(statistics.mean(elt))
     return arr_of_mean
 
 
@@ -200,6 +272,7 @@ def delete_png_files_in_stats():
 def main(durationInterval):
     delete_png_files_in_stats()
     make_global_graphs(durationInterval)
+    make_global_graph_with_global_csv_containing_stats_from_all_stations(durationInterval, "globalWaitingTime", "waiting time")
     make_stations_graphs(durationInterval)
     
 

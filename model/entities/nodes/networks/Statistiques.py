@@ -111,9 +111,15 @@ class Statistiques:
 
 
 	def write_stats_for_all_stations(self, time, stations):
+		globalWaitingTimeCsv = open("stats/global/globalWaitingTime.csv", 'a')
+		globalWaitingTimeCsv.write(time + ", ")
+		#autre fichier csv global    A METTRE
+
 		# Ecriture stats pour chaque station
 		for station in stations:
-			self.write_stats_for_station(time, station)
+			self.write_stats_for_station(time, station, globalWaitingTimeCsv)
+		globalWaitingTimeCsv.write("\n")
+		globalWaitingTimeCsv.close()
 
 
 	def write_columns_names_for_station(self, station):
@@ -129,15 +135,16 @@ class Statistiques:
 		csvfile.close()	
 			
 
-	def write_stats_for_station(self, time, station):
+	def write_stats_for_station(self, time, station, globalWaitingTimeCsv):
 		filename = 'stats/stations/' + station.name + "/stats.csv"
-		csvfile = open(filename, 'a')
-		csvfile.write(time + ", ")
+		csvStationFile = open(filename, 'a')
+		csvStationFile.write(time + ", ")
 
-		# A CHANGER
-		csvfile.write(self.array_to_proper_string_for_csv(station.get_waiting_times_since_last_minute_and_reset()) + "\n")
+		arr_waiting_times_since_last_minute = station.get_waiting_times_since_last_minute_and_reset()
+		csvStationFile.write(self.array_to_proper_string_for_csv(arr_waiting_times_since_last_minute) + "\n")
+		globalWaitingTimeCsv.write(self.array_to_proper_string_for_csv(arr_waiting_times_since_last_minute) + ", ")
 
-		csvfile.close()
+		csvStationFile.close()
 		
 	def array_to_proper_string_for_csv(self, array):	# array = [2, 5, 8.2]
 		proper_string_for_csv = ""

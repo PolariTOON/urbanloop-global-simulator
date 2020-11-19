@@ -407,6 +407,7 @@ class Network(Node):
                 # ECRITURE STATS
                 self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
                 self.statistiques.write_stats_for_all_stations(str(datetime.timedelta(seconds=round(self.env.time))), self.stations)
+                # ligne calcul stats autres (voir txt perso)
                 print("\n")
 
             last_count, last_pods = self.pods_du_reseau(last_count, last_pods)

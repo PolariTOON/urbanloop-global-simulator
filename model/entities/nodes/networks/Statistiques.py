@@ -117,30 +117,71 @@ class Statistiques:
 
 
 	def write_columns_names_for_station(self, station):
-		filename = 'stats/stations/' + station.name + ".csv"
+		folderPath = "stats/stations/" + station.name
+		access_rights = 0o755
+		try:
+			os.mkdir(folderPath, access_rights)
+		except OSError:
+			print ("Creation of the directory %s failed" % folderPath)
+		filename = 'stats/stations/' + station.name + "/stats.csv"
 		csvfile = open(filename, 'a')
-		csvfile.write("Time, Average waiting duration (in s)\n")
+		csvfile.write("Time, Waiting duration (in s)\n")
 		csvfile.close()	
 			
+
 	def write_stats_for_station(self, time, station):
-		filename = 'stats/stations/' + station.name + ".csv"
+		filename = 'stats/stations/' + station.name + "/stats.csv"
 		csvfile = open(filename, 'a')
 		csvfile.write(time + ", ")
-		csvfile.write(str(station.average_waiting_time) + "\n")
+
+		# A CHANGER
+		csvfile.write(self.array_to_proper_string_for_csv(station.get_waiting_times_since_last_minute_and_reset()) + "\n")
+
 		csvfile.close()
 		
-		
+	def array_to_proper_string_for_csv(self, array):	# array = [2, 5, 8.2]
+		proper_string_for_csv = ""
+		if (len(array) == 0):
+			return ""
+		else:
+			proper_string_for_csv += str(array[0])
+			for value in array:
+				proper_string_for_csv += "|"
+				proper_string_for_csv += str(value)
+			return proper_string_for_csv				# proper_string_for_csv = 2|5|8.2
+
+
+
+
 	def delete_old_images_and_csv_files(self):
 		files = glob.glob('stats/global/*')
 		for f in files:
 			if (f != "stats/global/infos.txt"):
 				os.remove(f)
+				
 		files = glob.glob('stats/stations/*')
+		#print(files)
+		#print("\n\n")
 		for f in files:
-			if (f != "stats/stations/infos.txt"):
-				os.remove(f)
+			#print(f)
+			if (os.path.isdir(f)):
 
+				# On supprime les fichiers dans le dossier
+				filesInDirectory = glob.glob(f + "/*")
+				for fileInDirectory in filesInDirectory:
+					#print(fileInDirectory)
+					os.remove(fileInDirectory)
 
+				# On supprime maintenant le dossier
+				try:
+					os.rmdir(f)
+				except OSError:
+					print ("Deletion of the directory " + f + " failed")
+					
+			else:		# fichier
+				if (f != "stats/stations/infos.txt"):
+					os.remove(f)
+		
 
 	def traveling_pods(self):
 		""" Renvoie les pods en mouvement du reseau

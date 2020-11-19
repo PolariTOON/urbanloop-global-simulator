@@ -29,6 +29,7 @@ class Station(Step):
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = 0
+        self._waiting_times_since_last_minute = []
         self._all_time_count = 0
         self._travelers = []
         if travelers is not None:       # initialisation des travelers et dépendances
@@ -134,6 +135,11 @@ class Station(Step):
     def capacity(self):
         return self._capacity
 
+    def get_waiting_times_since_last_minute_and_reset(self):
+        arr = self._waiting_times_since_last_minute
+        self._waiting_times_since_last_minute = []
+        return arr
+
     def isFull(self):
         for pod in self._pods:  # si au moins un emplacement est disponible return False
             if not pod:
@@ -196,6 +202,8 @@ class Station(Step):
                         pod.travelers = [going_traveler]         # le traveler est associé au pod
                         self._departure_count += 1               # on compte 1 départ de plus
                         self._average_waiting_time = (self._average_waiting_time * (self._departure_count - 1) + going_traveler.waiting_time) / self._departure_count  # calcul du temps d'attente moyen
+                        # On ajoute le nouveau temps d'attente dans la liste des temps d'attente de la derniere minute de la simulation
+                        self._waiting_times_since_last_minute.append(going_traveler.waiting_time)
                         self._boarding[i] = 0  # début du décompte de l'embarquement
 
             # Attente de la montée des voyageurs pour l'envoi d'une capsule

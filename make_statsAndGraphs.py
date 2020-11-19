@@ -4,88 +4,77 @@ import matplotlib.pyplot as plt
 import math, os, glob, statistics
     
 
-def make_stats_and_graphs():        #PRENDRE EN COMPTE LA PERIODE (exple 30mn)
+def make_global_graphs(durationInterval):        
     csvfileStats = open('stats/global/stat_log.csv', 'r')
-    csvfileFinalStats = open('stats/global/final_stat_log.csv', 'w')
 
     line = csvfileStats.readline()
     line = csvfileStats.readline()      # La ligne avec les noms de colonnes
-    maxTravelersInAPod = 0              # Le nombre maximal de voyageurs qu'il y a eu a un moment donne dans les capsules
-    maxWaitingTravelers = 0              
-    maxTravelingPods = 0            
-
-    arrTravelersInAPod = []    # Array contenant le nb de voyageurs qu'il y a eu dans les capsules au cours de la simul
-    arrWaitingTravelers = []              
-    arrTravelingPods = []        
-    arrAverageWaitingTime = []              
-    arrAverageTravelTime = []       
-    arrTotalGeneratedTravelers = []       
 
     arrTime = [] 
+    arrTravelersInAPod = []    
+    arrWaitingTravelers = []              
+    arrTravelingPods = []          
+
+    arrTimeInInterval = [] 
+    arrTravelersInAPodInInterval = []    
+    arrWaitingTravelersInInterval = []              
+    arrTravelingPodsInInterval = []          
+
+    comptMinutes = 0
     
     while (line):
         arrLine = line.split(',')
         line = csvfileStats.readline()
 
         # On ajoute le time
-        arrTime.append(arrLine[0])
+        arrTimeInInterval.append(arrLine[0])
 
         # arrLine[2] contient "travelers in a pod" a un moment donne
-        arrTravelersInAPod.append(int(arrLine[2]))
-        if (int(arrLine[2]) > maxTravelersInAPod):
-            maxTravelersInAPod = int(arrLine[2])
+        arrTravelersInAPodInInterval.append(int(arrLine[2]))
 
         # arrLine[3] contient "waiting travelers" a un moment donne
-        arrWaitingTravelers.append(int(arrLine[3]))
-        if (int(arrLine[3]) > maxWaitingTravelers):
-            maxWaitingTravelers = int(arrLine[3])
+        arrWaitingTravelersInInterval.append(int(arrLine[3]))
 
         # arrLine[4] contient "traveling pods" a un moment donne
-        arrTravelingPods.append(int(arrLine[4]))
-        if (int(arrLine[4]) > maxTravelingPods):
-            maxTravelingPods = int(arrLine[4])
+        arrTravelingPodsInInterval.append(int(arrLine[4]))
 
-        # arrLine[5] contient "traveling pods" a un moment donne
-        arrAverageWaitingTime.append(float(arrLine[5]))
+        comptMinutes += 1  
 
-        # arrLine[6] contient "traveling pods" a un moment donne
-        arrAverageTravelTime.append(float(arrLine[6]))
+        if (comptMinutes == durationInterval):
+            comptMinutes = 0
+            arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
 
-        # arrLine[7] contient "traveling pods" a un moment donne
-        arrTotalGeneratedTravelers.append(int(arrLine[7]))
-    
-    csvfileFinalStats.write('Maximum travelers in a pod, Maximum waiting travelers, Maximum traveling pods\n')
-    csvfileFinalStats.write(str(maxTravelersInAPod) + ", ")
-    csvfileFinalStats.write(str(maxWaitingTravelers) + ", ")
-    csvfileFinalStats.write(str(maxTravelingPods) + ", ")
+            # On ajoute les arrays de valeurs
+            if (len(arrTravelersInAPodInInterval) > 0):
+                arrTravelersInAPod.append(arrTravelersInAPodInInterval)
+            else:           # Pas de valeurs ds l'array
+                arrTravelersInAPod.append(0)
+            
+            if (len(arrWaitingTravelersInInterval) > 0):
+                arrWaitingTravelers.append(arrWaitingTravelersInInterval)
+            else:           # Pas de valeurs ds l'array
+                arrWaitingTravelers.append(0)
+            
+            if (len(arrTravelingPodsInInterval) > 0):
+                arrTravelingPods.append(arrTravelingPodsInInterval)
+            else:           # Pas de valeurs ds l'array
+                arrTravelingPods.append(0)
+
+            arrTimeInInterval = [] 
+            arrTravelersInAPodInInterval = []    
+            arrWaitingTravelersInInterval = []              
+            arrTravelingPodsInInterval = []       
 
     csvfileStats.close()
-    csvfileFinalStats.close()
 
-    make_graph(arrTime, arrTravelersInAPod, "Number of travelers in a pod", "stats/global", "arrTravelersInAPod", True)
-    make_graph(arrTime, arrWaitingTravelers, "Number of waiting travelers", "stats/global", "arrWaitingTravelers", True)
-    make_graph(arrTime, arrTravelingPods, "Number of traveling pods", "stats/global", "arrTravelingPods", True)
-    make_graph(arrTime, arrAverageWaitingTime, "Average waiting time", "stats/global", "arrAverageWaitingTime", False)
-    make_graph(arrTime, arrAverageTravelTime, "Average travel time", "stats/global", "arrAverageTravelTime", False)
-    make_graph(arrTime, arrTotalGeneratedTravelers, "Total generated travelers", "stats/global", "arrTotalGeneratedTravelers", True)
+    make_boxplot(arrTime, arrTravelersInAPod, "Travelers in a pod", "stats/global/arrTravelersInAPod")
+    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelersInAPod), "Average travelers in a pod", "stats/global", "arrTravelersInAPod", False)
 
+    make_boxplot(arrTime, arrWaitingTravelers, "Waiting Travelers", "stats/global/arrWaitingTravelers")
+    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrWaitingTravelers), "Average waiting Travelers", "stats/global", "arrWaitingTravelers", False)
 
-def make_graph(x, y, title, fileNamePref, fileNameSuf, isXComposedOfInt):
-    plt.plot(x, y)
-    plt.title(title)
-    fileName = fileNamePref + "/" + fileNameSuf + ".png"
-
-    if (isXComposedOfInt):
-        yint = range(min(y), math.ceil(max(y))+1)
-        plt.yticks(yint)
-
-    if os.path.exists(fileName):
-        os.remove(fileName)
-
-    plt.savefig(fileName)
-    # On clear la figure
-    plt.clf()
-
+    make_boxplot(arrTime, arrTravelingPods, "Traveling Pods", "stats/global/arrTravelingPods")
+    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelingPods), "Average traveling Pods", "stats/global", "arrTravelingPods", False)
 
 
 def make_stations_graphs(durationInterval):
@@ -97,16 +86,16 @@ def make_stations_graphs(durationInterval):
                 for fileInDirectory in filesInDirectory:
                     if (fileInDirectory == (f + "/stats.csv")):
                         stationCsv = open(fileInDirectory, 'r')
-                        # Creation et remplissage arrAverageWaitingTime   
+                        # Creation et remplissage arrWaitingTime   
                         arrTime = [] 
-                        arrAverageWaitingTime = []
+                        arrWaitingTime = []
 
                         # Parsage
                         line = stationCsv.readline()
                         line = stationCsv.readline()
 
                         arrTimeInInterval = []
-                        arrAverageWaitingTimeInInterval = []
+                        arrWaitingTimeInInterval = []
                         comptMinutes = 0
 
                         while (line):
@@ -120,7 +109,7 @@ def make_stations_graphs(durationInterval):
                             arrLineOfArrLine = arrLine[1].split('|')     
                             for elt in arrLineOfArrLine:
                                 if (elt != "" and elt != " " and elt != "\n" and elt != " \n"):
-                                    arrAverageWaitingTimeInInterval.append(float(elt))
+                                    arrWaitingTimeInInterval.append(float(elt))
 
                             comptMinutes += 1       
 
@@ -128,18 +117,56 @@ def make_stations_graphs(durationInterval):
                                 comptMinutes = 0
                                 arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
                                 # On ajoute les moyennes
-                                if (len(arrAverageWaitingTimeInInterval) > 0):
-                                    arrAverageWaitingTime.append(statistics.mean(arrAverageWaitingTimeInInterval))
+                                if (len(arrWaitingTimeInInterval) > 0):
+                                    arrWaitingTime.append(statistics.mean(arrWaitingTimeInInterval))
                                 else:           # Pas de valeurs ds l'array
-                                    arrAverageWaitingTime.append(0)
+                                    arrWaitingTime.append(0)
+
                                 arrTimeInInterval = []
-                                arrAverageWaitingTimeInInterval = []
+                                arrWaitingTimeInInterval = []
 
                                 # PS : si on veut afficher 10mn et qu'on regarde les intervalles de 3mn, on affichera pas la 10eme minute
 
-                        make_graph(arrTime, arrAverageWaitingTime, "Average waiting time", f, "arrAverageWaitingTime", False)
+                        make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "arrWaitingTime", False)
                         stationCsv.close()
 
+
+
+
+
+
+def make_boxplot(array_time, array_of_array, title, filename):
+    plt.boxplot(array_of_array)
+    plt.title('Boxplot : ' + title)
+    filename += "_boxplot.png"
+
+    plt.gca().xaxis.set_ticklabels(array_time)
+
+    plt.savefig(filename)
+    # On clear la figure
+    plt.clf()
+
+
+
+def get_array_of_mean_from_array_of_array(array):
+    arr_of_mean = []
+    for elt in array:
+        arr_of_mean.append(statistics.mean(elt))
+    return arr_of_mean
+
+
+def make_graph(x, y, title, fileNamePref, fileNameSuf, isXComposedOfInt):
+    plt.plot(x, y)
+    plt.title(title)
+    fileName = fileNamePref + "/" + fileNameSuf + ".png"
+
+    if (isXComposedOfInt):
+        yint = range(min(y), math.ceil(max(y))+1)
+        plt.yticks(yint)
+
+    plt.savefig(fileName)
+    # On clear la figure
+    plt.clf()
 
 
 def intervalOfListOfStringDates(listOfStringDate):
@@ -153,9 +180,26 @@ def intervalOfListOfStringDates(listOfStringDate):
 
     return interval
 
+
+def delete_png_files_in_stats():
+    files = glob.glob('stats/global/*')
+    for f in files:
+        if (f[-4:] != ".csv" and f[-4:] != ".txt"):          # On remove ce qui n'est pas un csv ou txt
+            os.remove(f)
+				
+    files = glob.glob('stats/stations/*')
+    for f in files:
+        if (os.path.isdir(f)):
+            # On supprime les fichiers dans le dossier
+            filesInDirectory = glob.glob(f + "/*")
+            for fileInDirectory in filesInDirectory:
+                if (fileInDirectory[-4:] != ".csv"):          # On remove ce qui n'est pas un csv
+                    os.remove(fileInDirectory)
+
     
 def main(durationInterval):
-    make_stats_and_graphs()
+    delete_png_files_in_stats()
+    make_global_graphs(durationInterval)
     make_stations_graphs(durationInterval)
     
 

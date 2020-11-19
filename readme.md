@@ -121,7 +121,7 @@ Pour lancer le calcul de statistiques finales et creer les figures des statistiq
 $ python3.7 make_statsAndGraphs.py
 ```
 
-Pour changer l'intervalle de temps (par defaut de 30 minutes), ajouter la commande -i et l'entien souhaite :
+Pour changer l'intervalle de temps (par defaut de 30 minutes), ajouter la commande -i et l'entier souhaite (5 par exemple) :
 
 ```sh
 $ python3.7 make_statsAndGraphs.py -i 5

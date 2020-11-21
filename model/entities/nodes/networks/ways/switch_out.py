@@ -20,6 +20,7 @@ class SwitchOut(Switch):
             self._beside.sections[-1].next.switch_in = self
         self._length = None
         self._stat_or_shed = stat_or_shed
+        self._failed_insertion_since_last_minute = 0
 
     @property
     def switch_in(self):
@@ -44,6 +45,11 @@ class SwitchOut(Switch):
     @property
     def name(self):
         return super().name or "Switch \"out\" %d" % self.id
+
+    def get_failed_insertion_since_last_minute_and_reset(self):
+        nb = self._failed_insertion_since_last_minute
+        self._failed_insertion_since_last_minute = 0
+        return nb
 
     @property
     def stat_or_shed(self):
@@ -110,6 +116,7 @@ class SwitchOut(Switch):
                             # On ne peut pas insérer la capsule
                             """print("\t\t\033[4;31mInsertion capsule impossible\u001B[0m", pod.name[:8], self.name,
                                   "\t\t\t\t\t\t\t\t\t\t\t\t\t\t(switchout l.111)\n")"""
+                            self._failed_insertion_since_last_minute += 1
                             pass
                         elif index == first_place - 1:
                             # On insert la capsule sur la dernière place

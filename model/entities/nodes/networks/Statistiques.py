@@ -119,7 +119,7 @@ class Statistiques:
 
 
 	def write_stats_for_all_stations(self, time, stations):
-		globalWaitingTimeCsv = open("stats/global/globalWaitingTime.csv", 'a')
+		globalWaitingTimeCsv = open("stats/global/globalWaitingTime/globalWaitingTime.csv", 'a')
 		globalWaitingTimeCsv.write(time + ",")
 		#autre fichier csv global    A METTRE
 
@@ -141,6 +141,23 @@ class Statistiques:
 		csvfile = open(filename, 'a')
 		csvfile.write("Time, Waiting duration (in s)\n")
 		csvfile.close()	
+
+
+	def create_global_directories(self):
+		self.create_directory("stats/global/globalWaitingTime")
+		self.create_directory("stats/global/globalTravelTime")
+		self.create_directory("stats/global/failedInsertions")
+
+		self.create_directory("stats/global/travelersInAPod")
+		self.create_directory("stats/global/waitingTravelers")
+		self.create_directory("stats/global/travelingPods")
+
+	def create_directory(self, filename):
+		access_rights = 0o755
+		try:
+			os.mkdir(filename, access_rights)
+		except OSError:
+			print ("Creation of the directory %s failed" % filename)
 			
 
 	def write_stats_for_station(self, time, station, globalWaitingTimeCsv):
@@ -154,9 +171,25 @@ class Statistiques:
 
 		csvStationFile.close()
 
+	
+	def write_stats_insertion(self, time, switches):
+		failedInsertionCsv = open("stats/global/failedInsertions/failedInsertions.csv", 'a')
+
+		row = str(time) + ","
+		failedInsertion = 0
+		for switch in switches:
+			if (type(switch).__name__ == "SwitchOut"):
+				failedInsertion += switch.get_failed_insertion_since_last_minute_and_reset()
+
+		row += str(failedInsertion)
+		row += "\n"
+
+		failedInsertionCsv.write(row)
+		failedInsertionCsv.close()
+
 
 	def write_travel_time_global(self, time):
-		globalTravelTimeCsv = open("stats/global/globalTravelTime.csv", 'a')
+		globalTravelTimeCsv = open("stats/global/globalTravelTime/globalTravelTime.csv", 'a')
 
 		row = str(time) + ","
 		for travel_time in self.get_travel_times_since_last_minute_and_reset():
@@ -168,7 +201,6 @@ class Statistiques:
 		globalTravelTimeCsv.close()
 
 
-		
 	def array_to_proper_string_for_csv(self, array):	# array = [2, 5, 8.2]
 		proper_string_for_csv = ""
 		if (len(array) == 0):
@@ -186,7 +218,11 @@ class Statistiques:
 	def delete_old_images_and_csv_files(self):
 		files = glob.glob('stats/global/*')
 		for f in files:
-			if (f != "stats/global/infos.txt"):
+			if (os.path.isdir(f)):
+				filesInDirectory = glob.glob(f + "/*")
+				for fileInDirectory in filesInDirectory:
+					os.remove(fileInDirectory)
+			elif (f != "stats/global/infos.txt"):		# si un fichier et pas un dossier
 				os.remove(f)
 				
 		files = glob.glob('stats/stations/*')

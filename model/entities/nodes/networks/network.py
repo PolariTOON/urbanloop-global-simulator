@@ -41,6 +41,7 @@ class Network(Node):
         self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
         # On cree les csv puis on ecrit les noms des colonne
         self._statistiques.write_columns_names_for_all_stations(self.stations)
+        self._statistiques.create_global_directories()
 
     @property
     def name(self):
@@ -407,6 +408,7 @@ class Network(Node):
                 # ECRITURE STATS
                 self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
                 self.statistiques.write_stats_for_all_stations(str(datetime.timedelta(seconds=round(self.env.time))), self.stations)
+                self.statistiques.write_stats_insertion(str(datetime.timedelta(seconds=round(self.env.time))), self.switches)
                 self.statistiques.write_travel_time_global(str(datetime.timedelta(seconds=round(self.env.time))))
                 # ligne calcul stats autres (voir txt perso)
                 print("\n")

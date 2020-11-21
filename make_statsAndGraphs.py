@@ -212,6 +212,8 @@ def get_array_of_standard_deviation_from_array_of_array(array):
     for elt in array:
         if (elt == 0):
             arr_of_mean.append(0)
+        elif (len(elt) == 1):
+            arr_of_mean.append(0)           # Convention choisie ici
         else:
             arr_of_mean.append(statistics.stdev(elt))
     return arr_of_mean
@@ -273,6 +275,7 @@ def main(durationInterval):
     delete_png_files_in_stats()
     make_global_graphs(durationInterval)
     make_global_graph_with_global_csv_containing_stats_from_all_stations(durationInterval, "globalWaitingTime", "waiting time")
+    make_global_graph_with_global_csv_containing_stats_from_all_stations(durationInterval, "globalTravelTime", "travel time")
     make_stations_graphs(durationInterval)
     
 

@@ -131,6 +131,9 @@ class SwitchIn(Switch):
                     if pod.id == place["id"]:
                         self._discrete_places[k] = pod
         while True:
+            #
+            #print(str(self._id) + "Foo 1")
+            #
             self._cursor = (self._cursor - self.speed * self.env.tick / self.place_size) % self._places_number
             if int(self._cursor) != self._first_place:
                 # Le curseur a dépassé une nouvelle place, on avance le rouage
@@ -140,6 +143,9 @@ class SwitchIn(Switch):
                 self._pod_to_add = None
             self._first_place = int(self._cursor)
             while True:
+                #
+                #print(str(self._id) + "Foo 2")
+                #
                 message = yield from self.read()
                 if message is None:
                     break

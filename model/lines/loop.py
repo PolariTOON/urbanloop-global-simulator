@@ -7,17 +7,19 @@ from .line import Line
 
 
 class Loop(Line):
-    def __init__(self, id, roads=None, switches=None, **kwargs):
+    def __init__(self, id, roads=None, switches=None, side_elements=None, **kwargs):
         """
         Instancie une boucle
         :param id: id de la boucle
         :param roads: liste des routes de la boucle
         :param switches: liste des aiguillages de la boucle
+        :param side_elements: liste des stations et sheds de la boucle (ils ne sont pas dans la boucles mais sur ses dérivations)
         :param kwargs: dictionnaire comportant les informations du json
         """
         super().__init__(id, **kwargs)
         self._roads = roads
         self._switches = switches
+        self._side_elements = side_elements
 
     @property
     def name(self):
@@ -30,6 +32,10 @@ class Loop(Line):
     @property
     def switches(self):
         return self._switches
+
+    @property
+    def side_elements(self):
+        return self._side_elements
 
     @property
     def x_min(self):
@@ -53,6 +59,10 @@ class Loop(Line):
         for r in self._roads:
             d += r.length
         return d
+
+    def get_element(i_element):
+
+        return
 
     def min_xy(self, choice):
         """
@@ -128,6 +138,11 @@ class Loop(Line):
                 length += section.length
                 section = section.serialize()
                 sections.append(section)
+        # TODO : à faire autrement
+        for e in self._side_elements:
+            step = e.serialize()
+            elements.append(step)
+        #
         dict = super().serialize()
         dict.update({
             "elements": elements,

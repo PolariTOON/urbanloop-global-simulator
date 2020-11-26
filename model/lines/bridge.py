@@ -6,17 +6,15 @@ from .line import Line
 
 
 class Bridge(Line):
-    def __init__(self, id, roads=None, switches=None, switch_out=None, switch_in=None, **kwargs):
+    def __init__(self, id, roads=None, switch_out=None, switch_in=None, **kwargs):
         """
         Instancie un pont
         :param id: id du pont
         :param roads: liste des routes du pont (il n'y en a qu'une normalement)
-        :param switches: liste des aiguillages du pont (il y en a 2 normalement)
         :param kwargs: dictionnaire comportant les informations du json
         """
         super().__init__(id, **kwargs)
         self._roads = roads or []
-        self._switches = switches or []
         self._switch_out = switch_out or None
         self._switch_in = switch_in or None
 

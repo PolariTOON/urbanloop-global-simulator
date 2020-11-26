@@ -19,6 +19,8 @@ class Shed(Step):
         }
         element_of_loop["loop"] = element_of_loop["loop"] or 0
         element_of_loop["element"] = element_of_loop["element"] or 0
+        
+        # Attributs relatifs à la gestion du stockage des pods
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
         self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
@@ -27,6 +29,17 @@ class Shed(Step):
             p = dico["pod"]
             dico["pod"] = Pod(env, self, 0, p)
         self._wait = -1
+
+        # Laison avec les bridges
+        #self._previous = kwargs.items()["previous"] -> already done in super() constructor (previous and next are roads, not sections)
+        #self._next = next
+        self._previous.next = self
+        self._next.previous = self
+        self._previous.sections[-1].next = self
+        self._next.sections[0].previous = self
+        
+        # TODO : self._switch_in
+        # TODO : self._switch_out
 
     def serialize(self):
         """sérialise les informations du dépôt"""
@@ -106,6 +119,8 @@ class Shed(Step):
                 message = yield from self.read()
                 if message is None:
                     break
+
+                # Messages relatifs à la gestion des pods
                 elif "pod_entry" == message["type"]:
                     pod = message["pod"]
                     yield from self._parent.write({
@@ -146,5 +161,10 @@ class Shed(Step):
                         for station0 in self.parent.parent.stations:
                             if station0.name == station:
                                 station0._incoming_pods -= 1
+
+                # Messages relatifs à la gestion des aiguillages
+                elif "[truc des switchs]" == message["type"]:
+                    pass
+                
                 else:
                     raise ValueError("Invalid message")

@@ -69,11 +69,11 @@ class Section(Track):
     @next.setter
     def next(self, value):
         self._next = value
-        other = self._previous
-        if value is None or other is None:
+        previous = self._previous
+        if value is None or previous is None:
             self._length = nan
         else:
-            self._length = hypot(other.x - value.x, other.y - value.y)  # TODO: gérer les autres types de chemins
+            self._length = hypot(previous.x - value.x, previous.y - value.y)
 
     @property
     def pods(self):
@@ -93,10 +93,10 @@ class Section(Track):
 
     def fermeture_ouverture(self):
         """ fonction pour la fermeture de voie via l'interface web"""
-        if self._speed == 0.0001:
+        if self._speed == 0.000001:
             self._speed = self._speed2
         else:
-            self._speed = 0.0001
+            self._speed = 0.000001
         self.weight = self._length / self._speed
 
     def update(self):

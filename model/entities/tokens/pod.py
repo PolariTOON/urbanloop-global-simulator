@@ -261,7 +261,9 @@ class Pod(Token):
                     "pod": self
                 })
                 self._turn = False
-
+            
+            # TODO : ajouter un warning si .position > .(new_)track_or_switch.length
+            
             # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
             # capsule indique la piste/l'aiguillage sur laquelle/lequel elle rentre
 
@@ -269,7 +271,7 @@ class Pod(Token):
                 bridge_to_switch = False
                 self._position -= self._track_or_switch.length
                 t = self._position / self._speed
-                if type(self._track_or_switch).__name__ == "SwitchOut" or type(self._track_or_switch).__name__ == "SwitchIn":
+                if type(self._track_or_switch).__name__ in ["SwitchOut", "SwitchIn"]:
                     self._track_or_switch = self._track_or_switch.next.sections[0]
                 else:
                     if type(self._track_or_switch).__name__ == "Section":
@@ -286,6 +288,7 @@ class Pod(Token):
                         "pod": self
                     })
                 else:
+                    # TODO : remettre position à 0 si Station ou Shed ?
                     yield from self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
@@ -318,6 +321,9 @@ class Pod(Token):
                     })
                 elif "docked" == message["type"]:
                     # La capsule s'arrête dans une gare ou un dépôt
+
+                    # TODO : check track_or_switch à ce niveau-là
+                    
                     self._speed = 0
                     self._endSpeed = 0
                 elif "insert" == message["type"]:

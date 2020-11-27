@@ -7,3 +7,4 @@ __pycache__/
 sortie.json
 test_project/sortie.json
 stats/
+stat_log.csv

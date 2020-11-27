@@ -29,7 +29,7 @@ const heading = document.createElement("h2");
 heading.textContent = "Undefined network";
 const firstParagraph = document.createElement("p");
 const rateView = document.createElement("label");
-rateView.innerHTML = "Rate: <output>×-</output>";
+rateView.innerHTML = "Rate: <output>&times-</output>"; // "&times-" = "×-"
 firstParagraph.append(rateView);
 const secondParagraph = document.createElement("p");
 const dateView = document.createElement("label");
@@ -98,7 +98,7 @@ state.addEventListener("load", async (event) => {
     const jerky = networkJSON["jerky"];
     const rate = networkJSON["rate"];
     const showing_travelers_waiting = networkJSON["showing_travelers_waiting"];
-    rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
+    rateView.control.value = "\u00d7" + `${2 ** rate}${jerky ? ` (jerky)` : ``}`; // "\u00d7" = "×"
     let datetime = Math.floor(networkJSON["time"]);
     const seconds = datetime % 60;
     datetime = (datetime - seconds) / 60;
@@ -137,7 +137,7 @@ state.addEventListener("load", async (event) => {
 state.addEventListener("unload", async (event) => {
     statistics.restartChart();
     heading.textContent = "Undefined network";
-    rateView.control.value = "×-";
+    rateView.control.value = "\u00d7-"; // = "×-"
     dateView.control.value = "Day -, --:--:--";
     legendsLayer.destroyChildren();
     elementsLayer.destroyChildren();
@@ -162,7 +162,7 @@ state.addEventListener("update", (event) => {
     const jerky = networkJSON["jerky"];
     const rate = networkJSON["rate"];
     const showing_travelers_waiting = networkJSON["showing_travelers_waiting"];
-    rateView.control.value = `×${2 ** rate}${jerky ? ` (jerky)` : ``}`;
+    rateView.control.value = "\u00d7" + `${2 ** rate}${jerky ? ` (jerky)` : ``}`; // "\u00d7" = "×"
     let datetime = Math.floor(networkJSON["time"]);
 
     statistics.datetime =datetime;

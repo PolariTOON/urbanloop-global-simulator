@@ -296,12 +296,14 @@ def change_destination_of_trip():
 
     user_id = request.json['user_id']
     new_arrival = request.json['new_arrival']
-
-    pod_of_user = simulation_for_api.get_network().get_pod_of_user(user_id)
+    
+    network = simulation_for_api.get_network()
+    pod_of_user = network.get_pod_of_user(user_id)
 
     if (pod_of_user == None):
         return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
     else :
+        network.pod_change_from_one_destination_to_another(pod_of_user.destination, new_arrival)
         pod_of_user.change_destination(user_id, new_arrival)
         return jsonify({ 'msg': 'Changement de destination valide' })
 
@@ -321,11 +323,14 @@ def call_emergency_exit(user_id):
     except NameError:
         return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
 
-    pod_of_user = simulation_for_api.get_network().get_pod_of_user(user_id)
+    network = simulation_for_api.get_network()
+    pod_of_user = network.get_pod_of_user(user_id)
 
     if (pod_of_user == None):
         return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
     else :
+        new_dest = pod_of_user.get_next_station()
+        network.pod_change_from_one_destination_to_another(pod_of_user.destination, new_dest)
         pod_of_user.call_emergency_exit(user_id)
         return jsonify({ 'msg': 'Appel d\'urgence demande' })
 

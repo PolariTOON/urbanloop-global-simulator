@@ -526,7 +526,6 @@ class Network(Node):
         """ Renvoie un objet pod qui est celui de l'user, si celui-ci est dans une capsule """
 
         moving_pods = self._statistiques.traveling_pods()
-
         for key in moving_pods:
             a_moving_pod = moving_pods[key]
             if (len(a_moving_pod) > 0):
@@ -537,6 +536,17 @@ class Network(Node):
         
         return None         # Le voyageur n'est pas encore dans une capsule
 
+    def get_station_with_name(self, name_of_station):
+        for station in self.stations:
+            if (station.name == name_of_station):
+                return station
+        print("station non trouvee dans le reseau")
+
+    def pod_change_from_one_destination_to_another(self, former_dest, new_dest):
+        former_dest_station = self.get_station_with_name(former_dest)
+        new_dest_station = self.get_station_with_name(new_dest)
+        former_dest_station.down_incoming_pods() # on decremente le nombre de pods qui vont arriver
+        new_dest_station.up_incoming_pods()      # on incremente le nombre de pods qui vont arriver
 
 ####################    Fin classe
 

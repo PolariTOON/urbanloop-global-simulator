@@ -51,7 +51,7 @@ class Station(Step):
             self._pods[-i-1] = Pod(env, self, 0)
         self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
         self._departure_pods = departure_pods or []                     # dictionnaire des pods sur le point de partir  # todo revoir l'initialisation de departure_pods en cas de chargement reseau
-        self._incoming_pods = 0  # à serialiser si on veut télécharger/rechager le réseau, c'est le nombre de pods en chemin vers la station
+        self._incoming_pods = 0  # à serialiser si on veut télécharger/recharger le réseau, c'est le nombre de pods en chemin vers la station
 
     def up_all_time_count(self):
         self._all_time_count += 1
@@ -88,6 +88,9 @@ class Station(Step):
 
     def up_incoming_pods(self):
         self._incoming_pods += 1
+
+    def down_incoming_pods(self):
+        self._incoming_pods -= 1
 
     @property
     def element_of_loop(self):

@@ -136,7 +136,8 @@ class Statistiques:
 		try:
 			os.mkdir(folderPath, access_rights)
 		except OSError:
-			print ("Creation of the directory %s failed" % folderPath)
+			#print ("Creation of the directory %s failed" % folderPath)
+			print("")
 		filename = 'stats/stations/' + station.name + "/stats.csv"
 		csvfile = open(filename, 'a')
 		csvfile.write("Time, Waiting duration (in s)\n")
@@ -157,7 +158,8 @@ class Statistiques:
 		try:
 			os.mkdir(filename, access_rights)
 		except OSError:
-			print ("Creation of the directory %s failed" % filename)
+			#print ("Creation of the directory %s failed" % filename)
+			print("")
 			
 
 	def write_stats_for_station(self, time, station, globalWaitingTimeCsv):

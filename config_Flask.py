@@ -234,10 +234,9 @@ def run_app(port, networks, wave):
 # RESTFUL API FLASK POUR APPLIS MOBILE
 
 
-# INFOS D'UNE CAPSULE
-@_app.route('/capsule/<string:user_id>/', methods=['GET'])
+@_app.route('/capsule/<string:user_id>', methods=['GET'])
 def getUserPosition(user_id):
-    """ Donne les infos de la capsule dont on a renseigne l'identifiant     A DEVELOPPER"""
+    """ Donne les infos de la capsule dont on a renseigne l'identifiant"""
 
     try:
         simulation_for_api
@@ -251,13 +250,12 @@ def getUserPosition(user_id):
     else :
         #print(pod_of_user.getPreviousStation())
         return jsonify({ 'source': pod_of_user.source,
-                         'next_station': pod_of_user.getNextStation(),
+                         'next_station': pod_of_user.get_next_station(),
                          'destination': pod_of_user.destination,
-                         'time_before_arrival': pod_of_user.getTimeBeforeArrival()})
+                         'time_before_arrival': pod_of_user.get_time_before_arrival()})
 
 
 
-# CREATION NOUVEAU TRAJET DANS SIMULATEUR
 @_app.route('/new_trip', methods=['POST'])
 def add_trip():
     """Fonction permettant de donner un nouveau trajet au simulateur"""
@@ -281,6 +279,34 @@ def add_trip():
 #{
     #"user_id": "1321",
     #"departure": "TNCY",
-    #"arrival": "commanderie"
+    #"arrival": "commanderie",
     #"typeCapsule" : "solo"
+#}
+
+
+
+@_app.route('/change_dest', methods=['POST'])
+def change_destination_of_trip():
+    """Fonction permettant de changer de destination pour un utilisateur"""
+
+    try:
+        simulation_for_api
+    except NameError:
+        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
+
+    user_id = request.json['user_id']
+    new_arrival = request.json['new_arrival']
+
+    pod_of_user = simulation_for_api.get_network().get_pod_of_user(user_id)
+
+    if (pod_of_user == None):
+        return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
+    else :
+        pod_of_user.change_destination(user_id, new_arrival)
+        return jsonify({ 'msg': 'Changement de destination valide' })
+
+ #Argument : 
+#{
+    #"user_id": "1321",
+    #"new_arrival": "commanderie"
 #}

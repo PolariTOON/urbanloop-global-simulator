@@ -532,7 +532,7 @@ class Network(Node):
             if (len(a_moving_pod) > 0):
                 for a_traveler in a_moving_pod[0].travelers:
                     if (a_traveler.id == str(user_id)):
-                        print("User trouve !")
+                        #print("User trouve !")
                         return a_moving_pod[0]
         
         return None         # Le voyageur n'est pas encore dans une capsule

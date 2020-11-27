@@ -122,11 +122,11 @@ class Simulation:
             self._env.run(until=self._env.now+1)
             self._state = random() * 2 ** 53
             seed(self._state)
-        second = self._env.time
 
+        # TODO : mettre ça dans le 'for' (mais check si ça ralentit pas trop la simulation)
         # TODO : correctement prendre en compte 'self._travelers_per_day'
         if self._travelers_per_day > 0:
-            self._probability.generate_traveler_2(second, self._env)
+            self._probability.generate_traveler_2(self._env.time, self._env)
 
     def serialize(self):
         dict = self._network.serialize()

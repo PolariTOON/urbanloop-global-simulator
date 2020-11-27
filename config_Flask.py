@@ -64,8 +64,12 @@ async def _post_network(simulations, network_index, network_item):
     """ Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json
         network_item contient toutes les informations du fichier JSON
     """
+    print("Received network: '%s'" % network_item["name"])
+    if network_item["name"] != "Network to test Stations":
+        print("Error : this version of the simulator can only be used with 'test_station.json'")
+        return
     if network_item is not None:
-        network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations si besoin
+        #network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations si besoin
         if "id" in network_item:
             del network_item["id"]
         from app import _wave, _remove_travelers

@@ -235,7 +235,7 @@ def run_app(port, networks, wave):
 
 
 @_app.route('/capsule/<string:user_id>', methods=['GET'])
-def getUserPosition(user_id):
+def get_user_position(user_id):
     """ Donne les infos de la capsule dont on a renseigne l'identifiant"""
 
     try:
@@ -310,3 +310,27 @@ def change_destination_of_trip():
     #"user_id": "1321",
     #"new_arrival": "commanderie"
 #}
+
+
+@_app.route('/emergency_exit/<string:user_id>', methods=['GET'])
+def call_emergency_exit(user_id):
+    """Fonction permettant de demander une sortie d'urgence pour un utilisateur"""
+
+    try:
+        simulation_for_api
+    except NameError:
+        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
+
+    pod_of_user = simulation_for_api.get_network().get_pod_of_user(user_id)
+
+    if (pod_of_user == None):
+        return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
+    else :
+        pod_of_user.call_emergency_exit(user_id)
+        return jsonify({ 'msg': 'Appel d\'urgence demande' })
+
+
+
+
+
+

@@ -394,7 +394,7 @@ class Pod(Token):
         nbIter = 0              # Pour eviter une boucle infinie
         nextStation = None
 
-        while (nextStation is None and nbIter < 100):   
+        while (nextStation is None and nbIter < 200):   
             while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOn le plus proche
                 if ((type(eltOfNetwork).__name__ == "Road") and (len(eltOfNetwork.stations) > 0)):  # Route contenant la station
                     return self.get_stations_of_road(eltOfNetwork)
@@ -504,4 +504,14 @@ class Pod(Token):
                 has_found_traveler = True
         if (has_found_traveler == False):
             print("Error in change_destination")
+
+    def call_emergency_exit(self, user_id):
+        self._destination = self.get_next_station()
+        for a_traveler in self._travelers:
+            if (a_traveler.id == str(user_id)):
+                a_traveler.call_emergency_exit()
+                has_found_traveler = True
+        if (has_found_traveler == False):
+            print("Error in call_emergency_exit")
+
             

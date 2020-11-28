@@ -251,6 +251,7 @@ def get_user_position(user_id):
         #print(pod_of_user.getPreviousStation())
         return jsonify({ 'source': pod_of_user.source,
                          'next_station': pod_of_user.get_next_station(),
+                         'previous_station': pod_of_user.get_previous_station(),
                          'destination': pod_of_user.destination,
                          'time_before_arrival': pod_of_user.get_time_before_arrival()})
 

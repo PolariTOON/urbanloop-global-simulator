@@ -10,7 +10,7 @@ class Bridge(Line):
         """
         Instancie un pont
         :param id: id du pont
-        :param roads: liste des routes du pont (il n'y en a qu'une normalement)
+        :param roads: liste des routes du pont (il n'y en a qu'une normalement, mais on pourrait imaginer avoir un autre bridge sur celui-ci)
         :param kwargs: dictionnaire comportant les informations du json
         """
         super().__init__(id, **kwargs)
@@ -19,16 +19,22 @@ class Bridge(Line):
         self._switch_in = switch_in or None
 
     def serialize(self):
-        section = self._roads[0].sections[0]
+        road = self._roads[0] # on suppose qu'il n'y a qu'une route, tant qu'il n'y a aucun moyen de lier les routes entre elles (par ex avec des switchs)
+        sections = []
+        elements = []
         pods = []
-        for pod_index in range(len(section.pods)):
-            pod = section.pods[pod_index]
-            pod = pod.serialize()
-            pods.append(pod)
-        section = section.serialize()
+        for section in road.sections:
+            for pod_index in range(len(section.pods)):
+                pod = section.pods[pod_index]
+                pod = pod.serialize()
+                pods.append(pod)
+            sections.append(section.serialize())
+        for step in road.steps:
+            elements.append(step.serialize())
         dict = super().serialize()
         dict.update({
-            "section": section,
+            "elements": elements,
+            "sections": sections,
             "pods": pods,
             "switch_out": self.switch_out,
             "switch_in": self.switch_in

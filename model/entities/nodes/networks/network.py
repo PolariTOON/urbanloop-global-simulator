@@ -165,6 +165,8 @@ class Network(Node):
             sections = []
             elements = self._loops[i_loop]["elements"]
             roads = self._loops[i_loop]["roads"]
+            if elements[0]["type"] not in ["switch_in", "switch_out"]:
+                raise ValueError("Error: in network.py: loop %d must begin with a switch" % i_loop)
             for i_node in range(len(elements)):
                 n = elements[i_node]
                 section = self._loops[i_loop]["sections"][i_node]
@@ -178,7 +180,6 @@ class Network(Node):
                             "loop": i_loop,
                             "element": i_node
                         }
-                        
                     else:
                         if "switch_out" in self._bridges[id_bridge]:
                             print("error id =", id_bridge)
@@ -187,51 +188,60 @@ class Network(Node):
                             "loop": i_loop,
                             "element": i_node
                         }
-                        
                     self._loops[i_loop]["switches"].append(n)
-                    self._loops[i_loop]["roads"].append({
-                        "steps": steps,
-                        "sections": sections
-                    })
-                    steps = []
-                    sections = []
+                    if i_node >= 1: # on saute le cas elements[0] (car c'est le 1er switch de la boucle)  # TODO : faire les étapes 1 à 4 plus proprement ? si possible ?
+                        self._loops[i_loop]["roads"].append({
+                            "steps": steps,
+                            "sections": sections
+                        })
+                        steps = []
+                        sections = []
+                    sections.append(section)
                 
                 else:
-                    if n["type"] in ["station", "shed"]:
-                        n["element_of_loop"] = {
-                            "loop": i_loop,
-                            "element": i_node
-                        }
-                    steps.append(n)  # important : on ajoute l'étape
-                
-                sections.append(section)
+                    # type: station, shed, sensor
+                    n["element_of_loop"] = {
+                        "loop": i_loop,
+                        "element": i_node
+                    }
+                    steps.append(n)
+                    sections.append(section)
+                    
+            # on ajoute la dernière road
             roads.append({
                 "steps": steps,
                 "sections": sections
             })
         
+        loops_elems_count = [len(loop["elements"]) for loop in self._loops] # permettra de compter aussi les éléments des bridges rattachés aux boucles pour leur indexation
+        for bridge in self._bridges: # pour les éléments des bridges, n["element_of_loop"]["loop"] est la boucle qui possède le switchOut vers ce bridge
+            i_loop = bridge["switch_out"]["loop"]
+            for n in bridge["elements"]:
+                n["element_of_loop"] = {
+                    "loop": i_loop,
+                    "element": loops_elems_count[i_loop]
+                }
+                loops_elems_count[i_loop] += 1
+        
         #  Etape 2 : Instanciation des routes
         for i_loop in range(len(self._loops)):
             roads = self._loops[i_loop]["roads"]
-            for road in range(1, len(roads)): # TODO : vérifier pourquoi on commence à 1
+            for road in range(len(roads)):
                 if "id" in roads[road]:
                     del roads[road]["id"]
                 new_road = Road(env, len(self._roads), self._margin_min, self._pod_size, False, **roads[
                     road])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._roads.append(new_road)
-                #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
-                roads[road - 1] = new_road
-            roads.pop()
+                roads[road] = new_road
         
         nb_roads = len(self._roads)  # nombre de routes du réseau qui sont internes aux boucles
 
         for b in range(len(self._bridges)):
-            steps = []
-            sections = [self._bridges[b]["section"]]
+            bridge = self._bridges[b]
             new_road = Road(env, nb_roads + b, self._margin_min, self._pod_size, True, **{
-                "steps": steps,
-                "sections": sections
-            })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
+                "steps": bridge["elements"],
+                "sections": bridge["sections"]
+            })  #La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._roads.append(new_road)
             self._bridges[b]["roads"] = [new_road]  # On ajoute sa route au bridge
         
@@ -260,9 +270,6 @@ class Network(Node):
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
         for b in range(len(self._bridges)):
             bridge = self._bridges[b]
-            switch_out = self._get_elt_of_loop(**bridge["switch_out"])
-            switch_in = self._get_elt_of_loop(**bridge["switch_in"])
-            bridge["switches"] = [switch_out, switch_in]
             self._init_pods_of_line(bridge)
             if "id" in bridge:
                 del bridge["id"]
@@ -270,11 +277,20 @@ class Network(Node):
         for i_loop in range(len(self._loops)):
             loop = self._loops[i_loop]
             self._init_pods_of_line(loop)
-        for i_loop in range(len(self._loops)):
-            loop = self._loops[i_loop]
             if "id" in loop:
                 del loop["id"]
             self._loops[i_loop] = Loop(i_loop, **loop)
+
+        print("Nerwork creation: Success")
+
+        print(self._bridges[0]._roads[0].sections[0].serialize())
+        print("")
+        print(self._bridges[0]._roads[0].sections[1].serialize())
+        print("")
+        print(self._bridges[1]._roads[0].sections[0].serialize())
+        print("")
+        print(self._bridges[1]._roads[0].sections[1].serialize())
+        print("")
 
     def _init_parent_of_children(self):
         """
@@ -288,6 +304,8 @@ class Network(Node):
             road.init_parent_of_children()
 
     def _init_pods_of_line(self, line):
+        if "pods" not in line:
+            line["pods"] = []
         for pod in line["pods"]:
             pod["source"] = self._get_elt_of_loop(**pod["source"])
             pod["destination"] = self._get_elt_of_loop(**pod["destination"])

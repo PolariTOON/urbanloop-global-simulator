@@ -97,7 +97,7 @@ state.addEventListener("load", async (event) => {
     heading.textContent = name;
     const jerky = networkJSON["jerky"];
     const rate = networkJSON["rate"];
-    const showing_travelers_waiting = networkJSON["showing_travelers_waiting"];
+    const showWaitingTravelers = networkJSON["showing_travelers_waiting"];
     rateView.control.value = "\u00d7" + `${2 ** rate}${jerky ? ` (jerky)` : ``}`; // "\u00d7" = "×"
     let datetime = Math.floor(networkJSON["time"]);
     const seconds = datetime % 60;
@@ -117,14 +117,14 @@ state.addEventListener("load", async (event) => {
     const bridgesJSON = networkJSON["bridges"];
     for (const json of loopsJSON) {
         const loop = new Loop(json, legendsLayer, elementsLayer, sectionsLayer, hintsLayer);
-        loop.update(json, podsLayer, hintsLayer, showing_travelers_waiting);     // On oublie pas showing_travelers_waiting
+        loop.update(json, podsLayer, hintsLayer, showWaitingTravelers);  // showWaitingTravelers indicates if we should display the number of waiting travelers at each station
         state.loops.push(loop);
     }
     for (const json of bridgesJSON) {
         const switchOut = state.loops[json["switch_out"]["loop"]]._elements[json["switch_out"]["element"]];
         const switchIn = state.loops[json["switch_in"]["loop"]]._elements[json["switch_in"]["element"]];
-        const bridge = new Bridge(json, switchOut, switchIn, legendsLayer, sectionsLayer, hintsLayer);
-        bridge.update(json, loopsJSON, podsLayer, hintsLayer);
+        const bridge = new Bridge(json, switchOut, switchIn, legendsLayer, elementsLayer, sectionsLayer, hintsLayer);
+        bridge.update(json, loopsJSON, podsLayer, hintsLayer, showWaitingTravelers);
         state.bridges.push(bridge);
     }
     for (const [id, pod] of state.pods.entries()) {
@@ -161,7 +161,7 @@ state.addEventListener("update", (event) => {
     heading.textContent = name;
     const jerky = networkJSON["jerky"];
     const rate = networkJSON["rate"];
-    const showing_travelers_waiting = networkJSON["showing_travelers_waiting"];
+    const showWaitingTravelers = networkJSON["showing_travelers_waiting"];
     rateView.control.value = "\u00d7" + `${2 ** rate}${jerky ? ` (jerky)` : ``}`; // "\u00d7" = "×"
     let datetime = Math.floor(networkJSON["time"]);
 
@@ -182,11 +182,11 @@ state.addEventListener("update", (event) => {
     const bridgesJSON = networkJSON["bridges"];
     for (let i = 0, li = loopsJSON.length; i < li; i++) {
         const json = loopsJSON[i];
-        state.loops[i].update(json, podsLayer, hintsLayer, showing_travelers_waiting);   // On oublie pas showing_travelers_waiting
+        state.loops[i].update(json, podsLayer, hintsLayer, showWaitingTravelers);  // showWaitingTravelers indicates if we should display the number of waiting travelers at each station
     }
     for (let i = 0, li = bridgesJSON.length; i < li; i++) {
         const json = bridgesJSON[i];
-        state.bridges[i].update(json, loopsJSON, podsLayer, hintsLayer);
+        state.bridges[i].update(json, loopsJSON, podsLayer, hintsLayer, showWaitingTravelers);
     }
     const invertedScaleX = 1 / stage.scaleX();
     const invertedScaleY = 1 / stage.scaleY();

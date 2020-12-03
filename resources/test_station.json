@@ -37,21 +37,21 @@
     {
       "name": "Bridge0",
       "elements": [
-        {"type": "shed", "name": "Shed1", "x": 200, "y": 350, "pods": {"max": 5, "count": 0}}
+        {"type": "shed", "name": "Shed1", "x": 200, "y": 350, "pods": {"max": 5, "count": 3}}
       ],
       "sections": [
-        {"speed": 19.44, "path": {"type": "line"}}, "pods": []},
-        {"speed": 19.44, "path": {"type": "line"}}, "pods": []}
+        {"speed": 19.44, "path": {"type": "line"}, "pods": []},
+        {"speed": 19.44, "path": {"type": "line"}, "pods": []}
       ]
     }, 
     {
       "name": "Bridge1",
       "elements": [
-        {"type": "shed", "name": "Shed2", "x": 500, "y": 350, "pods": {"max": 5, "count": 0}}
+        {"type": "station", "name": "Station1", "x": 500, "y": 350, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
       ],
       "sections": [
-        {"speed": 19.44, "path": {"type": "line"}}, "pods": []},
-        {"speed": 19.44, "path": {"type": "line"}}, "pods": []}
+        {"speed": 19.44, "path": {"type": "line"}, "pods": []},
+        {"speed": 19.44, "path": {"type": "line"}, "pods": []}
       ]
     }
   ]

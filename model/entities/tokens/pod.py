@@ -200,6 +200,7 @@ class Pod(Token):
         :return: void
         """
         while True:
+            print(self._track_or_switch._name)
             has_real_traveler = False
             for traveler in self._travelers:     # On regarde si un de nos passagers a ete genere avec un ticket
                 if (traveler.real_user):

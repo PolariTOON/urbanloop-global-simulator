@@ -22,7 +22,7 @@ class Section(Track):
         self._previous = None
         self._next = None
         self._pods = []
-        self._margin = self._speed * (margin_min + pod_size) / 8.33 - pod_size  # 8.33 m/s = 30 km/h est la vitesse des plus petites boucles
+        self._margin = self._speed * (margin_min + pod_size) / 8.33 - pod_size  # 8.33 m/s = 30 km/h est la vitesse des plus petites boucles -> TODO : à mettre à jour ?
         self._speed2 = speed
 
     @property
@@ -56,11 +56,11 @@ class Section(Track):
     @previous.setter
     def previous(self, value):
         self._previous = value
-        other = self._next
-        if value is None or other is None:
+        _next = self._next
+        if value is None or _next is None:
             self._length = nan
         else:
-            self._length = hypot(other.x - value.x, other.y - value.y)  # TODO: gérer les autres types de chemins
+            self._length = hypot(_next.x - value.x, _next.y - value.y)
 
     @property
     def next(self):

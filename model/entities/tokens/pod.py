@@ -41,6 +41,8 @@ class Pod(Token):
         else:
             self._failing = False
         self._contain_real_user = False
+        self._changed_destination = False
+        self._emergency_exit = False
         self._endSpeed = self._speed
         self._acceleration = acceleration or 2
         self._brake = brake or 5
@@ -182,6 +184,8 @@ class Pod(Token):
             "destination": self.destination,
             "failing": self.failing,
             "contain_real_user": self._contain_real_user,
+            "changed_destination": self._changed_destination,
+            "emergency_exit": self._emergency_exit,
             "coef": self._coef,
             "acceleration": self._acceleration,
             "brake": self._brake,
@@ -200,11 +204,22 @@ class Pod(Token):
         :return: void
         """
         while True:
+            # OPTIMISATION : ne regarder que lors de l'embarquement !
+            #################
             has_real_traveler = False
+            has_traveler_who_changed_dest = False
+            has_traveler_who_called_emergency_exit = False
             for traveler in self._travelers:     # On regarde si un de nos passagers a ete genere avec un ticket
                 if (traveler.real_user):
-                    has_real_traveler = True         # c'est le cas
-            self._contain_real_user = has_real_traveler    
+                    has_real_traveler = True        
+                if (traveler.changed_dest):
+                    has_traveler_who_changed_dest = True        
+                if (traveler.called_emergency_exit):
+                    has_traveler_who_called_emergency_exit = True         
+            self._contain_real_user = has_real_traveler   
+            self._changed_destination = has_traveler_who_changed_dest   
+            self._emergency_exit = has_traveler_who_called_emergency_exit   
+            #################
 
             # Gestion du décalage et de la discrétisation : on reprend la vitesse moyenne après avoir parcouru la bonne distance
             if self._length_before_restore is not None:
@@ -379,32 +394,32 @@ class Pod(Token):
     # Fonctions de calcul de prochaines/precedentes stations et temps
 
     # A MODIF SI SUPPRESSION MINI BOUCLES
-    def getPreviousStation(self):   # Pas de table de routage pr celui-ci
+    def get_previous_station(self):   # Pas de table de routage pr celui-ci
         """ Donne la prochaine station traversee par la capsule """ 
         eltOfNetwork = self._track_or_switch
 
         while (type(eltOfNetwork).__name__ != "SwitchIn"):     # On cherche le SwitchIn le plus proche
             eltOfNetwork = eltOfNetwork.previous
 
-        previousStation = self.getStationsOnMiniLoop(eltOfNetwork)          # Peut etre null, pr eviter il faudrait utiliser un tableau des gares traversees
+        previousStation = self.get_stations_on_mini_loop(eltOfNetwork)          # Peut etre null, pr eviter il faudrait utiliser un tableau des gares traversees
             
         return previousStation
 
     # A MODIF SI SUPPRESSION MINI BOUCLES
-    def getNextStation(self): 
+    def get_next_station(self): 
         """ Donne la prochaine station traversee par la capsule """ 
         eltOfNetwork = self._track_or_switch
 
         nbIter = 0              # Pour eviter une boucle infinie
         nextStation = None
 
-        while (nextStation is None and nbIter < 100):   
+        while (nextStation is None and nbIter < 200):   
             while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOn le plus proche
                 if ((type(eltOfNetwork).__name__ == "Road") and (len(eltOfNetwork.stations) > 0)):  # Route contenant la station
-                    return self.getStationsOfRoad(eltOfNetwork)
+                    return self.get_stations_of_road(eltOfNetwork)
                 eltOfNetwork = eltOfNetwork.next
 
-            nextStation = self.getStationsOnMiniLoop(eltOfNetwork)
+            nextStation = self.get_stations_on_mini_loop(eltOfNetwork)
             if (nextStation is None): # On a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
                 if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
                     eltOfNetwork = eltOfNetwork.beside
@@ -415,7 +430,7 @@ class Pod(Token):
         return nextStation
 
     # A MODIF SI SUPPRESSION MINI BOUCLES
-    def getTimeBeforeArrival(self):
+    def get_time_before_arrival(self):
         """Renvoie la duree avant arrivee a destination"""
 
         eltOfNetwork = self._track_or_switch
@@ -428,7 +443,7 @@ class Pod(Token):
         while ( (stationConsidered != self._destination) and (nbIter < 200) ):   
             while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOut le plus proche
                 if ((type(eltOfNetwork).__name__ == "Road") and (len(eltOfNetwork.stations) > 0)):  # Route contenant la station
-                    timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.next)
+                    timeToDest += self.get_time_of_elt_of_network(eltOfNetwork.next)
 
                     for station in eltOfNetwork.stations:
                         stationConsidered = station.name        
@@ -439,35 +454,35 @@ class Pod(Token):
 
                     break       # On ne va pas continuer a chercher un SwitchOut, car on est arrive a la destination (a la route pres)
 
-                timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.next)
+                timeToDest += self.get_time_of_elt_of_network(eltOfNetwork.next)
                 eltOfNetwork = eltOfNetwork.next
 
             if (stationConsidered == self._destination):        # Dans le cas on l'on a trouve grace au "for station"
                 break        # On sort du while (break aurait eu le meme effet)
 
             # On cherche la station mtn qu'on est a un switchOut, ou le prochain switchOut
-            stationConsidered = self.getStationsOnMiniLoop(eltOfNetwork)
+            stationConsidered = self.get_stations_on_mini_loop(eltOfNetwork)
             if (stationConsidered is None):  # On n'a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
                 if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
-                    timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.beside)
+                    timeToDest += self.get_time_of_elt_of_network(eltOfNetwork.beside)
                     eltOfNetwork = eltOfNetwork.beside
                 else:                                   # sinon on regarde le trajet normal du switch
-                    timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.next)
+                    timeToDest += self.get_time_of_elt_of_network(eltOfNetwork.next)
                     eltOfNetwork = eltOfNetwork.next
             elif (stationConsidered != self._destination):    # On a trouve une mini boucle, mais pas avec la station destination
-                timeToDest += self.getTimeOfEltOfNetwork(eltOfNetwork.next)
+                timeToDest += self.get_time_of_elt_of_network(eltOfNetwork.next)
                 eltOfNetwork = eltOfNetwork.next    # On passe notre chemin
                 
             nbIter += 1
 
         # Actuellement, on ne considere pas le temps de parcours de la mini-boucle contenant la station destination")
-        # Faire que getStationsOnMiniLoop et getStationsOfRoad renvoient en plus un temps pour faire cela
+        # Faire que get_stations_on_mini_loop et get_stations_of_road renvoient en plus un temps pour faire cela
         # Rectification : comme on compte supprimer les mini-boucles, ne pas le faire
 
         return " Time = " + str(timeToDest) + " (ne considere pas les mini-boucles) (considere juste la vitesse de la section/switch ou la capsule se trouve, mais pas sa vitesse actuelle/vitesse future reelle en fction du traffic)(surement faux quand traffic)"
 
 
-    def getTimeOfEltOfNetwork(self, eltOfNetwork):
+    def get_time_of_elt_of_network(self, eltOfNetwork):
         """ Renvoie la duree necessaire pr parcourirr un element du reseau, ou le pod ne se trouve pas """
         timeOfElt = 0
 
@@ -481,19 +496,41 @@ class Pod(Token):
         return timeOfElt
 
 
-    def getStationsOnMiniLoop(self, eltOfNetwork):
+    def get_stations_on_mini_loop(self, eltOfNetwork):
         """ Renvoie le nom de la station sur la mini-boucle actuel, en partant d'un Switch """
         if (type(eltOfNetwork).__name__ == "SwitchOut"):
-            return self.getStationsOfRoad(eltOfNetwork.beside.next.next)
+            return self.get_stations_of_road(eltOfNetwork.beside.next.next)
         elif (type(eltOfNetwork).__name__ == "SwitchIn"):
-            return self.getStationsOfRoad(eltOfNetwork.beside.previous.previous)
+            return self.get_stations_of_road(eltOfNetwork.beside.previous.previous)
         else :
             return None
 
-    def getStationsOfRoad(self, aRoad):
+    def get_stations_of_road(self, aRoad):
         """ Renvoie le nom de la station (qu'une seule normalement) sur la road """
         if (type(aRoad).__name__ == "Road"):
             if (len(aRoad.stations) > 0):      
                 for station in aRoad.stations:
                     return station.name      # On renvoie direct car on considere qu'il n'y a qu'une station au max par road (potentiellement a changer plus tard)
             return None
+
+
+    def change_destination(self, user_id, new_dest):
+        self._destination = new_dest
+        has_found_traveler = False
+        for a_traveler in self._travelers:
+            if (a_traveler.id == str(user_id)):
+                a_traveler.change_destination()
+                has_found_traveler = True
+        if (has_found_traveler == False):
+            print("Error in change_destination")
+
+    def call_emergency_exit(self, user_id):
+        self._destination = self.get_next_station()
+        for a_traveler in self._travelers:
+            if (a_traveler.id == str(user_id)):
+                a_traveler.call_emergency_exit()
+                has_found_traveler = True
+        if (has_found_traveler == False):
+            print("Error in call_emergency_exit")
+
+            

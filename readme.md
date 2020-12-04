@@ -121,6 +121,12 @@ Pour lancer le calcul de statistiques finales et creer les figures des statistiq
 $ python3.7 make_statsAndGraphs.py
 ```
 
+Pour changer l'intervalle de temps (par defaut de 30 minutes), ajouter la commande -i et l'entier souhaite (5 par exemple) :
+
+```sh
+$ python3.7 make_statsAndGraphs.py -i 5
+```
+
 ### Utilisation
 
 L'interface se présente de la façon suivante :
@@ -171,4 +177,4 @@ docker run -itp 80:8090 --env n='resources/test2jerky.json' urbanloop-simulator
 
 ### Editeur
 
-Pour utiliser l'éditeur, les instructions sont disponibles sur le ReadMe présent dans le dossier [`editeur-de-r-eseau-urbanloop`](editeur-de-r-eseau-urbanloop)
+Pour utiliser l'éditeur, les instructions sont disponibles sur le ReadMe présent dans le dossier [`editeur_reseau`](editeur_reseau).

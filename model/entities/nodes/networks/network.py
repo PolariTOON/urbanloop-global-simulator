@@ -39,6 +39,9 @@ class Network(Node):
         self._routing_table0 = {}
         self._update_routing(init=True)  # création des tables de routage
         self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
+        # On cree les csv puis on ecrit les noms des colonne
+        self._statistiques.write_columns_names_for_all_stations(self.stations)
+        self._statistiques.create_global_directories()
 
     @property
     def name(self):
@@ -420,8 +423,15 @@ class Network(Node):
                       "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
                 if self.departure_arrival_printer:
                     self.statistiques.print_stats()
+
+                # ECRITURE STATS
                 self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
+                self.statistiques.write_stats_for_all_stations(str(datetime.timedelta(seconds=round(self.env.time))), self.stations)
+                self.statistiques.write_stats_insertion(str(datetime.timedelta(seconds=round(self.env.time))), self.switches)
+                self.statistiques.write_travel_time_global(str(datetime.timedelta(seconds=round(self.env.time))))
+                # ligne calcul stats autres (voir txt perso)
                 print("\n")
+
             last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
             #print("-------------------------------------------------------------")
             #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
@@ -539,17 +549,27 @@ class Network(Node):
         """ Renvoie un objet pod qui est celui de l'user, si celui-ci est dans une capsule """
 
         moving_pods = self._statistiques.traveling_pods()
-
         for key in moving_pods:
             a_moving_pod = moving_pods[key]
             if (len(a_moving_pod) > 0):
                 for a_traveler in a_moving_pod[0].travelers:
                     if (a_traveler.id == str(user_id)):
-                        print("User trouve !")
+                        #print("User trouve !")
                         return a_moving_pod[0]
         
         return None         # Le voyageur n'est pas encore dans une capsule
 
+    def get_station_with_name(self, name_of_station):
+        for station in self.stations:
+            if (station.name == name_of_station):
+                return station
+        print("station non trouvee dans le reseau")
+
+    def pod_change_from_one_destination_to_another(self, former_dest, new_dest):
+        former_dest_station = self.get_station_with_name(former_dest)
+        new_dest_station = self.get_station_with_name(new_dest)
+        former_dest_station.down_incoming_pods() # on decremente le nombre de pods qui vont arriver
+        new_dest_station.up_incoming_pods()      # on incremente le nombre de pods qui vont arriver
 
 ####################    Fin classe
 

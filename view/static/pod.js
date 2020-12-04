@@ -3,7 +3,10 @@ const {Circle} = Konva;
 
 const shadowColor = "#333"
 const outerColor = "#fc0";
-const outerColorWhenCommandedByUser = "#f1a";       // pink
+const outerColorWhenCommanded = "#1f6";                                 // vert
+const outerColorWhenCommandedAndChangedDest = "#f1A";                   // pink
+const outerColorWhenCommandedAndEmergencyExit = "#f70";                 // orange
+const outerColorWhenCommandedAndChangedDestAndEmergencyExit = "#b61";   // marron
 const failingOuterColor = "#ff0707";
 const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
@@ -117,7 +120,10 @@ export class Pod extends Entity {
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
         this._outerColor = outerColor;
-        this._outerColorWhenCommandedByUser = outerColorWhenCommandedByUser;
+        this._outerColorWhenCommanded = outerColorWhenCommanded;
+        this.outerColorWhenCommandedAndChangedDest = outerColorWhenCommandedAndChangedDest;
+        this.outerColorWhenCommandedAndEmergencyExit = outerColorWhenCommandedAndEmergencyExit;
+        this.outerColorWhenCommandedAndChangedDestAndEmergencyExit = outerColorWhenCommandedAndChangedDestAndEmergencyExit;
         this._failing = false;
         this._contain_real_user = false;
         this._keepFlag = keepFlag;
@@ -216,6 +222,8 @@ export class Pod extends Entity {
         const destination = json["destination"];
         const failing = json["failing"];
         this._contain_real_user = json["contain_real_user"];
+        this._changed_destination = json["changed_destination"];
+        this._emergency_exit = json["emergency_exit"];
         this._name = name;
         this._x = x;
         this._y = y;
@@ -231,8 +239,29 @@ export class Pod extends Entity {
         this._failing = failing;
 
         if (this._contain_real_user)
-        {
-            this.__outerShape.fill(outerColorWhenCommandedByUser); 
+        {   
+            if (this._changed_destination)
+            {
+                if (this._emergency_exit)
+                {
+                    this.__outerShape.fill(outerColorWhenCommandedAndChangedDestAndEmergencyExit); 
+                }
+                else
+                {
+                    this.__outerShape.fill(outerColorWhenCommandedAndChangedDest); 
+                }
+            }
+            else
+            {
+                if (this._emergency_exit)
+                {
+                    this.__outerShape.fill(outerColorWhenCommandedAndEmergencyExit); 
+                }
+                else
+                {
+                    this.__outerShape.fill(outerColorWhenCommanded); 
+                }
+            }
         }
         else
         {

@@ -200,7 +200,6 @@ class Pod(Token):
         :return: void
         """
         while True:
-            print(self._track_or_switch._name)
             has_real_traveler = False
             for traveler in self._travelers:     # On regarde si un de nos passagers a ete genere avec un ticket
                 if (traveler.real_user):
@@ -251,11 +250,13 @@ class Pod(Token):
                 if len(self._travelers) > 0:
                     self._traveled_distance_t += self._speed * self.env.tick
 
-            # La capsule s'insère et tourne si elle en a reçu l'ordre
-
-            if type(self._track_or_switch).__name__ == "SwitchOut" and self._turn and self._position >= self._track_or_switch.length :
+            # La capsule s'insère sur un bridge si elle en a reçu l'ordre
+            if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ == "SwitchOut" and self._turn:
                 self.position -= self._track_or_switch.length
-                self._track_or_switch = self._track_or_switch.beside.sections[0]
+                new_section = self._track_or_switch.beside.sections[0]
+                self._track_or_switch = new_section
+                if self.position > new_section.length:
+                    print("Warning: pod.py: a pod has travelled to much distance in a same tick while entering a bridge.")
                 yield from self._track_or_switch.write({
                     "author": self,
                     "type": "pod_entry",
@@ -263,25 +264,31 @@ class Pod(Token):
                 })
                 self._turn = False
             
-            # TODO : ajouter un warning si .position > .(new_)track_or_switch.length
-            
-            # Gestion du changement de piste ou d'aiguillage : comme pour le prototype, la
-            # capsule indique la piste/l'aiguillage sur laquelle/lequel elle rentre
-
-            if self._position > self._track_or_switch.length and self._speed != 0:
+            # La capsule arrive sur une nouvelle piste / aiguillage
+            elif self._position > self._track_or_switch.length:
                 bridge_to_switch = False
                 self._position -= self._track_or_switch.length
                 t = self._position / self._speed
+
+                # si on quitte un switch
                 if type(self._track_or_switch).__name__ in ["SwitchOut", "SwitchIn"]:
                     self._track_or_switch = self._track_or_switch.next.sections[0]
+
+                # si on quitte une section
                 else:
                     if type(self._track_or_switch).__name__ == "Section":
-                        if self._track_or_switch.is_bridge:
-                            # la capsule va entrer sur un aiguillage entrant par un pont
+                        next_elem = self._track_or_switch.next
+                        if self._track_or_switch.is_bridge and type(next_elem).__name__ == "SwitchIn":
+                                                               # ça ne fonctionnera pas si on a un bridge dans un bridge
+                                                               # TODO : vérifier la structure du réseau pour ne pas avoir de bridge dans un bridge ?
+                            # la capsule entre sur une route depuis un pont
                             bridge_to_switch = True
+                    else:
+                        # si on quitte une step (shed, station, sensor) : rien à faire
+                        pass
                     self._track_or_switch = self._track_or_switch.next
-                self._position = t * self._track_or_switch.speed
 
+                self._position = t * self._track_or_switch.speed
                 if bridge_to_switch:
                     yield from self._track_or_switch.write({
                         "author": self,
@@ -289,12 +296,17 @@ class Pod(Token):
                         "pod": self
                     })
                 else:
-                    # TODO : remettre position à 0 si Station ou Shed ?
+                    if type(self._track_or_switch).__name__ in ["Station", "Shed"]:
+                        self._position = 0
                     yield from self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": self
                     })
+
+                # on vérifie si le pod n'est pas allé trop loin
+                if self.position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in ["Shed", "Station", "Sensor"]:
+                    print("Warning: pod.py: a pod has travelled to much distance while arriving on '%s'." % self._track_or_switch.name)
 
             # Gestion des messages reçus
             while True:
@@ -323,7 +335,7 @@ class Pod(Token):
                 elif "docked" == message["type"]:
                     # La capsule s'arrête dans une gare ou un dépôt
 
-                    # TODO : check track_or_switch à ce niveau-là
+                    # TODO : check track_or_switch à ce niveau-là (-> je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être une problème...))
                     
                     self._speed = 0
                     self._endSpeed = 0

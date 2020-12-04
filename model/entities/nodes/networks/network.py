@@ -241,7 +241,7 @@ class Network(Node):
             new_road = Road(env, nb_roads + b, self._margin_min, self._pod_size, True, **{
                 "steps": bridge["elements"],
                 "sections": bridge["sections"]
-            })  #La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
+            })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._roads.append(new_road)
             self._bridges[b]["roads"] = [new_road]  # On ajoute sa route au bridge
         
@@ -282,15 +282,6 @@ class Network(Node):
             self._loops[i_loop] = Loop(i_loop, **loop)
 
         print("Nerwork creation: Success")
-
-        print(self._bridges[0]._roads[0].sections[0].serialize())
-        print("")
-        print(self._bridges[0]._roads[0].sections[1].serialize())
-        print("")
-        print(self._bridges[1]._roads[0].sections[0].serialize())
-        print("")
-        print(self._bridges[1]._roads[0].sections[1].serialize())
-        print("")
 
     def _init_parent_of_children(self):
         """
@@ -500,6 +491,10 @@ class Network(Node):
                 else:
                     raise ValueError("Invalid message")
 
+    #
+    # TODO : trouver où cette fonction est utilisée,
+    #        il faudra peut-être l'enlever quand le débuggage sera fini (pour ne pas ralentir les simulations)
+    #
     def pods_du_reseau(self, last_count, last_pods):
         """ permet d'afficher dans le terminal les pods du réseau, leur position et les compter quand un pod est manquant"""
         pods_du_reseau = {}

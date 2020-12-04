@@ -271,6 +271,9 @@ class Station(Step):
                     })
                     # la capsule va se garer dans la station s'il y a de la place
                     if pod.destination == self.name and not self._pods[0]:
+                        #
+                        # TODO : comprendre la gestion des pods dans Station
+                        #
                         if self._pods_size < self.capacity:
                             for i in range(len(self.pods)-1, -1, -1):
                                 if self._pods[i] is None:
@@ -303,6 +306,10 @@ class Station(Step):
                     send_one_time = True  # pour autoriser à nouveau la libération de pods
                     if message["pod"] in self._departure_pods:
                         self._departure_pods.remove(message["pod"])  # lorsqu'une capsule part suite à un appel empty il faut la supprimer de departure_pods
+                    if message["pod"] in self._pods:
+                        index = self._pods.index(message["pod"])
+                        self._pods[index] = None
+                        print("Info: pod index in station: %d" % index)
                 elif "empty" == message["type"]:
                     for i in range(len(self._pods) - 1, -1, -1):
                         if self._pods[i] is not None and self._boarding[i] == -1 and not self._pods_ready[i]:  # on libère un pod vide (pas None, n'a pas de passager et n'est pas prêt à partir

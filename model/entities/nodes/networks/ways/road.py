@@ -206,7 +206,7 @@ class Road(Way):
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:
-                    # La route prévient la bonne piste / l'aiguillage qu'une capsule est sortie
+                    # La route prévient la bonne piste / aiguillage qu'une capsule est sortie
                     new_track = message["author"]
                     pod = message["pod"]
                     if isinstance(new_track, Switch):

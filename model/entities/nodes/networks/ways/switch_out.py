@@ -83,7 +83,7 @@ class SwitchOut(Switch):
                     # Entrée d'une capsule, il faut prévenir la section précédente que la capsule est sortie
                     pod = message["pod"]
                     self._pods.append(pod)
-                    track = pod.track_or_switch.previous.sections[-1] # ça peut poser pb si un capsule saute 2 sections d'un coup
+                    track = pod.track_or_switch.previous.sections[-1]
                     yield from track.write({
                         "author": self,
                         "type": "pod_exit",

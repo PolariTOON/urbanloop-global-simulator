@@ -22,7 +22,7 @@ class Simulation:
         "state" (flottant) un seed permettant de choisir le générateur pseudo-aléatoire utilisé et donc de relancer une même simulation dans les mêmes conditions
         """
         running = running or False
-        max_rate = max_rate or 7
+        max_rate = max_rate or 8
         rate = rate or 0
         jerky = jerky or False
         time = time or 0

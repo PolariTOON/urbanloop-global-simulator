@@ -15,7 +15,7 @@ _simulations = {}
 _remove_travelers = False
 
 _running_default = False
-_speed_default = 7 # = simulation max rate
+_speed_default = 8  # but speed is also limited by simulation.max_rate
 
 # handler for SIGINT (CTRL-C)
 _quit = False

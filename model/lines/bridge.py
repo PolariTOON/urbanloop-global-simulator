@@ -23,11 +23,16 @@ class Bridge(Line):
         sections = []
         elements = []
         pods = []
+        length = 0
         for section in road.sections:
             for pod_index in range(len(section.pods)):
                 pod = section.pods[pod_index]
                 pod = pod.serialize()
+                pod.update({
+                    "position": length + pod["position"] # position dans le bridge = longueur des précédentes sections + position dans la section actuelle
+                })
                 pods.append(pod)
+            length += section.length
             sections.append(section.serialize())
         for step in road.steps:
             elements.append(step.serialize())

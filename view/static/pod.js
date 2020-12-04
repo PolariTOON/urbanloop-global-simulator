@@ -62,7 +62,6 @@ function calcPositionInSection(json, lineJSON, loopsJSON) {
         position -= length;
         index++;
     }
-    console.log(index);
     let x = startElement["x"];
     let y = startElement["y"];
     switch (path["type"]) {

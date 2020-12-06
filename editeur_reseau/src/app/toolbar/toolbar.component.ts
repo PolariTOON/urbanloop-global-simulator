@@ -61,7 +61,7 @@ export class ToolbarComponent implements OnInit {
 		);
         
         //Configuration du popper du menu
-        //On utilise une Promise car il doit être visible lorsqu'il est initilialisé sinon il s'affiche mal
+        //On utilise une Promise car il doit ï¿½tre visible lorsqu'il est initilialisï¿½ sinon il s'affiche mal
         //On le cache donc dans le then
         this.btn_options = document.querySelector('#btn_options') as HTMLElement;
         this.menu_options = document.querySelector('#menu_options') as HTMLElement;
@@ -154,10 +154,10 @@ export class ToolbarComponent implements OnInit {
         delete network.hours;
         delete network.minutes;
         
-		let blob = new Blob([JSON.stringify(network)], { type: 'application/json' });
+		let blob = new Blob([JSON.stringify(network, null, 2)], { type: 'application/json' });
 		let url = window.URL.createObjectURL(blob);
 		this.fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-        //Lance le téléchargement
+        //Lance le tï¿½lï¿½chargement
         const fileName = this.getFileName();
         if (window.navigator && window.navigator.msSaveOrOpenBlob)
             window.navigator.msSaveOrOpenBlob(blob, fileName);

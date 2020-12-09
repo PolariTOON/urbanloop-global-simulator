@@ -53,7 +53,7 @@ def return_javascript(filename):
     """ javascript modules need to be sent with MIME type of : text/javascript
         this function ensures that javascript files are sent with the right MIME type.
     """
-    js_filename = 'view/static/' + filename + '.js'
+    js_filename = './view/static/' + filename + '.js'
     with open(js_filename, 'r') as f:
         content = f.read()
     return Response(response=content, mimetype="text/javascript")

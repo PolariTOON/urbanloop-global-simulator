@@ -200,6 +200,7 @@ class Pod(Token):
         :return: void
         """
         while True:
+            print(self.id + "  1")
             has_real_traveler = False
             for traveler in self._travelers:     # On regarde si un de nos passagers a ete genere avec un ticket
                 if (traveler.real_user):
@@ -292,8 +293,10 @@ class Pod(Token):
                         "pod": self
                     })
 
+            print(self.id + "  2")
             # Gestion des messages reçus
             while True:
+                print(self.id + "  3")
                 message = yield from self.read()
                 if message is None:
                     break
@@ -326,6 +329,9 @@ class Pod(Token):
                         self._turn = self._track_or_switch.stat_or_shed == self._destination   # self.turn est vrai si c'est l'arrivée
                         stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
                         if stat_or_shed.isFull():
+                            #
+                            # TODO : prendre en charge ce cas
+                            #
                             print("\033[4;31mFull\u001B[0m", stat_or_shed.name, "\t\t", len(stat_or_shed.pods), "/", stat_or_shed.capacity, end=' [')
                             for pod in stat_or_shed.pods:
                                 if pod is not None:
@@ -333,7 +339,7 @@ class Pod(Token):
                                 else:
                                     print(pod, end=' ')
                             print("]\t\t\t\t (pod l.305)\n")
-                            print("\tpods_size = ", stat_or_shed._pods_size, "/", stat_or_shed.capacity, "\n\tlen departure_pods", len(stat_or_shed._departure_pods), "> departure pods = [", end=' ')
+                            print("\tpods_size = ", stat_or_shed.pods_size, "/", stat_or_shed.capacity, "\n\tlen departure_pods", len(stat_or_shed._departure_pods), "> departure pods = [", end=' ')
                             for pod in stat_or_shed._departure_pods:
                                 if pod is not None:
                                     print(pod.name[:8], end=' ')
@@ -355,6 +361,7 @@ class Pod(Token):
                     self.speed = self._track_or_switch.speed
                 else:
                     raise ValueError("Invalid message: ", message)
+            print(self.id + "  4")
 
 
     # Fonctions de calcul de prochaines/precedentes stations et temps

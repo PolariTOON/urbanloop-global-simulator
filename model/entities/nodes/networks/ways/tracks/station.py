@@ -113,6 +113,10 @@ class Station(Step):
         return self._pods
 
     @property
+    def pods_size(self):
+        return self._pods_size
+
+    @property
     def travelers(self):
         """Liste modélisant les voyageurs en attente, elle contient leur temps d'attente"""
         return self._travelers

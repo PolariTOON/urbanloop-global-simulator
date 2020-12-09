@@ -62,6 +62,11 @@ class Shed(Step):
         return self._pods
 
     @property
+    def pods_size(self):
+        """Liste des capsules stockées dans le dépôt"""
+        return len(self._pods)
+
+    @property
     def capacity(self):
         """Capacité d'accueil maximale du dépôt"""
         return self._capacity

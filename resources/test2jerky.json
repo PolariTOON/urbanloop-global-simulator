@@ -50,7 +50,8 @@
       ],
       "pods": []
     },
-    {"name": "boucle_Gare_test",
+    {
+      "name": "boucle_Gare_test",
       "elements": [
         {"type": "switch_in", "x": 320, "y": 530, "id_bridge": 2, "pods": []},
         {"type": "station", "name": "Gare", "x": 270, "y": 570, "pods": {"max": 2, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},

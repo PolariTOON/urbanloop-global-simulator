@@ -22,7 +22,7 @@ class Section(Track):
         self._previous = None
         self._next = None
         self._pods = []
-        self._margin = self._speed * (margin_min + pod_size) / 8.33 - pod_size  # 8.33 m/s = 30 km/h est la vitesse des plus petites boucles
+        self._margin = self._speed * (margin_min + pod_size) / 8.33 - pod_size  # 8.33 m/s = 30 km/h est la vitesse des plus petites boucles -> TODO : à mettre à jour ?
         self._speed2 = speed
 
     @property
@@ -56,11 +56,11 @@ class Section(Track):
     @previous.setter
     def previous(self, value):
         self._previous = value
-        other = self._next
-        if value is None or other is None:
+        _next = self._next
+        if value is None or _next is None:
             self._length = nan
         else:
-            self._length = hypot(other.x - value.x, other.y - value.y)  # TODO: gérer les autres types de chemins
+            self._length = hypot(_next.x - value.x, _next.y - value.y)
 
     @property
     def next(self):
@@ -69,11 +69,11 @@ class Section(Track):
     @next.setter
     def next(self, value):
         self._next = value
-        other = self._previous
-        if value is None or other is None:
+        previous = self._previous
+        if value is None or previous is None:
             self._length = nan
         else:
-            self._length = hypot(other.x - value.x, other.y - value.y)  # TODO: gérer les autres types de chemins
+            self._length = hypot(previous.x - value.x, previous.y - value.y)
 
     @property
     def pods(self):
@@ -93,10 +93,10 @@ class Section(Track):
 
     def fermeture_ouverture(self):
         """ fonction pour la fermeture de voie via l'interface web"""
-        if self._speed == 0.0001:
+        if self._speed == 0.000001:
             self._speed = self._speed2
         else:
-            self._speed = 0.0001
+            self._speed = 0.000001
         self.weight = self._length / self._speed
 
     def update(self):
@@ -111,33 +111,25 @@ class Section(Track):
                     if pod in self._pods:
                         self._pods.remove(pod)
                     else:
-                        print("\u001B[31m [erreur pod non trouvé]", pod.name[:9], self.name, " (section l.103)\u001B[0m")  # pour détecter l'erreur quand on accélère la simulation
+                        print("\u001B[31m [erreur pod non trouvé]", pod.name[:9], self.name, " (section l.103)\u001B[0m")
                         
                 elif "pod_entry" == message["type"]:
                     # Une capsule entre dans la section : il faut lui donner la bonne vitesse
-                    # et il faut notifier le parent pour qu'il prévienne la piste/l'aiguillage précédente
                     pod = message["pod"]
                     self._pods.append(pod)
-                    if isinstance(self.previous, Shed):  # suppression de la capsule dans le shed d'envoie
-                        if len(self.previous.pods) == 0:
-                            print("\t\t\t\t", self.previous.name, "est vide", "(section l.122)")
-                        if self.previous.pods[0] == message["author"]:
-                            self.previous.pods.remove(pod)
-                    if isinstance(self.previous, Station):  # suppression de la capsule de la station d'envoie
-                        if self.previous.pods[0] == message["author"]:
-                            self.previous.pods[0] = None        # une capsule par à la fois elle a été placée à la fin
-                                                                # on empêche en même temps d'insérer un nouveau pod alors
-                                                                # que le précédent n'est pas encore parti
-                    yield from self._parent.write({
-                        "author": self,
-                        "type": "pod_entry",
-                        "pod": pod
-                    })
                     yield from pod.write({
                         "author": self,
                         "type": "speed",
                         "speed": self._speed
                     })
+                    # si on est entré dans une Road, on la notifie (cette Road sera
+                    # chargée de notifier la Road précédente que le pod l'a quittée)
+                    if True: #self._parent.sections[0] == self:
+                        yield from self._parent.write({
+                            "author": self,
+                            "type": "pod_entry",
+                            "pod": pod
+                        })
                 else:
                     raise ValueError("Invalid message")
 

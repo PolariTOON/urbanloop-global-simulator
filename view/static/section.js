@@ -73,6 +73,18 @@ export class Section extends Entity {
         this.__closed = 0;
         this.unselect();
     }
+    set _startElement(value) {
+        this.__startElement = value;
+    }
+    get _startElement() {
+        return this.__startElement;
+    }
+    set _endElement(value) {
+        this.__endElement = value;
+    }
+    get _endElement() {
+        return this.__endElement;
+    }
     set _x(value) {
         super._x = value;
         this.__outerPath.x(value);

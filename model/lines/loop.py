@@ -118,8 +118,7 @@ class Loop(Line):
                 section = road.sections[section_index]
                 for pod_index in range(len(section.pods)):
                     pod = section.pods[pod_index]
-                    position = pod.position
-                    position += length
+                    position = length + pod.position # Attention ! 'position' dans la vue != 'position' dans le modèle (vue -> par rapport à l'ensemble de la boucle ; modèle -> par rapport à la section actuelle du pod)
                     pod = pod.serialize()
                     pod.update({
                         "position": position

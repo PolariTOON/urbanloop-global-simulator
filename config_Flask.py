@@ -64,8 +64,9 @@ async def _post_network(simulations, network_index, network_item):
     """ Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json
         network_item contient toutes les informations du fichier JSON
     """
+    print("Received network: '%s'" % network_item["name"])
     if network_item is not None:
-        network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations si besoin
+        #network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations si besoin
         if "id" in network_item:
             del network_item["id"]
         from app import _wave, _remove_travelers
@@ -234,10 +235,9 @@ def run_app(port, networks, wave):
 # RESTFUL API FLASK POUR APPLIS MOBILE
 
 
-# INFOS D'UNE CAPSULE
-@_app.route('/capsule/<string:user_id>/', methods=['GET'])
-def getUserPosition(user_id):
-    """ Donne les infos de la capsule dont on a renseigne l'identifiant     A DEVELOPPER"""
+@_app.route('/capsule/<string:user_id>', methods=['GET'])
+def get_user_position(user_id):
+    """ Donne les infos de la capsule dont on a renseigne l'identifiant"""
 
     try:
         simulation_for_api
@@ -251,13 +251,13 @@ def getUserPosition(user_id):
     else :
         #print(pod_of_user.getPreviousStation())
         return jsonify({ 'source': pod_of_user.source,
-                         'next_station': pod_of_user.getNextStation(),
+                         'next_station': pod_of_user.get_next_station(),
+                         'previous_station': pod_of_user.get_previous_station(),
                          'destination': pod_of_user.destination,
-                         'time_before_arrival': pod_of_user.getTimeBeforeArrival()})
+                         'time_before_arrival': pod_of_user.get_time_before_arrival()})
 
 
 
-# CREATION NOUVEAU TRAJET DANS SIMULATEUR
 @_app.route('/new_trip', methods=['POST'])
 def add_trip():
     """Fonction permettant de donner un nouveau trajet au simulateur"""
@@ -281,6 +281,63 @@ def add_trip():
 #{
     #"user_id": "1321",
     #"departure": "TNCY",
-    #"arrival": "commanderie"
+    #"arrival": "commanderie",
     #"typeCapsule" : "solo"
 #}
+
+
+
+@_app.route('/change_dest', methods=['POST'])
+def change_destination_of_trip():
+    """Fonction permettant de changer de destination pour un utilisateur"""
+
+    try:
+        simulation_for_api
+    except NameError:
+        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
+
+    user_id = request.json['user_id']
+    new_arrival = request.json['new_arrival']
+    
+    network = simulation_for_api.get_network()
+    pod_of_user = network.get_pod_of_user(user_id)
+
+    if (pod_of_user == None):
+        return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
+    else :
+        network.pod_change_from_one_destination_to_another(pod_of_user.destination, new_arrival)
+        pod_of_user.change_destination(user_id, new_arrival)
+        return jsonify({ 'msg': 'Changement de destination valide' })
+
+ #Argument : 
+#{
+    #"user_id": "1321",
+    #"new_arrival": "commanderie"
+#}
+
+
+@_app.route('/emergency_exit/<string:user_id>', methods=['GET'])
+def call_emergency_exit(user_id):
+    """Fonction permettant de demander une sortie d'urgence pour un utilisateur"""
+
+    try:
+        simulation_for_api
+    except NameError:
+        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
+
+    network = simulation_for_api.get_network()
+    pod_of_user = network.get_pod_of_user(user_id)
+
+    if (pod_of_user == None):
+        return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
+    else :
+        new_dest = pod_of_user.get_next_station()
+        network.pod_change_from_one_destination_to_another(pod_of_user.destination, new_dest)
+        pod_of_user.call_emergency_exit(user_id)
+        return jsonify({ 'msg': 'Appel d\'urgence demande' })
+
+
+
+
+
+

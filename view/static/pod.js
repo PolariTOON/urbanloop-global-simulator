@@ -3,7 +3,10 @@ const {Circle} = Konva;
 
 const shadowColor = "#333"
 const outerColor = "#fc0";
-const outerColorWhenCommandedByUser = "#f1a";       // pink
+const outerColorWhenCommanded = "#1f6";                                 // vert
+const outerColorWhenCommandedAndChangedDest = "#f1A";                   // pink
+const outerColorWhenCommandedAndEmergencyExit = "#f70";                 // orange
+const outerColorWhenCommandedAndChangedDestAndEmergencyExit = "#b61";   // marron
 const failingOuterColor = "#ff0707";
 const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
@@ -34,28 +37,33 @@ function calcPositionInSection(json, lineJSON, loopsJSON) {
     let path;
     let length;
     let position = json["position"];
-    if (loopsJSON !== null) {
-        const loopStartElement = lineJSON["switch_out"]["loop"];
-        const loopEndElement = lineJSON["switch_in"]["loop"];
-        const startElementIndex = lineJSON["switch_out"]["element"];
-        const endElementIndex = lineJSON["switch_in"]["element"];
-        startElement = loopsJSON[loopStartElement]["elements"][startElementIndex];
-        endElement = loopsJSON[loopEndElement]["elements"][endElementIndex];
-        path = lineJSON["section"]["path"];
+    let elements;
+    let sections = lineJSON["sections"];
+    if (loopsJSON !== null) {  // Pod in a Bridge
+        // find the switches in loopJSON
+        const switchOutLoop = lineJSON["switch_out"]["loop"];
+        const switchInLoop = lineJSON["switch_in"]["loop"];
+        const switchOutIndex = lineJSON["switch_out"]["element"];
+        const switchInIndex = lineJSON["switch_in"]["element"];
+        const switchOut = loopsJSON[switchOutLoop]["elements"][switchOutIndex];
+        const switchIn = loopsJSON[switchInLoop]["elements"][switchInIndex];
+        // create an array containing both the switches and the elements :
+        // [switch_out, element 1, element 2, ..., switch in]
+        elements = [switchOut].concat(lineJSON["elements"]).concat(switchIn);
+    } else {  // Pod in a Loop
+        elements = lineJSON["elements"];
+    }
+    let index = 0;
+    while (true) {
+        startElement = elements[index];
+        endElement = elements[(index + 1) % elements.length];
+        path = sections[index]["path"];
         length = calcLength(startElement, endElement, path);
-    } else {
-        let index = 0;
-        while (true) {
-            startElement = lineJSON["elements"][index];
-            endElement = lineJSON["elements"][(index + 1) % lineJSON["elements"].length];
-            path = lineJSON["sections"][index]["path"];
-            length = calcLength(startElement, endElement, path);
-            if (position < length) {
-                break;
-            }
-            position -= length;
-            index++;
+        if (position < length) {
+            break;
         }
+        position -= length;
+        index++;
     }
     let x = startElement["x"];
     let y = startElement["y"];
@@ -71,11 +79,11 @@ function calcPositionInSection(json, lineJSON, loopsJSON) {
     return {x, y, position};
 }
 
-function calcPosition(json, json2, json3) {
-    if (json2 !== null) {
-        return calcPositionInSection(json, json2, json3);
+function calcPosition(json, lineJSON, loopsJSON) {
+    if (lineJSON !== null) {
+        return calcPositionInSection(json, lineJSON, loopsJSON);
     } else {
-        return calcPositionInSwitch(json, json3);
+        return calcPositionInSwitch(json, loopsJSON);
     }
 }
 
@@ -112,7 +120,10 @@ export class Pod extends Entity {
         this.__outerShape = outerShape;
         this.__innerShape = innerShape;
         this._outerColor = outerColor;
-        this._outerColorWhenCommandedByUser = outerColorWhenCommandedByUser;
+        this._outerColorWhenCommanded = outerColorWhenCommanded;
+        this.outerColorWhenCommandedAndChangedDest = outerColorWhenCommandedAndChangedDest;
+        this.outerColorWhenCommandedAndEmergencyExit = outerColorWhenCommandedAndEmergencyExit;
+        this.outerColorWhenCommandedAndChangedDestAndEmergencyExit = outerColorWhenCommandedAndChangedDestAndEmergencyExit;
         this._failing = false;
         this._contain_real_user = false;
         this._keepFlag = keepFlag;
@@ -201,16 +212,18 @@ export class Pod extends Entity {
             }
         }
     }
-    update(json, json2, json3) {
+    update(json, lineJSON, loopsJSON) {
         const name = json["name"];
         const speed = json["speed"];
-        const {x, y, position} = calcPosition(json, json2, json3);
+        const {x, y, position} = calcPosition(json, lineJSON, loopsJSON);
         const travelerCount = json["travelers"]["count"];
         const travelerMax = json["travelers"]["max"];
         const source = json["source"];
         const destination = json["destination"];
         const failing = json["failing"];
         this._contain_real_user = json["contain_real_user"];
+        this._changed_destination = json["changed_destination"];
+        this._emergency_exit = json["emergency_exit"];
         this._name = name;
         this._x = x;
         this._y = y;
@@ -226,8 +239,29 @@ export class Pod extends Entity {
         this._failing = failing;
 
         if (this._contain_real_user)
-        {
-            this.__outerShape.fill(outerColorWhenCommandedByUser); 
+        {   
+            if (this._changed_destination)
+            {
+                if (this._emergency_exit)
+                {
+                    this.__outerShape.fill(outerColorWhenCommandedAndChangedDestAndEmergencyExit); 
+                }
+                else
+                {
+                    this.__outerShape.fill(outerColorWhenCommandedAndChangedDest); 
+                }
+            }
+            else
+            {
+                if (this._emergency_exit)
+                {
+                    this.__outerShape.fill(outerColorWhenCommandedAndEmergencyExit); 
+                }
+                else
+                {
+                    this.__outerShape.fill(outerColorWhenCommanded); 
+                }
+            }
         }
         else
         {

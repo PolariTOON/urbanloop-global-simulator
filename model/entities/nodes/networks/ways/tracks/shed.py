@@ -103,9 +103,6 @@ class Shed(Step):
                     "waiting_time": 0,
                     "traveler": False
                 })
-                # la suppression se fait en même temps que l'arrivée sur la voie suivante pour pouvoir
-                # suivre le nombre de capsule dans le réseau, suppression section l.121 (pod[0] = None)
-                # self._pods.remove(pod)
 
             while True:
                 message = yield from self.read()
@@ -136,7 +133,13 @@ class Shed(Step):
                             "type": "passing"
                         })
                 elif "pod_exit" == message["type"]:
-                    pass
+                    pod = message["pod"]
+                    if pod in self._pods:
+                        self._pods.remove(pod)
+                    else:
+                        # dans ce cas, le pod n'était pas docked dans le shed,
+                        # et on accepte qu'il passe à travers.
+                        pass
                 elif "refill" == message["type"]:
                     station = message["station"]
                     if len(self._pods) > 0 and len(self.pods) > len(self._departure_pods):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
@@ -148,6 +151,9 @@ class Shed(Step):
                         self._departure_pods.append(pod)
                     else:
                         # print("\u001B[31m", self.name, "envoie de pod impossible, shed vide", len(self._pods), "\u001B[0m", "(shed l.141)\n")
+                        #
+                        # TODO : corriger ça ??!! (il faut juste décrémenter incoming_pods pour UNE station)
+                        #
                         for station0 in self.parent.parent.stations:
                             if station0.name == station:
                                 station0._incoming_pods -= 1

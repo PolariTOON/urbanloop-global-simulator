@@ -14,7 +14,7 @@ class Road(Way):
 
     def __init__(self, env, id, margin_min, pod_size, is_bridge, steps=None, sections=None, **kwargs):
         super().__init__(env, id, pod_size, **kwargs)
-        self._steps = steps or []  # [shed, capteur, station, ...]
+        self._steps = steps or []  # sheds, capteurs et stations
         self._sections = sections or []  # [{"type": "machin"}, ...](le bon nombre = 1 de + que de steps)
         self._previous = None
         self._next = None
@@ -206,7 +206,7 @@ class Road(Way):
                 if message is None:
                     break
                 elif "pod_entry" == message["type"]:
-                    # La route prévient la bonne piste / l'aiguillage qu'une capsule est sortie
+                    # La route prévient la bonne piste / aiguillage qu'une capsule est sortie
                     new_track = message["author"]
                     pod = message["pod"]
                     if isinstance(new_track, Switch):

@@ -15,7 +15,7 @@ _simulations = {}
 _remove_travelers = False
 
 _running_default = False
-_speed_default = 7 # = simulation max rate
+_speed_default = 8  # but speed is also limited by simulation.max_rate
 
 # handler for SIGINT (CTRL-C)
 _quit = False
@@ -24,7 +24,7 @@ def quit_func(sig, frame):
     # stop `_run_simulations()`
     global _quit
     _quit = True
-    # -> we should maybe properly close Flask process before exiting ?
+    # IDEA: we should maybe properly close Flask process before exiting ?
     exit(0)
 signal.signal(signal.SIGINT, quit_func)
 
@@ -44,7 +44,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
         try:
             with open(network_path) as file:
                 network_item = load(file)
-                network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour les dépôts et stations
+                #network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour les dépôts et stations
         except Exception: network_item = None
         if network_item is not None:
             if "id" in network_item:
@@ -63,17 +63,19 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
     _loop = get_running_loop()
     while not _quit:
         if with_interface:
-            await sleep(0.5)#0.4) # ralentit la simulation pour utiliser l'interface (0.04s -> 25 images par secondes)
+            #print("__")
+            #await sleep(1)
+            await sleep(0.04) #0.5) # ralentit la simulation pour utiliser l'interface (0.04s -> 25 images par secondes)
         else:
             pass # à tester (remplacer par await sleep(0.000001) ?)
         crashed_simulations = []
         for key in _simulations:
             simulation = _simulations[key]
             try:
-                print("a")
-                print(int(simulation._env.now))
+                #print("a")
+                #print(int(simulation._env.now))
                 simulation.update()
-                print("b\n")
+                #print("b\n")
             except Exception:
                 crashed_simulations.append(key)
                 print_exc()

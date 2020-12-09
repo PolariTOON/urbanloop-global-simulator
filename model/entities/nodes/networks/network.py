@@ -39,6 +39,9 @@ class Network(Node):
         self._routing_table0 = {}
         self._update_routing(init=True)  # création des tables de routage
         self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
+        # On cree les csv puis on ecrit les noms des colonne
+        self._statistiques.write_columns_names_for_all_stations(self.stations)
+        self._statistiques.create_global_directories()
 
     @property
     def name(self):
@@ -151,93 +154,112 @@ class Network(Node):
         Création du model à partir du dictionnaire obtenu à partir du fichier json
         :return: (void) Le réseau est construit
         """
+        
         #  Etape 1 : Récupérer les infos du json sous forme pratique
         for bridge in self._bridges:
             if "switch_in" in bridge:
                 del bridge["switch_in"]
             if "switch_out" in bridge:
                 del bridge["switch_out"]
-        for b in range(len(self._loops)):
-            self._loops[b]["switches"] = []
-            self._loops[b]["roads"] = []
+        for i_loop in range(len(self._loops)):
+            self._loops[i_loop]["switches"] = []
+            self._loops[i_loop]["roads"] = []
             steps = []
             sections = []
-            elements = self._loops[b]["elements"]
-            roads = self._loops[b]["roads"]
-            for node in range(len(elements)):
-                n = elements[node]
-                p = self._loops[b]["sections"][node]
+            elements = self._loops[i_loop]["elements"]
+            roads = self._loops[i_loop]["roads"]
+            if elements[0]["type"] not in ["switch_in", "switch_out"]:
+                raise ValueError("Error: in network.py: loop %d must begin with a switch" % i_loop)
+            for i_node in range(len(elements)):
+                n = elements[i_node]
+                section = self._loops[i_loop]["sections"][i_node]
                 if n["type"] in ["switch_in", "switch_out"]:
                     id_bridge = n["id_bridge"]
+                    
                     if n["type"] == "switch_in":
                         if "switch_in" in self._bridges[id_bridge]:
-                            print("error id =", id_bridge)
-                            raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN (network l.178)")
+                            raise ValueError("Error: in network.py: bridge %d already has a switch in" % id_bridge)
                         self._bridges[id_bridge]["switch_in"] = {
-                            "loop": b,
-                            "element": node
+                            "loop": i_loop,
+                            "element": i_node
                         }
                     else:
                         if "switch_out" in self._bridges[id_bridge]:
                             print("error id =", id_bridge)
-                            raise ValueError("[ERROR] MISTAKES IN THE NETWORK DESIGN (network l.185)")
+                            raise ValueError("Error: in network.py: bridge %d already has a switch out" % id_bridge)
                         self._bridges[id_bridge]["switch_out"] = {
-                            "loop": b,
-                            "element": node
+                            "loop": i_loop,
+                            "element": i_node
                         }
-                    self._loops[b]["switches"].append(n)
-                    self._loops[b]["roads"].append({
-                        "steps": steps,
-                        "sections": sections
-                    })
-                    steps = []
-                    sections = []
+                    self._loops[i_loop]["switches"].append(n)
+                    if i_node >= 1: # on saute le cas elements[0] (car c'est le 1er switch de la boucle)  # TODO : faire les étapes 1 à 4 plus proprement ? si possible ?
+                        self._loops[i_loop]["roads"].append({
+                            "steps": steps,
+                            "sections": sections
+                        })
+                        steps = []
+                        sections = []
+                    sections.append(section)
+                
                 else:
-                    if n["type"] == "station" or n["type"] == "shed":
-                        n["element_of_loop"] = {
-                            "loop": b,
-                            "element": node
-                        }
-                    steps.append(n)  # important : on ajoute l'étape
-                sections.append(p)
+                    # type: station, shed, sensor
+                    n["element_of_loop"] = {
+                        "loop": i_loop,
+                        "element": i_node
+                    }
+                    steps.append(n)
+                    sections.append(section)
+                    
+            # on ajoute la dernière road
             roads.append({
                 "steps": steps,
                 "sections": sections
             })
+        
+        loops_elems_count = [len(loop["elements"]) for loop in self._loops] # permettra de compter aussi les éléments des bridges rattachés aux boucles pour leur indexation
+        for bridge in self._bridges: # pour les éléments des bridges, n["element_of_loop"]["loop"] est la boucle qui possède le switchOut vers ce bridge
+            i_loop = bridge["switch_out"]["loop"]
+            for n in bridge["elements"]:
+                n["element_of_loop"] = {
+                    "loop": i_loop,
+                    "element": loops_elems_count[i_loop]
+                }
+                loops_elems_count[i_loop] += 1
+        
         #  Etape 2 : Instanciation des routes
-        for b in range(len(self._loops)):
-            roads = self._loops[b]["roads"]
-            for road in range(1, len(roads)):
+        for i_loop in range(len(self._loops)):
+            roads = self._loops[i_loop]["roads"]
+            for road in range(len(roads)):
                 if "id" in roads[road]:
                     del roads[road]["id"]
                 new_road = Road(env, len(self._roads), self._margin_min, self._pod_size, False, **roads[
                     road])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._roads.append(new_road)
-                #  Comme le premier elt est une liste vide on remet les elts en remplaçant celle-ci
-                roads[road - 1] = new_road
-            roads.pop()
-        l = len(self._roads)  # nombre de routes du réseau internes aux boucles
-        for p in range(len(self._bridges)):
-            steps = []
-            sections = [self._bridges[p]["section"]]
-            new_road = Road(env, l + p, self._margin_min, self._pod_size, True, **{
-                "steps": steps,
-                "sections": sections
+                roads[road] = new_road
+        
+        nb_roads = len(self._roads)  # nombre de routes du réseau qui sont internes aux boucles
+
+        for b in range(len(self._bridges)):
+            bridge = self._bridges[b]
+            new_road = Road(env, nb_roads + b, self._margin_min, self._pod_size, True, **{
+                "steps": bridge["elements"],
+                "sections": bridge["sections"]
             })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._roads.append(new_road)
-            self._bridges[p]["roads"] = [new_road]  # On ajoute sa route au bridge
+            self._bridges[b]["roads"] = [new_road]  # On ajoute sa route au bridge
+        
         #  Etape 3 : Instanciation des aiguillages, ajout de leurs capsules et liaison avec les routes
-        for b in range(len(self._loops)):
+        for i_loop in range(len(self._loops)):
             first_switch = len(self._switches)
-            for s in range(len(self._loops[b]["switches"])):
+            for s in range(len(self._loops[i_loop]["switches"])):
                 #  Capsules
-                switch = self._loops[b]["switches"][s]
+                switch = self._loops[i_loop]["switches"][s]
                 #  Routes et Id
                 id_switch = len(self._switches)
                 switch["previous"] = self._roads[
-                    (id_switch - first_switch - 1) % len(self._loops[b]["switches"]) + first_switch]  # loop_in
+                    (id_switch - first_switch - 1) % len(self._loops[i_loop]["switches"]) + first_switch]  # loop_in
                 switch["next"] = self._roads[id_switch]  # loop_out
-                switch["beside"] = self._roads[l + switch["id_bridge"]]  # road_bridge
+                switch["beside"] = self._roads[nb_roads + switch["id_bridge"]]  # road_bridge
                 if "id" in switch:
                     del switch["id"]
                 if switch["type"] == "switch_in":
@@ -246,25 +268,23 @@ class Network(Node):
                 else:
                     new_switch = SwitchOut(env, id_switch, self._margin_min, self._pod_size, max_speed, **switch)
                 self._switches.append(new_switch)
-                self._loops[b]["switches"][s] = new_switch
+                self._loops[i_loop]["switches"][s] = new_switch
+        
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
-        for p in range(len(self._bridges)):
-            bridge = self._bridges[p]
-            switch_out = self._get_elt_of_loop(**bridge["switch_out"])
-            switch_in = self._get_elt_of_loop(**bridge["switch_in"])
-            bridge["switches"] = [switch_out, switch_in]
+        for b in range(len(self._bridges)):
+            bridge = self._bridges[b]
             self._init_pods_of_line(bridge)
             if "id" in bridge:
                 del bridge["id"]
-            self._bridges[p] = Bridge(p, **bridge)
-        for b in range(len(self._loops)):
-            loop = self._loops[b]
+            self._bridges[b] = Bridge(b, **bridge)
+        for i_loop in range(len(self._loops)):
+            loop = self._loops[i_loop]
             self._init_pods_of_line(loop)
-        for b in range(len(self._loops)):
-            loop = self._loops[b]
             if "id" in loop:
                 del loop["id"]
-            self._loops[b] = Loop(b, **loop)
+            self._loops[i_loop] = Loop(i_loop, **loop)
+
+        print("Nerwork creation: Success")
 
     def _init_parent_of_children(self):
         """
@@ -278,15 +298,17 @@ class Network(Node):
             road.init_parent_of_children()
 
     def _init_pods_of_line(self, line):
+        if "pods" not in line:
+            line["pods"] = []
         for pod in line["pods"]:
-            # pod["source"] = self._get_elt_of_loop(**pod["source"]) # faux on ne change pas les sources et destination d'une capsule
-            # pod["destination"] = self._get_elt_of_loop(**pod["destination"])
+            pod["source"] = self._get_elt_of_loop(**pod["source"])
+            pod["destination"] = self._get_elt_of_loop(**pod["destination"])
             _init_pod_of_line(line, pod)
 
     def _get_elt_of_loop(self, loop=None, element=None, **kwargs):
         """
         :param loop, element: numéro de la boucle et de l'élément s'y trouvant
-        :return: l'objet instancié correspondant au numéro d'élément présent dans la boucle spécifiée
+        :return: l'objet retourné correspondant au numéro d'élément présent dans la boucle spécifiée
         """
         #  Initialisation des variables
         if loop < 0 or loop > len(self._loops):
@@ -342,7 +364,7 @@ class Network(Node):
             if isinstance(s1, SwitchIn):
                 for s2 in self._switches:
                     if isinstance(s2, SwitchIn):
-                        way = shorter_way(s1, s2)   # on calcul le plus court chemin entre nos 2 switchs
+                        way = shortest_way(s1, s2)   # on calcul le plus court chemin entre nos 2 switchs
                         last_switch = way[-1]
                         steps = last_switch.next.steps
                         if steps != []:
@@ -401,8 +423,15 @@ class Network(Node):
                       "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
                 if self.departure_arrival_printer:
                     self.statistiques.print_stats()
+
+                # ECRITURE STATS
                 self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
+                self.statistiques.write_stats_for_all_stations(str(datetime.timedelta(seconds=round(self.env.time))), self.stations)
+                self.statistiques.write_stats_insertion(str(datetime.timedelta(seconds=round(self.env.time))), self.switches)
+                self.statistiques.write_travel_time_global(str(datetime.timedelta(seconds=round(self.env.time))))
+                # ligne calcul stats autres (voir txt perso)
                 print("\n")
+
             last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
             #print("-------------------------------------------------------------")
             #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
@@ -437,7 +466,7 @@ class Network(Node):
                         })
                 elif "empty" == message["type"]:
                     # On demande à une station d'envoyer une capsule à un dépôt pour faire de la place
-                    # TODO:  ne pas choisir aléatoirement
+                    # TODO:  ne pas choisir aléatoirement (vérifier que le shed a bien une place libre)
                     sheds = self.sheds
                     if sheds:
                         station = message["station"]
@@ -472,6 +501,10 @@ class Network(Node):
                 else:
                     raise ValueError("Invalid message")
 
+    #
+    # TODO : trouver où cette fonction est utilisée,
+    #        il faudra peut-être l'enlever quand le débuggage sera fini (pour ne pas ralentir les simulations)
+    #
     def pods_du_reseau(self, last_count, last_pods):
         """ permet d'afficher dans le terminal les pods du réseau, leur position et les compter quand un pod est manquant"""
         pods_du_reseau = {}
@@ -516,17 +549,27 @@ class Network(Node):
         """ Renvoie un objet pod qui est celui de l'user, si celui-ci est dans une capsule """
 
         moving_pods = self._statistiques.traveling_pods()
-
         for key in moving_pods:
             a_moving_pod = moving_pods[key]
             if (len(a_moving_pod) > 0):
                 for a_traveler in a_moving_pod[0].travelers:
                     if (a_traveler.id == str(user_id)):
-                        print("User trouve !")
+                        #print("User trouve !")
                         return a_moving_pod[0]
         
         return None         # Le voyageur n'est pas encore dans une capsule
 
+    def get_station_with_name(self, name_of_station):
+        for station in self.stations:
+            if (station.name == name_of_station):
+                return station
+        print("station non trouvee dans le reseau")
+
+    def pod_change_from_one_destination_to_another(self, former_dest, new_dest):
+        former_dest_station = self.get_station_with_name(former_dest)
+        new_dest_station = self.get_station_with_name(new_dest)
+        former_dest_station.down_incoming_pods() # on decremente le nombre de pods qui vont arriver
+        new_dest_station.up_incoming_pods()      # on incremente le nombre de pods qui vont arriver
 
 ####################    Fin classe
 
@@ -545,7 +588,7 @@ def _init_pod_of_line(line, pod):
             position -= length
     raise ValueError("Element's position out of range")
 
-def shorter_way_tracks(start_track, destination_track):
+def shortest_way_tracks(start_track, destination_track):
     """
     Lance le calcul du plus court chemin si nécéssaire (i.e si les pistes sont sur des routes différentes)
     :param start_track: piste de départ
@@ -556,9 +599,9 @@ def shorter_way_tracks(start_track, destination_track):
     if previous_switch_out(start_track) == previous_switch_out(destination_track):
         return []
     else:
-        return shorter_way(next_switch_out(start_track), previous_switch_out(destination_track))
+        return shortest_way(next_switch_out(start_track), previous_switch_out(destination_track))
 
-def shorter_way(start_switch, destination_switch):
+def shortest_way(start_switch, destination_switch):
     """
     Calcul du plus court chemin entre deux aiguillages avec l'algorithme de Dijkstra
     :param start_switch: aiguillage de départ

@@ -80,6 +80,9 @@ Pour lancer le programme, utilisez :
 $ python3.7 main.py -p
 ```
 
+(l'utilisation préalable de `export FLASK_ENV=development` (ou `SET FLASK_ENV=development` sur Windows)
+permet d'activer le mode debug de Flask).
+
 Il est aussi possible de charger des réseaux dès le lancement :
 
 ```sh
@@ -113,6 +116,18 @@ Pour plus d'informations, utilisez la commande suivante :
 
 ```sh
 $ python3.7 test_project/lauch_simulators.py -h
+```
+
+Pour lancer le calcul de statistiques finales et creer les figures des statistiques temporelles dans le dossier stats/, utilisez :
+
+```sh
+$ python3.7 make_statsAndGraphs.py
+```
+
+Pour changer l'intervalle de temps (par defaut de 30 minutes), ajouter la commande -i et l'entier souhaite (5 par exemple) :
+
+```sh
+$ python3.7 make_statsAndGraphs.py -i 5
 ```
 
 ### Utilisation
@@ -165,4 +180,4 @@ docker run -itp 80:8090 --env n='resources/test2jerky.json' urbanloop-simulator
 
 ### Editeur
 
-Pour utiliser l'éditeur, les instructions sont disponibles sur le ReadMe présent dans le dossier [`editeur-de-r-eseau-urbanloop`](editeur-de-r-eseau-urbanloop)
+Pour utiliser l'éditeur, les instructions sont disponibles sur le ReadMe présent dans le dossier [`editeur_reseau`](editeur_reseau).

@@ -1,6 +1,7 @@
 {
   "name": "Maquette",
   "time": 28800,
+  "jerky": true,
   "state": 42,
   "running": false,
   "margin_min": 1,

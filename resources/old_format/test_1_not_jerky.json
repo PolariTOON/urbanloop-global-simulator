@@ -1,10 +1,9 @@
 {
-  "name": "Mini network",
+  "name": "Test 1 not jerky",
   "time": 28800,
   "state": 56565,
   "running": false,
   "margin_min": 2,
-  "jerky": true,
   "max_speed": 30,
   "pod_size": 2,
   "places_number": 5,

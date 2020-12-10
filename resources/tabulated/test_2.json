@@ -1,10 +1,10 @@
 {
-  "name": "Mini network",
+  "name": "Test 2",
   "time": 28800,
+  "jerky": true,
   "state": 56565,
   "running": false,
   "margin_min": 2,
-  "jerky": true,
   "max_speed": 30,
   "pod_size": 2,
   "places_number": 5,
@@ -30,27 +30,27 @@
           "type": "switch_out",
           "x": 390.98058067569093,
           "y": 495.0970966215454,
-          "id_bridge": 2,
+          "id_bridge": 4,
           "pods": []
         },
         {
           "type": "switch_in",
           "x": 389.01941932430907,
           "y": 504.9029033784546,
-          "id_bridge": 2,
+          "id_bridge": 4,
           "pods": []
         },
         {
           "type": "switch_out",
-          "x": 324.7683112752893,
-          "y": 501.50439608546054,
-          "id_bridge": 3,
+          "x": 320,
+          "y": 500,
+          "id_bridge": 2,
           "pods": []
         },
         {
           "type": "switch_in",
-          "x": 315.2316887247107,
-          "y": 498.49560391453946,
+          "x": 220,
+          "y": 500,
           "id_bridge": 3,
           "pods": []
         },
@@ -116,28 +116,28 @@
           "type": "switch_out",
           "x": 150.4152273992687,
           "y": 334.9827287912244,
-          "id_bridge": 4,
+          "id_bridge": 5,
           "pods": []
         },
         {
           "type": "switch_in",
           "x": 149.5847726007313,
           "y": 325.0172712087756,
-          "id_bridge": 4,
+          "id_bridge": 5,
           "pods": []
         },
         {
           "type": "switch_out",
           "x": 195.25535669477554,
           "y": 318.4225463854082,
-          "id_bridge": 5,
+          "id_bridge": 6,
           "pods": []
         },
         {
           "type": "switch_in",
           "x": 204.74464330522446,
           "y": 321.5774536145918,
-          "id_bridge": 5,
+          "id_bridge": 6,
           "pods": []
         },
         {
@@ -187,6 +187,66 @@
         }
       ],
       "pods": []
+    },
+    {
+      "name": "boucle_Gare_test",
+      "elements": [
+        {
+          "type": "switch_in",
+          "x": 320,
+          "y": 530,
+          "id_bridge": 2,
+          "pods": []
+        },
+        {
+          "type": "switch_out",
+          "x": 275.0,
+          "y": 570.0,
+          "id_bridge": 7,
+          "pods": []
+        },
+        {
+          "type": "switch_in",
+          "x": 265.0,
+          "y": 570.0,
+          "id_bridge": 7,
+          "pods": []
+        },
+        {
+          "type": "switch_out",
+          "x": 220,
+          "y": 530,
+          "id_bridge": 3,
+          "pods": []
+        }
+      ],
+      "sections": [
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "pods": []
     }
   ],
   "bridges": [
@@ -209,6 +269,32 @@
       "sections": [
         {
           "speed": 19.44,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "elements": []
+    },
+    {
+      "name": "Gare_entree",
+      "pods": [],
+      "sections": [
+        {
+          "speed": 6,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "elements": []
+    },
+    {
+      "name": "Gare_sortie",
+      "pods": [],
+      "sections": [
+        {
+          "speed": 6,
           "path": {
             "type": "line"
           }
@@ -253,42 +339,6 @@
       "pods": []
     },
     {
-      "name": "Deviation for Gare",
-      "sections": [
-        {
-          "speed": 16.67,
-          "path": {
-            "type": "line"
-          }
-        },
-        {
-          "speed": 16.67,
-          "path": {
-            "type": "line"
-          }
-        }
-      ],
-      "elements": [
-        {
-          "type": "station",
-          "name": "Gare",
-          "x": 318.49560391453946,
-          "y": 504.7683112752893,
-          "pods": {
-            "max": 5,
-            "count": 0
-          },
-          "station_type": 0,
-          "travelers": {
-            "count": 0,
-            "average_waiting_time": 0,
-            "all_time_count": 0
-          }
-        }
-      ],
-      "pods": []
-    },
-    {
       "name": "Deviation for Marie-Jeanne",
       "sections": [
         {
@@ -311,8 +361,8 @@
           "x": 145.0172712087756,
           "y": 330.4152273992687,
           "pods": {
-            "max": 100,
-            "count": 100
+            "max": 2,
+            "count": 1
           }
         }
       ],
@@ -341,8 +391,44 @@
           "x": 201.5774536145918,
           "y": 315.2553566947755,
           "pods": {
-            "max": 100,
-            "count": 100
+            "max": 2,
+            "count": 0
+          }
+        }
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Gare",
+      "sections": [
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "elements": [
+        {
+          "type": "station",
+          "name": "Gare",
+          "x": 270.0,
+          "y": 575.0,
+          "pods": {
+            "max": 2,
+            "count": 0
+          },
+          "station_type": 0,
+          "travelers": {
+            "count": 0,
+            "average_waiting_time": 0,
+            "all_time_count": 0
           }
         }
       ],

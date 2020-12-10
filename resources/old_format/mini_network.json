@@ -1,7 +1,7 @@
 {
   "name": "Mini network",
-  "jerky": true,
   "time": 28800,
+  "jerky": true,
   "state": 42,
   "running": false,
   "margin_min": 2,
@@ -75,7 +75,8 @@
         {"type": "station", "name": "Auchan", "x": 90, "y": 370, "pods": {"max": 3, "count": 1}, "station_type": 2, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "station", "name": "Sapiniere", "x": 121, "y": 235, "pods": {"max": 3, "count": 1}, "station_type": 1, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
         {"type": "shed", "name": "Marie-Jeanne", "x": 212, "y": 229, "pods": {"max": 40, "count": 20}},
-        {"type": "switch_out", "x": 339, "y": 295, "id_bridge": 0, "pods": []}
+        {"type": "switch_out", "x": 339, "y": 295, "id_bridge": 0, "pods": []},
+        {"type": "sensor", "x": 300, "y": 370}
       ],
       "sections": [
         {"speed": 22.22, "path": {"type": "line"}},

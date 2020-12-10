@@ -134,13 +134,13 @@ class Simulation:
     def serialize(self):
         dict = self._network.serialize()
         dict.update({
+            "time": self.time,
+            "jerky": self.jerky,
+            "state": self.state,
             "running": self.running,
             "showing_travelers_waiting": self._showing_travelers_waiting,
             "rate": self.rate,
             "max_rate": self.max_rate,
-            "jerky": self.jerky,
-            "time": self.time,
-            "state": self.state,
             "modified": True,
         })
         return dict

@@ -1,6 +1,7 @@
 {
   "name": "Mini network",
   "time": 28800,
+  "jerky": true,
   "state": 42,
   "running": false,
   "margin_min": 2,
@@ -222,20 +223,9 @@
           "y": 469,
           "id_bridge": 3,
           "pods": []
-        },
-        {
-          "type": "sensor",
-          "x": 280,
-          "y": 470
         }
       ],
       "sections": [
-        {
-          "speed": 16.67,
-          "path": {
-            "type": "line"
-          }
-        },
         {
           "speed": 16.67,
           "path": {
@@ -513,7 +503,7 @@
           "y": 285.22110495639026,
           "pods": {
             "max": 4,
-            "count": 0
+            "count": 2
           },
           "station_type": 0,
           "travelers": {
@@ -549,7 +539,7 @@
           "y": 369.2837877248725,
           "pods": {
             "max": 4,
-            "count": 0
+            "count": 2
           },
           "station_type": 0,
           "travelers": {
@@ -585,7 +575,7 @@
           "y": 449.1462754430817,
           "pods": {
             "max": 4,
-            "count": 0
+            "count": 2
           },
           "station_type": 2,
           "travelers": {
@@ -621,7 +611,7 @@
           "y": 571.1810729357386,
           "pods": {
             "max": 5,
-            "count": 0
+            "count": 3
           },
           "station_type": 0,
           "travelers": {
@@ -657,7 +647,7 @@
           "y": 659.5720664681329,
           "pods": {
             "max": 4,
-            "count": 0
+            "count": 2
           },
           "station_type": 2,
           "travelers": {
@@ -693,7 +683,7 @@
           "y": 662.281415073035,
           "pods": {
             "max": 3,
-            "count": 0
+            "count": 1
           },
           "station_type": 1,
           "travelers": {
@@ -729,7 +719,7 @@
           "y": 550.0729088307872,
           "pods": {
             "max": 40,
-            "count": 40
+            "count": 20
           }
         }
       ],
@@ -759,7 +749,7 @@
           "y": 371.7244798262931,
           "pods": {
             "max": 3,
-            "count": 0
+            "count": 1
           },
           "station_type": 2,
           "travelers": {
@@ -795,7 +785,7 @@
           "y": 231.63947426768473,
           "pods": {
             "max": 3,
-            "count": 0
+            "count": 1
           },
           "station_type": 1,
           "travelers": {
@@ -831,7 +821,7 @@
           "y": 224.2066510452227,
           "pods": {
             "max": 40,
-            "count": 40
+            "count": 20
           }
         }
       ],

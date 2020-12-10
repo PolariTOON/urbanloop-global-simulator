@@ -1,8 +1,8 @@
 {
   "name": "Grand Nancy",
   "time": 28800,
-  "state": 56565,
   "jerky": true,
+  "state": 56565,
   "running": false,
   "margin_min": 2,
   "max_speed": 30,

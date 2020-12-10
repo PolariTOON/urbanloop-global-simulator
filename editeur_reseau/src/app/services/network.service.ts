@@ -133,7 +133,7 @@ export class NetworkService {
             bridge: true,
             loop: true,
             zoom: 10,
-            switch: false
+            switch: true		// remettre a faux plus tard
         };
     }
     

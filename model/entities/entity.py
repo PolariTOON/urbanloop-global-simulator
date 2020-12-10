@@ -27,9 +27,6 @@ class Entity:
     def write2(self, message):
         if message is None:
             raise ValueError()
-
-        # -> yield StorePut(self._store, message) ??
-        
         Process(self._env, self._pipe2(message))
         return
         yield
@@ -38,7 +35,7 @@ class Entity:
         yield StorePut(self._store, message)
 
     def read2(self):
-        (timeout, getter) = (Timeout(self._env, self._env.tick), StoreGet(self._store))
+        (timeout, getter) = (Timeout(self._env, 1 - (self._env.now - floor(self._env.now))), StoreGet(self._store))
         condition = yield timeout | getter
         if getter not in condition:
             getter.cancel()
@@ -54,15 +51,12 @@ class Entity:
         yield
 
     def _pipe(self, message):
-        timeout = random() * self._env.tick
-        print(self._env.now)
-        print(self._env.tick)
-        print("\n")
+        timeout = random() *  (1 - (self._env.now - floor(self._env.now)))
         yield Timeout(self._env, timeout)
         yield StorePut(self._store, message)
 
     def read(self):
-        (timeout, getter) = (Timeout(self._env, self._env.tick), StoreGet(self._store))
+        (timeout, getter) = (Timeout(self._env, 1 - (self._env.now - floor(self._env.now))), StoreGet(self._store))
         condition = yield timeout | getter
         if getter not in condition:
             getter.cancel()

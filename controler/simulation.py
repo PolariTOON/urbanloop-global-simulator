@@ -60,6 +60,10 @@ class Simulation:
         return self._network
 
     @property
+    def env(self):
+        return self._env
+
+    @property
     def running(self):
         return self._running
 

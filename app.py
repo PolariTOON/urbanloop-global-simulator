@@ -61,19 +61,17 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
     _loop = get_running_loop()
     while not _quit:
         if with_interface:
-            #print("__")
-            #await sleep(1)
-            await sleep(0.04) #0.5) # ralentit la simulation pour utiliser l'interface (0.04s -> 25 images par secondes)
+            await sleep(0.5) #0.04) # ralentit la simulation pour utiliser l'interface (0.04s -> 25 images par secondes)
         else:
             pass # à tester (remplacer par await sleep(0.000001) ?)
         crashed_simulations = []
         for key in _simulations:
             simulation = _simulations[key]
             try:
-                #print("a")
-                #print(int(simulation._env.now))
+                #print("__")
+                #print("now: %f" % float(simulation._env.now))
+                #print("now: %f" % float(simulation._env.time))
                 simulation.update()
-                #print("b\n")
             except Exception:
                 crashed_simulations.append(key)
                 print_exc()

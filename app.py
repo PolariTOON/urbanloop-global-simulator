@@ -5,7 +5,6 @@ from traceback import print_exc
 import signal
 
 from controler.simulation import Simulation
-import modifjson
 
 """Classe chargée de la réalisation de la simulation"""
 
@@ -44,7 +43,6 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
         try:
             with open(network_path) as file:
                 network_item = load(file)
-                #network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour les dépôts et stations
         except Exception: network_item = None
         if network_item is not None:
             if "id" in network_item:

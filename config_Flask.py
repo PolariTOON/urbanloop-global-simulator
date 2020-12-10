@@ -3,7 +3,6 @@ from flask import Flask, jsonify, request, Response
 from functools import wraps
 from logging import ERROR, getLogger
 from controler.simulation import Simulation
-import modifjson
 
 """Classe chargée de la réalisation de la simulation avec interface web"""
 
@@ -66,12 +65,10 @@ async def _post_network(simulations, network_index, network_item):
     """
     print("Received network: '%s'" % network_item["name"])
     if network_item is not None:
-        #network_item = modifjson.mod_station(network_item) # ajout des mini-boucles pour dépots et stations si besoin
         if "id" in network_item:
             del network_item["id"]
         from app import _wave, _remove_travelers
         simulation = Simulation(network_index, _wave, remove_travelers=_remove_travelers, **network_item)
-
         # Pour utiliser la simulation dans l'API
         print("Creation simulation en tant que variable global (pour utiliser dans l'API)")
         global simulation_for_api  # Variable non locale a cette fonction

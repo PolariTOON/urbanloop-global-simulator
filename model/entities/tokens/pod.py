@@ -204,7 +204,9 @@ class Pod(Token):
         :return: void
         """
         while True:
-            print(self.id + "  1")
+
+            #print(self.id + "  1")
+
             # OPTIMISATION : ne regarder que lors de l'embarquement !
             #################
             has_real_traveler = False
@@ -323,11 +325,13 @@ class Pod(Token):
                 if self.position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in ["Shed", "Station", "Sensor"]:
                     print("Warning: pod.py: a pod has travelled to much distance while arriving on '%s'." % self._track_or_switch.name)
 
-            print(self.id + "  2")
+            #print(self.id + "  2")
             
             # Gestion des messages reçus
             while True:
-                print(self.id + "  3")
+                
+                #print(self.id + "  3")
+                
                 message = yield from self.read()
                 if message is None:
                     break
@@ -395,7 +399,8 @@ class Pod(Token):
                     self.speed = self._track_or_switch.speed
                 else:
                     raise ValueError("Invalid message: ", message)
-            print(self.id + "  4")
+            
+            #print(self.id + "  4")
 
 
     # Fonctions de calcul de prochaines/precedentes stations et temps

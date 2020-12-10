@@ -32,16 +32,15 @@ class Network(Node):
         self._init_graph_from_json(env, max_speed, places_number)
         self._init_parent_of_children()
         self._init_weights()
-        self._statistiques = Statistiques()
         # Initialisation de la table de routage de chaque aiguillage
         # C'est une liste de dictionnaires de la forme {"switch": s, "table": t}
         # où t contient les destinations pour lesquelles il faut tourner en s1
         self._routing_table0 = {}
         self._update_routing(init=True)  # création des tables de routage
         self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
-        # On cree les csv puis on ecrit les noms des colonne
+        self._statistiques = Statistiques()
+        # On cree les csv puis on ecrit les noms des colonnes
         self._statistiques.write_columns_names_for_all_stations(self.stations)
-        self._statistiques.create_global_directories()
 
     @property
     def name(self):
@@ -284,8 +283,6 @@ class Network(Node):
                 del loop["id"]
             self._loops[i_loop] = Loop(i_loop, **loop)
 
-        print("Nerwork creation: Success")
-
     def _init_parent_of_children(self):
         """
         Initialise le parent des routes et aiguillages comme étant le réseau
@@ -430,7 +427,7 @@ class Network(Node):
                 self.statistiques.write_stats_insertion(str(datetime.timedelta(seconds=round(self.env.time))), self.switches)
                 self.statistiques.write_travel_time_global(str(datetime.timedelta(seconds=round(self.env.time))))
                 # ligne calcul stats autres (voir txt perso)
-                print("\n")
+                #print("\n")
 
             last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
             #print("-------------------------------------------------------------")

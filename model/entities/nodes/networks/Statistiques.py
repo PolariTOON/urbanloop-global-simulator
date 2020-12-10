@@ -18,8 +18,9 @@ class Statistiques:
 		self._traveling_pods = {}  		# dictionnaire des capsules en voyage
 		# self._travels = []  			# tableau des voyages effectués
 		self._total_generated_travelers = 0
-		# Gestion fichiers 
+		# Gestion fichiers
 		self.delete_old_images_and_csv_files()
+		self.create_global_directories()
 		csvfile = open('stats/global/stat_log.csv', 'w')
 		csvfile.write('Time, total travelers, travelers in a pod, waiting travelers, traveling pods, average waiting time, average travel time, total generated travelers\n')
 		csvfile.close()
@@ -132,12 +133,7 @@ class Statistiques:
 
 	def write_columns_names_for_station(self, station):
 		folderPath = "stats/stations/" + station.name
-		access_rights = 0o755
-		try:
-			os.mkdir(folderPath, access_rights)
-		except OSError:
-			#print ("Creation of the directory %s failed" % folderPath)
-			print("")
+		self.create_directory(folderPath)
 		filename = 'stats/stations/' + station.name + "/stats.csv"
 		csvfile = open(filename, 'a')
 		csvfile.write("Time, Waiting duration (in s)\n")
@@ -145,6 +141,10 @@ class Statistiques:
 
 
 	def create_global_directories(self):
+		self.create_directory("stats")
+		self.create_directory("stats/global")
+		self.create_directory("stats/stations")
+		
 		self.create_directory("stats/global/globalWaitingTime")
 		self.create_directory("stats/global/globalTravelTime")
 		self.create_directory("stats/global/failedInsertions")
@@ -159,8 +159,8 @@ class Statistiques:
 			os.mkdir(filename, access_rights)
 		except OSError:
 			#print ("Creation of the directory %s failed" % filename)
-			print("")
-			
+                        pass
+
 
 	def write_stats_for_station(self, time, station, globalWaitingTimeCsv):
 		filename = 'stats/stations/' + station.name + "/stats.csv"

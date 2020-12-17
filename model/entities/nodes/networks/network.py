@@ -35,7 +35,7 @@ class Network(Node):
         # Initialisation de la table de routage de chaque aiguillage
         # C'est une liste de dictionnaires de la forme {"switch": s, "table": t}
         # où t contient les destinations pour lesquelles il faut tourner en s1
-        self._routing_table0 = {}
+        self._routing_table = {}
         self._update_routing(init=True)  # création des tables de routage
         self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
         self._statistiques = Statistiques()
@@ -336,45 +336,54 @@ class Network(Node):
                 weight += section.weight
             road.weight = weight
 
+    def _is_destination(self, switch):
+        """ Renvoie True si le switch fait partie d'une sérivation vers une station / shed. """
+        # TODO : à déplacer dans les Switchs
+        return len(switch.beside.sections) >= 2
+    
     def _update_routing(self, init=False):
         """
         Envoie aux aiguillages sortant une nouvelle table de routage
         :return: void
-        """
-        """
-        On construit la table de routage de chaque switch du réseau:
+
+        On construit la table de routage de chaque switch du réseau :
             la table de routage d'un switch indique si pour une destination donnée on doit tourner pour atteindre la desination
             la table contient donc une liste de destinations pour lesquelles il faut tourner
             les destinations restantes sont celles pour lesquelles il faut continuer dans la boucle
-
-        Pour construire les tables:
-            On calcule les plus courts chemins entre les switchs du réseau
-                Pour chaque dépot/station à l'arrivée d'un chemin (destination),
-                Pour chaque switch de ce chemin, s'il faut tourner pour atteindre la destination,
-                 on ajoute la destination à la table de ce switch
+        
         """
-        for s0 in self._switches:   # initialisation d'une table globale
-            if isinstance(s0, SwitchOut):
-                self._routing_table0[s0.name] = []
-        # Remplissage
+        # initialisation d'une table globale
+        for s in self._switches:
+            if isinstance(s, SwitchOut):
+                self._routing_table[s.name] = []
+        # Switches menant aux stations/sheds
+        for s in self._switches:
+            if isinstance(s, SwitchOut) and s.is_destination():
+                for step in s.beside.steps:
+                    self._routing_table[s.name].append(step.name)
+        # Remplissage pour les switchs entre 2 boucles différentes
         for s1 in self._switches:
-            if isinstance(s1, SwitchIn):
+            if isinstance(s1, SwitchOut) and not s1.is_destination():
                 for s2 in self._switches:
-                    if isinstance(s2, SwitchIn):
-                        way = shortest_way(s1, s2)   # on calcul le plus court chemin entre nos 2 switchs
-                        last_switch = way[-1]
-                        steps = last_switch.next.steps
-                        if steps != []:
-                            for index in range(len(way)-1):
-                                s = way[index]
-                                if s.next.next != way[(index+1) % len(way)]:
-                                    if steps[0].name not in self._routing_table0[s.name]:
-                                        self._routing_table0[s.name].append(steps[0].name)
-        if init:  # Envoie des tables
-            # Initialisation des tables de routage des aiguillages
+                    if s1 != s2:
+                        way = shortest_way(s1, s2)
+                        if s1.switch_in in way:
+                            # le plus court chemin menant à s2 passe par le bridge de s1,
+                            # on ajoute donc à la table de s1 l'ensemble des éléments
+                            # directement accessibles depuis s2.
+                            # Attention : cela n'est vrai que parce qu'on sait que le
+                            # bridge de s1 ne mène pas à la même boucle que s1.
+                            if isinstance(s2, SwitchOut):
+                                s2_steps = s2.next.steps[:] + s2.beside.steps[:]
+                            else:
+                                s2_steps = s2.next.steps[:]
+                            for step in s2_steps:
+                                self._routing_table[s1.name].append(step.name)
+        # Envoie des tables aux switchs
+        if init:
             for switch in self._switches:
                 if isinstance(switch, SwitchOut):
-                    switch.routing_table = self._routing_table0[switch.name]
+                    switch.routing_table = self._routing_table[switch.name]
 
     def maj_routing_tables(self):
         """pour mettre à jour les tables de routage"""
@@ -384,7 +393,7 @@ class Network(Node):
                 yield from switch.write({
                     "author": self,
                     "type": "update_routing",
-                    "table": self._routing_table0[switch.name]
+                    "table": self._routing_table[switch.name]
                 })
 
     def find(self, step):
@@ -435,7 +444,10 @@ class Network(Node):
             #print("-------------------------------------------------------------")
             if self._dynamic_routing and int(int(self.env.now) % (30 / self.env.tick)) == 0:  # TODO: utilise self.env.time plutôt que self.env.tick
                 # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
+                #print("Updated routing tables...")
                 yield from self.maj_routing_tables()
+                #print("Routing tables updated")
+                
             while True:
                 message = yield from self.read()
                 if message is None:
@@ -500,7 +512,7 @@ class Network(Node):
 
     #
     # TODO : trouver où cette fonction est utilisée,
-    #        il faudra peut-être l'enlever quand le débuggage sera fini (pour ne pas ralentir les simulations)
+    #        il faudra peut-être la désactiver hors du débuggage (pour ne pas ralentir les simulations)
     #
     def pods_du_reseau(self, last_count, last_pods):
         """ permet d'afficher dans le terminal les pods du réseau, leur position et les compter quand un pod est manquant"""

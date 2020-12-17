@@ -180,7 +180,7 @@ function updatePodsSwitch(jsonFile, pods){
 }
 
 function updatePodsBridge(jsonFile, pods) {
-    const length = jsonFile["section"]["length"];
+    const length = jsonFile["sections"][0]["length"];
     let newPods = [];
     for (const pod of jsonFile["pods"]){
         const pos = pod["position"];

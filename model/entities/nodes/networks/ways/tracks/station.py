@@ -219,6 +219,7 @@ class Station(Step):
                     self._boarding[i] += self.env.tick  # on incrémente le temps
                     if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                         self._boarding[i] = -1  # reset du timer
+                        print("Envoi")
                         self._pods_ready[i] = True   # on indique que le pod en position i est prêt à partir
                         self.send_pod(self._pods[i], self._pods[i].travelers[0].destination, True)  # on l'ajoute à la liste des pods au départ
 

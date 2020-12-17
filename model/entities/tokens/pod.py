@@ -456,6 +456,11 @@ class Pod(Token):
 
         eltOfNetwork = self._track_or_switch
 
+
+        # On regarde si on ne se trouve pas sur la derivation finale
+        if (type(eltOfNetwork.previous).__name__ == "SwitchOut" and self.get_station_on_bridge_derivation(eltOfNetwork.previous) == self._destination):
+            return " Time = " + str(self.get_time_of_elt_of_network(eltOfNetwork))
+
         nbIter = 0              # Pour eviter une boucle infinie
         stationConsidered = None
         timeToDest = (eltOfNetwork.length - self._position) / self._track_or_switch.speed
@@ -497,6 +502,9 @@ class Pod(Token):
             nbIter += 1
 
 
+        timeInsideBridgeDerivationOfArrival = self.get_time_of_elt_of_network(eltOfNetwork)
+        timeToDest += timeInsideBridgeDerivationOfArrival
+
         # A FAIRE POUR TRISTAN
         # Actuellement, on ne considere pas le temps de parcours de u bridge-derivation contenant la station destination")
         # Faire que get_station_on_bridge_derivation renvoient en plus un temps pour faire cela
@@ -506,7 +514,7 @@ class Pod(Token):
 
 
     def get_time_of_elt_of_network(self, eltOfNetwork):
-        """ Renvoie la duree necessaire pr parcourirr un element du reseau, ou le pod ne se trouve pas """
+        """ Renvoie la duree necessaire pr parcourir un element du reseau, ou le pod ne se trouve pas """
         timeOfElt = 0
 
         if (type(eltOfNetwork).__name__ == "Road"):     # Road n'a pas d'attribut speed, mais possede des sections
@@ -552,7 +560,6 @@ class Pod(Token):
             return steps[0].name
         else :
             return None
-
 
     def change_destination(self, user_id, new_dest):
         self._destination = new_dest

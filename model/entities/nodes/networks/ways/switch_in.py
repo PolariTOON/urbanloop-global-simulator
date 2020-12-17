@@ -103,7 +103,7 @@ class SwitchIn(Switch):
             # On décale les capsules à partir de la première place libre
             if self._discrete_places[index] is not None:
                 pod = self._discrete_places[index]
-                yield from pod.write({
+                pod.write({
                     "author": self,
                     "type": "speed_a_while",
                     "speed": speed,
@@ -148,7 +148,7 @@ class SwitchIn(Switch):
                     pod = message["pod"]
                     self._pods.append(pod)
                     track = pod.track_or_switch.previous.sections[-1]
-                    yield from track.write({
+                    track.write({
                         "author": self,
                         "type": "pod_exit",
                         "pod": pod
@@ -159,7 +159,7 @@ class SwitchIn(Switch):
                     time_to_discretize = (int((self._discretize_length - (self.place_size - x))/self.place_size)*self.place_size + self.place_size-x) / self.speed
                     speed = d / time_to_discretize
                     self._pod_to_add = pod
-                    yield from pod.write({
+                    pod.write({
                         "author": self,
                         "type": "speed_a_while",
                         "length_before_restore": self._discretize_length,
@@ -170,12 +170,12 @@ class SwitchIn(Switch):
                     # notification au pont que la capsule n'y est plus
                     pod = message["pod"]
                     track = pod.track_or_switch.beside.sections[-1]
-                    yield from track.write({
+                    track.write({
                         "author": self,
                         "type": "pod_exit",
                         "pod": pod
                     })
-                    yield from pod.write({
+                    pod.write({
                         "author": self,
                         "type": "passing_from_switch"
                     })

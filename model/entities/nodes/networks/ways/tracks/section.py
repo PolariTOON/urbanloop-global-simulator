@@ -117,7 +117,7 @@ class Section(Track):
                     # Une capsule entre dans la section : il faut lui donner la bonne vitesse
                     pod = message["pod"]
                     self._pods.append(pod)
-                    yield from pod.write({
+                    pod.write({
                         "author": self,
                         "type": "speed",
                         "speed": self._speed
@@ -125,7 +125,7 @@ class Section(Track):
                     # si on est entré dans une Road, on la notifie (cette Road sera
                     # chargée de notifier la Road précédente que le pod l'a quittée)
                     if True: #self._parent.sections[0] == self:
-                        yield from self._parent.write({
+                        self._parent.write({
                             "author": self,
                             "type": "pod_entry",
                             "pod": pod

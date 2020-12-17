@@ -127,10 +127,14 @@ class Simulation:
             self._state = random() * 2 ** 53
             seed(self._state)
 
-        # TODO : mettre ça dans le 'for' (mais check si ça ralentit pas trop la simulation)
-        # TODO : correctement prendre en compte 'self._travelers_per_day'
+        # on ne génère pas les travelers à chaque update pour des raisons de performances
         if self._travelers_per_day > 0:
-            self._probability.generate_traveler_2(self._env.time, self._env)
+            if times * self._env.tick > 15.0:
+                # si on a moins d'une génération de travelers toutes les 15 secondes,
+                # alors on considère que l'approximation est mauvaise
+                print("Warning: simulation.py: travelers generation will be too much approximated,"
+                      "         you need to improve the source code (or reduce tick or rate) to fix this eventual problem.")
+            self._probability.generate_traveler_2(self._env.time, self._env, nb_ticks=times)
 
     def serialize(self):
         dict = self._network.serialize()

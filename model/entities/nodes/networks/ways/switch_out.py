@@ -90,7 +90,7 @@ class SwitchOut(Switch):
                     pod = message["pod"]
                     self._pods.append(pod)
                     track = pod.track_or_switch.previous.sections[-1]
-                    yield from track.write({
+                    track.write({
                         "author": self,
                         "type": "pod_exit",
                         "pod": pod
@@ -100,7 +100,7 @@ class SwitchOut(Switch):
                     x = self._switch_in.cursor
                     t = d / self.speed + (self._beside.length - x) / self._switch_in.speed
                     speed = d / t
-                    yield from pod.write({
+                    pod.write({
                         "author": self,
                         "type": "speed_a_while",
                         "speed": speed,
@@ -120,7 +120,7 @@ class SwitchOut(Switch):
                             pass
                         elif index == first_place - 1:
                             # On insère la capsule sur la dernière place
-                            yield from pod.write({
+                            pod.write({
                                 "author": self,
                                 "type": "insert"
                             })
@@ -129,7 +129,7 @@ class SwitchOut(Switch):
                             self.switch_in.backstep(index)
                             # On envoie un message indiquant que la voiture doit aller sur le pont
                             # La voiture s'insère alors sur la dernière place
-                            yield from pod.write({
+                            pod.write({
                                 "author": self,
                                 "type": "insert"
                             })

@@ -19,18 +19,21 @@ class Probability:
         self._activity_and_residential_fluctuation = int(prob['activity_and_residential_fluctuation'])
         if None in (self._city_percent, self._activity_and_residential_percent, self._activity_and_residential_fluctuation):
             raise ValueError("Converter hasn't been loaded (probability l.20)")
+        
         self._morning_peak_hour = int(traveler['morning_peak_hour'])
         self._evening_peak_hour = int(traveler['evening_peak_hour'])
         if self._activity_and_residential_fluctuation < 0 or self._activity_and_residential_fluctuation >= self._activity_and_residential_percent:
             self._activity_and_residential_fluctuation = floor(self._activity_and_residential_percent / 2)
+        
         self.stations = stations
         self.statistiques = statistiques
         peak_hours_coefficient = [1, 1, 1, 1, 1, 1, 7, 40, 20, 15, 15, 10, 20, 20, 15, 7, 15, 20, 20, 10, 7, 3, 2, 2]  # coefficient de fréquentation selon l'heure de la journée
-        somme_coefficient = int(sum(peak_hours_coefficient))  # total des coefficients
+        sum_coefficient = int(sum(peak_hours_coefficient))  # total des coefficients
         travelers_per_day = int(traveler["travelers_per_day"])  # on récupère le nombre moyen de voyageurs par jour
-        traveler_lambda_per_hour = [travelers_per_day * coefficient / somme_coefficient for coefficient in peak_hours_coefficient]  # liste du nombre de passagers générés pour chaque heure de la journée
+        traveler_lambda_per_hour = [travelers_per_day * coefficient / sum_coefficient for coefficient in peak_hours_coefficient]  # liste du nombre de passagers générés pour chaque heure de la journée
         self.traveler_per_tick = [traveler0 / (3600 / tick) for traveler0 in traveler_lambda_per_hour]  # nombre moyen de passagers générés par tick selon l'heure
         coef_station = []
+        
         """
             - zone d’activité : 0
             - zone résidentielle : 1
@@ -132,10 +135,11 @@ class Probability:
                                         "\n\t\t\u001B[32m|\u001B[0m taille de la station:", s.capacity, "\n")"""
                 s._all_time_count += 1
 
-    def generate_traveler_2(self, time, env):
+    def generate_traveler_2(self, time, env, nb_ticks=1):
         """utilisation de la loi de Poisson"""
         hour = int(round(time / 3600, 2)) % 24
-        travelers_to_generate = self.traveler_per_tick[hour]    # nb de voyageurs que l'on génère au tick présent
+        travelers_to_generate = nb_ticks * self.traveler_per_tick[hour]  # nb de voyageurs que l'on génère au tick présent
+                                                                         # (ou au groupe de ticks présent si nb_ticks > 1)
         travelers_to_generate_per_station = []
         for coef0 in self.coef_station:
             travelers_to_generate_per_station.append(coef0*travelers_to_generate)   # répartition des passagers à générer selon le type de station

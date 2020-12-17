@@ -260,6 +260,8 @@ class Pod(Token):
                 # S'il n'y a pas de capsule devant on réaugmente la vitesse
                 elif self._speed < self._track_or_switch.speed:
                     self.speed = self._track_or_switch.speed
+                    #
+                    # ^ TODO : utiliser l'accélération
             
             # La capsule avance
             if self._speed != 0:

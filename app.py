@@ -35,9 +35,18 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
     global _loop
     global _simulations
     global _remove_travelers
+    global _running_default
+    global _speed_default
 
     _wave = wave
     _remove_travelers = remove_travelers
+    if not with_interface:
+        _running_default = True
+    if not with_interface:
+        #print("strating with ..." ...)
+        #_speed_default = ...
+        pass
+
     # lancement des simulations avec les réseaux préchargés
     for network_path in networks:
         try:
@@ -51,9 +60,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
                 network_index = len(_simulations)
                 simulation = Simulation(network_index, _wave, _remove_travelers, **network_item)
                 _simulations[network_index] = simulation
-                global _running_default
                 simulation.running = _running_default
-                global _speed_default
                 simulation.rate = _speed_default
             except Exception:
                 print_exc()

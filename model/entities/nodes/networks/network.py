@@ -428,8 +428,12 @@ class Network(Node):
                 self.statistiques.write_travel_time_global(str(datetime.timedelta(seconds=round(self.env.time))))
                 # ligne calcul stats autres (voir txt perso)
                 #print("\n")
-
-            last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
+                
+            #
+            # TODO : permettre de paramétrer l'activation / désactivation de cette ligne ?
+            #
+            #last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
+            
             #print("-------------------------------------------------------------")
             #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
             #print("-------------------------------------------------------------")
@@ -626,6 +630,7 @@ def shortest_way(start_switch, destination_switch):
                 previouses[switch.next.next] = switch       # on note que le prédécessur du switch.next.next est le switch actuel
             if isinstance(switch, SwitchOut):  # Pour un out on a aussi le beside comme successeur
                 new_weight = weight + switch.beside.weight
+                # ^ TODO : à adapter aux nouveaux bridges
                 if switch.beside.next not in best_weight.keys() or new_weight < best_weight[switch.beside.next]:
                     best_weight[switch.beside.next] = new_weight
                     previouses[switch.beside.next] = switch

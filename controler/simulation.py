@@ -109,6 +109,7 @@ class Simulation:
     def update(self):
         if not self._running:  # simulation en pause
             return
+        
         times = 1
         tick = self._wave
         if self._jerky:  # mode jerky

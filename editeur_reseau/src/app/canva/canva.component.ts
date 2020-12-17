@@ -197,9 +197,7 @@ export class CanvaComponent implements OnInit {
         // R�ception de l'ordre de cr�ation d'un nouvel �l�ment
 		this.newElementSubscription = this.networkService.newElementSubject.subscribe(
 			(type: string) => {
-				this.createCircle(this.canvasElement.width/2, this.canvasElement.height/2, type == 'station' ? 4: 50, null, type, 1)
-				this.unToggleAll();
-				this.update()
+                this.createCircle(this.canvasElement.width/2, this.canvasElement.height/2, type == 'station' ? 4: 50, null, type, 1);
 			}
 		);
 		
@@ -289,18 +287,20 @@ export class CanvaComponent implements OnInit {
         };
         if (type == 'bridge') {
             //Quand on cr�e un pont, on cr�e aussi un deuxi�me cercle et on le lie
-            elt['type'] = 'switch_in';
+            elt['type'] = 'switch_out';
             this.circles.push(elt);
             
             let elt2 = Object.assign({}, elt);
-            elt2['type'] = 'switch_out';
+            elt2['type'] = 'switch_in';
             elt2['id'] = this.nextCircleId++;
             elt2.x += elt.r * 4;
+
             this.circles.push(elt2);
             
             const n = this.circles.length - 1;
             this.linkBridge(n-1, n, 16.67, null, null);
-        } else {
+        } 
+        else {
             //Cas d'un non-switch
             elt['name'] = name != null ? name: type + ' ' + (this.nextCircleId-1);
             elt['type'] = type;
@@ -309,6 +309,9 @@ export class CanvaComponent implements OnInit {
                 elt['station_type'] = station_type;
             this.circles.push(elt);
         }
+
+        this.update();      // On met a jour l'affichage
+        // il n'y avait pas cela originellement, mais apres mes changements j'en ai eu besoin, je ne sais pas pourqoi
     }
     
     //Renvoie un cercle selon l'id
@@ -364,6 +367,7 @@ export class CanvaComponent implements OnInit {
     
     //D�place un cercle selon un point de rep�re
     moveCircle(circle, centerX: number, centerY: number, shift: number, max: number) {
+
 		const angle = this.angle(circle.x, circle.y, centerX, centerY);
 		const norm = this.distance(circle.x, circle.y, centerX, centerY);
         
@@ -374,7 +378,8 @@ export class CanvaComponent implements OnInit {
             coef *= this.zoomPower * this.circles.length;
         
 		circle.x += Math.cos(angle) * coef;
-		circle.y += Math.sin(angle) * coef;
+        circle.y += Math.sin(angle) * coef;
+        
 		return circle;
 	}
     
@@ -407,7 +412,7 @@ export class CanvaComponent implements OnInit {
 				if (this.removing)
 					this.networkService.toggleRemove();
 				return;
-			}
+            }
 	}
     
     //G�re le click sur un cercle
@@ -422,9 +427,21 @@ export class CanvaComponent implements OnInit {
 					if (this.linkingFrom == -1)
                         //Si on a cliqu� sur le cercle source
 						this.linkingFrom = circle.id;
-					else 
+                    else 
+                    {
                         //Si on a cliqu� sur le cercle cible
-						this.createLink(this.linkingFrom, circle.id, 16.67, false, null, null, false);
+                        const circle1 = this.getCircle(this.linkingFrom);
+                        const circle2 = this.getCircle(circle.id);
+
+                        if (circle1.type == 'station' || circle1.type == 'shed' || circle2.type == 'station' || circle2.type == 'shed')
+                        {
+                            this.createLink(this.linkingFrom, circle.id, 16.67, false, null, null, true);
+                        }
+                        else
+                        {
+                            this.createLink(this.linkingFrom, circle.id, 16.67, false, null, null, false);
+                        }
+                    }
 				} else if (this.editing) {
                     //Cas o� on veut �diter un cercle
 					const links = this.convertLinks(circle.id);
@@ -478,6 +495,7 @@ export class CanvaComponent implements OnInit {
     
     //Centre le centre de gravit� des cercles
     centerCircles() {
+
         let centerX = 0;
         let centerY = 0;
         this.circles.forEach((circle) => {
@@ -486,10 +504,15 @@ export class CanvaComponent implements OnInit {
         });
         centerX = centerX / this.circles.length - this.canvaWidth / 2;
         centerY = centerY / this.circles.length - this.canvaHeight / 2;
-        for (let circle of this.circles) {
+
+        /*
+        J'ai commente ceci car ca changeait la place des stations/sheds avec le systeme de bridge-deviation
+        for (let circle of this.circles) 
+        {
             circle.x -= centerX;
             circle.y -= centerY;
         }
+        */
     }
     
     getCircleIndex(id: number) {
@@ -510,7 +533,7 @@ export class CanvaComponent implements OnInit {
         return null;
     }
 
-    // La version adaptee au changement sur les mini-boucle, avec les bridges pour chaque station
+    // La version adaptee au changement sur les mini-boucle, avec les bridge-deviations pour chaque station
     // Renvoie le lien qui est un bridge s'il y en a
     goingFromConsideringBridgesForCircle(id: number)
     {
@@ -524,7 +547,7 @@ export class CanvaComponent implements OnInit {
             {
                 linkFound = link;
             }
-            else if (link.bridge && link.from == id)
+            else if (link.special && link.bridge && link.from == id)
             {
                 bridgeLinkFound = link;
                 hasFoundBridgeLink = true;
@@ -540,21 +563,45 @@ export class CanvaComponent implements OnInit {
             return linkFound;
         }
     }
-    
-//FONCTIONS GERANT LES LIENS
+
+    //FONCTIONS GERANT LES LIENS
 
     //Cr�e un nouveau lien
     // TODO : ne pas pouvoir linker des switch de boucles diff�rentes
     createLink(id1: number, id2: number, speed: number, bridge: boolean, bridgeName: string, loopName: string, isSpecial: boolean) {
         const b = !bridge && this.isSwitch(id1) && this.isSwitch(id2) && this.getCircle(id1).linked == id2;
         const name = bridgeName != null ? bridgeName: 'bridge ' + this.nextBridgeId;
-        
-        if (!b && id1 != id2 && (bridge || !this.alreadyLinked(id1, id2))) {
+        let created = false;
+        let inLoop = false;
+        let authorizedIfSpecialLink = true;
+
+        if (isSpecial)     
+        {
+            const circle1 = this.getCircle(id1);    // Le depart
+            const circle2 = this.getCircle(id2);    // L'arrivee
+    
+            if ( (circle1.type == 'station' || circle1.type == 'shed') && circle2.type != 'switch_in')
+            {
+                authorizedIfSpecialLink = false;
+            }
+            if ( (circle2.type == 'station' || circle2.type == 'shed') && circle1.type != 'switch_out')
+            {
+                authorizedIfSpecialLink = false;
+            }
+
+            //console.log("Pas sur de cela le 'inLoop = true', peut causer des soucis je pense");
+            inLoop = true;
+            this.makeBridgeOfLinkSpecial(id1, id2);
+        }
+
+        if (!b && id1 != id2 && (bridge || !this.alreadyLinked(id1, id2)) && authorizedIfSpecialLink) 
+        {            
 			this.links.push({
 				id: this.nextLinkId++,
 				from: id1,
 				to: id2,
-				inLoop: false,
+                inLoop: inLoop,
+                special: isSpecial,
 				speed: speed,
 				length: this.distanceCircles(id1, id2),
                 angle: this.angleCircles(id1, id2),
@@ -562,15 +609,20 @@ export class CanvaComponent implements OnInit {
                 name: bridge ? name: null,
                 source: 'middle'
             });
-		}
+            created = true;
+        }
         if (this.linking)
         {
             this.networkService.unlink();
         }
 
-        // Si on est pas dans un cas de section sur un bridge vers une station (nouveau format de bridge)
-        if (!isSpecial)
+        // Si on est pas dans un cas de section sur un bridge vers une station (nouveau format de bridge), et si on a bien cree un lien
+        if (!isSpecial && created)
+        {
 		    this.checkForLoops(loopName);
+        }
+
+        //console.log("\nCreated link " + id1 + "-" + id2 + "    special = " + isSpecial + "\n\n");
     }
     
     /*
@@ -585,10 +637,48 @@ export class CanvaComponent implements OnInit {
             if ((link.to == id1 && link.from == id2) || (link.to == id2 && link.from == id1))
             {
                 link.bridge = true;
+                link.special = true;
                 link.name = bridgeName;
             }
         }
-	}
+    }
+    
+    // Va rendre le bridge reliant un des deux points special (rappel, special -> bridge-derivation)
+    makeBridgeOfLinkSpecial(id1: number, id2: number)
+    {
+        const circle1 = this.getCircle(id1);
+        const circle2 = this.getCircle(id2);
+
+        if (circle1.type == 'station' || circle1.type == 'shed')
+        {
+            for (const link of this.links)
+            {
+                // On le fait alors sur circle 2 qui doit etre un switch, sinon bad argument id1, id2
+                if (link.bridge && (link.to == id2) || (link.from == id2))
+                {
+                    link.special = true;
+                    return;
+                }
+            }
+        }
+        else if (circle2.type == 'station' || circle2.type == 'shed')
+        {
+            for (const link of this.links)
+            {
+                // On le fait alors sur circle 1 qui doit etre un switch, sinon bad argument id1, id2
+                if (link.bridge && (link.to == id1) || (link.from == id1))
+                {
+                    link.special = true;
+                    return;
+                }
+            }
+        }
+        else
+        {
+            console.log("%cError", "color: red");
+        }
+    }
+    
     
     //Renvoie un lien selon l'id
     getLink(id: number) {
@@ -617,10 +707,20 @@ export class CanvaComponent implements OnInit {
     }
     
     //Renvoie l'indice d'un lien selon l'id
-    findLink(id: number) {
-		for (let i = 0; i < this.links.length; i++)
-			if (this.links[i].from == id && !this.links[i].bridge)
-				return i;
+    findLink(id: number) 
+    {
+        for (let i = 0; i < this.links.length; i++)
+        {
+            const link = this.links[i];
+            if (link.from == id && !link.bridge)
+            {
+                return i;
+            }
+            else if (link.from == id && link.special)    // Il faut pouvoir emprunter un bridge s'il est un bridge-derivation, dans la fonction checkForLoops
+            {
+                return i;
+            }
+        }
 		return -1;
 	}
     
@@ -722,10 +822,15 @@ export class CanvaComponent implements OnInit {
 //FONCTIONS GERANT LES BOUCLES
 
     //V�rifie s'il faut cr�er une boucle
-    checkForLoops(name: string) {
-		for (let i = 0; i < this.links.length; i++) {
-			const link = this.links[i];
-			if (!link.inLoop && !link.bridge) {
+    checkForLoops(name: string) 
+    {
+        for (let i = 0; i < this.links.length; i++) 
+        {
+            const link = this.links[i];
+
+            // pas inLoop, pas pont non special, pas lien special
+            if (!link.inLoop && !(link.bridge && !link.special) && !(!link.bridge && link.special)) 
+            {
 				let stop = false; //Vaut vrai quand le parcours est termin�
 				let isLoop = false; //Vaut vrai si une boucle doit �tre cr��e
 				let links = Object.assign([], this.links); //Liste des liens � parcourir
@@ -736,11 +841,13 @@ export class CanvaComponent implements OnInit {
                 //On d�vient tous les liens comme non marqu�s
 				for (let link of links)
 					link.checked = false;
-				links[i].checked = true;
-				
-				while (!stop && !isLoop) {
-					//On cherche le prochain lien
-					const nextLink = this.findLink(next);
+                links[i].checked = true;
+
+                while (!stop && !isLoop) 
+                {
+                    //On cherche le prochain lien
+                    const nextLink = this.findLink(next);
+
 					if (nextLink == -1)
 						//S'il n'existe pas la boucle n'est pas ferm�e
 						stop = true;
@@ -748,21 +855,33 @@ export class CanvaComponent implements OnInit {
 						//Si le lien est d�j� marqu�, on est revenu au point de d�part
 						isLoop = true;
 					else {
-						//Sinon, on ajoute le lien au chemin et on passe au suivant
-						way.push(nextLink);
-						next = links[nextLink].to;
+                        //Sinon, on ajoute le lien au chemin et on passe au suivant
+                        const nextLinkObject = this.getLink(nextLink);
+
+                        way.push(nextLink);
+                        next = links[nextLink].to;
 					}
-				}
-				if (isLoop) {
+                }
+
+                if (isLoop) 
+                {
 					let loop = []
-					for (const j of way) {
+                    for (const j of way) 
+                    {
                         const circleId = this.links[j].from;
+
                         for (let circle of this.circles)
-                            if (circle.id == circleId)
+                        {
+                            // On n'ajoute pas les stations et sheds aux loops maintenant (avec les bridge-deviation)
+                            if (circle.id == circleId && circle.type != 'station' && circle.type != 'shed')
+                            {
                                 circle.loopId = this.nextLoopId;
+                            }
+                        }
 						this.links[j].inLoop = true;
 						loop.push(circleId);
-					}
+                    }
+
 					this.loops.push({
 						id: this.nextLoopId++,
 						name: name != null ? name: 'untitled loop ' + this.nextLoopId,
@@ -770,7 +889,7 @@ export class CanvaComponent implements OnInit {
 					});
 				}
 			}
-		}
+        }
 	}
     
     getLoop(id: number) {
@@ -815,10 +934,11 @@ export class CanvaComponent implements OnInit {
 //FONCTIONS RELATIVES � L'AFFICHAGE    
     
     //Mets � jour l'affichage
-    update() {
+    update() 
+    {
 		this.ctx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 		
-		//Affichage des cerlces
+		//Affichage des cercles
 		this.circles.forEach((circle) => {
 			//Couleur
 			if (circle.id == this.linkingFrom)
@@ -1110,7 +1230,9 @@ export class CanvaComponent implements OnInit {
     //Renvoie vrai si la boucle contient un switch dont l'autre switch n'est pas dans une boucle
     containsSwitchLinkedWithAloneSwitch(loop) {
         for (const circleId of loop.loop) {
-            const circle = this.circles[circleId];
+            // Il y avait ca mais je trouve cela completement faux
+            //const circle = this.circles[circleId];
+            const circle = this.getCircle(circleId);
             const other = this.getCircle(circle.linked);
             if (this.isSwitch(circle.id) && other.loopId == -1)
                 return true;
@@ -1138,6 +1260,8 @@ export class CanvaComponent implements OnInit {
         let numberStationsWronglyPlaced = 0;
         let numberShedsWronglyPlaced = 0;
         
+        console.log("\n\nCONVERT NETWORK\n\n");
+
         //On parcourt les boucles
 		for (let i = 0; i < this.loops.length; i++) {
 			const loop = this.loops[i];
@@ -1185,7 +1309,9 @@ export class CanvaComponent implements OnInit {
                     }
                     this.network.loops[i].elements.push(elt);
                     //On ajoute ensuite une section
+
                     const link = this.goingFromConsideringBridgesForCircle(circleId);
+
                     this.network.loops[i].sections.push(
                     {
                         speed: link.speed,
@@ -1197,12 +1323,16 @@ export class CanvaComponent implements OnInit {
             }
         }
 
+        // L'ordre est important ! On va d'abord stocker les bridges classiques puis les speciaux
+        let classicalBridges = [];
+        let specialBridges = [];
+
         //On parcourt tous les liens qui sont des bridge
         this.links.forEach((link) => 
         {
             const goingFromFrom = this.goingFrom(link.from);
             const goingFromTo = this.goingFrom(link.to);
-            
+
             // Si le lien est un pont (sinon on l'a deja traite dans loops normalement)
             if (link.bridge && goingFromFrom != null && goingFromTo != null)
             {
@@ -1221,8 +1351,7 @@ export class CanvaComponent implements OnInit {
                         speed: linkFromCircle1.speed,
                         path: {
                             type: 'line'
-                        },
-                        pods: []
+                        }
                     })
 
                     const linkToCircle1 = this.getLinkToCircleOfId(circle1.id);
@@ -1231,8 +1360,7 @@ export class CanvaComponent implements OnInit {
                         speed: linkToCircle1.speed,
                         path: {
                             type: 'line'
-                        },
-                        pods: []
+                        }
                     })
 
 
@@ -1266,15 +1394,49 @@ export class CanvaComponent implements OnInit {
 
 
                     // On push le tout
-                    this.network.bridges.push(
+                    specialBridges.push(
                     {
                         name: link.name,
+                        sections: sectionsFound,
                         elements: elements,
-                        sections: sectionsFound
+                        pods: []
+                    });
+                }
+                else    //Points classiques (ne reliant pas station/shed)
+                {
+                    let sectionsFound = [];
+
+                    // Qu'une seule section dans ce cas-la
+                    sectionsFound.push(
+                    {
+                        speed: link.speed,
+                        path: {
+                            type: 'line'
+                        }
+                    })
+
+                    classicalBridges.push(
+                    {
+                        name: link.name,
+                        pods: [],
+                        sections: sectionsFound,
+                        elements: []
                     });
                 }
             }
         });
+
+        // On rassemble les bridges classique et les speciaux 
+        classicalBridges.forEach((classicalBridge) =>
+        {
+            this.network.bridges.push(classicalBridge);
+        });
+        specialBridges.forEach((specialBridge) =>
+        {
+            this.network.bridges.push(specialBridge);
+        });
+        ///////
+        
         this.networkService.updateNetwork(this.network);
 
         if (numberStationsWronglyPlaced > 0 || numberShedsWronglyPlaced > 0)
@@ -1300,7 +1462,6 @@ export class CanvaComponent implements OnInit {
         let bridges = [];
         for (const bridge of network.bridges)
             bridges.push([]);
-
 
         network.loops.forEach((loop) => {        
             const firstId = this.nextCircleId;
@@ -1335,11 +1496,15 @@ export class CanvaComponent implements OnInit {
             const j = bridges[k][1];
             const bridge = network.bridges[k];
 
-            if (bridge.section != null)
+            if (bridge.section != null)             // sur un bridge classique avec format section
             {
                 this.linkBridge(i, j, bridge.section.speed, bridge.name, null);
             }
-            else        // Sur un bridge de station
+            else if (bridge.sections.length == 1)   // sur un bridge classique avec format sections
+            {
+                this.linkBridge(i, j, bridge.sections[0].speed, bridge.name, null);
+            }
+            else        // Sur un bridge de station/shed
             {
                 this.linkBridgeWhenAlreadyLinked(i, j, bridge.sections[0].speed, bridge.name, null);
 
@@ -1362,6 +1527,19 @@ export class CanvaComponent implements OnInit {
                 this.createLink(lastId, j, bridge.sections[0].speed, false, bridge.name + "_from_station", null, true);
                 this.createLink(i, lastId, bridge.sections[1].speed, false, bridge.name + "_to_station", null, true);
             }
+        }
+
+    }
+
+    printLinks()        // pour debugger plus facilement, pas utile actuellement
+    {
+        for (const link of this.links)
+        {
+            console.log("Link " + link.id);
+            console.log("link.from : " + link.from);
+            console.log("link.to : " + link.to);
+            console.log("link.bridge : " + link.bridge);
+            console.log("link.special : " + link.special);
         }
     }
 

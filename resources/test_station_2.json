@@ -1,10 +1,10 @@
 {
-  "name": "Network to test Stations",
+  "name": "Test Stations 2",
   "time": 28800,
+  "jerky": true,
   "state": 56565,
   "running": false,
   "margin_min": 2,
-  "jerky": true,
   "max_speed": 30,
   "pod_size": 2,
   "places_number": 5,

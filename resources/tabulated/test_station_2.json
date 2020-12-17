@@ -1,0 +1,166 @@
+{
+  "name": "Test Stations 2",
+  "time": 28800,
+  "jerky": true,
+  "state": 56565,
+  "running": false,
+  "margin_min": 2,
+  "max_speed": 30,
+  "pod_size": 2,
+  "places_number": 5,
+  "dynamic_routing": false,
+  "view_box": {
+    "x": 0,
+    "y": 200,
+    "width": 600,
+    "height": 500
+  },
+  "loops": [
+    {
+      "name": "Loop A",
+      "elements": [
+        {
+          "type": "switch_out",
+          "x": 250,
+          "y": 250,
+          "id_bridge": 0,
+          "pods": []
+        },
+        {
+          "type": "switch_in",
+          "x": 250,
+          "y": 450,
+          "id_bridge": 0,
+          "pods": []
+        },
+        {
+          "type": "shed",
+          "name": "Shed0",
+          "x": 350,
+          "y": 450,
+          "pods": {
+            "max": 5,
+            "count": 3
+          }
+        },
+        {
+          "type": "switch_out",
+          "x": 450,
+          "y": 450,
+          "id_bridge": 1,
+          "pods": []
+        },
+        {
+          "type": "switch_in",
+          "x": 450,
+          "y": 250,
+          "id_bridge": 1,
+          "pods": []
+        }
+      ],
+      "sections": [
+        {
+          "speed": 16.67,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 16.67,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 16.67,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 16.67,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 16.67,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "pods": []
+    }
+  ],
+  "bridges": [
+    {
+      "name": "Bridge 0",
+      "elements": [
+        {
+          "type": "shed",
+          "name": "Shed1",
+          "x": 200,
+          "y": 350,
+          "pods": {
+            "max": 5,
+            "count": 0
+          }
+        }
+      ],
+      "sections": [
+        {
+          "speed": 19.44,
+          "path": {
+            "type": "line"
+          },
+          "pods": []
+        },
+        {
+          "speed": 19.44,
+          "path": {
+            "type": "line"
+          },
+          "pods": []
+        }
+      ]
+    },
+    {
+      "name": "Bridge 1",
+      "elements": [
+        {
+          "type": "station",
+          "name": "Station1",
+          "x": 500,
+          "y": 350,
+          "pods": {
+            "max": 5,
+            "count": 0
+          },
+          "station_type": 0,
+          "travelers": {
+            "count": 0,
+            "average_waiting_time": 0,
+            "all_time_count": 0
+          }
+        }
+      ],
+      "sections": [
+        {
+          "speed": 19.44,
+          "path": {
+            "type": "line"
+          },
+          "pods": []
+        },
+        {
+          "speed": 19.44,
+          "path": {
+            "type": "line"
+          },
+          "pods": []
+        }
+      ]
+    }
+  ]
+}

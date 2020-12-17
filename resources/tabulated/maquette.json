@@ -1,0 +1,240 @@
+{
+  "name": "Maquette",
+  "time": 28800,
+  "jerky": true,
+  "state": 42,
+  "running": false,
+  "margin_min": 1,
+  "max_speed": 10,
+  "pod_size": 1,
+  "places_number": 3,
+  "dynamic_routing": false,
+  "view_box": {
+    "x": 0,
+    "y": 0,
+    "width": 400,
+    "height": 600
+  },
+  "loops": [
+    {
+      "name": "Boucle 1",
+      "elements": [
+        {
+          "type": "switch_out",
+          "x": 250,
+          "y": 235,
+          "id_bridge": 0,
+          "pods": []
+        },
+        {
+          "type": "switch_out",
+          "x": 205.0,
+          "y": 150.0,
+          "id_bridge": 2,
+          "pods": []
+        },
+        {
+          "type": "switch_in",
+          "x": 195.0,
+          "y": 150.0,
+          "id_bridge": 2,
+          "pods": []
+        },
+        {
+          "type": "switch_in",
+          "x": 150,
+          "y": 235,
+          "id_bridge": 1,
+          "pods": []
+        }
+      ],
+      "sections": [
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "pods": []
+    },
+    {
+      "name": "Boucle 2",
+      "elements": [
+        {
+          "type": "switch_out",
+          "x": 150,
+          "y": 250,
+          "id_bridge": 1,
+          "pods": []
+        },
+        {
+          "type": "switch_in",
+          "x": 250,
+          "y": 250,
+          "id_bridge": 0,
+          "pods": []
+        },
+        {
+          "type": "switch_out",
+          "x": 205.0,
+          "y": 350.0,
+          "id_bridge": 3,
+          "pods": []
+        },
+        {
+          "type": "switch_in",
+          "x": 195.0,
+          "y": 350.0,
+          "id_bridge": 3,
+          "pods": []
+        }
+      ],
+      "sections": [
+        {
+          "speed": 5,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 5,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 5,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 5,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "pods": []
+    }
+  ],
+  "bridges": [
+    {
+      "name": "B1 - B2",
+      "pods": [],
+      "sections": [
+        {
+          "speed": 6,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "elements": []
+    },
+    {
+      "name": "B2 - B1",
+      "pods": [],
+      "sections": [
+        {
+          "speed": 6,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "elements": []
+    },
+    {
+      "name": "Deviation for Gare b1",
+      "sections": [
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 7,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "elements": [
+        {
+          "type": "station",
+          "name": "Gare b1",
+          "x": 200.0,
+          "y": 145.0,
+          "pods": {
+            "max": 2,
+            "count": 0
+          },
+          "station_type": 0,
+          "travelers": {
+            "count": 0,
+            "average_waiting_time": 0,
+            "all_time_count": 0
+          }
+        }
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Gare b2",
+      "sections": [
+        {
+          "speed": 5,
+          "path": {
+            "type": "line"
+          }
+        },
+        {
+          "speed": 5,
+          "path": {
+            "type": "line"
+          }
+        }
+      ],
+      "elements": [
+        {
+          "type": "station",
+          "name": "Gare b2",
+          "x": 200.0,
+          "y": 355.0,
+          "pods": {
+            "max": 2,
+            "count": 0
+          },
+          "station_type": 0,
+          "travelers": {
+            "count": 0,
+            "average_waiting_time": 0,
+            "all_time_count": 0
+          }
+        }
+      ],
+      "pods": []
+    }
+  ]
+}

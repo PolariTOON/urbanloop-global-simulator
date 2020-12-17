@@ -49,6 +49,7 @@ class Pod(Token):
         self._ready = ready or False
         self._traveled_distance = traveled_distance or 0
         self._traveled_distance_t = traveled_distance_t or 0
+        self._previous_station = None
 
     @property
     def position(self):
@@ -103,6 +104,10 @@ class Pod(Token):
     def track_or_switch(self, value):
         """piste (section ou étape) ou aiguillage où se trouve la capsule"""
         self._track_or_switch = value
+        previousStation = self.get_station_if_on_switch(self._track_or_switch.previous)
+        if (previousStation != None):
+            self._previous_station = previousStation
+                    
 
     @property
     def source(self):
@@ -272,7 +277,9 @@ class Pod(Token):
             if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ == "SwitchOut" and self._turn:
                 self.position -= self._track_or_switch.length
                 new_section = self._track_or_switch.beside.sections[0]
-                self._track_or_switch = new_section
+                self.track_or_switch = new_section
+                #self._track_or_switch = new_section
+
                 if self.position > new_section.length:
                     print("Warning: pod.py: a pod has travelled to much distance in a same tick while entering a bridge.")
                 self._track_or_switch.write({
@@ -290,7 +297,8 @@ class Pod(Token):
 
                 # si on quitte un switch
                 if type(self._track_or_switch).__name__ in ["SwitchOut", "SwitchIn"]:
-                    self._track_or_switch = self._track_or_switch.next.sections[0]
+                    self.track_or_switch = self._track_or_switch.next.sections[0]
+                    #self._track_or_switch = self._track_or_switch.next.sections[0]
 
                 # si on quitte une section
                 else:
@@ -304,7 +312,9 @@ class Pod(Token):
                     else:
                         # si on quitte une step (shed, station, sensor) : rien à faire
                         pass
-                    self._track_or_switch = self._track_or_switch.next
+                    self.track_or_switch = self._track_or_switch.next
+                    #self._track_or_switch = self._track_or_switch.next
+                    
 
                 self._position = t * self._track_or_switch.speed
                 if bridge_to_switch:
@@ -339,7 +349,9 @@ class Pod(Token):
                     # Ordre de changement de vitesse
                     self.speed = message["speed"]
                 elif "passing" == message["type"]:
-                    self._track_or_switch = self._track_or_switch.next
+                    self.track_or_switch = self._track_or_switch.next
+                    #self._track_or_switch = self._track_or_switch.next
+                    
                     self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
@@ -347,7 +359,9 @@ class Pod(Token):
                         "traveled_distance": self._traveled_distance
                     })
                 elif "passing_from_switch" == message["type"]:
-                    self._track_or_switch = self._track_or_switch.next.sections[0]
+                    self.track_or_switch = self._track_or_switch.next.sections[0]
+                    #self._track_or_switch = self._track_or_switch.next.sections[0]
+                    
                     self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
@@ -361,6 +375,7 @@ class Pod(Token):
                     
                     self._speed = 0
                     self._endSpeed = 0
+                    self._previous_station = None      # On reset la derniere station
                 elif "insert" == message["type"]:
                     # Ordre d'insertion, la capsule est autorisée à tourner
                     if self._track_or_switch.stat_or_shed:  # si c'est un dépot ou station
@@ -409,29 +424,13 @@ class Pod(Token):
     def get_previous_station(self):   # Pas de table de routage pr celui-ci
         """ Donne la prochaine station traversee par la capsule """ 
 
-        print("\nget_previous_station")
-
-        eltOfNetwork = self._track_or_switch
-
-        nbIter = 0              # Pour eviter une boucle infinie
-        previousStation = None
-
-        while (previousStation is None and nbIter < 200): 
-            while (type(eltOfNetwork).__name__ != "SwitchIn"):     # On cherche le SwitchIn le plus proche
-                eltOfNetwork = eltOfNetwork.previous
-            previousStation = self.get_station_on_bridge_derivation(eltOfNetwork) 
-
-            if (previousStation == None):               # On est sur un SwitchIn d'un bridge non derivation
-                eltOfNetwork = eltOfNetwork.previous    # On continue de regarder en arriere
-            
-        return previousStation
+        if (self._previous_station == None):
+            self._previous_station = self.source
+        return self._previous_station
 
 
     def get_next_station(self): 
         """ Donne la prochaine station traversee par la capsule """ 
-
-        print("\nget_next_station")
-
         eltOfNetwork = self._track_or_switch
 
         nbIter = 0              # Pour eviter une boucle infinie
@@ -442,7 +441,6 @@ class Pod(Token):
                 if ((type(eltOfNetwork).__name__ == "Road") and (len(eltOfNetwork.stations) > 0)):  # Route contenant la station
                     return self.get_stations_of_road(eltOfNetwork)
                 eltOfNetwork = eltOfNetwork.next
-
             nextStation = self.get_station_on_bridge_derivation(eltOfNetwork)
             if (nextStation is None): # On a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
                 if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
@@ -450,7 +448,6 @@ class Pod(Token):
                 else:                                   # sinon on regarde le trajet normal du switch
                     eltOfNetwork = eltOfNetwork.next
             nbIter += 1
-        
         return nextStation
 
 
@@ -540,18 +537,18 @@ class Pod(Token):
             return None
 
 
-    def get_station_on_bridge_derivation(self, eltOfNetwork):
-        """ Renvoie le nom de la station sur la bridge-derivation actuelle, en partant d'un Switch """
-        print("In get_station_on_bridge_derivation, on : " + eltOfNetwork.name)
-
-        steps = eltOfNetwork.beside.steps
-        print(len(steps))
-
-        if (len(steps) == 0):
+    def get_station_if_on_switch(self, eltOfNetwork):
+        if (type(eltOfNetwork).__name__ == "SwitchOut" or type(eltOfNetwork).__name__ == "SwitchIn"):
+            return self.get_station_on_bridge_derivation(eltOfNetwork)
+        else :
             return None
 
+    def get_station_on_bridge_derivation(self, eltOfNetwork):
+        """ Renvoie le nom de la station sur la bridge-derivation actuelle, en partant d'un Switch """
+        steps = eltOfNetwork.beside.steps
+        if (len(steps) == 0):
+            return None
         if (type(steps[0]).__name__ == "Station"):
-            print("shedOrStation = " + steps[0].name)
             return steps[0].name
         else :
             return None

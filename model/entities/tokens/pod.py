@@ -403,35 +403,47 @@ class Pod(Token):
             #print(self.id + "  4")
 
 
-    # Fonctions de calcul de prochaines/precedentes stations et temps
 
-    # A MODIF SI SUPPRESSION MINI BOUCLES
+
+
     def get_previous_station(self):   # Pas de table de routage pr celui-ci
         """ Donne la prochaine station traversee par la capsule """ 
+
+        print("\nget_previous_station")
+
         eltOfNetwork = self._track_or_switch
 
-        while (type(eltOfNetwork).__name__ != "SwitchIn"):     # On cherche le SwitchIn le plus proche
-            eltOfNetwork = eltOfNetwork.previous
+        nbIter = 0              # Pour eviter une boucle infinie
+        previousStation = None
 
-        previousStation = self.get_stations_on_mini_loop(eltOfNetwork)          # Peut etre null, pr eviter il faudrait utiliser un tableau des gares traversees
+        while (previousStation is None and nbIter < 200): 
+            while (type(eltOfNetwork).__name__ != "SwitchIn"):     # On cherche le SwitchIn le plus proche
+                eltOfNetwork = eltOfNetwork.previous
+            previousStation = self.get_station_on_bridge_derivation(eltOfNetwork) 
+
+            if (previousStation == None):               # On est sur un SwitchIn d'un bridge non derivation
+                eltOfNetwork = eltOfNetwork.previous    # On continue de regarder en arriere
             
         return previousStation
 
-    # A MODIF SI SUPPRESSION MINI BOUCLES
+
     def get_next_station(self): 
         """ Donne la prochaine station traversee par la capsule """ 
+
+        print("\nget_next_station")
+
         eltOfNetwork = self._track_or_switch
 
         nbIter = 0              # Pour eviter une boucle infinie
         nextStation = None
 
         while (nextStation is None and nbIter < 200):   
-            while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOn le plus proche
+            while (type(eltOfNetwork).__name__ != "SwitchOut"):     # On cherche le SwitchOut le plus proche
                 if ((type(eltOfNetwork).__name__ == "Road") and (len(eltOfNetwork.stations) > 0)):  # Route contenant la station
                     return self.get_stations_of_road(eltOfNetwork)
                 eltOfNetwork = eltOfNetwork.next
 
-            nextStation = self.get_stations_on_mini_loop(eltOfNetwork)
+            nextStation = self.get_station_on_bridge_derivation(eltOfNetwork)
             if (nextStation is None): # On a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
                 if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
                     eltOfNetwork = eltOfNetwork.beside
@@ -441,7 +453,7 @@ class Pod(Token):
         
         return nextStation
 
-    # A MODIF SI SUPPRESSION MINI BOUCLES
+
     def get_time_before_arrival(self):
         """Renvoie la duree avant arrivee a destination"""
 
@@ -473,7 +485,7 @@ class Pod(Token):
                 break        # On sort du while (break aurait eu le meme effet)
 
             # On cherche la station mtn qu'on est a un switchOut, ou le prochain switchOut
-            stationConsidered = self.get_stations_on_mini_loop(eltOfNetwork)
+            stationConsidered = self.get_station_on_bridge_derivation(eltOfNetwork)
             if (stationConsidered is None):  # On n'a pas reussi a trouver une mini boucle assez proche, on va devoir regarder les tables de routage du SwitchOut
                 if (eltOfNetwork._is_route(self)):      # On regarde le beside (cad qu'on prend le pont (les pointilles) au SwitchOn)
                     timeToDest += self.get_time_of_elt_of_network(eltOfNetwork.beside)
@@ -487,11 +499,13 @@ class Pod(Token):
                 
             nbIter += 1
 
-        # Actuellement, on ne considere pas le temps de parcours de la mini-boucle contenant la station destination")
-        # Faire que get_stations_on_mini_loop et get_stations_of_road renvoient en plus un temps pour faire cela
-        # Rectification : comme on compte supprimer les mini-boucles, ne pas le faire
 
-        return " Time = " + str(timeToDest) + " (ne considere pas les mini-boucles) (considere juste la vitesse de la section/switch ou la capsule se trouve, mais pas sa vitesse actuelle/vitesse future reelle en fction du traffic)(surement faux quand traffic)"
+        # A FAIRE POUR TRISTAN
+        # Actuellement, on ne considere pas le temps de parcours de u bridge-derivation contenant la station destination")
+        # Faire que get_station_on_bridge_derivation renvoient en plus un temps pour faire cela
+
+        # (considere juste la vitesse de la section/switch ou la capsule se trouve, mais pas sa vitesse actuelle/vitesse future reelle en fction du traffic)
+        return " Time = " + str(timeToDest) + " (surement faux quand traffic)"
 
 
     def get_time_of_elt_of_network(self, eltOfNetwork):
@@ -504,12 +518,12 @@ class Pod(Token):
                 timeOfElt += (section.length / section.speed)
         else:
             timeOfElt = eltOfNetwork.length / eltOfNetwork.speed
-        
         return timeOfElt
 
 
-    def get_stations_on_mini_loop(self, eltOfNetwork):
-        """ Renvoie le nom de la station sur la mini-boucle actuel, en partant d'un Switch """
+    # Deprecated
+    def get_station_on_mini_loop(self, eltOfNetwork):
+        """ Renvoie le nom de la station sur la mini-boucle actuelle, en partant d'un Switch """
         if (type(eltOfNetwork).__name__ == "SwitchOut"):
             return self.get_stations_of_road(eltOfNetwork.beside.next.next)
         elif (type(eltOfNetwork).__name__ == "SwitchIn"):
@@ -517,12 +531,29 @@ class Pod(Token):
         else :
             return None
 
-    def get_stations_of_road(self, aRoad):
+    def get_station_of_road(self, aRoad):
         """ Renvoie le nom de la station (qu'une seule normalement) sur la road """
         if (type(aRoad).__name__ == "Road"):
             if (len(aRoad.stations) > 0):      
                 for station in aRoad.stations:
                     return station.name      # On renvoie direct car on considere qu'il n'y a qu'une station au max par road (potentiellement a changer plus tard)
+            return None
+
+
+    def get_station_on_bridge_derivation(self, eltOfNetwork):
+        """ Renvoie le nom de la station sur la bridge-derivation actuelle, en partant d'un Switch """
+        print("In get_station_on_bridge_derivation, on : " + eltOfNetwork.name)
+
+        steps = eltOfNetwork.beside.steps
+        print(len(steps))
+
+        if (len(steps) == 0):
+            return None
+
+        if (type(steps[0]).__name__ == "Station"):
+            print("shedOrStation = " + steps[0].name)
+            return steps[0].name
+        else :
             return None
 
 

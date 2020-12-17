@@ -247,7 +247,6 @@ def get_user_position(user_id):
     if (pod_of_user == None):
         return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
     else :
-        #print(pod_of_user.getPreviousStation())
         return jsonify({ 'source': pod_of_user.source,
                          'next_station': pod_of_user.get_next_station(),
                          'previous_station': pod_of_user.get_previous_station(),

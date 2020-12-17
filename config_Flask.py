@@ -27,6 +27,7 @@ def _synchronize(key=None):
             exception = future.exception()
             if exception is not None:
                 result = None
+                print("Error with: " + key)
                 print("\u001b[31m", exception, "\u001b[0m")
             else:
                 result = future.result()

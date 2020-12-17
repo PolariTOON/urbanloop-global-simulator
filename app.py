@@ -64,12 +64,14 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
                 simulation.rate = _speed_default
             except Exception:
                 print_exc()
-    print(_speed_default)
     # main loop
     _loop = get_running_loop()
+    i=0
     while not _quit:
         if with_interface:
+            #print("sleep start")
             await sleep(0.04) # ralentit la simulation pour utiliser l'interface (0.04s -> 25 images par secondes)
+            #print("sleep end")
         else:
             pass # à tester (remplacer par await sleep(0.000001) ?)
         crashed_simulations = []
@@ -77,14 +79,16 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
             simulation = _simulations[key]
             try:
                 #print("__")
-                #print("now: %f" % float(simulation._env.now))
-                #print("now: %f" % float(simulation._env.time))
+                #print("update...")
                 simulation.update()
+                #print("updated" + str(i))
+                i+=1
             except Exception:
                 crashed_simulations.append(key)
                 print_exc()
         for key in crashed_simulations:
             del _simulations[key]
+    
     print("Terminated")
 
 

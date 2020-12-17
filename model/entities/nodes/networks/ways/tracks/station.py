@@ -219,7 +219,6 @@ class Station(Step):
                     self._boarding[i] += self.env.tick  # on incrémente le temps
                     if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                         self._boarding[i] = -1  # reset du timer
-                        print("Envoi")
                         self._pods_ready[i] = True   # on indique que le pod en position i est prêt à partir
                         self.send_pod(self._pods[i], self._pods[i].travelers[0].destination, True)  # on l'ajoute à la liste des pods au départ
 
@@ -325,7 +324,8 @@ class Station(Step):
                     if message["pod"] in self._pods:
                         index = self._pods.index(message["pod"])
                         self._pods[index] = None
-                        print("Info: pod index in station: %d" % index)
+                        # TODO : enlever le print ci-dessous
+                        #print("Info: pod index in station: %d" % index)
                 elif "empty" == message["type"]:
                     for i in range(len(self._pods) - 1, -1, -1):
                         if self._pods[i] is not None and self._boarding[i] == -1 and not self._pods_ready[i]:  # on libère un pod vide (pas None, n'a pas de passager et n'est pas prêt à partir

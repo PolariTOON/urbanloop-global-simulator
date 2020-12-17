@@ -76,6 +76,10 @@ class Switch(Way):
         """Route précédente de l'aiguillage (sur la même boucle)"""
         return self._previous
 
+    def is_destination(self):
+        """Renvoie True s'il s'agit d'un switch vers/depuis une station/shed"""
+        return len(self.beside.steps) >= 1
+
     def serialize(self):
         """Sérialise les information de l'aiguillage pour les envoyer à la vue"""
         dict = super().serialize()

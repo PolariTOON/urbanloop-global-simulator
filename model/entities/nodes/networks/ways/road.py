@@ -213,7 +213,7 @@ class Road(Way):
                         track = new_track.previous.sections[-1]
                     else:
                         track = new_track.previous
-                    yield from track.write({
+                    track.write({
                         "author": self,
                         "type": "pod_exit",
                         "pod": pod
@@ -221,7 +221,7 @@ class Road(Way):
                 elif "docked" == message["type"]:
                     # La route remonte l'information d'un stationnement au réseau
                     pod = message["pod"]
-                    yield from self._parent.write({
+                    self._parent.write({
                         "author": self,
                         "type": "docked",
                         "pod": pod,
@@ -229,20 +229,20 @@ class Road(Way):
                     })
                 elif "refill" == message["type"]:
                     station = message["station"]
-                    yield from self.parent.write({
+                    self.parent.write({
                         "author": self,
                         "type": "refill",
                         "station": station
                     })
                 elif "empty" == message["type"]:
                     station = message["station"]
-                    yield from self.parent.write({
+                    self.parent.write({
                         "author": self,
                         "type": "empty",
                         "station": station
                     })
                 elif "departure" == message["type"]:
-                    yield from self.parent.write({
+                    self.parent.write({
                         "author": self,
                         "pod": message["pod"],
                         "type": "departure",

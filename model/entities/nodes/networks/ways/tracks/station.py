@@ -193,7 +193,7 @@ class Station(Step):
             if send_one_time and self.empty_call():
                 send_one_time = False
                 # Vide la station de capsules
-                yield from self.parent.write({
+                self.parent.write({
                     "author": self,
                     "type": "empty",
                     "station": self
@@ -219,6 +219,7 @@ class Station(Step):
                     self._boarding[i] += self.env.tick  # on incrémente le temps
                     if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                         self._boarding[i] = -1  # reset du timer
+                        print("Envoi")
                         self._pods_ready[i] = True   # on indique que le pod en position i est prêt à partir
                         self.send_pod(self._pods[i], self._pods[i].travelers[0].destination, True)  # on l'ajoute à la liste des pods au départ
 
@@ -246,13 +247,13 @@ class Station(Step):
                     if pod.travelers:
                         traveler = pod.travelers[0]
                         waiting_time = traveler.waiting_time
-                    yield from pod.write({
+                    pod.write({
                         "author": self,
                         "type": "departure",
                         "destination": destination
                     })
                     # prévient le parent
-                    yield from self.parent.write({
+                    self.parent.write({
                         "author": self,
                         "pod": pod,
                         "type": "departure",
@@ -265,7 +266,7 @@ class Station(Step):
 
             if self.refill_call():
                 # Re-approvisionnement des capsules
-                yield from self.parent.write({
+                self.parent.write({
                     "author": self,
                     "type": "refill",
                     "station": self.name
@@ -279,7 +280,7 @@ class Station(Step):
                     break
                 elif "pod_entry" == message["type"]:
                     pod = message["pod"]
-                    yield from self.parent.write({
+                    self.parent.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": pod
@@ -302,18 +303,18 @@ class Station(Step):
                         else:
                             raise Exception("pod entry but full station l.277")  # le pod vérifie déjà s'il peut s'insérer "not self.pods[0]"
                         pod.travelers = []
-                        yield from pod.write({
+                        pod.write({
                             "author": self,
                             "type": "docked"
                         })
-                        yield from self.parent.write({
+                        self.parent.write({
                             "author": self,
                             "type": "docked",
                             "pod": pod,
                             "timestamp": self.env.time
                         })
                     else:
-                        yield from pod.write({
+                        pod.write({
                             "author": self,
                             "type": "passing"
                         })

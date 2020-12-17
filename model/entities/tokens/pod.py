@@ -275,7 +275,7 @@ class Pod(Token):
                 self._track_or_switch = new_section
                 if self.position > new_section.length:
                     print("Warning: pod.py: a pod has travelled to much distance in a same tick while entering a bridge.")
-                yield from self._track_or_switch.write({
+                self._track_or_switch.write({
                     "author": self,
                     "type": "pod_entry",
                     "pod": self
@@ -308,7 +308,7 @@ class Pod(Token):
 
                 self._position = t * self._track_or_switch.speed
                 if bridge_to_switch:
-                    yield from self._track_or_switch.write({
+                    self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry_from_bridge",
                         "pod": self
@@ -316,7 +316,7 @@ class Pod(Token):
                 else:
                     if type(self._track_or_switch).__name__ in ["Station", "Shed"]:
                         self._position = 0
-                    yield from self._track_or_switch.write({
+                    self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": self
@@ -340,7 +340,7 @@ class Pod(Token):
                     self.speed = message["speed"]
                 elif "passing" == message["type"]:
                     self._track_or_switch = self._track_or_switch.next
-                    yield from self._track_or_switch.write({
+                    self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": self,
@@ -348,7 +348,7 @@ class Pod(Token):
                     })
                 elif "passing_from_switch" == message["type"]:
                     self._track_or_switch = self._track_or_switch.next.sections[0]
-                    yield from self._track_or_switch.write({
+                    self._track_or_switch.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": self,

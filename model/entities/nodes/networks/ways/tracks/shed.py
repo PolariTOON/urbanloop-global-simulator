@@ -88,13 +88,13 @@ class Shed(Step):
                 self._wait = 0
                 pod = self._departure_pods.pop(0)
                 destination = pod.destination
-                yield from pod.write({
+                pod.write({
                     "author": self,
                     "type": "departure",
                     "destination": destination
                 })
                 # prévient le parent
-                yield from self.parent.write({
+                self.parent.write({
                     "author": self,
                     "pod": pod,
                     "type": "departure",
@@ -110,25 +110,25 @@ class Shed(Step):
                     break
                 elif "pod_entry" == message["type"]:
                     pod = message["pod"]
-                    yield from self._parent.write({
+                    self._parent.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": pod
                     })
                     if pod.destination == self.name:
                         self._pods.append(pod)
-                        yield from pod.write({
+                        pod.write({
                             "author": self,
                             "type": "docked"
                         })
-                        yield from self.parent.write({
+                        self.parent.write({
                             "author": self,
                             "type": "docked",
                             "pod": pod,
                             "timestamp": self.env.time
                         })
                     else:
-                        yield from pod.write({
+                        pod.write({
                             "author": self,
                             "type": "passing"
                         })

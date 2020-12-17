@@ -24,41 +24,38 @@ class Entity:
     def name(self):
         return self._name
 
-    def write2(self, message):
-        if message is None:
-            raise ValueError()
-        Process(self._env, self._pipe2(message))
-        return
-        yield
-
-    def _pipe2(self, message):
-        yield StorePut(self._store, message)
-
-    def read2(self):
-        (timeout, getter) = (Timeout(self._env, 1 - (self._env.now - floor(self._env.now))), StoreGet(self._store))
-        condition = yield timeout | getter
-        if getter not in condition:
-            getter.cancel()
-            return None
-        message = condition[getter]
-        return message
-
     def write(self, message):
         if message is None:
             raise ValueError()
-        Process(self._env, self._pipe(message))
+        StorePut(self._store, message)
         return
-        yield
-
-    def _pipe(self, message):
-        timeout = random() *  (1 - (self._env.now - floor(self._env.now)))
-        yield Timeout(self._env, timeout)
-        yield StorePut(self._store, message)
 
     def read(self):
         (timeout, getter) = (Timeout(self._env, 1 - (self._env.now - floor(self._env.now))), StoreGet(self._store))
         condition = yield timeout | getter
         if getter not in condition:
+            # Timeout -> envoi d'un update (= None)
+            getter.cancel()
+            return None
+        message = condition[getter]
+        return message
+
+    def write1(self, message):
+        if message is None:
+            raise ValueError()
+        Process(self._env, self._pipe(message))
+        return
+
+    def _pipe1(self, message):
+        timeout = random() *  (1 - (self._env.now - floor(self._env.now)))
+        yield Timeout(self._env, timeout) # Timeout pour simuler la durée d'envoi du message
+        yield StorePut(self._store, message)
+
+    def read1(self):
+        (timeout, getter) = (Timeout(self._env, 1 - (self._env.now - floor(self._env.now))), StoreGet(self._store))
+        condition = yield timeout | getter
+        if getter not in condition:
+            # Timeout -> envoi d'un update (= None)
             getter.cancel()
             return None
         message = condition[getter]

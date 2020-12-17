@@ -29,12 +29,12 @@ class Sensor(Step):
                     break
                 elif "pod_entry" == message["type"]:  # Un capsule ne s'arrête pas devant un capteur donc il passe directement l'info du passage à son suivant
                     pod = message["pod"]
-                    yield from self._parent.write({
+                    self._parent.write({
                         "author": self,
                         "type": "pod_entry",
                         "pod": pod
                     })
-                    yield from pod.write({
+                    pod.write({
                         "author": self,
                         "type": "passing"
                     })

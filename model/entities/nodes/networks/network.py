@@ -390,7 +390,7 @@ class Network(Node):
         self._update_routing(init=False)  # calcul des nouvelles tables
         for switch in self._switches:     # envoie des messages pour mettre à jour
             if isinstance(switch, SwitchOut):
-                yield from switch.write({
+                switch.write({
                     "author": self,
                     "type": "update_routing",
                     "table": self._routing_table[switch.name]
@@ -445,7 +445,7 @@ class Network(Node):
             if self._dynamic_routing and int(int(self.env.now) % (30 / self.env.tick)) == 0:  # TODO: utilise self.env.time plutôt que self.env.tick
                 # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
                 #print("Updated routing tables...")
-                yield from self.maj_routing_tables()
+                self.maj_routing_tables()
                 #print("Routing tables updated")
                 
             while True:
@@ -468,7 +468,7 @@ class Network(Node):
                     if sheds:
                         station = message["station"]
                         shed = choice(sheds)
-                        yield from shed.write({
+                        shed.write({
                             "author": self,
                             "type": "refill",
                             "station": station
@@ -480,7 +480,7 @@ class Network(Node):
                     if sheds:
                         station = message["station"]
                         shed = choice(sheds)
-                        yield from station.write({
+                        station.write({
                             "author": self,
                             "type": "empty",
                             "shed": shed

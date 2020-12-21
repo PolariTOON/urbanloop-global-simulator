@@ -203,7 +203,8 @@ class Station(Step):
             if len(self._travelers) > 0 and self._pods_size > 0:
                 for i in range(self._capacity - 1, -1, -1):  # on commence par les premières capsules à partir
                     pod = self._pods[i]
-                    if len(self._travelers) > 0 and pod and pod.isEmpty() and pod not in self._departure_pods:  # s'il y a un traveler en attente, un pod avec de la place  # todo autoriser un passager à utiliser une capsule vide qui allait partir
+                    if len(self._travelers) > 0 and pod and pod.isEmpty() and pod not in self._departure_pods:  # s'il y a un traveler en attente, un pod avec de la place
+                        # TODO :  autoriser un passager à utiliser une capsule vide qui allait partir
                         going_traveler = self._travelers.pop(0)  # on enlève le traveler de ceux qui attendent
                         going_traveler.departure(self.env.time)  # heure de départ
                         pod.travelers = [going_traveler]         # le traveler est associé au pod
@@ -217,6 +218,11 @@ class Station(Step):
             for i in range(len(self._boarding)):  # pour chaque capsule
                 if self._boarding[i] != -1:       # si un voyageur embarque
                     self._boarding[i] += self.env.tick  # on incrémente le temps
+                    #
+                    # TODO : corriger bug :
+                    #        des fois, "self._pods[i]" est None ici (ça ne devrait pas être le cas)
+                    #        peut-être que ça arrive lorsqu'un pod arrive dans une station déjà pleine
+                    #
                     if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                         self._boarding[i] = -1  # reset du timer
                         self._pods_ready[i] = True   # on indique que le pod en position i est prêt à partir

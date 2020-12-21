@@ -479,7 +479,9 @@ class Network(Node):
                         })
                 elif "empty" == message["type"]:
                     # On demande à une station d'envoyer une capsule à un dépôt pour faire de la place
-                    # TODO:  ne pas choisir aléatoirement (vérifier que le shed a bien une place libre)
+                    #
+                    # TODO: ne pas choisir aléatoirement (vérifier que le shed a bien une place libre)
+                    #
                     sheds = self.sheds
                     if sheds:
                         station = message["station"]

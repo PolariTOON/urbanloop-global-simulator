@@ -6,7 +6,11 @@
 
 * Stages de deuxième année à *Telecom Nancy* effectués par M. Tristan LE GODAIS et M. Malo MONGARD encadrés par M. Thibault CHOLEZ dont les objectifs principaux sont l'amélioration du simulateur avec notamment l'ajout de l'algorithme d'aiguillage réalisé lors d'un autre Projet Industriel. Ces stages ont amené une refonte complète du simulateur.
 
-* Projet Industriel 2019-2020 de M. GAU M. OLIVIER et M. ALIBAY encadré par M. Thibault CHOLEZ dont l'objectif est de continuer le développement de la refonte du simulateur effectuée lors des précédents stages.
+* Projet Industriel 2019-2020 de M. GAU, M. OLIVIER et M. ALIBAY encadré par M. Thibault CHOLEZ dont l'objectif est de continuer le développement de la refonte du simulateur effectuée lors des précédents stages.
+
+* Stage de deuxième année à *Telecom Nancy* effectué par M. Pierre-Antoine GROSSELIN encadré par M. Thibault CHOLEZ.
+
+* Projet Industriel 2020-2021 de M. Clément CROUZET, M. Tristan DENIAU et M. Arthur SAOUT encadré par M. Thibault CHOLEZ dont l'objectif est de relier le simulateur avec les applications mobiles et des bornes de stations, ainsi que d'exploiter le simulateur pour obtenir des préconisations pour un réseau *UrbanLoop* à l'échelle du *Grand Nancy*.
 
 ## Contexte
 
@@ -26,7 +30,11 @@ Le sous-projet présent est :
 	* Malo MONGARD ;
 	* Valentin GAU ;
 	* Antoine OLIVIER ;
-	* Dylan ALIBAY.
+	* Dylan ALIBAY ;
+	* Pierre-Antoine GROSSELIN ;
+	* Clément CROUZET ;
+	* Tristan DENIAU ;
+	* Arthur SAOUT.
 
 Le projet de ce dépôt s'inscrit dans le cadre scolaire d'un Projet Industriel de 3ème année à *TELECOM Nancy*. Le sujet est *Simulation du réseau de transport urbain par capsules UrbanLoop*.
 
@@ -155,6 +163,27 @@ Vous pouvez visualiser ce qu'il se passe à un aiguillage lorsqu'il est sélecti
 Avec le bouton ![](pictures/poubelle.png) vous pouvez supprimer le réseau choisi, pour ensuite en choisir un différent.
 
 Pour se connecter à l'interface web depuis une autre machine du réseau local, il suffit d'accéder à \[IP hôte\]:\[port\] (\[IP hôte\] peut être obtenu avec `ipconfig` sur Windows et `ifconfig` sur Linux et Mac).
+
+### API REST
+
+Lorsque le programme est lancé avec l'interface web, le serveur Flask fournit également une API REST.
+
+Cette API permet aux applications mobiles et des bornes de station d'intéragir avec le simulateur (par exemple pour qu'une demande de trajet sur les applications déclenche l'envoi d'une capsule dans le simulateur, et pour permettre à l'appli mobile de suivre la progression du trajet).
+
+Pour utiliser l'API manuellement, vous pouvez par exemple utiliser `curl` (ici on prend l'exemple des stations de `resources/mini_network.json`) :
+
+- création d'un voyageur :
+	`curl -X POST -H "Content-Type:application/json" localhost:8090/new_trip -d "{ \"user_id\": \"123\", \"departure\": \"Stanislas\", \"arrival\": \"Telecom Nancy\", \"typeCapsule\" : \"solo\" }"`
+
+- récupération des informations pour le suivi du trajet d'un voyageur d'id "123" :
+	`curl localhost:8090/capsule/123`
+
+- demande de changement de destination pour un voyageur d'id "123" :
+	`curl -X POST -H "Content-Type:application/json" localhost:8090/change_dest -d "{ \"user_id\": \"123\", \"new_arrival\": \"Velodrome\" }"`
+
+- demande de sortie d'urgence pour un voyageur d'id "123" :
+	`curl localhost:8090/emergency_exit/123`
+
 
 ### Utilisation de *Docker*
 

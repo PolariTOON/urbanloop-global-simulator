@@ -76,86 +76,83 @@ class Shed(Step):
 
     def update(self):
         """Fonction gérant le processus dépôt"""
-        while True:
-            # Attente pour le prochain départ
-            if self._wait != -1:
-                self._wait += self.env.tick
-                if self._wait > self.next.margin / self.next.speed:
-                    self._wait = -1
+        
+        # Attente pour le prochain départ
+        if self._wait != -1:
+            self._wait += self.env.tick
+            if self._wait > self.next.margin / self.next.speed:
+                self._wait = -1
 
-            # Départ d'une capsule
-            if self._departure_pods and self._wait == -1:
-                self._wait = 0
-                pod = self._departure_pods.pop(0)
-                destination = pod.destination
+        # Départ d'une capsule
+        if self._departure_pods and self._wait == -1:
+            self._wait = 0
+            pod = self._departure_pods.pop(0)
+            destination = pod.destination
+            pod.write({
+                "author": self,
+                "type": "departure",
+                "destination": destination
+            })
+            # prévient le parent
+            self.parent.write({
+                "author": self,
+                "pod": pod,
+                "type": "departure",
+                "destination": destination,
+                "timestamp": self.env.time,
+                "waiting_time": 0,
+                "traveler": False
+            })
+
+    def handle_message(self, message):
+        if "pod_entry" == message["type"]:
+            pod = message["pod"]
+            self._parent.write({
+                "author": self,
+                "type": "pod_entry",
+                "pod": pod
+            })
+            if pod.destination == self.name:
+                self._pods.append(pod)
                 pod.write({
                     "author": self,
-                    "type": "departure",
-                    "destination": destination
+                    "type": "docked"
                 })
-                # prévient le parent
                 self.parent.write({
                     "author": self,
+                    "type": "docked",
                     "pod": pod,
-                    "type": "departure",
-                    "destination": destination,
-                    "timestamp": self.env.time,
-                    "waiting_time": 0,
-                    "traveler": False
+                    "timestamp": self.env.time
                 })
-
-            while True:
-                message = yield from self.read()
-                if message is None:
-                    break
-                elif "pod_entry" == message["type"]:
-                    pod = message["pod"]
-                    self._parent.write({
-                        "author": self,
-                        "type": "pod_entry",
-                        "pod": pod
-                    })
-                    if pod.destination == self.name:
-                        self._pods.append(pod)
-                        pod.write({
-                            "author": self,
-                            "type": "docked"
-                        })
-                        self.parent.write({
-                            "author": self,
-                            "type": "docked",
-                            "pod": pod,
-                            "timestamp": self.env.time
-                        })
-                    else:
-                        pod.write({
-                            "author": self,
-                            "type": "passing"
-                        })
-                elif "pod_exit" == message["type"]:
-                    pod = message["pod"]
-                    if pod in self._pods:
-                        self._pods.remove(pod)
-                    else:
-                        # dans ce cas, le pod n'était pas docked dans le shed,
-                        # et on accepte qu'il passe à travers.
-                        pass
-                elif "refill" == message["type"]:
-                    station = message["station"]
-                    if len(self._pods) > 0 and len(self.pods) > len(self._departure_pods):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
-                        i = 0
-                        while i < len(self._pods) - 1 and self._pods[i] in self._departure_pods:
-                            i += 1
-                        pod = self._pods[i]
-                        pod.destination = station
-                        self._departure_pods.append(pod)
-                    else:
-                        # print("\u001B[31m", self.name, "envoie de pod impossible, shed vide", len(self._pods), "\u001B[0m", "(shed l.141)\n")
-                        #
-                        # TODO : corriger ça ??!! (il faut juste décrémenter incoming_pods pour UNE station)
-                        #
-                        for station0 in self.parent.parent.stations:
-                            if station0.name == station:
-                                station0._incoming_pods -= 1
-                else:
-                    raise ValueError("Invalid message")
+            else:
+                pod.write({
+                    "author": self,
+                    "type": "passing"
+                })
+        elif "pod_exit" == message["type"]:
+            pod = message["pod"]
+            if pod in self._pods:
+                self._pods.remove(pod)
+            else:
+                # dans ce cas, le pod n'était pas docked dans le shed,
+                # et on accepte qu'il passe à travers.
+                pass
+        elif "refill" == message["type"]:
+            station = message["station"]
+            if len(self._pods) > 0 and len(self.pods) > len(self._departure_pods):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
+                i = 0
+                while i < len(self._pods) - 1 and self._pods[i] in self._departure_pods:
+                    i += 1
+                pod = self._pods[i]
+                pod.destination = station
+                self._departure_pods.append(pod)
+            else:
+                # print("\u001B[31m", self.name, "envoie de pod impossible, shed vide", len(self._pods), "\u001B[0m", "(shed l.141)\n")
+                #
+                # TODO : corriger ça ??!! (il faut juste décrémenter incoming_pods pour UNE station)
+                #
+                for station0 in self.parent.parent.stations:
+                    if station0.name == station:
+                        station0._incoming_pods -= 1
+        else:
+            raise ValueError("Invalid message")

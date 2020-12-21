@@ -204,224 +204,206 @@ class Pod(Token):
         return self._track_or_switch.closest(self)
 
     def update(self):
-        """
-        Fonction qui gère le processus "pod", à chaque tour d'événement simpy les actions sont exécutées
-        :return: void
-        """
-        while True:
 
-            #print(self.id + "  1")
+        # OPTIMISATION : ne regarder que lors de l'embarquement !
+        #################
+        has_real_traveler = False
+        has_traveler_who_changed_dest = False
+        has_traveler_who_called_emergency_exit = False
+        for traveler in self._travelers:     # On regarde si un de nos passagers a ete genere avec un ticket
+            if (traveler.real_user):
+                has_real_traveler = True        
+            if (traveler.changed_dest):
+                has_traveler_who_changed_dest = True        
+            if (traveler.called_emergency_exit):
+                has_traveler_who_called_emergency_exit = True         
+        self._contain_real_user = has_real_traveler   
+        self._changed_destination = has_traveler_who_changed_dest   
+        self._emergency_exit = has_traveler_who_called_emergency_exit   
+        #################
 
-            # OPTIMISATION : ne regarder que lors de l'embarquement !
-            #################
-            has_real_traveler = False
-            has_traveler_who_changed_dest = False
-            has_traveler_who_called_emergency_exit = False
-            for traveler in self._travelers:     # On regarde si un de nos passagers a ete genere avec un ticket
-                if (traveler.real_user):
-                    has_real_traveler = True        
-                if (traveler.changed_dest):
-                    has_traveler_who_changed_dest = True        
-                if (traveler.called_emergency_exit):
-                    has_traveler_who_called_emergency_exit = True         
-            self._contain_real_user = has_real_traveler   
-            self._changed_destination = has_traveler_who_changed_dest   
-            self._emergency_exit = has_traveler_who_called_emergency_exit   
-            #################
+        # Gestion du décalage et de la discrétisation : on reprend la vitesse moyenne après avoir parcouru la bonne distance
+        if self._length_before_restore is not None:
+            if self._length_before_restore > 0:
+                self._length_before_restore -= self._speed * self.env.tick
+            else:
+                self._length_before_restore = None
+                if self._speed_restore is not None:
+                    self.speed = self._speed_restore
+                    self._speed_restore = None
 
-            # Gestion du décalage et de la discrétisation : on reprend la vitesse moyenne après avoir parcouru la bonne distance
-            if self._length_before_restore is not None:
-                if self._length_before_restore > 0:
-                    self._length_before_restore -= self._speed * self.env.tick
-                else:
-                    self._length_before_restore = None
-                    if self._speed_restore is not None:
-                        self.speed = self._speed_restore
-                        self._speed_restore = None
-
-            # La capsule accélère ou freine
+        # La capsule accélère ou freine
+        if self._speed < self._endSpeed:
+            self._speed += self._acceleration
+            if self._speed > self._endSpeed:
+                self._speed = self._endSpeed
+        elif self._speed > self._endSpeed:
+            self._speed -= self._brake
             if self._speed < self._endSpeed:
-                self._speed += self._acceleration
-                if self._speed > self._endSpeed:
-                    self._speed = self._endSpeed
-            elif self._speed > self._endSpeed:
-                self._speed -= self._brake
-                if self._speed < self._endSpeed:
-                    self._speed = self._endSpeed
+                self._speed = self._endSpeed
 
-            # La capsule détecte la capsule la plus proche devant elle
-            if type(self._track_or_switch).__name__ == "Section":
-                closest, same_section = self.closest()
-                if closest:
-                    if same_section:
-                        diff = closest.position - self._position
-                    else:
-                        diff = closest.position + (self._track_or_switch.length - self._position)
-                    if diff < self._track_or_switch.margin:
-                        self.speed = closest.speed / 2
-                    # Si la plus proche est trop loin on réaugmente la vitesse
-                    elif self._speed < self._track_or_switch.speed:
-                        self.speed = self._track_or_switch.speed
-                # S'il n'y a pas de capsule devant on réaugmente la vitesse
+        # La capsule détecte la capsule la plus proche devant elle
+        if type(self._track_or_switch).__name__ == "Section":
+            closest, same_section = self.closest()
+            if closest:
+                if same_section:
+                    diff = closest.position - self._position
+                else:
+                    diff = closest.position + (self._track_or_switch.length - self._position)
+                if diff < self._track_or_switch.margin:
+                    self.speed = closest.speed / 2
+                # Si la plus proche est trop loin on réaugmente la vitesse
                 elif self._speed < self._track_or_switch.speed:
                     self.speed = self._track_or_switch.speed
-                    #
-                    # ^ TODO : utiliser l'accélération
-            
-            # La capsule avance
-            if self._speed != 0:
-                self._position += self._speed * self.env.tick
-                self._traveled_distance += self._speed * self.env.tick
-                if len(self._travelers) > 0:
-                    self._traveled_distance_t += self._speed * self.env.tick
+            # S'il n'y a pas de capsule devant on réaugmente la vitesse
+            elif self._speed < self._track_or_switch.speed:
+                self.speed = self._track_or_switch.speed
+                #
+                # ^ TODO : utiliser l'accélération
+        
+        # La capsule avance
+        if self._speed != 0:
+            self._position += self._speed * self.env.tick
+            self._traveled_distance += self._speed * self.env.tick
+            if len(self._travelers) > 0:
+                self._traveled_distance_t += self._speed * self.env.tick
 
-            # La capsule s'insère sur un bridge si elle en a reçu l'ordre
-            if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ == "SwitchOut" and self._turn:
-                self.position -= self._track_or_switch.length
-                new_section = self._track_or_switch.beside.sections[0]
-                self.track_or_switch = new_section
-                #self._track_or_switch = new_section
+        # La capsule s'insère sur un bridge si elle en a reçu l'ordre
+        if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ == "SwitchOut" and self._turn:
+            self.position -= self._track_or_switch.length
+            new_section = self._track_or_switch.beside.sections[0]
+            self.track_or_switch = new_section
+            #self._track_or_switch = new_section
 
-                if self.position > new_section.length:
-                    print("Warning: pod.py: a pod has travelled to much distance in a same tick while entering a bridge.")
+            if self.position > new_section.length:
+                print("Warning: pod.py: a pod has travelled to much distance in a same tick while entering a bridge.")
+            self._track_or_switch.write({
+                "author": self,
+                "type": "pod_entry",
+                "pod": self
+            })
+            self._turn = False
+        
+        # La capsule arrive sur une nouvelle piste / aiguillage
+        elif self._position > self._track_or_switch.length:
+            bridge_to_switch = False
+            self._position -= self._track_or_switch.length
+            t = self._position / self._speed
+
+            # si on quitte un switch
+            if type(self._track_or_switch).__name__ in ["SwitchOut", "SwitchIn"]:
+                self.track_or_switch = self._track_or_switch.next.sections[0]
+                #self._track_or_switch = self._track_or_switch.next.sections[0]
+
+            # si on quitte une section
+            else:
+                if type(self._track_or_switch).__name__ == "Section":
+                    next_elem = self._track_or_switch.next
+                    if self._track_or_switch.is_bridge and type(next_elem).__name__ == "SwitchIn":
+                                                           # ça ne fonctionnera pas si on a un bridge dans un bridge
+                                                           # TODO : vérifier la structure du réseau pour ne pas avoir de bridge dans un bridge ?
+                        # la capsule entre sur une route depuis un pont
+                        bridge_to_switch = True
+                else:
+                    # si on quitte une step (shed, station, sensor) : rien à faire
+                    pass
+                self.track_or_switch = self._track_or_switch.next
+                #self._track_or_switch = self._track_or_switch.next
+                
+
+            self._position = t * self._track_or_switch.speed
+            if bridge_to_switch:
+                self._track_or_switch.write({
+                    "author": self,
+                    "type": "pod_entry_from_bridge",
+                    "pod": self
+                })
+            else:
+                if type(self._track_or_switch).__name__ in ["Station", "Shed"]:
+                    self._position = 0
                 self._track_or_switch.write({
                     "author": self,
                     "type": "pod_entry",
                     "pod": self
                 })
-                self._turn = False
+            # on vérifie si le pod n'est pas allé trop loin
+            if self.position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in ["Shed", "Station", "Sensor"]:
+                print("Warning: pod.py: a pod has travelled to much distance while arriving on '%s'." % self._track_or_switch.name)
+        
+        return
+    
+    def handle_message(self, message):
+        # Gestion des messages reçus
+        
+        if "speed" == message["type"]:
+            # Ordre de changement de vitesse
+            self.speed = message["speed"]
+        elif "passing" == message["type"]:
+            self.track_or_switch = self._track_or_switch.next
+            #self._track_or_switch = self._track_or_switch.next
             
-            # La capsule arrive sur une nouvelle piste / aiguillage
-            elif self._position > self._track_or_switch.length:
-                bridge_to_switch = False
-                self._position -= self._track_or_switch.length
-                t = self._position / self._speed
-
-                # si on quitte un switch
-                if type(self._track_or_switch).__name__ in ["SwitchOut", "SwitchIn"]:
-                    self.track_or_switch = self._track_or_switch.next.sections[0]
-                    #self._track_or_switch = self._track_or_switch.next.sections[0]
-
-                # si on quitte une section
-                else:
-                    if type(self._track_or_switch).__name__ == "Section":
-                        next_elem = self._track_or_switch.next
-                        if self._track_or_switch.is_bridge and type(next_elem).__name__ == "SwitchIn":
-                                                               # ça ne fonctionnera pas si on a un bridge dans un bridge
-                                                               # TODO : vérifier la structure du réseau pour ne pas avoir de bridge dans un bridge ?
-                            # la capsule entre sur une route depuis un pont
-                            bridge_to_switch = True
-                    else:
-                        # si on quitte une step (shed, station, sensor) : rien à faire
-                        pass
-                    self.track_or_switch = self._track_or_switch.next
-                    #self._track_or_switch = self._track_or_switch.next
-                    
-
-                self._position = t * self._track_or_switch.speed
-                if bridge_to_switch:
-                    self._track_or_switch.write({
-                        "author": self,
-                        "type": "pod_entry_from_bridge",
-                        "pod": self
-                    })
-                else:
-                    if type(self._track_or_switch).__name__ in ["Station", "Shed"]:
-                        self._position = 0
-                    self._track_or_switch.write({
-                        "author": self,
-                        "type": "pod_entry",
-                        "pod": self
-                    })
-                # on vérifie si le pod n'est pas allé trop loin
-                if self.position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in ["Shed", "Station", "Sensor"]:
-                    print("Warning: pod.py: a pod has travelled to much distance while arriving on '%s'." % self._track_or_switch.name)
-
-            #print(self.id + "  2")
+            self._track_or_switch.write({
+                "author": self,
+                "type": "pod_entry",
+                "pod": self,
+                "traveled_distance": self._traveled_distance
+            })
+        elif "passing_from_switch" == message["type"]:
+            self.track_or_switch = self._track_or_switch.next.sections[0]
+            #self._track_or_switch = self._track_or_switch.next.sections[0]
             
-            # Gestion des messages reçus
-            while True:
-                
-                #print(self.id + "  3")
-                
-                message = yield from self.read()
-                if message is None:
-                    break
-                elif "speed" == message["type"]:
-                    # Ordre de changement de vitesse
-                    self.speed = message["speed"]
-                elif "passing" == message["type"]:
-                    self.track_or_switch = self._track_or_switch.next
-                    #self._track_or_switch = self._track_or_switch.next
-                    
-                    self._track_or_switch.write({
-                        "author": self,
-                        "type": "pod_entry",
-                        "pod": self,
-                        "traveled_distance": self._traveled_distance
-                    })
-                elif "passing_from_switch" == message["type"]:
-                    self.track_or_switch = self._track_or_switch.next.sections[0]
-                    #self._track_or_switch = self._track_or_switch.next.sections[0]
-                    
-                    self._track_or_switch.write({
-                        "author": self,
-                        "type": "pod_entry",
-                        "pod": self,
-                        "traveled_distance": self._traveled_distance
-                    })
-                elif "docked" == message["type"]:
-                    # La capsule s'arrête dans une gare ou un dépôt
+            self._track_or_switch.write({
+                "author": self,
+                "type": "pod_entry",
+                "pod": self,
+                "traveled_distance": self._traveled_distance
+            })
+        elif "docked" == message["type"]:
+            # La capsule s'arrête dans une gare ou un dépôt
 
-                    # TODO : check track_or_switch à ce niveau-là (-> je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être une problème...))
-                    
-                    self._speed = 0
-                    self._endSpeed = 0
-                    self._previous_station = None      # On reset la derniere station
-                elif "insert" == message["type"]:
-                    # Ordre d'insertion, la capsule est autorisée à tourner
-                    if self._track_or_switch.stat_or_shed:  # si c'est un dépot ou station
-                        self._turn = self._track_or_switch.stat_or_shed == self._destination   # self.turn est vrai si c'est l'arrivée
-                        stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
-                        if stat_or_shed.isFull():
-                            #
-                            # TODO : prendre en charge ce cas
-                            #
-                            print("\033[4;31mFull\u001B[0m", stat_or_shed.name, "\t\t", len(stat_or_shed.pods), "/", stat_or_shed.capacity, end=' [')
-                            for pod in stat_or_shed.pods:
-                                if pod is not None:
-                                    print(pod.name[:8], end=' ')
-                                else:
-                                    print(pod, end=' ')
-                            print("]\t\t\t\t (pod l.305)\n")
-                            print("\tpods_size = ", stat_or_shed.pods_size, "/", stat_or_shed.capacity, "\n\tlen departure_pods", len(stat_or_shed._departure_pods), "> departure pods = [", end=' ')
-                            for pod in stat_or_shed._departure_pods:
-                                if pod is not None:
-                                    print(pod.name[:8], end=' ')
-                            print("]\n")
-                            self._turn = False
-                    else:
-                        self._turn = True
-                elif "speed_a_while" == message["type"]:
-                    # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
-                    # Ou lors d'une discrétisation
-                    # La capsule prend une vitesse sur une certaine distance puis reprend la vitesse moyenne
-                    self.speed = message["speed"]
-                    self._length_before_restore = message["length_before_restore"]
-                    self._speed_restore = message["speed_restore"]
-                elif "departure" == message["type"]:
-                    # La capsule part d'un dépôt ou d'une gare
-                    self._source = message["author"].name
-                    self._destination = message["destination"]
-                    self.speed = self._track_or_switch.speed
-                else:
-                    raise ValueError("Invalid message: ", message)
+            # TODO : check track_or_switch à ce niveau-là (-> je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être une problème...))
             
-            #print(self.id + "  4")
-
-
-
-
+            self._speed = 0
+            self._endSpeed = 0
+            self._previous_station = None      # On reset la derniere station
+        elif "insert" == message["type"]:
+            # Ordre d'insertion, la capsule est autorisée à tourner
+            if self._track_or_switch.stat_or_shed:  # si c'est un dépot ou station
+                self._turn = self._track_or_switch.stat_or_shed == self._destination   # self.turn est vrai si c'est l'arrivée
+                stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
+                if stat_or_shed.isFull():
+                    #
+                    # TODO : prendre en charge ce cas
+                    #
+                    print("\033[4;31mFull\u001B[0m", stat_or_shed.name, "\t\t", len(stat_or_shed.pods), "/", stat_or_shed.capacity, end=' [')
+                    for pod in stat_or_shed.pods:
+                        if pod is not None:
+                            print(pod.name[:8], end=' ')
+                        else:
+                            print(pod, end=' ')
+                    print("]\t\t\t\t (pod l.305)\n")
+                    print("\tpods_size = ", stat_or_shed.pods_size, "/", stat_or_shed.capacity, "\n\tlen departure_pods", len(stat_or_shed._departure_pods), "> departure pods = [", end=' ')
+                    for pod in stat_or_shed._departure_pods:
+                        if pod is not None:
+                            print(pod.name[:8], end=' ')
+                    print("]\n")
+                    self._turn = False
+            else:
+                self._turn = True
+        elif "speed_a_while" == message["type"]:
+            # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
+            # Ou lors d'une discrétisation
+            # La capsule prend une vitesse sur une certaine distance puis reprend la vitesse moyenne
+            self.speed = message["speed"]
+            self._length_before_restore = message["length_before_restore"]
+            self._speed_restore = message["speed_restore"]
+        elif "departure" == message["type"]:
+            # La capsule part d'un dépôt ou d'une gare
+            self._source = message["author"].name
+            self._destination = message["destination"]
+            self.speed = self._track_or_switch.speed
+        else:
+            raise ValueError("Invalid message: ", message)
 
     def get_previous_station(self):   # Pas de table de routage pr celui-ci
         """ Donne la prochaine station traversee par la capsule """ 

@@ -199,58 +199,57 @@ class Road(Way):
                 step.parent = self
 
     def update(self):
-        """Fonction gérant le processus route"""
-        while True:
-            while True:
-                message = yield from self.read()
-                if message is None:
-                    break
-                elif "pod_entry" == message["type"]:
-                    # La route prévient la bonne piste / aiguillage qu'une capsule est sortie
-                    new_track = message["author"]
-                    pod = message["pod"]
-                    if isinstance(new_track, Switch):
-                        track = new_track.previous.sections[-1]
-                    else:
-                        track = new_track.previous
-                    track.write({
-                        "author": self,
-                        "type": "pod_exit",
-                        "pod": pod
-                    })
-                elif "docked" == message["type"]:
-                    # La route remonte l'information d'un stationnement au réseau
-                    pod = message["pod"]
-                    self._parent.write({
-                        "author": self,
-                        "type": "docked",
-                        "pod": pod,
-                        "timestamp": message["timestamp"]
-                    })
-                elif "refill" == message["type"]:
-                    station = message["station"]
-                    self.parent.write({
-                        "author": self,
-                        "type": "refill",
-                        "station": station
-                    })
-                elif "empty" == message["type"]:
-                    station = message["station"]
-                    self.parent.write({
-                        "author": self,
-                        "type": "empty",
-                        "station": station
-                    })
-                elif "departure" == message["type"]:
-                    self.parent.write({
-                        "author": self,
-                        "pod": message["pod"],
-                        "type": "departure",
-                        "origin": message["author"].name,
-                        "destination": message["destination"],
-                        "timestamp": message["timestamp"],
-                        "waiting_time": message["waiting_time"],
-                        "traveler": message["traveler"]
-                        })
-                else:
-                    raise ValueError("Invalid message")
+        return
+
+    def handle_message(self, message):
+        
+        if "pod_entry" == message["type"]:
+            # La route prévient la bonne piste / aiguillage qu'une capsule est sortie
+            new_track = message["author"]
+            pod = message["pod"]
+            if isinstance(new_track, Switch):
+                track = new_track.previous.sections[-1]
+            else:
+                track = new_track.previous
+            track.write({
+                "author": self,
+                "type": "pod_exit",
+                "pod": pod
+            })
+        elif "docked" == message["type"]:
+            # La route remonte l'information d'un stationnement au réseau
+            pod = message["pod"]
+            self._parent.write({
+                "author": self,
+                "type": "docked",
+                "pod": pod,
+                "timestamp": message["timestamp"]
+            })
+        elif "refill" == message["type"]:
+            station = message["station"]
+            self.parent.write({
+                "author": self,
+                "type": "refill",
+                "station": station
+            })
+        elif "empty" == message["type"]:
+            station = message["station"]
+            self.parent.write({
+                "author": self,
+                "type": "empty",
+                "station": station
+            })
+        elif "departure" == message["type"]:
+            self.parent.write({
+                "author": self,
+                "pod": message["pod"],
+                "type": "departure",
+                "origin": message["author"].name,
+                "destination": message["destination"],
+                "timestamp": message["timestamp"],
+                "waiting_time": message["waiting_time"],
+                "traveler": message["traveler"]
+                })
+        else:
+            raise ValueError("Invalid message")
+

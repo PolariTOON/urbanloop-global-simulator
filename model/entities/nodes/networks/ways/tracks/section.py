@@ -100,38 +100,37 @@ class Section(Track):
         self.weight = self._length / self._speed
 
     def update(self):
-        while True:
-            while True:
-                message = yield from self.read()
-                if message is None:
-                    break
-                elif "pod_exit" == message["type"]:
-                    # Une capsule n'est plus dans la section
-                    pod = message["pod"]
-                    if pod in self._pods:
-                        self._pods.remove(pod)
-                    else:
-                        print("\u001B[31m [erreur pod non trouvé]", pod.name[:9], self.name, " (section l.103)\u001B[0m")
-                        
-                elif "pod_entry" == message["type"]:
-                    # Une capsule entre dans la section : il faut lui donner la bonne vitesse
-                    pod = message["pod"]
-                    self._pods.append(pod)
-                    pod.write({
-                        "author": self,
-                        "type": "speed",
-                        "speed": self._speed
-                    })
-                    # si on est entré dans une Road, on la notifie (cette Road sera
-                    # chargée de notifier la Road précédente que le pod l'a quittée)
-                    if True: #self._parent.sections[0] == self:
-                        self._parent.write({
-                            "author": self,
-                            "type": "pod_entry",
-                            "pod": pod
-                        })
-                else:
-                    raise ValueError("Invalid message")
+        return
+
+    def handle_message(self, message):
+        
+        if "pod_exit" == message["type"]:
+            # Une capsule n'est plus dans la section
+            pod = message["pod"]
+            if pod in self._pods:
+                self._pods.remove(pod)
+            else:
+                print("\u001B[31m [erreur pod non trouvé]", pod.name[:9], self.name, " (section l.103)\u001B[0m")
+                
+        elif "pod_entry" == message["type"]:
+            # Une capsule entre dans la section : il faut lui donner la bonne vitesse
+            pod = message["pod"]
+            self._pods.append(pod)
+            pod.write({
+                "author": self,
+                "type": "speed",
+                "speed": self._speed
+            })
+            # si on est entré dans une Road, on la notifie (cette Road sera
+            # chargée de notifier la Road précédente que le pod l'a quittée)
+            if True: #self._parent.sections[0] == self:
+                self._parent.write({
+                    "author": self,
+                    "type": "pod_entry",
+                    "pod": pod
+                })
+        else:
+            raise ValueError("Invalid message")
 
     def serialize(self):
         dict = super().serialize()

@@ -78,6 +78,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
         for key in _simulations:
             simulation = _simulations[key]
             try:
+                #print()
                 #print("__")
                 #print("update...")
                 simulation.update()

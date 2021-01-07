@@ -113,16 +113,18 @@ class SwitchIn(Switch):
             self._discrete_places[index] = self._discrete_places[index + 1]
         self._discrete_places[self._first_place - 1] = None
 
-    def update(self):
-        """Fonction modélisant le processus aiguillage entrant"""
-        # Les distances importantes sur la boucle où l'on peut s'inserer
+    def run(self):
+        
+        # Les distances importantes sur la boucle où l'on peut s'insérer
         self._discretize_length = self.place_size * self.max_speed / (self.max_speed - self.speed)
         self._set_up_length = self._places_number * self.place_size
         self._finalisation_length = self._places_number * self._places_number * self.max_speed / self.speed
+        
         # Maj de la vitesse du pont
         section = self.beside.sections[0]
         section.speed = max(section.speed, self.speed * section.length / self._finalisation_length)
         self._switch_out.set_c1_length()
+        
         # Initialisation des places discrétisées
         for k in range(self._places_number):
             place = self._discrete_places[k]
@@ -130,62 +132,66 @@ class SwitchIn(Switch):
                 for pod in self._pods:
                     if pod.id == place["id"]:
                         self._discrete_places[k] = pod
-        while True:
-            self._cursor = (self._cursor - self.speed * self.env.tick / self.place_size) % self._places_number
-            if int(self._cursor) != self._first_place:
-                # Le curseur a dépassé une nouvelle place, on avance le rouage
-                # pod_to_add est None si pas de capsule à insérer dans le tableau
-                # Si une capsule etait dans la dernière place alors elle disparaît
-                self._discrete_places[self._first_place] = self._pod_to_add
-                self._pod_to_add = None
-            self._first_place = int(self._cursor)
-            while True:
-                message = yield from self.read()
-                if message is None:
-                    break
-                elif "pod_entry" == message["type"]:
-                    # Notification à la section précédente que la capsule n'y est plus
-                    pod = message["pod"]
-                    self._pods.append(pod)
-                    track = pod.track_or_switch.previous.sections[-1]
-                    track.write({
-                        "author": self,
-                        "type": "pod_exit",
-                        "pod": pod
-                    })
-                    # Discrétisation de la capsule
-                    x = (self._cursor % 1) * self.place_size
-                    d = self._discretize_length - pod.position
-                    time_to_discretize = (int((self._discretize_length - (self.place_size - x))/self.place_size)*self.place_size + self.place_size-x) / self.speed
-                    speed = d / time_to_discretize
-                    self._pod_to_add = pod
-                    pod.write({
-                        "author": self,
-                        "type": "speed_a_while",
-                        "length_before_restore": self._discretize_length,
-                        "speed": speed,
-                        "speed_restore": self.speed
-                    })
-                elif "pod_entry_from_bridge" == message["type"]:
-                    # notification au pont que la capsule n'y est plus
-                    pod = message["pod"]
-                    track = pod.track_or_switch.beside.sections[-1]
-                    track.write({
-                        "author": self,
-                        "type": "pod_exit",
-                        "pod": pod
-                    })
-                    pod.write({
-                        "author": self,
-                        "type": "passing_from_switch"
-                    })
-                elif "pod_exit" == message["type"]:
-                    pod = message["pod"]
-                    if pod in self.pods:
-                        self.pods.remove(pod)
-                else:
-                    raise ValueError("Invalid message")
+                        
+        yield from super().run()
+    
+    def update(self):
+        """Fonction modélisant le processus aiguillage entrant"""
+        
+        self._cursor = (self._cursor - self.speed * self.env.tick / self.place_size) % self._places_number
+        if int(self._cursor) != self._first_place:
+            # Le curseur a dépassé une nouvelle place, on avance le rouage
+            # pod_to_add est None si pas de capsule à insérer dans le tableau
+            # Si une capsule etait dans la dernière place alors elle disparaît
+            self._discrete_places[self._first_place] = self._pod_to_add
+            self._pod_to_add = None
+        self._first_place = int(self._cursor)
 
+    def handle_message(self, message):
+        
+        if "pod_entry" == message["type"]:
+            # Notification à la section précédente que la capsule n'y est plus
+            pod = message["pod"]
+            self._pods.append(pod)
+            track = pod.track_or_switch.previous.sections[-1]
+            track.write({
+                "author": self,
+                "type": "pod_exit",
+                "pod": pod
+            })
+            # Discrétisation de la capsule
+            x = (self._cursor % 1) * self.place_size
+            d = self._discretize_length - pod.position
+            time_to_discretize = (int((self._discretize_length - (self.place_size - x))/self.place_size)*self.place_size + self.place_size-x) / self.speed
+            speed = d / time_to_discretize
+            self._pod_to_add = pod
+            pod.write({
+                "author": self,
+                "type": "speed_a_while",
+                "length_before_restore": self._discretize_length,
+                "speed": speed,
+                "speed_restore": self.speed
+            })
+        elif "pod_entry_from_bridge" == message["type"]:
+            # notification au pont que la capsule n'y est plus
+            pod = message["pod"]
+            track = pod.track_or_switch.beside.sections[-1]
+            track.write({
+                "author": self,
+                "type": "pod_exit",
+                "pod": pod
+            })
+            pod.write({
+                "author": self,
+                "type": "passing_from_switch"
+            })
+        elif "pod_exit" == message["type"]:
+            pod = message["pod"]
+            if pod in self.pods:
+                self.pods.remove(pod)
+        else:
+            raise ValueError("Invalid message")
+    
     def init_pods(self, env, pods):
         if pods is None:
             return None

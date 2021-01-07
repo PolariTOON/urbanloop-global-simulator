@@ -52,6 +52,8 @@ class Station(Step):
         self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
         self._departure_pods = departure_pods or []                     # dictionnaire des pods sur le point de partir  # todo revoir l'initialisation de departure_pods en cas de chargement reseau
         self._incoming_pods = 0  # à serialiser si on veut télécharger/recharger le réseau, c'est le nombre de pods en chemin vers la station
+        self.wait = -1       # pour décompter le départ entre 2 capsules
+        self.send_one_time = True  # permet d'évacuer les pods superflus
 
     def up_all_time_count(self):
         self._all_time_count += 1
@@ -185,160 +187,161 @@ class Station(Step):
 
     def update(self):
         """Fonction gérant le processus gare"""
-        wait = -1       # pour décompter le départ entre 2 capsules
-        send_one_time = True  # permet d'évacuer les pods superflus
-        self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
-        while True:
-            # On fait un appel pour libérer des capsules s'il y a trop de capsules vides en attente
-            if send_one_time and self.empty_call():
-                send_one_time = False
-                # Vide la station de capsules
+        
+        # On fait un appel pour libérer des capsules s'il y a trop de capsules vides en attente
+        if self.send_one_time and self.empty_call():
+            self.send_one_time = False
+            # Vide la station de capsules
+            self.parent.write({
+                "author": self,
+                "type": "empty",
+                "station": self
+            })
+
+        # On charge les voyageurs s'il y a de la place
+        if len(self._travelers) > 0 and self._pods_size > 0:
+            for i in range(self._capacity - 1, -1, -1):  # on commence par les premières capsules à partir
+                pod = self._pods[i]
+                if len(self._travelers) > 0 and pod and pod.isEmpty() and pod not in self._departure_pods:  # s'il y a un traveler en attente, un pod avec de la place
+                    # TODO :  autoriser un passager à utiliser une capsule vide qui allait partir
+                    going_traveler = self._travelers.pop(0)  # on enlève le traveler de ceux qui attendent
+                    going_traveler.departure(self.env.time)  # heure de départ
+                    pod.travelers = [going_traveler]         # le traveler est associé au pod
+                    self._departure_count += 1               # on compte 1 départ de plus
+                    self._average_waiting_time = (self._average_waiting_time * (self._departure_count - 1) + going_traveler.waiting_time) / self._departure_count  # calcul du temps d'attente moyen
+                    # On ajoute le nouveau temps d'attente dans la liste des temps d'attente de la derniere minute de la simulation
+                    self._waiting_times_since_last_minute.append(going_traveler.waiting_time)
+                    self._boarding[i] = 0  # début du décompte de l'embarquement
+
+        # Attente de la montée des voyageurs pour l'envoi d'une capsule
+        for i in range(len(self._boarding)):  # pour chaque capsule
+            if self._boarding[i] != -1:       # si un voyageur embarque
+                self._boarding[i] += self.env.tick  # on incrémente le temps
+                #
+                # TODO : corriger bug :
+                #        des fois, "self._pods[i]" est None ici (ça ne devrait pas être le cas)
+                #        peut-être que ça arrive lorsqu'un pod arrive dans une station déjà pleine
+                #
+                if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
+                    self._boarding[i] = -1  # reset du timer
+                    self._pods_ready[i] = True   # on indique que le pod en position i est prêt à partir
+                    self.send_pod(self._pods[i], self._pods[i].travelers[0].destination, True)  # on l'ajoute à la liste des pods au départ
+
+        # Attente entre le départ de 2 capsules
+        if self.wait != -1:                                          # une capsule est parti il y peu
+            self.wait += self.env.tick                               # on décompte le départ
+            if self.wait > self.next.margin / self.next.speed:       # quand on a assez attendu
+                self.wait = -1                                       # on peut envoyer
+
+
+        # Départ d'une capsule
+        if self.wait == -1:             # wait == -1 indique que l'on envoie une capsule
+            for pod0 in self._departure_pods:   # normalement les pods de departure_pods sont ceux qui attendent
+                                                # de partir et doivent donc etre dans pods
+                if pod0 not in self.pods:
+                    print("\u001B[31m", self.name, pod0.name[:8], "not in pods! (station l.207)\u001B[0m")
+                    self._departure_pods.remove(pod0)
+            if len(self._departure_pods) > 0:  # un pod attendait un départ
+                indice_pod = self.pods.index(self._departure_pods[0])   # indice du pod qui doit partir
+                self.shift_pods(indice_pod)  # décalage des autres pods dans la file
+                pod = self._departure_pods.pop()
+                destination = pod.destination
+                traveler = None
+                waiting_time = 0
+                if pod.travelers:
+                    traveler = pod.travelers[0]
+                    waiting_time = traveler.waiting_time
+                pod.write({
+                    "author": self,
+                    "type": "departure",
+                    "destination": destination
+                })
+                # prévient le parent
                 self.parent.write({
                     "author": self,
-                    "type": "empty",
-                    "station": self
+                    "pod": pod,
+                    "type": "departure",
+                    "destination": destination,
+                    "timestamp": self.env.time,
+                    "waiting_time": waiting_time,
+                    "traveler": traveler
                 })
+                self.wait = 0
 
-            # On charge les voyageurs s'il y a de la place
-            if len(self._travelers) > 0 and self._pods_size > 0:
-                for i in range(self._capacity - 1, -1, -1):  # on commence par les premières capsules à partir
-                    pod = self._pods[i]
-                    if len(self._travelers) > 0 and pod and pod.isEmpty() and pod not in self._departure_pods:  # s'il y a un traveler en attente, un pod avec de la place  # todo autoriser un passager à utiliser une capsule vide qui allait partir
-                        going_traveler = self._travelers.pop(0)  # on enlève le traveler de ceux qui attendent
-                        going_traveler.departure(self.env.time)  # heure de départ
-                        pod.travelers = [going_traveler]         # le traveler est associé au pod
-                        self._departure_count += 1               # on compte 1 départ de plus
-                        self._average_waiting_time = (self._average_waiting_time * (self._departure_count - 1) + going_traveler.waiting_time) / self._departure_count  # calcul du temps d'attente moyen
-                        # On ajoute le nouveau temps d'attente dans la liste des temps d'attente de la derniere minute de la simulation
-                        self._waiting_times_since_last_minute.append(going_traveler.waiting_time)
-                        self._boarding[i] = 0  # début du décompte de l'embarquement
-
-            # Attente de la montée des voyageurs pour l'envoi d'une capsule
-            for i in range(len(self._boarding)):  # pour chaque capsule
-                if self._boarding[i] != -1:       # si un voyageur embarque
-                    self._boarding[i] += self.env.tick  # on incrémente le temps
-                    if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
-                        self._boarding[i] = -1  # reset du timer
-                        print("Envoi")
-                        self._pods_ready[i] = True   # on indique que le pod en position i est prêt à partir
-                        self.send_pod(self._pods[i], self._pods[i].travelers[0].destination, True)  # on l'ajoute à la liste des pods au départ
-
-            # Attente entre le départ de 2 capsules
-            if wait != -1:                                          # une capsule est parti il y peu
-                wait += self.env.tick                               # on décompte le départ
-                if wait > self.next.margin / self.next.speed:       # quand on a assez attendu
-                    wait = -1                                       # on peut envoyer
-
-
-            # Départ d'une capsule
-            if wait == -1:             # wait == -1 indique que l'on envoie une capsule
-                for pod0 in self._departure_pods:   # normalement les pods de departure_pods sont ceux qui attendent
-                                                    # de partir et doivent donc etre dans pods
-                    if pod0 not in self.pods:
-                        print("\u001B[31m", self.name, pod0.name[:8], "not in pods! (station l.207)\u001B[0m")
-                        self._departure_pods.remove(pod0)
-                if len(self._departure_pods) > 0:  # un pod attendait un départ
-                    indice_pod = self.pods.index(self._departure_pods[0])   # indice du pod qui doit partir
-                    self.shift_pods(indice_pod)  # décalage des autres pods dans la file
-                    pod = self._departure_pods.pop()
-                    destination = pod.destination
-                    traveler = None
-                    waiting_time = 0
-                    if pod.travelers:
-                        traveler = pod.travelers[0]
-                        waiting_time = traveler.waiting_time
-                    pod.write({
-                        "author": self,
-                        "type": "departure",
-                        "destination": destination
-                    })
-                    # prévient le parent
-                    self.parent.write({
-                        "author": self,
-                        "pod": pod,
-                        "type": "departure",
-                        "destination": destination,
-                        "timestamp": self.env.time,
-                        "waiting_time": waiting_time,
-                        "traveler": traveler
-                    })
-                    wait = 0
-
-            if self.refill_call():
-                # Re-approvisionnement des capsules
-                self.parent.write({
-                    "author": self,
-                    "type": "refill",
-                    "station": self.name
-                })
-                self._incoming_pods += 1    # un pod sera envoyé pour combler l'espace,
-                                            # on incrémente ici pour éviter le spamming
-                                            # des messages le temps que le pod soit envoyé
-            while True:
-                message = yield from self.read()
-                if message is None:
-                    break
-                elif "pod_entry" == message["type"]:
-                    pod = message["pod"]
-                    self.parent.write({
-                        "author": self,
-                        "type": "pod_entry",
-                        "pod": pod
-                    })
-                    # la capsule va se garer dans la station s'il y a de la place
-                    if pod.destination == self.name and not self._pods[0]:
-                        #
-                        # TODO : comprendre la gestion des pods dans Station
-                        #
-                        if self._pods_size < self.capacity:
-                            for i in range(len(self.pods)-1, -1, -1):
-                                if self._pods[i] is None:
-                                    self._pods[i] = pod
-                                    break
-                            self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
-                            self._incoming_pods -= 1
-                            if self._incoming_pods < 0:
-                                print("\033[4;31merreur comptage incoming pods\u001B[0m", self._incoming_pods,
-                                      "(station l.277)", self.name, "\n")
-                        else:
-                            raise Exception("pod entry but full station l.277")  # le pod vérifie déjà s'il peut s'insérer "not self.pods[0]"
-                        pod.travelers = []
-                        pod.write({
-                            "author": self,
-                            "type": "docked"
-                        })
-                        self.parent.write({
-                            "author": self,
-                            "type": "docked",
-                            "pod": pod,
-                            "timestamp": self.env.time
-                        })
-                    else:
-                        pod.write({
-                            "author": self,
-                            "type": "passing"
-                        })
-                elif "pod_exit" == message["type"]:
-                    send_one_time = True  # pour autoriser à nouveau la libération de pods
-                    if message["pod"] in self._departure_pods:
-                        self._departure_pods.remove(message["pod"])  # lorsqu'une capsule part suite à un appel empty il faut la supprimer de departure_pods
-                    if message["pod"] in self._pods:
-                        index = self._pods.index(message["pod"])
-                        self._pods[index] = None
-                        print("Info: pod index in station: %d" % index)
-                elif "empty" == message["type"]:
-                    for i in range(len(self._pods) - 1, -1, -1):
-                        if self._pods[i] is not None and self._boarding[i] == -1 and not self._pods_ready[i]:  # on libère un pod vide (pas None, n'a pas de passager et n'est pas prêt à partir
-                            if self._pods[i] not in self._departure_pods:
-                                self.send_pod(self._pods[i], message["shed"].name)
-                                wait = -1
-                                break
-                        else:
-                            print("\u001B[31m", self.name, "pas de pod à libérer (station l.311)", len(self._departure_pods), "\u001B[0m")
-
-                    send_one_time = True  # pour autoriser un autre message empty
+        if self.refill_call():
+            # Re-approvisionnement des capsules
+            self.parent.write({
+                "author": self,
+                "type": "refill",
+                "station": self.name
+            })
+            self._incoming_pods += 1    # un pod sera envoyé pour combler l'espace,
+                                        # on incrémente ici pour éviter le spamming
+                                        # des messages le temps que le pod soit envoyé
+    
+    def handle_message(self, message):
+        if "pod_entry" == message["type"]:
+            pod = message["pod"]
+            self.parent.write({
+                "author": self,
+                "type": "pod_entry",
+                "pod": pod
+            })
+            # la capsule va se garer dans la station s'il y a de la place
+            if pod.destination == self.name and not self._pods[0]:
+                #
+                # TODO : comprendre la gestion des pods dans Station
+                #
+                if self._pods_size < self.capacity:
+                    for i in range(len(self.pods)-1, -1, -1):
+                        if self._pods[i] is None:
+                            self._pods[i] = pod
+                            break
+                    self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
+                    self._incoming_pods -= 1
+                    if self._incoming_pods < 0:
+                        print("\033[4;31merreur comptage incoming pods\u001B[0m", self._incoming_pods,
+                              "(station l.277)", self.name, "\n")
                 else:
-                    raise ValueError("Invalid message station l.321", message)
+                    raise Exception("pod entry but full station l.277")  # le pod vérifie déjà s'il peut s'insérer "not self.pods[0]"
+                pod.travelers = []
+                pod.write({
+                    "author": self,
+                    "type": "docked"
+                })
+                self.parent.write({
+                    "author": self,
+                    "type": "docked",
+                    "pod": pod,
+                    "timestamp": self.env.time
+                })
+            else:
+                pod.write({
+                    "author": self,
+                    "type": "passing"
+                })
+        elif "pod_exit" == message["type"]:
+            self.send_one_time = True  # pour autoriser à nouveau la libération de pods
+            if message["pod"] in self._departure_pods:
+                self._departure_pods.remove(message["pod"])  # lorsqu'une capsule part suite à un appel empty il faut la supprimer de departure_pods
+            if message["pod"] in self._pods:
+                index = self._pods.index(message["pod"])
+                self._pods[index] = None
+                # TODO : enlever le print ci-dessous
+                #print("Info: pod index in station: %d" % index)
+        elif "empty" == message["type"]:
+            for i in range(len(self._pods) - 1, -1, -1):
+                if self._pods[i] is not None and self._boarding[i] == -1 and not self._pods_ready[i]:  # on libère un pod vide (pas None, n'a pas de passager et n'est pas prêt à partir
+                    if self._pods[i] not in self._departure_pods:
+                        self.send_pod(self._pods[i], message["shed"].name)
+                        wait = -1
+                        break
+                else:
+                    print("\u001B[31m", self.name, "pas de pod à libérer (station l.311)", len(self._departure_pods), "\u001B[0m")
+            self.send_one_time = True  # pour autoriser un autre message empty
+            
+        else:
+            raise ValueError("Invalid message station l.321", message)
 
     def empty_call(self):
         """Fonction qui permet de choisir si on se débarasse de capsules vides dans une station"""

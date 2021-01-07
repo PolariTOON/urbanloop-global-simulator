@@ -41,7 +41,12 @@ class Network(Node):
         self._statistiques = Statistiques()
         # On cree les csv puis on ecrit les noms des colonnes
         self._statistiques.write_columns_names_for_all_stations(self.stations)
-
+        # pour débugguer / profiler
+        self.last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
+        self.last_pods = {}
+        self.one_print = True
+        #self.last_sec = 1
+    
     @property
     def name(self):
         return super().name or "Network %d" % self.id
@@ -404,111 +409,105 @@ class Network(Node):
         raise ValueError("Step not in the network")
 
     def update(self):
-        """
-        Gestion du processus du réseau à chaque boucle d'événement simpy
-        :return: void
-        """
-        last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
-        last_pods = {}
-        one_print = True
-        #last_sec = 1
 
-        while True:
-            #       Affichage des secondes de la simul si besoin de tester GET de l'API pr les durees de trajet
-            #if ( round(self.env.time) % 60 == last_sec):
-            #    print("last_sec = " + str(last_sec))       
-            #    last_sec += 1
-            #    if (last_sec == 60):
-            #        last_sec = 0
+        #       Affichage des secondes de la simul si besoin de tester GET de l'API pr les durees de trajet
+        #if ( round(self.env.time) % 60 == self.last_sec):
+        #    print("last_sec = " + str(self.last_sec))       
+        #    last_sec += 1
+        #    if (self.last_sec == 60):
+        #        self.last_sec = 0
 
-            if round(self.env.time) % 60 == 1:  # pour éviter d'écrire plusieurs lignes pour un temps donné si le pas est bas
-                one_print = True
-            if round(self.env.time) % 60 == 0 and one_print:  # affichage et écriture en fichier toutes les minutes de simulations
-                one_print = False
-                print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
-                      "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
-                if self.departure_arrival_printer:
-                    self.statistiques.print_stats()
+        if round(self.env.time) % 60 == 1:  # pour éviter d'écrire plusieurs lignes pour un temps donné si le pas est bas
+            one_print = True
+        if round(self.env.time) % 60 == 0 and self.one_print:  # affichage et écriture en fichier toutes les minutes de simulations
+            self.one_print = False
+            print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
+                  "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
+            if self.departure_arrival_printer:
+                self.statistiques.print_stats()
 
-                # ECRITURE STATS
-                self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
-                self.statistiques.write_stats_for_all_stations(str(datetime.timedelta(seconds=round(self.env.time))), self.stations)
-                self.statistiques.write_stats_insertion(str(datetime.timedelta(seconds=round(self.env.time))), self.switches)
-                self.statistiques.write_travel_time_global(str(datetime.timedelta(seconds=round(self.env.time))))
-                # ligne calcul stats autres (voir txt perso)
-                #print("\n")
-
-            last_count, last_pods = self.pods_du_reseau(last_count, last_pods)
-            #print("-------------------------------------------------------------")
-            #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
-            #print("-------------------------------------------------------------")
-            if self._dynamic_routing and int(int(self.env.now) % (30 / self.env.tick)) == 0:  # TODO: utilise self.env.time plutôt que self.env.tick
-                # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
-                #print("Updated routing tables...")
-                self.maj_routing_tables()
-                #print("Routing tables updated")
-                
-            while True:
-                message = yield from self.read()
-                if message is None:
-                    break
-                elif "docked" == message["type"]:
-                    # Une capsule stationne
-                    timestamp = message["timestamp"]
-                    if self.departure_arrival_printer:
-                        print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) +
-                              "] Arrival\u001B[0m", message["pod"].destination, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.396)", end='')
-                        print("\n\t\t\u001B[35m|\u001B[0m nom du pod:", message["pod"].name[:8], "\n")
-                    self._statistiques.remove_traveling_pod(message["pod"], timestamp)
-                    pass
-                elif "refill" == message["type"]:
-                    # On demande à un dépôt d'envoyer une capsule à la station qui le demande
-                    # TODO:  ne pas choisir aléatoirement
-                    sheds = self.sheds
-                    if sheds:
-                        station = message["station"]
-                        shed = choice(sheds)
-                        shed.write({
-                            "author": self,
-                            "type": "refill",
-                            "station": station
-                        })
-                elif "empty" == message["type"]:
-                    # On demande à une station d'envoyer une capsule à un dépôt pour faire de la place
-                    # TODO:  ne pas choisir aléatoirement (vérifier que le shed a bien une place libre)
-                    sheds = self.sheds
-                    if sheds:
-                        station = message["station"]
-                        shed = choice(sheds)
-                        station.write({
-                            "author": self,
-                            "type": "empty",
-                            "shed": shed
-                        })
-                elif "departure" == message["type"]:
-                    timestamp = message["timestamp"]
-                    origin = message["origin"]
-                    destination = message["destination"]
-                    waiting_time = message["waiting_time"]
-                    traveler = message["traveler"]
-                    self._statistiques.add_waiting_time(timestamp, waiting_time)
-                    if self.departure_arrival_printer:
-                        print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp)))
-                              + "] Departure\u001B[0m ", origin, " -> ", destination,
-                              "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.432)")
-                        print("\t\t\u001B[36m|\u001B[0m nom du pod:\t", message["pod"].name[:8])
-                        print("\t\t\u001B[36m|\u001B[0m waiting time:\t", str(round(waiting_time)) + " seconds")
-                        print("\t\t\u001B[36m|\u001B[0m traveler:\t\t", str(traveler), "\n")
-                    self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler, origin)
-                    if traveler:
-                        # dans le cas d'un voyage,
-                        # ce n'est pas une capsule appelée par la station pour combler l'espace
-                        # on met à jour le compteur ici
-                        for station0 in self.stations:
-                            if station0.name == destination:
-                                station0.up_incoming_pods()
-                else:
-                    raise ValueError("Invalid message")
+            # ECRITURE STATS
+            self.statistiques.write_stats_line(str(datetime.timedelta(seconds=round(self.env.time))))
+            self.statistiques.write_stats_for_all_stations(str(datetime.timedelta(seconds=round(self.env.time))), self.stations)
+            self.statistiques.write_stats_insertion(str(datetime.timedelta(seconds=round(self.env.time))), self.switches)
+            self.statistiques.write_travel_time_global(str(datetime.timedelta(seconds=round(self.env.time))))
+            # ligne calcul stats autres (voir txt perso)
+            #print("\n")
+            
+        #
+        # TODO : permettre de paramétrer l'activation / désactivation de cette ligne ?
+        #
+        #self.last_count, self.last_pods = self.pods_du_reseau(self.last_count, self.last_pods)
+        
+        #print("-------------------------------------------------------------")
+        #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
+        #print("-------------------------------------------------------------")
+        if self._dynamic_routing and int(int(self.env.now) % (30 / self.env.tick)) == 0:  # TODO: utilise self.env.time plutôt que self.env.tick
+            # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
+            #print("Updated routing tables...")
+            self.maj_routing_tables()
+            #print("Routing tables updated")
+    
+    def handle_message(self, message):
+        if "docked" == message["type"]:
+            # Une capsule stationne
+            timestamp = message["timestamp"]
+            if self.departure_arrival_printer:
+                print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) +
+                      "] Arrival\u001B[0m", message["pod"].destination, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.396)", end='')
+                print("\n\t\t\u001B[35m|\u001B[0m nom du pod:", message["pod"].name[:8], "\n")
+            self._statistiques.remove_traveling_pod(message["pod"], timestamp)
+            pass
+        elif "refill" == message["type"]:
+            # On demande à un dépôt d'envoyer une capsule à la station qui le demande
+            # TODO:  ne pas choisir aléatoirement
+            sheds = self.sheds
+            if sheds:
+                station = message["station"]
+                shed = choice(sheds)
+                shed.write({
+                    "author": self,
+                    "type": "refill",
+                    "station": station
+                })
+        elif "empty" == message["type"]:
+            # On demande à une station d'envoyer une capsule à un dépôt pour faire de la place
+            #
+            # TODO: ne pas choisir aléatoirement (vérifier que le shed a bien une place libre)
+            #
+            sheds = self.sheds
+            if sheds:
+                station = message["station"]
+                shed = choice(sheds)
+                station.write({
+                    "author": self,
+                    "type": "empty",
+                    "shed": shed
+                })
+        elif "departure" == message["type"]:
+            timestamp = message["timestamp"]
+            origin = message["origin"]
+            destination = message["destination"]
+            waiting_time = message["waiting_time"]
+            traveler = message["traveler"]
+            self._statistiques.add_waiting_time(timestamp, waiting_time)
+            if self.departure_arrival_printer:
+                print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp)))
+                      + "] Departure\u001B[0m ", origin, " -> ", destination,
+                      "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.432)")
+                print("\t\t\u001B[36m|\u001B[0m nom du pod:\t", message["pod"].name[:8])
+                print("\t\t\u001B[36m|\u001B[0m waiting time:\t", str(round(waiting_time)) + " seconds")
+                print("\t\t\u001B[36m|\u001B[0m traveler:\t\t", str(traveler), "\n")
+            self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler, origin)
+            if traveler:
+                # dans le cas d'un voyage,
+                # ce n'est pas une capsule appelée par la station pour combler l'espace
+                # on met à jour le compteur ici
+                for station0 in self.stations:
+                    if station0.name == destination:
+                        station0.up_incoming_pods()
+        else:
+            raise ValueError("Invalid message")
 
     #
     # TODO : trouver où cette fonction est utilisée,
@@ -638,6 +637,7 @@ def shortest_way(start_switch, destination_switch):
                 previouses[switch.next.next] = switch       # on note que le prédécessur du switch.next.next est le switch actuel
             if isinstance(switch, SwitchOut):  # Pour un out on a aussi le beside comme successeur
                 new_weight = weight + switch.beside.weight
+                # ^ TODO : à adapter aux nouveaux bridges
                 if switch.beside.next not in best_weight.keys() or new_weight < best_weight[switch.beside.next]:
                     best_weight[switch.beside.next] = new_weight
                     previouses[switch.beside.next] = switch

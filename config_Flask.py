@@ -1,20 +1,24 @@
 from asyncio import run, run_coroutine_threadsafe, sleep
 from flask import Flask, jsonify, request, Response
 from functools import wraps
+from asyncio import run, run_coroutine_threadsafe, sleep
+from flask import Flask, jsonify, request, Response
+from functools import wraps
 from logging import ERROR, getLogger
 from controler.simulation import Simulation
 
-"""Classe chargée de la réalisation de la simulation avec interface web"""
+""" Fonctions chargées de la réalisation de la simulation avec interface web """
 
 _app = Flask(__name__, static_url_path="", static_folder="view/static", template_folder="view/templates")
 _app.logger.setLevel(ERROR)
 getLogger("werkzeug").setLevel(ERROR)
 
+_simulation_for_api = None
 _running_default = False    # par défaut on ne lance pas les simulations
 _speed_default = 0          # par défaut la vitesse de simulation est x1
 
 def _synchronize(key=None):
-    """Synchronisation du serveur flask avec simpy, NE PAS TOUCHER"""
+    """ Synchronisation du serveur flask avec le thread des simulations, NE PAS TOUCHER """
     if not isinstance(key, str):
         key = None
     def synchronize(coroutine):
@@ -27,6 +31,7 @@ def _synchronize(key=None):
             exception = future.exception()
             if exception is not None:
                 result = None
+                print("Error with: " + key)
                 print("\u001b[31m", exception, "\u001b[0m")
             else:
                 result = future.result()
@@ -60,32 +65,30 @@ def return_javascript(filename):
 @_app.route("/networks/<int:network_index>/", methods=["POST"])
 @_synchronize("network_item")
 async def _post_network(simulations, network_index, network_item):
-    """ Requête post pour envoyer et charger un réseau depuis la vue à partir d'un fichier json
+    """ Requête POST pour envoyer et charger un réseau depuis la vue à partir d'un fichier json.
         network_item contient toutes les informations du fichier JSON
     """
-    print("Received network: '%s'" % network_item["name"])
+    global _simulation_for_api
     if network_item is not None:
+        from app import _wave, _remove_travelers
         if "id" in network_item:
             del network_item["id"]
-        from app import _wave, _remove_travelers
+        print("Received network: '%s'" % network_item["name"])
         simulation = Simulation(network_index, _wave, remove_travelers=_remove_travelers, **network_item)
-        # Pour utiliser la simulation dans l'API
-        print("Creation simulation en tant que variable global (pour utiliser dans l'API)")
-        global simulation_for_api  # Variable non locale a cette fonction
-        # Je ne sais pas pk declarer en dehors de cette fonction "simulation_for_api = None" ne marche pas, cela ne change la valeur de la var que localement ...
-        simulation_for_api = simulation
-
         simulations[network_index] = simulation
+        # Pour utiliser la simulation dans l'API
+        _simulation_for_api = simulation
         return simulation.serialize()
-    if network_index in simulations:
-        del simulations[network_index]
-    return None
-
+    else:
+        if network_index in simulations:
+            del simulations[network_index]
+        _simulation_for_api = None
+        return None
 
 @_app.route("/networks/<int:network_index>/", methods=["GET"])
 @_synchronize()
 async def _get_network(simulations, network_index):
-    """Requête get pour récupérer le fichier json d'un réseau depuis la vue"""
+    """ Requête GET pour récupérer le fichier json d'un réseau depuis la vue """
     if network_index in simulations:
         simulation = simulations[network_index]
         return simulation.serialize()
@@ -95,7 +98,7 @@ async def _get_network(simulations, network_index):
 @_app.route("/networks/<int:network_index>/clock/play/", methods=["POST"])
 @_synchronize()
 async def _play_clock(simulations, network_index):
-    """Requête post pour lancer la simulation depuis la vue"""
+    """ Requête POST pour lancer la simulation depuis la vue """
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.running = True
@@ -106,7 +109,7 @@ async def _play_clock(simulations, network_index):
 @_app.route("/networks/<int:network_index>/clock/pause/", methods=["POST"])
 @_synchronize()
 async def _pause_clock(simulations, network_index):
-    """Requête post pour mettre en pause la simulation depuis la vue"""
+    """ Requête POST pour mettre en pause la simulation depuis la vue """
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.running = False
@@ -118,7 +121,7 @@ async def _pause_clock(simulations, network_index):
 @_app.route("/networks/<int:network_index>/travelersWaiting/show/", methods=["POST"])
 @_synchronize()
 async def _show_travelers_waiting(simulations, network_index):
-    """Requête post pour afficher le nombre de passagers attendant dans les stations depuis la vue"""
+    """ Requête POST pour afficher le nombre de passagers attendant dans les stations depuis la vue """
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.showing_travelers_waiting = True
@@ -128,7 +131,7 @@ async def _show_travelers_waiting(simulations, network_index):
 @_app.route("/networks/<int:network_index>/travelersWaiting/hide/", methods=["POST"])
 @_synchronize()
 async def _hide_travelers_waiting(simulations, network_index):
-    """Requête post pour afficher le nombre de passagers attendant dans les stations depuis la vue"""
+    """ Requête POST pour afficher le nombre de passagers attendant dans les stations depuis la vue """
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.showing_travelers_waiting = False
@@ -140,7 +143,7 @@ async def _hide_travelers_waiting(simulations, network_index):
 @_app.route("/networks/<int:network_index>/clock/decelerate/", methods=["POST"])
 @_synchronize()
 async def _decelerate_clock(simulations, network_index):
-    """Requête post pour décélerer la simulation depuis la vue"""
+    """ Requête POST pour décélérer la simulation depuis la vue """
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.rate -= 1
@@ -151,7 +154,7 @@ async def _decelerate_clock(simulations, network_index):
 @_app.route("/networks/<int:network_index>/clock/accelerate/", methods=["POST"])
 @_synchronize()
 async def _accelerate_clock(simulations, network_index):
-    """Requête post pour accélrer la simulation depuis la vue"""
+    """ Requête POST pour accélérer la simulation depuis la vue """
     if network_index in simulations:
         simulation = simulations[network_index]
         simulation.rate += 1
@@ -169,7 +172,7 @@ async def _get_bridge(simulations, network_index, bridge_index):
 @_app.route("/networks/<int:network_index>/loops/<int:loop_index>/", methods=["GET"])
 @_synchronize()
 async def _get_loop(simulations, network_index, loop_index):
-    """Requête get pour récupérer le fichier json d'une boucle depuis la vue"""
+    """ Requête GET pour récupérer le fichier json d'une boucle depuis la vue """
     return simulations[network_index]._network.loops[loop_index].serialize()
 
 
@@ -228,25 +231,23 @@ def run_app(port, networks, wave):
 
 
 
-###############################################
-# RESTFUL API FLASK POUR APPLIS MOBILE
+##########################################################################
+# RESTFUL FLASK API pour les applications mobile et les bornes de stations
 
 
 @_app.route('/capsule/<string:user_id>', methods=['GET'])
 def get_user_position(user_id):
-    """ Donne les infos de la capsule dont on a renseigne l'identifiant"""
+    """ Donne les infos de la capsule dont on a renseigne l'identifiant """
 
-    try:
-        simulation_for_api
-    except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
+    global _simulation_for_api
+    if _simulation_for_api == None:
+        return jsonify({ 'msg': 'Aucune simulation n\'a pas été chargée' })
 
-    pod_of_user = simulation_for_api.get_network().get_pod_of_user(user_id)
+    pod_of_user = _simulation_for_api.get_network().get_pod_of_user(user_id)
 
     if (pod_of_user == None):
         return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
     else :
-        #print(pod_of_user.getPreviousStation())
         return jsonify({ 'source': pod_of_user.source,
                          'next_station': pod_of_user.get_next_station(),
                          'previous_station': pod_of_user.get_previous_station(),
@@ -254,49 +255,55 @@ def get_user_position(user_id):
                          'time_before_arrival': pod_of_user.get_time_before_arrival()})
 
 
-
 @_app.route('/new_trip', methods=['POST'])
 def add_trip():
-    """Fonction permettant de donner un nouveau trajet au simulateur"""
+    """ Fonction permettant de donner un nouveau trajet au simulateur
 
-    try:
-        simulation_for_api
-    except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee' })
+    Argument du POST : 
+        {
+            "user_id": "1321",
+            "departure": "Stanislas",
+            "arrival": "Telecom Nancy",
+            "typeCapsule" : "solo"
+        }
+    
+    """
 
+    global _simulation_for_api
+    if _simulation_for_api == None:
+        return jsonify({ 'msg': 'Aucune simulation n\'a pas été chargée' })
+    
     user_id = request.json['user_id']
     departure = request.json['departure']
     arrival = request.json['arrival']
     #typeCapsule = request.json['typeCapsule']
 
-    #Lien infos recues-simulateur
-    simulation_for_api.add_traveler(departure, arrival, user_id)
+    #Lien infos reçues-simulateur
+    _simulation_for_api.add_traveler(departure, arrival, user_id)
 
     return jsonify({ 'msg': 'Trajet valide' })
-
-#Argument : 
-#{
-    #"user_id": "1321",
-    #"departure": "TNCY",
-    #"arrival": "commanderie",
-    #"typeCapsule" : "solo"
-#}
-
 
 
 @_app.route('/change_dest', methods=['POST'])
 def change_destination_of_trip():
-    """Fonction permettant de changer de destination pour un utilisateur"""
+    """ Fonction permettant de changer de destination pour un utilisateur
 
-    try:
-        simulation_for_api
-    except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
+    Argument du POST : 
+        {
+            "user_id": "1321",
+            "new_arrival": "Velodrome"
+        }
+    
+    """
+
+    global _simulation_for_api
+    if _simulation_for_api == None:
+        return jsonify({ 'msg': 'Aucune simulation n\'a pas été chargée' })
 
     user_id = request.json['user_id']
     new_arrival = request.json['new_arrival']
     
-    network = simulation_for_api.get_network()
+    network = _simulation_for_api.get_network()
     pod_of_user = network.get_pod_of_user(user_id)
 
     if (pod_of_user == None):
@@ -306,23 +313,16 @@ def change_destination_of_trip():
         pod_of_user.change_destination(user_id, new_arrival)
         return jsonify({ 'msg': 'Changement de destination valide' })
 
- #Argument : 
-#{
-    #"user_id": "1321",
-    #"new_arrival": "commanderie"
-#}
-
 
 @_app.route('/emergency_exit/<string:user_id>', methods=['GET'])
 def call_emergency_exit(user_id):
-    """Fonction permettant de demander une sortie d'urgence pour un utilisateur"""
+    """ Fonction permettant de demander une sortie d'urgence pour un utilisateur """
 
-    try:
-        simulation_for_api
-    except NameError:
-        return jsonify({ 'msg': 'La simulation n\'a pas ete chargee -_-' })
+    global _simulation_for_api
+    if _simulation_for_api == None:
+        return jsonify({ 'msg': 'Aucune simulation n\'a pas été chargée' })
 
-    network = simulation_for_api.get_network()
+    network = _simulation_for_api.get_network()
     pod_of_user = network.get_pod_of_user(user_id)
 
     if (pod_of_user == None):
@@ -332,9 +332,4 @@ def call_emergency_exit(user_id):
         network.pod_change_from_one_destination_to_another(pod_of_user.destination, new_dest)
         pod_of_user.call_emergency_exit(user_id)
         return jsonify({ 'msg': 'Appel d\'urgence demande' })
-
-
-
-
-
 

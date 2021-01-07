@@ -10,7 +10,7 @@ class Entity:
         self._id = id
         self._name = name or ""
         self._store = Store(env)
-        Process(self._env, self.update())
+        Process(self._env, self.run())
 
     @property
     def env(self):
@@ -23,6 +23,35 @@ class Entity:
     @property
     def name(self):
         return self._name
+
+    def serialize(self):
+        return {
+            "name": self.name,
+            "id": self.id
+        }
+
+    # mode 3
+
+    # ATTENTION :
+    #  certaines classes ("network" et "switch_in") font des choses dans "run",
+    #  et nécessitent qu'un "run" soit appelé (et ce, après que tous les objets soient instanciés)
+
+    def write3(self, message):
+        if message is None:
+            raise ValueError()
+        self.handle_message(message)
+        return
+    
+    def run3(self):
+        """
+        Fonction qui gère le processus, à chaque tour d'événement simpy les actions sont exécutées
+        :return: void
+        """
+        while True:
+            # TODO : TIMEOUT ICI
+            self.update()
+
+    # mode 2
 
     def write(self, message):
         if message is None:
@@ -39,6 +68,8 @@ class Entity:
             return None
         message = condition[getter]
         return message
+
+    # mode 1
 
     def write1(self, message):
         if message is None:
@@ -62,11 +93,23 @@ class Entity:
         # print("\t\t", self.name, "  --  ", message["author"].name, "  --  ", message["type"])
         return message
 
+    def run(self):
+        """
+        Fonction qui gère le processus, à chaque tour d'événement simpy les actions sont exécutées
+        :return: void
+        """
+        while True:
+            self.update()
+            # réception des messages
+            while True:
+                message = yield from self.read()
+                if message is None:
+                    break
+                else:
+                    self.handle_message(message)
+
     def update(self):
         raise NotImplementedError()
 
-    def serialize(self):
-        return {
-            "name": self.name,
-            "id": self.id
-        }
+    def handle_message(self):
+        raise NotImplementedError()

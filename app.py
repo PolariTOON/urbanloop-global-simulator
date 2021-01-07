@@ -35,6 +35,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
     global _loop
     global _simulations
     global _remove_travelers
+    global _running_default
     global _speed_default
 
     if not with_interface:
@@ -42,6 +43,13 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
 
     _wave = wave
     _remove_travelers = remove_travelers
+    if not with_interface:
+        _running_default = True
+    if not with_interface:
+        #print("strating with ..." ...)
+        #_speed_default = ...
+        pass
+
     # lancement des simulations avec les réseaux préchargés
     for network_path in networks:
         try:
@@ -55,32 +63,36 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
                 network_index = len(_simulations)
                 simulation = Simulation(network_index, _wave, _remove_travelers, **network_item)
                 _simulations[network_index] = simulation
-                global _running_default
                 simulation.running = _running_default
-                global _speed_default
                 simulation.rate = _speed_default
             except Exception:
                 print_exc()
     # main loop
     _loop = get_running_loop()
+    i=0
     while not _quit:
         if with_interface:
+            #print("sleep start")
             await sleep(0.04) # ralentit la simulation pour utiliser l'interface (0.04s -> 25 images par secondes)
+            #print("sleep end")
         else:
             pass # à tester (remplacer par await sleep(0.000001) ?)
         crashed_simulations = []
         for key in _simulations:
             simulation = _simulations[key]
             try:
+                #print()
                 #print("__")
-                #print("now: %f" % float(simulation._env.now))
-                #print("now: %f" % float(simulation._env.time))
+                #print("update...")
                 simulation.update()
+                #print("updated" + str(i))
+                i+=1
             except Exception:
                 crashed_simulations.append(key)
                 print_exc()
         for key in crashed_simulations:
             del _simulations[key]
+    
     print("Terminated")
 
 

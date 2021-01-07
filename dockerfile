@@ -14,4 +14,4 @@ ENV n='resources/test2jerky.json'
 
 ENV w='.042'
 
-CMD python main.py -n $n -p '8090' -w $w
+CMD python -O main.py -n $n -p '8090' -w $w

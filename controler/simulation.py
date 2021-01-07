@@ -51,8 +51,12 @@ class Simulation:
         self._state = state
         seed(self._state)  # à appeler avant d'utiliser random
         self._network = Network(self._env, id, **kwargs)
+
+        self._env.with_messages = False
+        self._env.updatable_entities = []
         self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
         self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
+
         self._travelers_per_day = traveler["travelers_per_day"]
         self._probability = Probability(prob, traveler, self._network.stations, self._network.statistiques, self._env.tick)
 
@@ -109,6 +113,7 @@ class Simulation:
     def update(self):
         if not self._running:  # simulation en pause
             return
+        
         times = 1
         tick = self._wave
         if self._jerky:  # mode jerky

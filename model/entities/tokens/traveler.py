@@ -49,7 +49,9 @@ class Traveler(Token):
 
     def update(self):
         return
-        yield
+
+    def handle_message(self, message):
+        return
 
     def change_destination(self):
         self._changed_dest = True

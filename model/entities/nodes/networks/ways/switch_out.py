@@ -76,68 +76,62 @@ class SwitchOut(Switch):
         return pod.destination in self._routing_table
 
     def update(self):
-        """
-        Gère le processus d'aiguillage sortant, à chaque tour d'événement simpy les actions sont exécutées
-        :return: void
-        """
-        while True:
-            while True:
-                message = yield from self.read()
-                if message is None:
-                    break
-                elif "pod_entry" == message["type"]:
-                    # Entrée d'une capsule, il faut prévenir la section précédente que la capsule est sortie
-                    pod = message["pod"]
-                    self._pods.append(pod)
-                    track = pod.track_or_switch.previous.sections[-1]
-                    track.write({
-                        "author": self,
-                        "type": "pod_exit",
-                        "pod": pod
-                    })
-                    # Régulation pour tomber sur une place si insertion
-                    d = self._length - pod.position
-                    x = self._switch_in.cursor
-                    t = d / self.speed + (self._beside.length - x) / self._switch_in.speed
-                    speed = d / t
+        return
+
+    def handle_message(self, message):
+        if "pod_entry" == message["type"]:
+            # Entrée d'une capsule, il faut prévenir la section précédente que la capsule est sortie
+            pod = message["pod"]
+            self._pods.append(pod)
+            track = pod.track_or_switch.previous.sections[-1]
+            track.write({
+                "author": self,
+                "type": "pod_exit",
+                "pod": pod
+            })
+            # Régulation pour tomber sur une place si insertion
+            d = self._length - pod.position
+            x = self._switch_in.cursor
+            t = d / self.speed + (self._beside.length - x) / self._switch_in.speed
+            speed = d / t
+            pod.write({
+                "author": self,
+                "type": "speed_a_while",
+                "speed": speed,
+                "length_before_restore": d,
+                "speed_restore": None
+            })
+            # routage si besoin
+            routing = self._is_route(pod)
+            if routing:
+                index = self.switch_in.last_index_of(None)
+                first_place = self._switch_in.first_place
+                if index == first_place or index == -1:
+                    # On ne peut pas insérer la capsule
+                    """print("\t\t\033[4;31mInsertion capsule impossible\u001B[0m", pod.name[:8], self.name,
+                          "\t\t\t\t\t\t\t\t\t\t\t\t\t\t(switchout l.111)\n")"""
+                    self._failed_insertion_since_last_minute += 1
+                    pass
+                elif index == first_place - 1:
+                    # On insère la capsule sur la dernière place
                     pod.write({
                         "author": self,
-                        "type": "speed_a_while",
-                        "speed": speed,
-                        "length_before_restore": d,
-                        "speed_restore": None
+                        "type": "insert"
                     })
-                    # routage si besoin
-                    routing = self._is_route(pod)
-                    if routing:
-                        index = self.switch_in.last_index_of(None)
-                        first_place = self._switch_in.first_place
-                        if index == first_place or index == -1:
-                            # On ne peut pas insérer la capsule
-                            """print("\t\t\033[4;31mInsertion capsule impossible\u001B[0m", pod.name[:8], self.name,
-                                  "\t\t\t\t\t\t\t\t\t\t\t\t\t\t(switchout l.111)\n")"""
-                            self._failed_insertion_since_last_minute += 1
-                            pass
-                        elif index == first_place - 1:
-                            # On insère la capsule sur la dernière place
-                            pod.write({
-                                "author": self,
-                                "type": "insert"
-                            })
-                        else:
-                            # On procède au décalage pour insérer la capsule
-                            self.switch_in.backstep(index)
-                            # On envoie un message indiquant que la voiture doit aller sur le pont
-                            # La voiture s'insère alors sur la dernière place
-                            pod.write({
-                                "author": self,
-                                "type": "insert"
-                            })
-                elif "pod_exit" == message["type"]:
-                    pod = message["pod"]
-                    self._pods.remove(pod)
-                elif "update_routing" == message["type"]:
-                    new_table = message["table"]
-                    self._routing_table = new_table
                 else:
-                    raise ValueError("Invalid message")
+                    # On procède au décalage pour insérer la capsule
+                    self.switch_in.backstep(index)
+                    # On envoie un message indiquant que la voiture doit aller sur le pont
+                    # La voiture s'insère alors sur la dernière place
+                    pod.write({
+                        "author": self,
+                        "type": "insert"
+                    })
+        elif "pod_exit" == message["type"]:
+            pod = message["pod"]
+            self._pods.remove(pod)
+        elif "update_routing" == message["type"]:
+            new_table = message["table"]
+            self._routing_table = new_table
+        else:
+            raise ValueError("Invalid message")

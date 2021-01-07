@@ -17,6 +17,10 @@ _simulation_for_api = None
 _running_default = False    # par défaut on ne lance pas les simulations
 _speed_default = 0          # par défaut la vitesse de simulation est x1
 
+def shutdown():
+    func = request.environ.get('werkzeug.server.shutdown')
+    func()
+
 def _synchronize(key=None):
     """ Synchronisation du serveur flask avec le thread des simulations, NE PAS TOUCHER """
     if not isinstance(key, str):
@@ -35,6 +39,10 @@ def _synchronize(key=None):
                 print("\u001b[31m", exception, "\u001b[0m")
             else:
                 result = future.result()
+            # check if app closed
+            from app import _quit
+            if _quit:
+                shutdown()
             return jsonify(result)
         return routine
     return synchronize

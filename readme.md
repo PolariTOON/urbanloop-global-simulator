@@ -103,6 +103,12 @@ Ajouter le paramètre `-e` permet de supprimer tous les voyageurs de la simulati
 $ python3.7 main.py -e [...]
 ```
 
+Utiliser `-d` permet de définir la durée à simuler, en secondes. Pour 24h :
+
+```sh
+$ python3.7 main.py -d 1440 [...]
+```
+
 Pour plus d'informations, utilisez la commande suivante :
 
 ```sh

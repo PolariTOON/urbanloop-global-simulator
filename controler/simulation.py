@@ -127,6 +127,7 @@ class Simulation:
         self._env.tick = tick
         for i in range(times):  # dans le mode jerky, on calcule plusieurs ticks à la fois
             self._env.time += tick  # on incrémente le temps
+                                    # TODO : time = time % (24*60)
             self._env.run(until=self._env.now+1)
             self._state = random() * 2 ** 53
             seed(self._state)
@@ -155,7 +156,7 @@ class Simulation:
         return dict
 
     def add_traveler(self, new_traveler_source, new_traveler_destination, user_id):
-        """ Ajout d'un voyageur dans la simulation .
+        """ Ajout d'un voyageur dans la simulation.
         fonction appelee quand un utilisateur scan sur l'application reader son ticket, et non pas quand il en reserve un """
 
         # Creation de l'objet Traveler

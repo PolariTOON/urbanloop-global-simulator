@@ -15,17 +15,28 @@ _remove_travelers = False
 
 _running_default = False
 _speed_default = 8  # but speed is also limited by simulation.max_rate
+_duration = -1
+_quit = False
+
+def save_simulations():
+    """ lors de la fermeture de l'application, sauvegarde l'état des réseaux dans le dossier `./save` """
+    from manip_format import pretty_dump
+    for key in _simulations:
+        simulation = _simulations[key]
+        outfile = "./save/%d.json" % key
+        with open(outfile, 'w') as f:
+            f.write(pretty_dump(simulation.serialize(), 2))
+
+def stop_app(sig=None, frame=None):
+    """ Quit the program """
+    print("Closing app...")
+    global _quit
+    _quit = True # stop `_run_simulations()`
+    save_simulations()
 
 # handler for SIGINT (CTRL-C)
-_quit = False
-def quit_func(sig, frame):
-    """ Quit the program """
-    # stop `_run_simulations()`
-    global _quit
-    _quit = True
-    # IDEA: we should maybe properly close Flask process before exiting ?
-    exit(0)
-signal.signal(signal.SIGINT, quit_func)
+signal.signal(signal.SIGINT, stop_app)
+    
 
 # init and main loop
 async def _run_simulations(with_interface, networks, wave, remove_travelers):
@@ -37,6 +48,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
     global _remove_travelers
     global _running_default
     global _speed_default
+    global _duration
 
     if not with_interface:
         print("WARNING : dans app.py : en mode sans interface, il est recommandé d'utiliser speed=7 pour optimiser la génération des travelers.")
@@ -78,6 +90,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
         else:
             pass # à tester (remplacer par await sleep(0.000001) ?)
         crashed_simulations = []
+        terminated = False
         for key in _simulations:
             simulation = _simulations[key]
             try:
@@ -90,18 +103,28 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
             except Exception:
                 crashed_simulations.append(key)
                 print_exc()
+            # check if the simulation is terminated
+            if simulation.env.now >= _duration / simulation.env.tick:
+                terminated = True
         for key in crashed_simulations:
             del _simulations[key]
-    
-    print("Terminated")
+        if terminated:
+            print("Simulation Terminated.")
+            stop_app()
+
+    await sleep(0.5) # important : redonne la main au serveur flask (on lui laisse le temps de se fermer)
+    print("Terminated.")
 
 
-def run_app(port, networks, wave, remove_travelers):
+def run_app(port, networks, wave, remove_travelers, duration=-1):
     """ Fonction permettant de lancer l'application
      port: n° de port si on souhaite l'interface web (sinon -1)"
      networks: contient les réseaux préchargés"
      wave: contient la vitesse de tic de simulation"
     """
+    global _duration
+    _duration = duration
+    
     if port != -1:
         with_interface = True
     else:

@@ -8,3 +8,4 @@ sortie.json
 test_project/sortie.json
 stats/
 stat_log.csv
+save/*.json

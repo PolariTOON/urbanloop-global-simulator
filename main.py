@@ -28,6 +28,15 @@ def wave(value):
     raise ArgumentTypeError("%s is not a valid wave" % value)
 
 
+def duration(value):
+    '''
+    wave = float(value)
+    if ... :
+        return wave
+    raise ArgumentTypeError("%s is not a valid duration" % value)
+    '''
+
+
 if __name__ == '__main__':
     argument_parser = ArgumentParser(description="Run the UrbanLoop simulator")
     argument_parser.add_argument("-n", "--networks", nargs='+', type=network, default=[], help="load the given networks or none by default, the path should be given for each network")

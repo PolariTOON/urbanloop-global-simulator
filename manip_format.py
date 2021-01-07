@@ -1,6 +1,17 @@
 import json
 import math
 
+def upgrade_file(old_filename, new_filename):
+        """
+                Converts a file from the old format to the new network format
+                (where stations are located on deviations instead of mini-loops)
+        """
+        with open(old_filename, 'r') as f:
+                data = json.loads(f.read())
+        upgrade_format(data)
+        with open(new_filename, 'w') as f:
+                f.write(pretty_dump(data, 2))
+
 def pretty_dump(data, indent):
         """
             converts the dictionnary 'data' into a json text with

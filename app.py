@@ -37,6 +37,9 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
     global _remove_travelers
     global _speed_default
 
+    if not with_interface:
+        print("WARNING : dans app.py : en mode sans interface, il est recommandé d'utiliser speed=7 pour optimiser la génération des travelers.")
+
     _wave = wave
     _remove_travelers = remove_travelers
     # lancement des simulations avec les réseaux préchargés
@@ -58,7 +61,6 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
                 simulation.rate = _speed_default
             except Exception:
                 print_exc()
-    print(_speed_default)
     # main loop
     _loop = get_running_loop()
     while not _quit:

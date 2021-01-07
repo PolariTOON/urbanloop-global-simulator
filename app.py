@@ -104,7 +104,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
                 crashed_simulations.append(key)
                 print_exc()
             # check if the simulation is terminated
-            if simulation.env.now >= _duration / simulation.env.tick:
+            if _duration >= 0 and simulation.env.now >= _duration / simulation.env.tick:
                 terminated = True
         for key in crashed_simulations:
             del _simulations[key]
@@ -112,7 +112,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
             print("Simulation Terminated.")
             stop_app()
 
-    await sleep(0.5) # important : redonne la main au serveur flask (on lui laisse le temps de se fermer)
+    await sleep(3.0) # important : redonne la main au serveur flask (on lui laisse le temps de se fermer)
     print("Terminated.")
 
 

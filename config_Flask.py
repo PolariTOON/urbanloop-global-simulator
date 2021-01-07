@@ -18,6 +18,16 @@ _running_default = False    # par défaut on ne lance pas les simulations
 _speed_default = 0          # par défaut la vitesse de simulation est x1
 
 def shutdown():
+    """
+        Permet de fermer l'application si :
+            - les simulations sont terminées
+            ou
+            - un signal CTRL-C a été reçu
+        ATTENTION :
+        Cette méthode ne sera appelée que lors du traitement d'une requête HTTP.
+        Si le programme est lancé avec l'interface web, le serveur ne sera donc
+        jamais fermé tant qu'aucun client web ne fera de requête au serveur.
+    """
     func = request.environ.get('werkzeug.server.shutdown')
     func()
 

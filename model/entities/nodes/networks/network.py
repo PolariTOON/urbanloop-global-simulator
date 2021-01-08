@@ -44,7 +44,7 @@ class Network(Node):
         # pour débugguer / profiler
         self.last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
         self.last_pods = {}
-        self.one_print = True
+        self._last_minute = int(self.env.time % 60)
         #self.last_sec = 1
     
     @property
@@ -417,12 +417,12 @@ class Network(Node):
         #    if (self.last_sec == 60):
         #        self.last_sec = 0
 
-        if round(self.env.time) % 60 == 1:  # pour éviter d'écrire plusieurs lignes pour un temps donné si le pas est bas
-            one_print = True
-        if round(self.env.time) % 60 == 0 and self.one_print:  # affichage et écriture en fichier toutes les minutes de simulations
-            self.one_print = False
+        current_minute = int(self.env.time / 60)
+        if current_minute != self._last_minute:  # affichage et écriture en fichier toutes les minutes de simulations
+            
+            self._last_minute = current_minute
             print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
-                  "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
+                  "]\u001B[0m\t\t\t\t\t\t\t\t\t\t(network l.402)")
             if self.departure_arrival_printer:
                 self.statistiques.print_stats()
 

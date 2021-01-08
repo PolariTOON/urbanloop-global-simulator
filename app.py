@@ -14,7 +14,7 @@ _simulations = {}
 _remove_travelers = False
 
 _running_default = False
-_speed_default = 8  # but speed is also limited by simulation.max_rate
+_speed_default = 7  # but speed is also limited by simulation.max_rate
 _duration = -1
 _quit = False
 
@@ -104,7 +104,7 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
                 crashed_simulations.append(key)
                 print_exc()
             # check if the simulation is terminated
-            if _duration >= 0 and simulation.env.now >= _duration / simulation.env.tick:
+            if _duration >= 0 and simulation.env.now * simulation.env.tick >= _duration:
                 terminated = True
         for key in crashed_simulations:
             del _simulations[key]

@@ -48,6 +48,7 @@ export class CanvaComponent implements OnInit {
     baseRadius = 10; //Rayon de base d'un cercle
     factor: number = 1; //Facteur de zoom
     zoomPower: number; //Puissance du zoom
+    oldFormat: boolean; // Si on utilise l'ancien format (sans les bridge-derivations)
     firstResize: boolean = true; //Le 1er resize est sp�cial car on n'update pas
     options: any; //Diff�rentes options d'affichage
     
@@ -113,6 +114,7 @@ export class CanvaComponent implements OnInit {
             (options: any) => {
                 this.options = options;
                 this.zoomPower = options.zoom;
+                this.oldFormat = options.oldFormat;
                 this.update();
             }
         );
@@ -429,17 +431,25 @@ export class CanvaComponent implements OnInit {
 						this.linkingFrom = circle.id;
                     else 
                     {
-                        //Si on a cliqu� sur le cercle cible
-                        const circle1 = this.getCircle(this.linkingFrom);
-                        const circle2 = this.getCircle(circle.id);
-
-                        if (circle1.type == 'station' || circle1.type == 'shed' || circle2.type == 'station' || circle2.type == 'shed')
+                        if (this.oldFormat)
                         {
-                            this.createLink(this.linkingFrom, circle.id, 16.67, false, null, null, true);
+                            //Si on a cliqu� sur le cercle cible
+                            this.createLink(this.linkingFrom, circle.id, 16.67, false, null, null, false);
                         }
                         else
                         {
-                            this.createLink(this.linkingFrom, circle.id, 16.67, false, null, null, false);
+                            //Si on a cliqu� sur le cercle cible
+                            const circle1 = this.getCircle(this.linkingFrom);
+                            const circle2 = this.getCircle(circle.id);
+
+                            if (circle1.type == 'station' || circle1.type == 'shed' || circle2.type == 'station' || circle2.type == 'shed')
+                            {
+                                this.createLink(this.linkingFrom, circle.id, 16.67, false, null, null, true);
+                            }
+                            else
+                            {
+                                this.createLink(this.linkingFrom, circle.id, 16.67, false, null, null, false);
+                            }
                         }
                     }
 				} else if (this.editing) {
@@ -569,60 +579,85 @@ export class CanvaComponent implements OnInit {
     //Cr�e un nouveau lien
     // TODO : ne pas pouvoir linker des switch de boucles diff�rentes
     createLink(id1: number, id2: number, speed: number, bridge: boolean, bridgeName: string, loopName: string, isSpecial: boolean) {
-        const b = !bridge && this.isSwitch(id1) && this.isSwitch(id2) && this.getCircle(id1).linked == id2;
-        const name = bridgeName != null ? bridgeName: 'bridge ' + this.nextBridgeId;
-        let created = false;
-        let inLoop = false;
-        let authorizedIfSpecialLink = true;
-
-        if (isSpecial)     
+        if (this.oldFormat)
         {
-            const circle1 = this.getCircle(id1);    // Le depart
-            const circle2 = this.getCircle(id2);    // L'arrivee
-    
-            if ( (circle1.type == 'station' || circle1.type == 'shed') && circle2.type != 'switch_in')
-            {
-                authorizedIfSpecialLink = false;
+            const b = !bridge && this.isSwitch(id1) && this.isSwitch(id2) && this.getCircle(id1).linked == id2;
+            const name = bridgeName != null ? bridgeName: 'bridge ' + this.nextBridgeId;
+            if (!b && id1 != id2 && (bridge || !this.alreadyLinked(id1, id2))) {
+                this.links.push({
+                    id: this.nextLinkId++,
+                    from: id1,
+                    to: id2,
+                    inLoop: false,
+                    speed: speed,
+                    length: this.distanceCircles(id1, id2),
+                    angle: this.angleCircles(id1, id2),
+                    bridge: bridge,
+                    name: bridge ? name: null,
+                    source: 'middle'
+                });
             }
-            if ( (circle2.type == 'station' || circle2.type == 'shed') && circle1.type != 'switch_out')
+            if (this.linking)
+                this.networkService.unlink();
+            this.checkForLoops(loopName);
+        }
+        else
+        {
+            const b = !bridge && this.isSwitch(id1) && this.isSwitch(id2) && this.getCircle(id1).linked == id2;
+            const name = bridgeName != null ? bridgeName: 'bridge ' + this.nextBridgeId;
+            let created = false;
+            let inLoop = false;
+            let authorizedIfSpecialLink = true;
+
+            if (isSpecial)     
             {
-                authorizedIfSpecialLink = false;
+                const circle1 = this.getCircle(id1);    // Le depart
+                const circle2 = this.getCircle(id2);    // L'arrivee
+        
+                if ( (circle1.type == 'station' || circle1.type == 'shed') && circle2.type != 'switch_in')
+                {
+                    authorizedIfSpecialLink = false;
+                }
+                if ( (circle2.type == 'station' || circle2.type == 'shed') && circle1.type != 'switch_out')
+                {
+                    authorizedIfSpecialLink = false;
+                }
+
+                //console.log("Pas sur de cela le 'inLoop = true', peut causer des soucis je pense");
+                inLoop = true;
+                this.makeBridgeOfLinkSpecial(id1, id2);
             }
 
-            //console.log("Pas sur de cela le 'inLoop = true', peut causer des soucis je pense");
-            inLoop = true;
-            this.makeBridgeOfLinkSpecial(id1, id2);
-        }
+            if (!b && id1 != id2 && (bridge || !this.alreadyLinked(id1, id2)) && authorizedIfSpecialLink) 
+            {            
+    			this.links.push({
+    				id: this.nextLinkId++,
+    				from: id1,
+    				to: id2,
+                    inLoop: inLoop,
+                    special: isSpecial,
+    				speed: speed,
+    				length: this.distanceCircles(id1, id2),
+                    angle: this.angleCircles(id1, id2),
+    				bridge: bridge,
+                    name: bridge ? name: null,
+                    source: 'middle'
+                });
+                created = true;
+            }
+            if (this.linking)
+            {
+                this.networkService.unlink();
+            }
 
-        if (!b && id1 != id2 && (bridge || !this.alreadyLinked(id1, id2)) && authorizedIfSpecialLink) 
-        {            
-			this.links.push({
-				id: this.nextLinkId++,
-				from: id1,
-				to: id2,
-                inLoop: inLoop,
-                special: isSpecial,
-				speed: speed,
-				length: this.distanceCircles(id1, id2),
-                angle: this.angleCircles(id1, id2),
-				bridge: bridge,
-                name: bridge ? name: null,
-                source: 'middle'
-            });
-            created = true;
-        }
-        if (this.linking)
-        {
-            this.networkService.unlink();
-        }
+            // Si on est pas dans un cas de section sur un bridge vers une station (nouveau format de bridge), et si on a bien cree un lien
+            if (!isSpecial && created)
+            {
+    		    this.checkForLoops(loopName);
+            }
 
-        // Si on est pas dans un cas de section sur un bridge vers une station (nouveau format de bridge), et si on a bien cree un lien
-        if (!isSpecial && created)
-        {
-		    this.checkForLoops(loopName);
-        }
-
-        //console.log("\nCreated link " + id1 + "-" + id2 + "    special = " + isSpecial + "\n\n");
+            //console.log("\nCreated link " + id1 + "-" + id2 + "    special = " + isSpecial + "\n\n");
+        }    
     }
     
     /*
@@ -709,16 +744,25 @@ export class CanvaComponent implements OnInit {
     //Renvoie l'indice d'un lien selon l'id
     findLink(id: number) 
     {
-        for (let i = 0; i < this.links.length; i++)
+        if (this.oldFormat)
         {
-            const link = this.links[i];
-            if (link.from == id && !link.bridge)
-            {
+            for (let i = 0; i < this.links.length; i++)
+            if (this.links[i].from == id && !this.links[i].bridge)
                 return i;
-            }
-            else if (link.from == id && link.special)    // Il faut pouvoir emprunter un bridge s'il est un bridge-derivation, dans la fonction checkForLoops
+        }
+        else
+        {
+            for (let i = 0; i < this.links.length; i++)
             {
-                return i;
+                const link = this.links[i];
+                if (link.from == id && !link.bridge)
+                {
+                    return i;
+                }
+                else if (link.from == id && link.special)    // Il faut pouvoir emprunter un bridge s'il est un bridge-derivation, dans la fonction checkForLoops
+                {
+                    return i;
+                }
             }
         }
 		return -1;
@@ -744,6 +788,7 @@ export class CanvaComponent implements OnInit {
 
     //Cr�e un lien entre deux switch
     linkBridge(i: number, j: number, speed: number, bridgeName: string, loopName: string) {
+        //////// PROBLEME ?
         const id1 = this.circles[i].id;
         const id2 = this.circles[j].id;
 
@@ -824,71 +869,125 @@ export class CanvaComponent implements OnInit {
     //V�rifie s'il faut cr�er une boucle
     checkForLoops(name: string) 
     {
-        for (let i = 0; i < this.links.length; i++) 
+        if (this.oldFormat)
         {
-            const link = this.links[i];
-
-            // pas inLoop, pas pont non special, pas lien special
-            if (!link.inLoop && !(link.bridge && !link.special) && !(!link.bridge && link.special)) 
-            {
-				let stop = false; //Vaut vrai quand le parcours est termin�
-				let isLoop = false; //Vaut vrai si une boucle doit �tre cr��e
-				let links = Object.assign([], this.links); //Liste des liens � parcourir
-				let next = link.to; //Prochain lien � parcourir
-				let way = [i]; //On construit la liste des liens de la boucle
-				const id = link.from;
-				
-                //On d�vient tous les liens comme non marqu�s
-				for (let link of links)
-					link.checked = false;
-                links[i].checked = true;
-
-                while (!stop && !isLoop) 
-                {
-                    //On cherche le prochain lien
-                    const nextLink = this.findLink(next);
-
-					if (nextLink == -1)
-						//S'il n'existe pas la boucle n'est pas ferm�e
-						stop = true;
-					else if (links[nextLink].checked)
-						//Si le lien est d�j� marqu�, on est revenu au point de d�part
-						isLoop = true;
-					else {
-                        //Sinon, on ajoute le lien au chemin et on passe au suivant
-                        const nextLinkObject = this.getLink(nextLink);
-
-                        way.push(nextLink);
-                        next = links[nextLink].to;
-					}
-                }
-
-                if (isLoop) 
-                {
-					let loop = []
-                    for (const j of way) 
-                    {
-                        const circleId = this.links[j].from;
-
-                        for (let circle of this.circles)
-                        {
-                            // On n'ajoute pas les stations et sheds aux loops maintenant (avec les bridge-deviation)
-                            if (circle.id == circleId && circle.type != 'station' && circle.type != 'shed')
-                            {
-                                circle.loopId = this.nextLoopId;
-                            }
+            for (let i = 0; i < this.links.length; i++) {
+                const link = this.links[i];
+                if (!link.inLoop && !link.bridge) {
+                    let stop = false; //Vaut vrai quand le parcours est termin�
+                    let isLoop = false; //Vaut vrai si une boucle doit �tre cr��e
+                    let links = Object.assign([], this.links); //Liste des liens � parcourir
+                    let next = link.to; //Prochain lien � parcourir
+                    let way = [i]; //On construit la liste des liens de la boucle
+                    const id = link.from;
+                    
+                    //On d�vient tous les liens comme non marqu�s
+                    for (let link of links)
+                        link.checked = false;
+                    links[i].checked = true;
+                    
+                    while (!stop && !isLoop) {
+                        //On cherche le prochain lien
+                        const nextLink = this.findLink(next);
+                        if (nextLink == -1)
+                            //S'il n'existe pas la boucle n'est pas ferm�e
+                            stop = true;
+                        else if (links[nextLink].checked)
+                            //Si le lien est d�j� marqu�, on est revenu au point de d�part
+                            isLoop = true;
+                        else {
+                            //Sinon, on ajoute le lien au chemin et on passe au suivant
+                            way.push(nextLink);
+                            next = links[nextLink].to;
                         }
-						this.links[j].inLoop = true;
-						loop.push(circleId);
+                    }
+                    if (isLoop) {
+                        let loop = []
+                        for (const j of way) {
+                            const circleId = this.links[j].from;
+                            for (let circle of this.circles)
+                                if (circle.id == circleId)
+                                    circle.loopId = this.nextLoopId;
+                            this.links[j].inLoop = true;
+                            loop.push(circleId);
+                        }
+                        this.loops.push({
+                            id: this.nextLoopId++,
+                            name: name != null ? name: 'untitled loop ' + this.nextLoopId,
+                            loop: loop
+                        });
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (let i = 0; i < this.links.length; i++) 
+            {
+                const link = this.links[i];
+
+                // pas inLoop, pas pont non special, pas lien special
+                if (!link.inLoop && !(link.bridge && !link.special) && !(!link.bridge && link.special)) 
+                {
+    				let stop = false; //Vaut vrai quand le parcours est termin�
+    				let isLoop = false; //Vaut vrai si une boucle doit �tre cr��e
+    				let links = Object.assign([], this.links); //Liste des liens � parcourir
+    				let next = link.to; //Prochain lien � parcourir
+    				let way = [i]; //On construit la liste des liens de la boucle
+    				const id = link.from;
+    				
+                    //On d�vient tous les liens comme non marqu�s
+    				for (let link of links)
+    					link.checked = false;
+                    links[i].checked = true;
+
+                    while (!stop && !isLoop) 
+                    {
+                        //On cherche le prochain lien
+                        const nextLink = this.findLink(next);
+
+    					if (nextLink == -1)
+    						//S'il n'existe pas la boucle n'est pas ferm�e
+    						stop = true;
+    					else if (links[nextLink].checked)
+    						//Si le lien est d�j� marqu�, on est revenu au point de d�part
+    						isLoop = true;
+    					else {
+                            //Sinon, on ajoute le lien au chemin et on passe au suivant
+                            const nextLinkObject = this.getLink(nextLink);
+
+                            way.push(nextLink);
+                            next = links[nextLink].to;
+    					}
                     }
 
-					this.loops.push({
-						id: this.nextLoopId++,
-						name: name != null ? name: 'untitled loop ' + this.nextLoopId,
-						loop: loop
-					});
-				}
-			}
+                    if (isLoop) 
+                    {
+    					let loop = []
+                        for (const j of way) 
+                        {
+                            const circleId = this.links[j].from;
+
+                            for (let circle of this.circles)
+                            {
+                                // On n'ajoute pas les stations et sheds aux loops maintenant (avec les bridge-deviation)
+                                if (circle.id == circleId && circle.type != 'station' && circle.type != 'shed')
+                                {
+                                    circle.loopId = this.nextLoopId;
+                                }
+                            }
+    						this.links[j].inLoop = true;
+    						loop.push(circleId);
+                        }
+
+    					this.loops.push({
+    						id: this.nextLoopId++,
+    						name: name != null ? name: 'untitled loop ' + this.nextLoopId,
+    						loop: loop
+    					});
+    				}
+    			}
+            }
         }
 	}
     
@@ -1249,269 +1348,306 @@ export class CanvaComponent implements OnInit {
 //FONCTIONS DE CONVERTION
 
     //Convertit le r�seau mod�le �dtieur -> simulateur
-	convertNetwork() {
-        this.goToZoom(1);
+	convertNetwork() 
+    {
+        if (this.oldFormat)
+        {
+            this.goToZoom(1);
         
-        this.updateViewBox();
-		this.network.loops = [];
-		this.network.bridges = [];
-        this.network.time = this.convertTimeToSeconds(this.network.hours, this.network.minutes);
-
-        let numberStationsWronglyPlaced = 0;
-        let numberShedsWronglyPlaced = 0;
+            this.updateViewBox();
+            this.network.loops = [];
+            this.network.bridges = [];
+            this.network.time = this.convertTimeToSeconds(this.network.hours, this.network.minutes);
+            
+            //On parcourt les boucles
+            for (let i = 0; i < this.loops.length; i++) {
+                const loop = this.loops[i];
+                if (!this.containsSwitchLinkedWithAloneSwitch(loop)) {
+                    this.network.loops.push({
+                        name: loop.name,
+                        elements: [],
+                        sections: [],
+                        pods: []
+                    });
+                    //On parcourt les cerlces de cette boucle
+                    loop.loop.forEach((circleId) => {
+                        //On ajoute chaque cerlce
+                        const circle = this.getCircle(circleId);
+                        let elt = {
+                            type: circle.type,
+                            x: circle.x,
+                            y: circle.y
+                        }
+                        if (this.isSwitch(circle.id)) {
+                            elt['pods'] = [];
+                            elt['id_bridge'] = circle.link;
+                        } else {
+                            elt['name'] = circle.name;
+                            elt['pods'] = {
+                                max: circle.max_pods,
+                                count: circle.type == 'station' ? 0: circle.max_pods
+                            };
+                            if (elt.type == 'station') {
+                                elt['station_type'] = circle.station_type;
+                                elt['travelers'] = {
+                                    count: 0, 
+                                    average_waiting_time: 0, 
+                                    all_time_count: 0
+                                };
+                            }
+                        }
+                        this.network.loops[i].elements.push(elt);
+                        //On ajoute ensuite une section
+                        const link = this.goingFrom(circleId);
+                        this.network.loops[i].sections.push({
+                            speed: link.speed,
+                            path: {
+                                type: 'line'
+                            }
+                        });
+                    });
+                }
+            }
+            //On parcourt tous les liens qui sont des bridge
+            this.links.forEach((link) => {
+                if (link.bridge && this.goingFrom(link.from) != null && this.goingFrom(link.to) != null) {
+                    this.network.bridges.push({
+                        name: link.name,
+                        section: {
+                            speed: link.speed,
+                            path: {
+                                type: 'line'
+                            }
+                        },
+                        pods: []
+                    });
+                }
+            });
+            console.log("here");
+            this.networkService.updateNetwork(this.network);
+        }
+        else
+        {
+            this.goToZoom(1);
         
-        console.log("\n\nCONVERT NETWORK\n\n");
+            this.updateViewBox();
+            this.network.loops = [];
+            this.network.bridges = [];
+            this.network.time = this.convertTimeToSeconds(this.network.hours, this.network.minutes);
 
-        //On parcourt les boucles
-		for (let i = 0; i < this.loops.length; i++) {
-			const loop = this.loops[i];
-            if (!this.containsSwitchLinkedWithAloneSwitch(loop)) {
-                this.network.loops.push({
-                    name: loop.name,
-                    elements: [],
-                    sections: [],
-                    pods: []
-                });
-                //On parcourt les cercles de cette boucle
-                loop.loop.forEach((circleId) => {
-                    //On ajoute chaque cerlce
-                    const circle = this.getCircle(circleId);
-                    let elt = {
-                        type: circle.type,
-                        x: circle.x,
-                        y: circle.y
-                    }
-                    if (this.isSwitch(circle.id)) {
-                        elt['id_bridge'] = circle.link;
-                        elt['pods'] = [];
-                    } 
-                    else 
-                    {
-                        elt['name'] = circle.name;
-                        elt['pods'] = {
-                            max: circle.max_pods,
-                            count: circle.type == 'station' ? 0: circle.max_pods
-                        };
-                        if (elt.type == 'station') 
+            let numberStationsWronglyPlaced = 0;
+            let numberShedsWronglyPlaced = 0;
+            
+            console.log("\n\nCONVERT NETWORK\n\n");
+
+            //On parcourt les boucles
+            for (let i = 0; i < this.loops.length; i++) {
+                const loop = this.loops[i];
+                if (!this.containsSwitchLinkedWithAloneSwitch(loop)) {
+                    this.network.loops.push({
+                        name: loop.name,
+                        elements: [],
+                        sections: [],
+                        pods: []
+                    });
+                    //On parcourt les cercles de cette boucle
+                    loop.loop.forEach((circleId) => {
+                        //On ajoute chaque cerlce
+                        const circle = this.getCircle(circleId);
+                        let elt = {
+                            type: circle.type,
+                            x: circle.x,
+                            y: circle.y
+                        }
+                        if (this.isSwitch(circle.id)) {
+                            elt['id_bridge'] = circle.link;
+                            elt['pods'] = [];
+                        } 
+                        else 
                         {
-                            numberStationsWronglyPlaced ++;
-                            elt['station_type'] = circle.station_type;
-                            elt['travelers'] = {
+                            elt['name'] = circle.name;
+                            elt['pods'] = {
+                                max: circle.max_pods,
+                                count: circle.type == 'station' ? 0: circle.max_pods
+                            };
+                            if (elt.type == 'station') 
+                            {
+                                numberStationsWronglyPlaced ++;
+                                elt['station_type'] = circle.station_type;
+                                elt['travelers'] = {
+                                    count: 0, 
+                                    average_waiting_time: 0, 
+                                    all_time_count: 0
+                                };
+                            }
+                            else if (elt.type == 'shed')
+                            {
+                                numberShedsWronglyPlaced ++;
+                            }
+                        }
+                        this.network.loops[i].elements.push(elt);
+                        //On ajoute ensuite une section
+
+                        const link = this.goingFromConsideringBridgesForCircle(circleId);
+
+                        this.network.loops[i].sections.push(
+                        {
+                            speed: link.speed,
+                            path: {
+                                type: 'line'
+                            }
+                        });
+                    });
+                }
+            }
+
+            // L'ordre est important ! On va d'abord stocker les bridges classiques puis les speciaux
+            let classicalBridges = [];
+            let specialBridges = [];
+
+            //On parcourt tous les liens qui sont des bridge
+            this.links.forEach((link) => 
+            {
+                const goingFromFrom = this.goingFrom(link.from);
+                const goingFromTo = this.goingFrom(link.to);
+
+                // Si le lien est un pont (sinon on l'a deja traite dans loops normalement)
+                if (link.bridge && goingFromFrom != null && goingFromTo != null)
+                {
+                    // CE QUI SUIT DECOULE DES MODIF FAITES SUR LES MINI-BOUCLES (maintenant un bridge relie la station au reseau)
+                    const circle1 = this.getSecondCircleHavingLinkFromCircleOfId(this.getCircle(link.from).id);
+                    const circle2 = this.getSecondCircleHavingLinkToCircleOfId(this.getCircle(link.to).id);
+                    
+                    if (circle1 == circle2 && circle1 != null)  // c'est le cas si c'est un pont-station
+                    {
+                        // Les sections
+                        let sectionsFound = [];
+
+                        const linkFromCircle1 = this.getLinkFromCircleOfId(circle1.id);
+                        sectionsFound.push(
+                            {
+                            speed: linkFromCircle1.speed,
+                            path: {
+                                type: 'line'
+                            }
+                        })
+
+                        const linkToCircle1 = this.getLinkToCircleOfId(circle1.id);
+                        sectionsFound.push(
+                            {
+                            speed: linkToCircle1.speed,
+                            path: {
+                                type: 'line'
+                            }
+                        })
+
+
+                        // Les elements
+                        let elements = [];
+
+                        const elt1 =
+                        {
+                            type: circle1.type,
+                            name: circle1.name,
+                            x: circle1.x,
+                            y: circle1.y,
+                            pods: 
+                            {
+                                max: circle1.max_pods,
+                                count: circle1.type == 'station' ? 0: circle1.max_pods
+                            },
+                            station_type: circle1.station_type
+                        };
+                        if (elt1.type == 'station') {
+                            elt1['station_type'] = circle1.station_type;
+                            elt1['travelers'] = {
                                 count: 0, 
                                 average_waiting_time: 0, 
                                 all_time_count: 0
                             };
                         }
-                        else if (elt.type == 'shed')
+
+                        // Qu'un seul element dans ce cas
+                        elements.push(elt1);
+
+
+                        // On push le tout
+                        specialBridges.push(
                         {
-                            numberShedsWronglyPlaced ++;
-                        }
+                            name: link.name,
+                            sections: sectionsFound,
+                            elements: elements,
+                            pods: []
+                        });
                     }
-                    this.network.loops[i].elements.push(elt);
-                    //On ajoute ensuite une section
-
-                    const link = this.goingFromConsideringBridgesForCircle(circleId);
-
-                    this.network.loops[i].sections.push(
+                    else    //Points classiques (ne reliant pas station/shed)
                     {
-                        speed: link.speed,
-                        path: {
-                            type: 'line'
-                        }
-                    });
-                });
-            }
-        }
+                        let sectionsFound = [];
 
-        // L'ordre est important ! On va d'abord stocker les bridges classiques puis les speciaux
-        let classicalBridges = [];
-        let specialBridges = [];
+                        // Qu'une seule section dans ce cas-la
+                        sectionsFound.push(
+                        {
+                            speed: link.speed,
+                            path: {
+                                type: 'line'
+                            }
+                        })
 
-        //On parcourt tous les liens qui sont des bridge
-        this.links.forEach((link) => 
-        {
-            const goingFromFrom = this.goingFrom(link.from);
-            const goingFromTo = this.goingFrom(link.to);
+                        classicalBridges.push(
+                        {
+                            name: link.name,
+                            pods: [],
+                            sections: sectionsFound,
+                            elements: []
+                        });
+                    }
+                }
+            });
 
-            // Si le lien est un pont (sinon on l'a deja traite dans loops normalement)
-            if (link.bridge && goingFromFrom != null && goingFromTo != null)
+            // On rassemble les bridges classique et les speciaux 
+            classicalBridges.forEach((classicalBridge) =>
             {
-                // CE QUI SUIT DECOULE DES MODIF FAITES SUR LES MINI-BOUCLES (maintenant un bridge relie la station au reseau)
-                const circle1 = this.getSecondCircleHavingLinkFromCircleOfId(this.getCircle(link.from).id);
-                const circle2 = this.getSecondCircleHavingLinkToCircleOfId(this.getCircle(link.to).id);
-                
-                if (circle1 == circle2 && circle1 != null)  // c'est le cas si c'est un pont-station
-                {
-                    // Les sections
-                    let sectionsFound = [];
+                this.network.bridges.push(classicalBridge);
+            });
+            specialBridges.forEach((specialBridge) =>
+            {
+                this.network.bridges.push(specialBridge);
+            });
+            ///////
+            
+            this.networkService.updateNetwork(this.network);
 
-                    const linkFromCircle1 = this.getLinkFromCircleOfId(circle1.id);
-                    sectionsFound.push(
-                        {
-                        speed: linkFromCircle1.speed,
-                        path: {
-                            type: 'line'
-                        }
-                    })
-
-                    const linkToCircle1 = this.getLinkToCircleOfId(circle1.id);
-                    sectionsFound.push(
-                        {
-                        speed: linkToCircle1.speed,
-                        path: {
-                            type: 'line'
-                        }
-                    })
-
-
-                    // Les elements
-                    let elements = [];
-
-                    const elt1 =
-                    {
-                        type: circle1.type,
-                        name: circle1.name,
-                        x: circle1.x,
-                        y: circle1.y,
-                        pods: 
-                        {
-                            max: circle1.max_pods,
-                            count: circle1.type == 'station' ? 0: circle1.max_pods
-                        },
-                        station_type: circle1.station_type
-                    };
-                    if (elt1.type == 'station') {
-                        elt1['station_type'] = circle1.station_type;
-                        elt1['travelers'] = {
-                            count: 0, 
-                            average_waiting_time: 0, 
-                            all_time_count: 0
-                        };
-                    }
-
-                    // Qu'un seul element dans ce cas
-                    elements.push(elt1);
-
-
-                    // On push le tout
-                    specialBridges.push(
-                    {
-                        name: link.name,
-                        sections: sectionsFound,
-                        elements: elements,
-                        pods: []
-                    });
-                }
-                else    //Points classiques (ne reliant pas station/shed)
-                {
-                    let sectionsFound = [];
-
-                    // Qu'une seule section dans ce cas-la
-                    sectionsFound.push(
-                    {
-                        speed: link.speed,
-                        path: {
-                            type: 'line'
-                        }
-                    })
-
-                    classicalBridges.push(
-                    {
-                        name: link.name,
-                        pods: [],
-                        sections: sectionsFound,
-                        elements: []
-                    });
-                }
+            if (numberStationsWronglyPlaced > 0 || numberShedsWronglyPlaced > 0)
+            {
+                console.log("%cIncorrect format " + numberShedsWronglyPlaced + " sheds et " + numberStationsWronglyPlaced + " stations", "color: red");
+                console.log("%cThe json will not be accepted in the simulator", "color: red");
+                console.log("Please integrate a bridge linking the sheds/stations individually to the place they are now");
             }
-        });
-
-        // On rassemble les bridges classique et les speciaux 
-        classicalBridges.forEach((classicalBridge) =>
-        {
-            this.network.bridges.push(classicalBridge);
-        });
-        specialBridges.forEach((specialBridge) =>
-        {
-            this.network.bridges.push(specialBridge);
-        });
-        ///////
-        
-        this.networkService.updateNetwork(this.network);
-
-        if (numberStationsWronglyPlaced > 0 || numberShedsWronglyPlaced > 0)
-        {
-            console.log("%cIncorrect format " + numberShedsWronglyPlaced + " sheds et " + numberStationsWronglyPlaced + " stations", "color: red");
-            console.log("%cThe json will not be accepted in the simulator", "color: red");
-            console.log("Please integrate a bridge linking the sheds/stations individually to the place they are now");
         }
 	}
 
     //Convertit le r�seau mod�le simulateur -> �diteur
-    convertFromNetwork(network) {
-        this.networkService.init();
-        this.network = Object.assign({}, network);
-        this.network.loops = [];
-        this.network.bridges = [];
-        this.networkService.updateNetwork(this.network);
-        
-        const time = this.convertSecondsToTime(network.time);
-        this.network['hours'] = time['hours'];
-        this.network['minutes'] = time['minutes'];
-        
-        let bridges = [];
-        for (const bridge of network.bridges)
-            bridges.push([]);
-
-        network.loops.forEach((loop) => {        
-            const firstId = this.nextCircleId;
-            loop.elements.forEach((elt) => {
-                if (elt.type != 'sensor') {
-                    const statOrShed = elt.type == 'station' || elt.type == 'shed'
-                    const max_pods = statOrShed ? elt.pods.max: null;
-                    const name = statOrShed ? elt.name: null;
-                    const station_type = statOrShed ? elt.station_type: null;
-                    this.createCircle(elt.x, elt.y, max_pods, name, elt.type, station_type);
-                    if (!statOrShed)
-                    {
-                        bridges[elt.id_bridge].push(this.circles.length - 1);
-                    }
-                }
-            });
-            const lastId = this.nextCircleId - 1;
+    convertFromNetwork(network) 
+    {
+        if (this.oldFormat)
+        {
+            this.networkService.init();
+            this.network = Object.assign({}, network);
+            this.network.loops = [];
+            this.network.bridges = [];
+            this.networkService.updateNetwork(this.network);
             
-            let i = firstId;
-            loop.sections.forEach((section) => {
-                if (i < lastId)
-                    this.createLink(i++, i, section.speed, false, null, loop.name, false);
-                else
-                    this.createLink(lastId, firstId, section.speed, false, null, loop.name, false);
-            });
-        });
-        this.centerCircles();
-        
-
-        for (let k = 0; k < bridges.length; k++) {
-            const i = bridges[k][0];
-            const j = bridges[k][1];
-            const bridge = network.bridges[k];
-
-            if (bridge.section != null)             // sur un bridge classique avec format section
-            {
-                this.linkBridge(i, j, bridge.section.speed, bridge.name, null);
-            }
-            else if (bridge.sections.length == 1)   // sur un bridge classique avec format sections
-            {
-                this.linkBridge(i, j, bridge.sections[0].speed, bridge.name, null);
-            }
-            else        // Sur un bridge de station/shed
-            {
-                this.linkBridgeWhenAlreadyLinked(i, j, bridge.sections[0].speed, bridge.name, null);
-
-                ///////////////////////////////////////////
-                ///// J'ai recopie  ceci, on le faisait pour les loops dans la meme fonction
+            const time = this.convertSecondsToTime(network.time);
+            this.network['hours'] = time['hours'];
+            this.network['minutes'] = time['minutes'];
+            
+            let bridges = [];
+            for (const bridge of network.bridges)
+                bridges.push([]);
+            
+            network.loops.forEach((loop) => {        
                 const firstId = this.nextCircleId;
-                bridge.elements.forEach((elt) => {
+                loop.elements.forEach((elt) => {
                     if (elt.type != 'sensor') {
                         const statOrShed = elt.type == 'station' || elt.type == 'shed'
                         const max_pods = statOrShed ? elt.pods.max: null;
@@ -1523,24 +1659,106 @@ export class CanvaComponent implements OnInit {
                     }
                 });
                 const lastId = this.nextCircleId - 1;
+                
+                let i = firstId;
+                loop.sections.forEach((section) => {
+                    if (i < lastId)
+                        this.createLink(i++, i, section.speed, false, null, loop.name, false);
+                    else
+                        this.createLink(lastId, firstId, section.speed, false, null, loop.name, false);
+                });
+            });
+            
+            this.centerCircles();
 
-                this.createLink(lastId, j, bridge.sections[0].speed, false, bridge.name + "_from_station", null, true);
-                this.createLink(i, lastId, bridge.sections[1].speed, false, bridge.name + "_to_station", null, true);
+            for (let k = 0; k < bridges.length; k++) {
+                const i = bridges[k][0];
+                const j = bridges[k][1];
+                const bridge = network.bridges[k];
+                this.linkBridge(i, j, bridge.section.speed, bridge.name, null);
             }
         }
-
-    }
-
-    printLinks()        // pour debugger plus facilement, pas utile actuellement
-    {
-        for (const link of this.links)
+        else
         {
-            console.log("Link " + link.id);
-            console.log("link.from : " + link.from);
-            console.log("link.to : " + link.to);
-            console.log("link.bridge : " + link.bridge);
-            console.log("link.special : " + link.special);
+            this.networkService.init();
+            this.network = Object.assign({}, network);
+            this.network.loops = [];
+            this.network.bridges = [];
+            this.networkService.updateNetwork(this.network);
+            
+            const time = this.convertSecondsToTime(network.time);
+            this.network['hours'] = time['hours'];
+            this.network['minutes'] = time['minutes'];
+            
+            let bridges = [];
+            for (const bridge of network.bridges)
+                bridges.push([]);
+
+            network.loops.forEach((loop) => {        
+                const firstId = this.nextCircleId;
+                loop.elements.forEach((elt) => {
+                    if (elt.type != 'sensor') {
+                        const statOrShed = elt.type == 'station' || elt.type == 'shed'
+                        const max_pods = statOrShed ? elt.pods.max: null;
+                        const name = statOrShed ? elt.name: null;
+                        const station_type = statOrShed ? elt.station_type: null;
+                        this.createCircle(elt.x, elt.y, max_pods, name, elt.type, station_type);
+                        if (!statOrShed)
+                        {
+                            bridges[elt.id_bridge].push(this.circles.length - 1);
+                        }
+                    }
+                });
+                const lastId = this.nextCircleId - 1;
+                
+                let i = firstId;
+                loop.sections.forEach((section) => {
+                    if (i < lastId)
+                        this.createLink(i++, i, section.speed, false, null, loop.name, false);
+                    else
+                        this.createLink(lastId, firstId, section.speed, false, null, loop.name, false);
+                });
+            });
+            this.centerCircles();
+            
+
+            for (let k = 0; k < bridges.length; k++) {
+                const i = bridges[k][0];
+                const j = bridges[k][1];
+                const bridge = network.bridges[k];
+
+                if (bridge.section != null)             // sur un bridge classique avec format section
+                {
+                    this.linkBridge(i, j, bridge.section.speed, bridge.name, null);
+                }
+                else if (bridge.sections.length == 1)   // sur un bridge classique avec format sections
+                {
+                    this.linkBridge(i, j, bridge.sections[0].speed, bridge.name, null);
+                }
+                else        // Sur un bridge de station/shed
+                {
+                    this.linkBridgeWhenAlreadyLinked(i, j, bridge.sections[0].speed, bridge.name, null);
+
+                    ///////////////////////////////////////////
+                    ///// J'ai recopie  ceci, on le faisait pour les loops dans la meme fonction
+                    const firstId = this.nextCircleId;
+                    bridge.elements.forEach((elt) => {
+                        if (elt.type != 'sensor') {
+                            const statOrShed = elt.type == 'station' || elt.type == 'shed'
+                            const max_pods = statOrShed ? elt.pods.max: null;
+                            const name = statOrShed ? elt.name: null;
+                            const station_type = statOrShed ? elt.station_type: null;
+                            this.createCircle(elt.x, elt.y, max_pods, name, elt.type, station_type);
+                            if (!statOrShed)
+                                bridges[elt.id_bridge].push(this.circles.length - 1);
+                        }
+                    });
+                    const lastId = this.nextCircleId - 1;
+
+                    this.createLink(lastId, j, bridge.sections[0].speed, false, bridge.name + "_from_station", null, true);
+                    this.createLink(i, lastId, bridge.sections[1].speed, false, bridge.name + "_to_station", null, true);
+                }
+            }
         }
     }
-
 }

@@ -13,7 +13,7 @@ permet de générer un fichier json qui correspond à un réseau
 
 
 def create_json(filename):
-    csvfile = open('resources/coordonnees_stations_bus_tram_Nancy.csv', 'r')
+    csvfile = open('modelisation_reseau/newStops.csv', 'r')
     print("generate ", filename)
 
     stations = []       # ensemble des noms de station/dépots
@@ -61,7 +61,7 @@ def create_json(filename):
     # pour afficher une preview de la position des stations
     # pre_show_map(latitudes, latitude_min, latitude_max, longitude_min, longitude_max, longitudes, abscisses, ordonnees, is_station, boucles)
 
-    jsonfile = open('resources/Grand_Nancy_8_boucles.json', 'w')
+    jsonfile = open('modelisation_reseau/Grand_Nancy.json', 'w')
     jsonfile.write("{\n\"name\": \"Grand Nancy\",\n\"time\": 28800,\n\"state\": 56565,\n\"jerky\": true,\n\"running\": false,\n\"margin_min\": 2,\n\"max_speed\": 30,\n\"pod_size\": 2,\n\"places_number\": 5,\n\"dynamic_routing\": false,\n\"view_box\": {\n\t\"x\": 0,\n\t\"y\": 200,\n\t\"width\": 600,\n\t\"height\": 500\n},\n")   # entete du fichier
 
     # écriture de la partie loops

@@ -56,6 +56,8 @@ class SwitchOut(Switch):
         return self._stat_or_shed
 
     def set_c1_length(self):
+        # TODO : cela ne concerne que le cas d'un bridge entre 2 loops, il faut ajouter le cas d'une dérivation vers une station/shed
+        # TODO : vérifier si ce n'est pas grave d'autoriser une longueur de 0.0
         self._length = self._switch_in.finalisation_length * self.speed / self._switch_in.speed - self._beside.sections[0].length * self.speed / self._beside.sections[0].speed
         if self._beside.length > self._switch_in.finalisation_length * self.max_speed / self._switch_in.speed:
             print("\u001b[31mLA LONGUEUR DU PONT", self._beside.sections[0].name, "NE RESPECTE PAS LES NORMES DU RESEAU, elle est superieur à :", self._switch_in.finalisation_length * self.max_speed / self._switch_in.speed, "mètres\u001b[0m")

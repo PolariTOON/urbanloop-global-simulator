@@ -1,9 +1,9 @@
 from numpy import floor, sum
-from random import randint, random, choice
+from random import seed, randint, random, choice
 from model.entities.tokens.traveler import Traveler
 from scipy.stats import norm
 import math
-from numpy.random import poisson
+import numpy.random as np_rand
 
 from model.entities.nodes.networks.ways.tracks import station
 
@@ -135,17 +135,19 @@ class Probability:
                                         "\n\t\t\u001B[32m|\u001B[0m taille de la station:", s.capacity, "\n")"""
                 s._all_time_count += 1
 
-    def generate_traveler_2(self, time, env, nb_ticks=1):
+    def generate_traveler_2(self, time, env, state, nb_ticks=1):
         """utilisation de la loi de Poisson"""
         hour = int(round(time / 3600, 2)) % 24
         travelers_to_generate = nb_ticks * self.traveler_per_tick[hour]  # nb de voyageurs que l'on génère au tick présent
                                                                          # (ou au groupe de ticks présent si nb_ticks > 1)
+        seed(state+12345)
+        np_rand.seed((int(state)+123456) % 2**32) # 'seed' must receive a number between 0 and 2**32 - 1 (also, 123456 cas be any number)
         travelers_to_generate_per_station = []
         for coef0 in self.coef_station:
             travelers_to_generate_per_station.append(coef0*travelers_to_generate)   # répartition des passagers à générer selon le type de station
         for i_station in range(len(self.stations)):     # pour chaque station on génère ou non des voyageurs
             station0 = self.stations[i_station]
-            for i_traveler in range(poisson(travelers_to_generate_per_station[i_station], 1)[0]):  # génération selon une loi de poisson
+            for i_traveler in range(np_rand.poisson(travelers_to_generate_per_station[i_station], 1)[0]):  # génération selon une loi de poisson
                 # get random destination
                 if len(self.coef_station) > 1:
                     destination = self.get_rand_station()

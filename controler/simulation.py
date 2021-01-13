@@ -140,7 +140,7 @@ class Simulation:
                 # alors on considère que l'approximation est mauvaise
                 print("Warning: simulation.py: travelers generation will be too much approximated,"
                       "         you need to improve the source code (or reduce tick or rate) to fix this eventual problem.")
-            self._probability.generate_traveler_2(self._env.time, self._env, nb_ticks=times)
+            self._probability.generate_traveler_2(self._env.time, self._env, self._state, nb_ticks=times)
 
     def serialize(self):
         dict = self._network.serialize()

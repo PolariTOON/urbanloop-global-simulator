@@ -205,22 +205,12 @@ class Pod(Token):
 
     def update(self):
 
-        # OPTIMISATION : ne regarder que lors de l'embarquement !
-        #################
-        has_real_traveler = False
-        has_traveler_who_changed_dest = False
-        has_traveler_who_called_emergency_exit = False
-        for traveler in self._travelers:     # On regarde si un de nos passagers a ete genere avec un ticket
-            if (traveler.real_user):
-                has_real_traveler = True        
-            if (traveler.changed_dest):
-                has_traveler_who_changed_dest = True        
-            if (traveler.called_emergency_exit):
-                has_traveler_who_called_emergency_exit = True         
-        self._contain_real_user = has_real_traveler   
-        self._changed_destination = has_traveler_who_changed_dest   
-        self._emergency_exit = has_traveler_who_called_emergency_exit   
-        #################
+        # OPTIMISATION : ne pas regarder à chaque update ?
+        for traveler in self._travelers:       
+            # On regarde si un de nos passagers a été genéré avec un ticket via l'appli mobile
+            self._contain_real_user = traveler.real_user   
+            self._changed_destination = traveler.changed_dest   
+            self._emergency_exit = traveler.called_emergency_exit   
 
         # Gestion du décalage et de la discrétisation : on reprend la vitesse moyenne après avoir parcouru la bonne distance
         if self._length_before_restore is not None:
@@ -327,7 +317,7 @@ class Pod(Token):
                     "pod": self
                 })
             # on vérifie si le pod n'est pas allé trop loin
-            if self.position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in ["Shed", "Station", "Sensor"]:
+            if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in ["SwitchOut", "Shed", "Station", "Sensor"]:
                 print("Warning: pod.py: a pod has travelled to much distance while arriving on '%s'." % self._track_or_switch.name)
         
         return
@@ -349,9 +339,7 @@ class Pod(Token):
                 "traveled_distance": self._traveled_distance
             })
         elif "passing_from_switch" == message["type"]:
-            self.track_or_switch = self._track_or_switch.next.sections[0]
-            #self._track_or_switch = self._track_or_switch.next.sections[0]
-            
+            self._track_or_switch = self._track_or_switch.next.sections[0]
             self._track_or_switch.write({
                 "author": self,
                 "type": "pod_entry",
@@ -360,9 +348,7 @@ class Pod(Token):
             })
         elif "docked" == message["type"]:
             # La capsule s'arrête dans une gare ou un dépôt
-
-            # TODO : check track_or_switch à ce niveau-là (-> je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être une problème...))
-            
+            # TODO : check track_or_switch à ce niveau-là (je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être une problème...))
             self._speed = 0
             self._endSpeed = 0
             self._previous_station = None      # On reset la derniere station
@@ -467,8 +453,8 @@ class Pod(Token):
                 timeToDest += self.get_time_of_elt_of_network(eltOfNetwork.next)
                 eltOfNetwork = eltOfNetwork.next
 
-            if (stationConsidered == self._destination):        # Dans le cas on l'on a trouve grace au "for station"
-                break        # On sort du while (break aurait eu le meme effet)
+            if (stationConsidered == self._destination):  # Dans le cas on l'on a trouve grace au "for station"
+                break
 
             # On cherche la station mtn qu'on est a un switchOut, ou le prochain switchOut
             stationConsidered = self.get_station_on_bridge_derivation(eltOfNetwork)

@@ -33,7 +33,7 @@ class Entity:
     # mode 3
 
     # ATTENTION :
-    #  certaines classes ("network" et "switch_in") font des choses dans "run",
+    #  certaines classes ("switch_in") font des choses dans "run",
     #  et nécessitent qu'un "run" soit appelé (et ce, après que tous les objets soient instanciés)
 
     def write3(self, message):

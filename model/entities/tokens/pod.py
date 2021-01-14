@@ -1,5 +1,4 @@
 from numpy.random import normal, seed
-from random import random as rd
 
 from .token import Token
 from .traveler import Traveler

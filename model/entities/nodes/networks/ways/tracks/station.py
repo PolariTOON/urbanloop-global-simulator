@@ -41,7 +41,7 @@ class Station(Step):
                                                              # pour le moment on génère de nouveaux travelers suivant le nombre qu'il y avait dans la station
         self._departure_count = departure_count or 0
         self._capacity = pods["max"]
-        self._parallel = parallel or False
+        self._parallel = parallel or False  # pas utilisé (pourrait permettre de savoir si les pods sont en parallèle les uns des autres)
         self._boarding = [-1 for _ in range(self._capacity)]            # contient les temps d'attente liés aux embarquements
         self._pods_ready = [False for _ in range(self._capacity)]       # contient un boolean indiquant si une capsule est prête à partir
         self._station_type = station_type
@@ -49,7 +49,6 @@ class Station(Step):
         self._pods = [None for _ in range(self._capacity)]
         for i in range(pods['count']):
             self._pods[-i-1] = Pod(env, self, 0)
-        self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
         self._departure_pods = departure_pods or []                     # dictionnaire des pods sur le point de partir  # todo revoir l'initialisation de departure_pods en cas de chargement reseau
         self._incoming_pods = 0  # à serialiser si on veut télécharger/recharger le réseau, c'est le nombre de pods en chemin vers la station
         self.wait = -1       # pour décompter le départ entre 2 capsules
@@ -61,7 +60,6 @@ class Station(Step):
     def serialize(self):
         """Permet la serialisation des informations"""
         dict = super().serialize()
-        self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
         #departure_pods = [{"pod": dico["pod"].serialize(), "destination": dico["destination"].serialize()} for dico in self._departure_pods]
         self.element_of_loop.update({
             "name": self.name
@@ -69,7 +67,7 @@ class Station(Step):
         dict.update({
             "type": "station",
             "pods": {
-                "count": self._pods_size,
+                "count": self.pods_size,
                 "max": self.capacity,
                 "pos": [True if pod else False for pod in self._pods],
                 "boarding": [self._boarding[i] != -1 for i in range(self._capacity)],
@@ -95,6 +93,10 @@ class Station(Step):
         self._incoming_pods -= 1
 
     @property
+    def pods_size(self):
+         return len(self._pods) - self._pods.count(None)
+        
+    @property
     def element_of_loop(self):
         """Numéro de la gare parmis les éléments de la boucle"""
         return self._element_of_loop
@@ -117,10 +119,6 @@ class Station(Step):
     def pods(self):
         """Liste contenant les capsules arrêtée dans la station"""
         return self._pods
-
-    @property
-    def pods_size(self):
-        return self._pods_size
 
     @property
     def travelers(self):
@@ -150,11 +148,14 @@ class Station(Step):
         return arr
 
     def isFull(self):
-        for pod in self._pods:  # si au moins un emplacement est disponible return False
-            if not pod:
-                return False
-        return True
+        """
+            Attention, on ne prend pas en compte self._incoming_pods
+        """
+        return self.pods_size < self._capacity
 
+    def is_available(self):
+        return self.pods_size + self._incoming_pods < self._capacity
+    
     def send_pod(self, pod, destination, traveler=False):
         """envoie une capsule
         destination : nom de la station ou entrepôt où envoyer
@@ -199,7 +200,7 @@ class Station(Step):
             })
 
         # On charge les voyageurs s'il y a de la place
-        if len(self._travelers) > 0 and self._pods_size > 0:
+        if len(self._travelers) > 0 and self.pods_size > 0:
             for i in range(self._capacity - 1, -1, -1):  # on commence par les premières capsules à partir
                 pod = self._pods[i]
                 if len(self._travelers) > 0 and pod and pod.isEmpty() and pod not in self._departure_pods:  # s'il y a un traveler en attente, un pod avec de la place
@@ -292,12 +293,11 @@ class Station(Step):
                 #
                 # TODO : comprendre la gestion des pods dans Station
                 #
-                if self._pods_size < self.capacity:
+                if self.pods_size < self.capacity:
                     for i in range(len(self.pods)-1, -1, -1):
                         if self._pods[i] is None:
                             self._pods[i] = pod
                             break
-                    self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
                     self._incoming_pods -= 1
                     if self._incoming_pods < 0:
                         print("\033[4;31merreur comptage incoming pods\u001B[0m", self._incoming_pods,
@@ -345,37 +345,35 @@ class Station(Step):
 
     def empty_call(self):
         """Fonction qui permet de choisir si on se débarasse de capsules vides dans une station"""
-        "self._pods_size indique le nombre de pods dans la station"
+        "self.pods_size indique le nombre de pods dans la station"
         "self.capacity le nombre de pods total que la station peut contenir"
         "self.travelers le nombre de passagers en attente de capsule dans la station"
         "self.departure_pods le nombre de pod en attente d'insertion dans le reseau"
-        self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
         bool_call = len(self._travelers) == 0 and self._boarding.count(-1) == len(self._boarding) and len(self._departure_pods) == 0
         if not bool_call:
             return False
         if self.capacity == 5:
-            bool_call = self._pods_size - len(self._departure_pods) > 3
+            bool_call = self.pods_size - len(self._departure_pods) > 3
         elif self.capacity == 4:
-            bool_call = self._pods_size - len(self._departure_pods) > 2
+            bool_call = self.pods_size - len(self._departure_pods) > 2
         elif self.capacity <= 3:
-            bool_call = self._pods_size - len(self._departure_pods) > 1
+            bool_call = self.pods_size - len(self._departure_pods) > 1
         else:
-            bool_call = self._pods_size - len(self._departure_pods) > self._pods_size/2
+            bool_call = self.pods_size - len(self._departure_pods) > self._pods_size/2
         return bool_call
 
     def refill_call(self):
         """Fonction qui permet d'appeler de nouvelles capsules s'il en manque dans la station"""
-        "self._pods_size indique le nombre de pods dans la station"
+        "self.pods_size indique le nombre de pods dans la station"
         "self.capacity le nombre de pods total que la station peut contenir"
         "self.travelers le nombre de passagers en attente de capsule dans la station"
         "self._incoming_pods est le nombre de pod dans le réseau qui arrivent vers la station"
-        self._pods_size = len(self._pods) - self._pods.count(None)  # on recalcule le nombre de pods dans la station pour prendre une décision
         if self.capacity == 5:
-            bool_call = self._incoming_pods + self._pods_size - len(self.travelers) - len(self._departure_pods) < 3
+            bool_call = self._incoming_pods + self.pods_size - len(self.travelers) - len(self._departure_pods) < 3
         elif self.capacity == 4:
-            bool_call = self._incoming_pods + self._pods_size - len(self.travelers) - len(self._departure_pods) < 2
+            bool_call = self._incoming_pods + self.pods_size - len(self.travelers) - len(self._departure_pods) < 2
         elif self.capacity <= 3:
-            bool_call = self._incoming_pods + self._pods_size - len(self.travelers) - len(self._departure_pods) < 1
+            bool_call = self._incoming_pods + self.pods_size - len(self.travelers) - len(self._departure_pods) < 1
         else:
-            bool_call = self._incoming_pods + self._pods_size - len(self.travelers) - len(self._departure_pods) < 3
+            bool_call = self._incoming_pods + self.pods_size - len(self.travelers) - len(self._departure_pods) < 3
         return bool_call

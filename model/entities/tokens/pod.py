@@ -1,4 +1,4 @@
-from numpy.random import normal
+from numpy.random import normal, seed
 from random import random as rd
 
 from .token import Token
@@ -6,6 +6,7 @@ from .traveler import Traveler
 
 _pod_list = []
 _moving_travelers = 0
+_seed_for_pods = 42         # To debug the None bug (sinon normal rend la simul non deterministe)
 
 class Pod(Token):
     """
@@ -31,6 +32,11 @@ class Pod(Token):
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
+
+        global _seed_for_pods
+        seed(_seed_for_pods)        # mauvaise pratique
+        _seed_for_pods += 1         
+
         self._coef = normal(1, 0.05/2) # Gaussienne à 95% de confiance (car pour avoir "moy +/- 2*sigma = [0.95,1.05]" il faut sigma = 0.05/2) (et pour 99.7% de confiance : 0.05/3)
         if self._coef > 1.05:
             self._coef = 1.05

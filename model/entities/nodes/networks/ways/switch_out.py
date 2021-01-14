@@ -106,12 +106,20 @@ class SwitchOut(Switch):
             # routage si besoin
             routing = self._is_route(pod)
             if routing:
+                # déviation vers une station/shed
+                if len(self._beside.steps) > 0 and type(self._beside.steps[0]).__name__ in ["Station", "Shed"]:
+                    station_or_shed = self._beside.steps[0]
+                    if station_or_shed.is_available():
+                        pod.write({
+                            "author": self,
+                            "type": "insert"
+                        })
+                # pont vers une autre boucle
                 index = self.switch_in.last_index_of(None)
                 first_place = self._switch_in.first_place
                 if index == first_place or index == -1:
                     # On ne peut pas insérer la capsule
-                    """print("\t\t\033[4;31mInsertion capsule impossible\u001B[0m", pod.name[:8], self.name,
-                          "\t\t\t\t\t\t\t\t\t\t\t\t\t\t(switchout l.111)\n")"""
+                    #print("\t\t\033[4;31mInsertion capsule impossible\u001B[0m", pod.name[:8], self.name, "\t\t(switchout l.122)\n")
                     self._failed_insertion_since_last_minute += 1
                     pass
                 elif index == first_place - 1:

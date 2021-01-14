@@ -38,6 +38,12 @@ def _synchronize(key=None):
     def synchronize(coroutine):
         @wraps(coroutine)
         def routine(*args, **kwargs):
+            # check if the app was closed
+            from app import _quit
+            if _quit:
+                shutdown()
+                return jsonify(None)
+            # else, handle request
             if key is not None:
                 kwargs[key] = request.get_json()
             from app import _loop, _simulations
@@ -49,10 +55,6 @@ def _synchronize(key=None):
                 print("\u001b[31m", exception, "\u001b[0m")
             else:
                 result = future.result()
-            # check if app closed
-            from app import _quit
-            if _quit:
-                shutdown()
             return jsonify(result)
         return routine
     return synchronize

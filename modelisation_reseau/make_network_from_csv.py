@@ -1,5 +1,6 @@
 from PIL import Image
 from numpy import *
+
 """
 permet de générer un fichier json qui correspond à un réseau
 à partir d'un fichier csv contenant les stations, dépots et boucles du réseau
@@ -11,10 +12,12 @@ permet de générer un fichier json qui correspond à un réseau
 """
 
 
+def create_json(infile, outfile):
 
-def create_json(filename):
-    csvfile = open('modelisation_reseau/newStops.csv', 'r')
-    print("generate ", filename)
+    csvfile = open(infile, 'r')
+    jsonfile = open(outfile, 'w')
+
+    print("generate ", outfile)
 
     stations = []       # ensemble des noms de station/dépots
     latitudes = []      # latitudes
@@ -61,7 +64,6 @@ def create_json(filename):
     # pour afficher une preview de la position des stations
     # pre_show_map(latitudes, latitude_min, latitude_max, longitude_min, longitude_max, longitudes, abscisses, ordonnees, is_station, boucles)
 
-    jsonfile = open('modelisation_reseau/Grand_Nancy.json', 'w')
     jsonfile.write("{\n\"name\": \"Grand Nancy\",\n\"time\": 28800,\n\"state\": 56565,\n\"jerky\": true,\n\"running\": false,\n\"margin_min\": 2,\n\"max_speed\": 30,\n\"pod_size\": 2,\n\"places_number\": 5,\n\"dynamic_routing\": false,\n\"view_box\": {\n\t\"x\": 0,\n\t\"y\": 200,\n\t\"width\": 600,\n\t\"height\": 500\n},\n")   # entete du fichier
 
     # écriture de la partie loops
@@ -108,14 +110,18 @@ def create_json(filename):
     # écriture de la partie bridges
 
 
-    bridges = "\t\"bridges\": [\n"
+    bridges = "\"bridges\": ["
 
     for bridge0 in bridge_indices.keys():
         if len(bridge0) == 13:  # c'est les switch in
-            bridges += "\t\t{\"name\": \"Bridge " + bridge0[-3:] + "\", \"section\": {\"speed\": 19.44," \
-                                                            " \"path\": {\"type\": \"line\"}}, \"pods\": []},\n"
-    bridges = bridges[:-2]
-    bridges += "\n\t]\n}"
+            bridges += "\n\t{\"name\": \"Bridge " + bridge0[-3:] + "\", \"section\": {\"speed\": 19.44," \
+                                                            " \"path\": {\"type\": \"line\"}}, \"pods\": []},"
+    
+    if len(bridge_indices.keys()) >= 1:
+        # remove last ','
+        bridges = bridges[:-1]
+    
+    bridges += "\n]\n}"
     ####################
 
     jsonfile.write(bridges)
@@ -164,5 +170,18 @@ def pre_show_map(latitudes, latitude_min, latitude_max, longitude_min, longitude
 
 
 if __name__ == '__main__':
-    nom_du_json = "Grand_Nancy.json"
-    create_json(nom_du_json)
+    import sys
+    
+    if len(sys.argv) <= 1:
+        infile  = 'full/newStops.csv'
+        outfile = 'full/Grand_Nancy.json'
+    elif len(sys.argv) == 3:
+        infile  = sys.argv[1]
+        outfile = sys.argv[2]
+    else:
+        print("Error: wrong usage.")
+        print("Example: python make_network_from_csv.py full/newStops.csv full/Grand_Nancy.csv")
+        exit(1)
+        
+    create_json(infile, outfile)
+

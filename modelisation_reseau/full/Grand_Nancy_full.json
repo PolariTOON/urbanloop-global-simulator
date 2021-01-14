@@ -18,7 +18,6 @@
 "loops": [
 	{"name": "1",
 	"elements": [
-		{"type": "switch_in", "x":4097,"y":4906,"id_bridge": 0, "pods": []},
 		{"type": "station", "name": "Art-sur-Meurthe","x":4025,"y":4909,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "station", "name": "Bosserville","x":4432,"y":4078,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "station", "name": "Art-sur-Meurthe - Bosserville","x":4322,"y":4168,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
@@ -528,12 +527,9 @@
 		{"type": "station", "name": "Pôle Technologique","x":3845,"y":660,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "station", "name": "UFR Staps","x":4734,"y":1546,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "station", "name": "Lycée Stanislas","x":4455,"y":1377,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-		{"type": "station", "name": "Valtriche","x":3873,"y":146,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-		{"type": "switch_out", "x":4097,"y":4906,"id_bridge": 0, "pods": []}
+		{"type": "station", "name": "Valtriche","x":3873,"y":146,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
 	],
 	"sections": [
-		{"speed": 20.00, "path": {"type": "line"}},
-		{"speed": 20.00, "path": {"type": "line"}},
 		{"speed": 20.00, "path": {"type": "line"}},
 		{"speed": 20.00, "path": {"type": "line"}},
 		{"speed": 20.00, "path": {"type": "line"}},
@@ -1048,7 +1044,6 @@
 	"pods": []
 	}
 ],
-	"bridges": [
-		{"name": "Bridge 1-2", "section": {"speed": 19.44, "path": {"type": "line"}}, "pods": []}
-	]
+"bridges": [
+]
 }

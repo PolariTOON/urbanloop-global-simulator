@@ -360,3 +360,18 @@ def create_mini_loops(data):
 	json.dump(data, s, sort_keys=True, indent=2)
 	s.close()
 	return data
+
+
+
+if __name__ == "__main__":
+        import sys
+        
+        if len(sys.argv) != 4 or sys.argv[1] not in ["-u", "--upgrade"]:
+                print("Error: wrong usage.")
+                print("Example: manip_format.py --upgrade network_to_upgrade.json output.json")
+                exit(1)
+        
+        infile = sys.argv[2]
+        outfile = sys.argv[3]
+        upgrade_file(infile, outfile)
+

@@ -45,6 +45,7 @@ export class Line extends Group {
         super();
         legendsLayer.add(text);
         this.__legend = text;
+        this.__legend.hide();
         this.__elements = elements;
         this.__sections = [];
     }

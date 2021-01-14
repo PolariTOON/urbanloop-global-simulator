@@ -1,12 +1,22 @@
 import pandas as pd
 import csv
 import fileinput
+import geopy.distance
 
 def inArray(nomStation, tab):
     for elem in tab:
         if(elem[0])==nomStation:
             return True
     return False
+
+def sup(elem,nTab,x):
+    coords_1 = (elem[4],elem[5])
+    for element in nTab:
+        coords_2 = (element[1],element[2])
+        d = geopy.distance.distance(coords_1, coords_2).m
+        if d < x : 
+            return False
+    return True
 
 df = pd.read_csv('stops.txt')
 print(df)
@@ -15,11 +25,14 @@ print(tab[0])
 
 nTab = []
 for element in tab:
+    #On vérifie qu'il n'y a pas une autre station avec le mm nom
     if not(inArray(element[2],nTab)):
-        ligne = [element[2],element[4],element[5],1,True,""]
-        nTab.append(ligne)
+        #On vérifie que la distance entre la nouvelle station et les autres est supérieure à x (en mètre)
+        if sup(element,nTab,500):
+            ligne = [element[2],element[4],element[5],1,True,""]
+            nTab.append(ligne)
 
-print(nTab[1])
+print(nTab[0])
 
 with open('newStops.csv', 'w', newline='') as outfile:
     writer = csv.writer(outfile)

@@ -333,6 +333,15 @@ class Network(Node):
                 elt += 1
         raise ValueError("Element's index out of range")
 
+    def get_station_by_name(self, name):
+        """
+            return a station by its name
+        """
+        for station in self.stations:
+            if station.name == name:
+                return station
+        return None
+
     def _init_weights(self):
         # Initialisation des poids des routes
         for road in self._roads:
@@ -491,17 +500,16 @@ class Network(Node):
             waiting_time = message["waiting_time"]
             traveler = message["traveler"]
             self._statistiques.add_waiting_time(timestamp, waiting_time)
+            self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler, origin)
             if self.departure_arrival_printer:
-                print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp)))
-                      + "] Departure\u001B[0m ", origin, " -> ", destination,
-                      "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.432)")
+                print("\u001B[36m[", str(datetime.timedelta(seconds=round(timestamp))),
+                      "] Departure\u001B[0m ", origin, " -> ", destination,
+                      "\n\t\t(network l.432)")
                 print("\t\t\u001B[36m|\u001B[0m nom du pod:\t", message["pod"].name[:8])
                 print("\t\t\u001B[36m|\u001B[0m waiting time:\t", str(round(waiting_time)) + " seconds")
                 print("\t\t\u001B[36m|\u001B[0m traveler:\t\t", str(traveler), "\n")
-            self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler, origin)
             if traveler:
-                # dans le cas d'un voyage,
-                # ce n'est pas une capsule appelée par la station pour combler l'espace
+                # dans le cas d'un voyage (et non pas d'un appel pour combler l'espace dans une station),
                 # on met à jour le compteur ici
                 for station0 in self.stations:
                     if station0.name == destination:

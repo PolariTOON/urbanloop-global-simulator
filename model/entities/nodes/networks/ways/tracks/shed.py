@@ -150,12 +150,11 @@ class Shed(Step):
                 pod.destination = station
                 self._departure_pods.append(pod)
             else:
-                # print("\u001B[31m", self.name, "envoie de pod impossible, shed vide", len(self._pods), "\u001B[0m", "(shed l.141)\n")
-                #
-                # TODO : corriger ça ??!! (il faut juste décrémenter incoming_pods pour UNE station)
-                #
-                for station0 in self.parent.parent.stations:
-                    if station0.name == station:
-                        station0._incoming_pods -= 1
+                # on cherche la station concernée,
+                # et on l'informe qu'elle ne recevra pas le pod.
+                network = self.parent.parent
+                found_station = network.get_station_by_name(station)
+                found_station.down_incoming_pods()
+
         else:
             raise ValueError("Invalid message")

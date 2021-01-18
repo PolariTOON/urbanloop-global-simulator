@@ -19,10 +19,6 @@ class Traveler(Token):
     def waiting_time(self):
         return self._waiting_time
 
-    @classmethod
-    def boarding_time(self):
-        return self._boarding_time
-
     @property
     def boarding_time(self):
         return self._boarding_time

@@ -191,12 +191,10 @@ class Road(Way):
         Initialise le parent des pistes de la route comme étant la route
         :return: void
         """
-        for index in range(len(self._sections)):
-            section = self._sections[index]
+        for section in self._sections:
             section.parent = self
-            if index < len(self._steps):
-                step = self._steps[index]
-                step.parent = self
+        for step in self._steps:
+            step.parent = self
 
     def update(self):
         return
@@ -249,7 +247,7 @@ class Road(Way):
                 "timestamp": message["timestamp"],
                 "waiting_time": message["waiting_time"],
                 "traveler": message["traveler"]
-                })
+            })
         else:
             raise ValueError("Invalid message")
 

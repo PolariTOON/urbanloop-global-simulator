@@ -33,7 +33,7 @@ class Pod(Token):
         self._speed_restore = speed_restore or None
 
         global _seed_for_pods
-        seed(_seed_for_pods)        # mauvaise pratique
+        seed(_seed_for_pods) # apparemment c'est une mauvaise pratique de redéfinir la seed au milieu de nul part (il est conseillé d'utilisé un autre random generator)
         _seed_for_pods += 1         
 
         self._coef = normal(1, 0.05/2) # Gaussienne à 95% de confiance (car pour avoir "moy +/- 2*sigma = [0.95,1.05]" il faut sigma = 0.05/2) (et pour 99.7% de confiance : 0.05/3)
@@ -112,8 +112,7 @@ class Pod(Token):
         previousStation = self.get_station_if_on_switch(self._track_or_switch.previous)
         if (previousStation != None):
             self._previous_station = previousStation
-                    
-
+    
     @property
     def source(self):
         """setter de l'attribut source"""
@@ -169,6 +168,11 @@ class Pod(Token):
         Renvoie si la capsule est défaillante ou non
         """
         return self._failing
+    
+    @property
+    def turn(self):
+        """si la station est sur un SwitchOut, indique si elle est autorisée à entrer sur le bridge"""
+        return self._turn
 
     @property
     def ready(self):
@@ -288,7 +292,6 @@ class Pod(Token):
             # si on quitte un switch
             if type(self._track_or_switch).__name__ in ["SwitchOut", "SwitchIn"]:
                 self.track_or_switch = self._track_or_switch.next.sections[0]
-                #self._track_or_switch = self._track_or_switch.next.sections[0]
 
             # si on quitte une section
             else:
@@ -303,8 +306,6 @@ class Pod(Token):
                     # si on quitte une step (shed, station, sensor) : rien à faire
                     pass
                 self.track_or_switch = self._track_or_switch.next
-                #self._track_or_switch = self._track_or_switch.next
-                
 
             self._position = t * self._track_or_switch.speed
             if bridge_to_switch:
@@ -436,7 +437,7 @@ class Pod(Token):
         if (type(eltOfNetwork.previous).__name__ == "SwitchOut" and self.get_station_on_bridge_derivation(eltOfNetwork.previous) == self._destination):
             return " Time = " + str(self.get_time_of_elt_of_network(eltOfNetwork))
 
-        nbIter = 0              # Pour eviter une boucle infinie
+        nbIter = 0  # Pour eviter une boucle infinie
         stationConsidered = None
         timeToDest = (eltOfNetwork.length - self._position) / self._track_or_switch.speed
         # Pas de problemes pour chercher la speed, car self._track_or_switch ne peut etre une road (j'ai l'impression)
@@ -481,7 +482,7 @@ class Pod(Token):
         timeToDest += timeInsideBridgeDerivationOfArrival
 
         # A FAIRE POUR TRISTAN
-        # Actuellement, on ne considere pas le temps de parcours de u bridge-derivation contenant la station destination")
+        # Actuellement, on ne considere pas le temps de parcours d'un bridge-derivation contenant la station destination")
         # Faire que get_station_on_bridge_derivation renvoient en plus un temps pour faire cela
 
         # (considere juste la vitesse de la section/switch ou la capsule se trouve, mais pas sa vitesse actuelle/vitesse future reelle en fction du traffic)
@@ -516,7 +517,7 @@ class Pod(Token):
         if (type(aRoad).__name__ == "Road"):
             if (len(aRoad.stations) > 0):      
                 for station in aRoad.stations:
-                    return station.name      # On renvoie direct car on considere qu'il n'y a qu'une station au max par road (potentiellement a changer plus tard)
+                    return station.name  # On renvoie direct car on considere qu'il n'y a qu'une station au max par road (potentiellement a changer plus tard)
             return None
 
 

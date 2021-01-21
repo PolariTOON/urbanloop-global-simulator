@@ -4,7 +4,7 @@ from .switch import Switch
 class SwitchOut(Switch):
     """Classe modélisant un aiguillage sortant
     Elle gère une partie de l'algorithme d'aiguillage"""
-    def __init__(self, env, id, margin_min, pod_size, max_speed, stat_or_shed=None, **kwargs):
+    def __init__(self, env, id, margin_min, pod_size, max_speed, **kwargs):
         if "pods" in kwargs:
             kwargs["pods"] = []
         super().__init__(env, id, margin_min, pod_size, max_speed, **kwargs)
@@ -19,7 +19,6 @@ class SwitchOut(Switch):
             self._switch_in._switch_out = self
             self._beside.sections[-1].next.switch_in = self
         self._length = None
-        self._stat_or_shed = stat_or_shed
         self._failed_insertion_since_last_minute = 0
 
     @property
@@ -53,7 +52,11 @@ class SwitchOut(Switch):
 
     @property
     def stat_or_shed(self):
-        return self._stat_or_shed
+        """
+            Permet de savoir si le SwitchOut mène à une dérivation vers une station ou un shed
+            (et non-pas vers une autre boucle).
+        """
+        return len(self._beside.steps) > 0 and type(self._beside.steps[0]).__name__ in ["Station", "Shed"]
 
     def set_c1_length(self):
         # TODO : cela ne concerne que le cas d'un bridge entre 2 loops, il faut ajouter le cas d'une dérivation vers une station/shed
@@ -106,37 +109,45 @@ class SwitchOut(Switch):
             # routage si besoin
             routing = self._is_route(pod)
             if routing:
-                # déviation vers une station/shed
-                if len(self._beside.steps) > 0 and type(self._beside.steps[0]).__name__ in ["Station", "Shed"]:
+                if self.stat_or_shed:
+                    # déviation vers une station/shed
                     station_or_shed = self._beside.steps[0]
                     if station_or_shed.is_available():
                         pod.write({
                             "author": self,
                             "type": "insert"
                         })
-                # pont vers une autre boucle
-                index = self.switch_in.last_index_of(None)
-                first_place = self._switch_in.first_place
-                if index == first_place or index == -1:
-                    # On ne peut pas insérer la capsule
-                    #print("\t\t\033[4;31mInsertion capsule impossible\u001B[0m", pod.name[:8], self.name, "\t\t(switchout l.122)\n")
-                    self._failed_insertion_since_last_minute += 1
-                    pass
-                elif index == first_place - 1:
-                    # On insère la capsule sur la dernière place
-                    pod.write({
-                        "author": self,
-                        "type": "insert"
-                    })
+                    else:
+                        #
+                        # échec de déviation !!!
+                        #
+                        # TODO : à prendre en compte
+                        #
+                        pass
                 else:
-                    # On procède au décalage pour insérer la capsule
-                    self.switch_in.backstep(index)
-                    # On envoie un message indiquant que la voiture doit aller sur le pont
-                    # La voiture s'insère alors sur la dernière place
-                    pod.write({
-                        "author": self,
-                        "type": "insert"
-                    })
+                    # pont vers une autre boucle
+                    index = self.switch_in.last_index_of(None)
+                    first_place = self._switch_in.first_place
+                    if index == first_place or index == -1:
+                        # On ne peut pas insérer la capsule
+                        #print("\t\t\033[4;31mInsertion capsule impossible\u001B[0m", pod.name[:8], self.name, "\t\t(switchout l.122)\n")
+                        self._failed_insertion_since_last_minute += 1
+                        pass
+                    elif index == first_place - 1:
+                        # On insère la capsule sur la dernière place
+                        pod.write({
+                            "author": self,
+                            "type": "insert"
+                        })
+                    else:
+                        # On procède au décalage pour insérer la capsule
+                        self.switch_in.backstep(index)
+                        # On envoie un message indiquant que la voiture doit aller sur le pont
+                        # La voiture s'insère alors sur la dernière place
+                        pod.write({
+                            "author": self,
+                            "type": "insert"
+                        })
         elif "pod_exit" == message["type"]:
             pod = message["pod"]
             self._pods.remove(pod)

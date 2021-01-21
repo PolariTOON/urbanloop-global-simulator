@@ -9,3 +9,4 @@ test_project/sortie.json
 stats/
 stat_log.csv
 save/*.json
+log.txt

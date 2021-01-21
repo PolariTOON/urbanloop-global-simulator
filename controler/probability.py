@@ -1,7 +1,6 @@
-from numpy import floor, sum
+from numpy import floor
 from random import seed, randint, random, choice
 from model.entities.tokens.traveler import Traveler
-from scipy.stats import norm
 import math
 import numpy.random as np_rand
 
@@ -51,11 +50,23 @@ class Probability:
             coef_station[i] = coef_station[i]/tot_coef
         self.coef_station = coef_station       # répartition des voyageurs dans le réseau
 
+    def normal_law_density(x, mu=0, sigma=1):
+        """
+            Return the probability density function value for a normal law.
+            
+            @param x: position where the function is evaluated
+            @param mu: mean
+            @param sigma: standard deviation
+        """
+        sqrt = math.sqrt 
+        pi, e = math.pi, math.e
+        return 1 / (sigma * sqrt(2*pi)) * e ** (-0.5 * ((x-mu)/sigma) ** 2)
+    
     def station_probability(self, station_type, second, is_arrival=True):
         """
         This function gives you the probability to lead a traveler to a station_type
-        at a certain time in second. You can choose if the station is a departure or
-        destination station.
+        at a certain time in second. You can chose if the station is a departure or
+        a destination station.
         :param station_type: The type of station you want to find its probability
         :param second: The time in second
         :param is_arrival: If the station is a departure or destination station
@@ -65,13 +76,13 @@ class Probability:
         gaussian_factor = 250 * (self._activity_and_residential_fluctuation / 100)
         result = 0
         decimal_hour = round(second / 3600, 2)
-        norm_mph = norm.pdf(decimal_hour, self._morning_peak_hour, 1)
-        norm_eph = norm.pdf(decimal_hour, self._evening_peak_hour, 1)
+        norm_mph = normal_law_density(decimal_hour, self._morning_peak_hour, 1)
+        norm_eph = normal_law_density(decimal_hour, self._evening_peak_hour, 1)
         if station_type == station.station_types["city"]:
             result = self._city_percent
         if station_type == station.station_types["activity"]:
             if is_arrival:
-                if second < 43200:
+                if second < 43200: # 43200s = 12h00
                     result = self._activity_and_residential_percent + gaussian_factor * norm_mph
                 else:
                     result = self._activity_and_residential_percent - gaussian_factor * norm_eph

@@ -13,7 +13,7 @@ class Pod(Token):
     des ordres de vitesses qui peuvent être sur une certaine distance
     au niveau des aiguillages
     """
-    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, ready=None, traveled_distance=None, traveled_distance_t=None, **kwargs):
+    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, during_departure=None, traveled_distance=None, traveled_distance_t=None, **kwargs):
         super().__init__(env, **kwargs)
         self._position = position or 0
         travelers = travelers or {
@@ -51,7 +51,7 @@ class Pod(Token):
         self._endSpeed = self._speed
         self._acceleration = acceleration or 2
         self._brake = brake or 5
-        self._ready = ready or False
+        self._during_departure = during_departure or False
         self._traveled_distance = traveled_distance or 0
         self._traveled_distance_t = traveled_distance_t or 0
         self._previous_station = None
@@ -92,7 +92,7 @@ class Pod(Token):
             _pod_list.append(self.name)
         # print("\u001B[36m moving travelers =", len(_pod_list), "\u001B[0m")  # cyan
 
-    def isEmpty(self):
+    def is_empty(self):
         return len(self._travelers) == 0
 
     @property
@@ -175,12 +175,13 @@ class Pod(Token):
         return self._turn
 
     @property
-    def ready(self):
-        return self._ready
+    def during_departure(self):
+        """si le pod a déjà reçu l'ordre de quitter sa station"""
+        return self._during_departure
         
-    @ready.setter
-    def ready(self, value):
-        self._ready = value
+    @during_departure.setter
+    def during_departure(self, value):
+        self._during_departure = value
 
     def serialize(self):
         dict = super().serialize()
@@ -203,7 +204,7 @@ class Pod(Token):
             "coef": self._coef,
             "acceleration": self._acceleration,
             "brake": self._brake,
-            "ready": self._ready,
+            "during_departure": self._during_departure,
             "traveled_distance": self._traveled_distance,
             "traveled_distance_t": self._traveled_distance_t
         })
@@ -269,10 +270,10 @@ class Pod(Token):
 
         # La capsule s'insère sur un bridge si elle en a reçu l'ordre
         if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ == "SwitchOut" and self._turn:
+            print("a"+self._track_or_switch.name)
             self.position -= self._track_or_switch.length
             new_section = self._track_or_switch.beside.sections[0]
             self.track_or_switch = new_section
-            #self._track_or_switch = new_section
 
             if self.position > new_section.length:
                 print("Warning: pod.py: a pod has travelled to much distance in a same tick while entering a bridge.")
@@ -282,9 +283,10 @@ class Pod(Token):
                 "pod": self
             })
             self._turn = False
-        
+
         # La capsule arrive sur une nouvelle piste / aiguillage
         elif self._position > self._track_or_switch.length:
+            #print("a"+self._track_or_switch.name)
             bridge_to_switch = False
             self._position -= self._track_or_switch.length
             t = self._position / self._speed
@@ -302,10 +304,11 @@ class Pod(Token):
                                                            # TODO : vérifier la structure du réseau pour ne pas avoir de bridge dans un bridge ?
                         # la capsule entre sur une route depuis un pont
                         bridge_to_switch = True
+                    self._track_or_switch = next_elem
                 else:
-                    # si on quitte une step (shed, station, sensor) : rien à faire
+                    # si on quitte une step (shed, station, sensor)
+                    self.track_or_switch = self._track_or_switch.next
                     pass
-                self.track_or_switch = self._track_or_switch.next
 
             self._position = t * self._track_or_switch.speed
             if bridge_to_switch:
@@ -334,16 +337,18 @@ class Pod(Token):
         if "speed" == message["type"]:
             # Ordre de changement de vitesse
             self.speed = message["speed"]
+
         elif "passing" == message["type"]:
+            # C'était en partie utilisé lorsque des stations/sheds étaient directement sur les boucles.
+            # Maintenant, on a toujours besoin de ce cas pour les Sensors.
             self.track_or_switch = self._track_or_switch.next
-            #self._track_or_switch = self._track_or_switch.next
-            
             self._track_or_switch.write({
                 "author": self,
                 "type": "pod_entry",
                 "pod": self,
                 "traveled_distance": self._traveled_distance
             })
+            
         elif "passing_from_switch" == message["type"]:
             self._track_or_switch = self._track_or_switch.next.sections[0]
             self._track_or_switch.write({
@@ -352,36 +357,18 @@ class Pod(Token):
                 "pod": self,
                 "traveled_distance": self._traveled_distance
             })
+            
         elif "docked" == message["type"]:
             # La capsule s'arrête dans une gare ou un dépôt
             # TODO : check track_or_switch à ce niveau-là (je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être une problème...))
             self._speed = 0
             self._endSpeed = 0
             self._previous_station = None      # On reset la derniere station
+            
         elif "insert" == message["type"]:
             # Ordre d'insertion, la capsule est autorisée à tourner
-            if self._track_or_switch.stat_or_shed:  # si c'est un dépot ou station
-                self._turn = self._track_or_switch.stat_or_shed == self._destination   # self.turn est vrai si c'est l'arrivée
-                stat_or_shed = self._track_or_switch.parent.find({"name": self._track_or_switch.stat_or_shed})
-                if stat_or_shed.isFull():
-                    #
-                    # TODO : prendre en charge ce cas
-                    #
-                    print("\033[4;31mFull\u001B[0m", stat_or_shed.name, "\t\t", len(stat_or_shed.pods), "/", stat_or_shed.capacity, end=' [')
-                    for pod in stat_or_shed.pods:
-                        if pod is not None:
-                            print(pod.name[:8], end=' ')
-                        else:
-                            print(pod, end=' ')
-                    print("]\t\t\t\t (pod l.305)\n")
-                    print("\tpods_size = ", stat_or_shed.pods_size, "/", stat_or_shed.capacity, "\n\tlen departure_pods", len(stat_or_shed._departure_pods), "> departure pods = [", end=' ')
-                    for pod in stat_or_shed._departure_pods:
-                        if pod is not None:
-                            print(pod.name[:8], end=' ')
-                    print("]\n")
-                    self._turn = False
-            else:
-                self._turn = True
+            self._turn = True
+                
         elif "speed_a_while" == message["type"]:
             # Ordre de vitesse lors d'un décalage pour laisser une capsule s'insérer
             # Ou lors d'une discrétisation
@@ -393,7 +380,14 @@ class Pod(Token):
             # La capsule part d'un dépôt ou d'une gare
             self._source = message["author"].name
             self._destination = message["destination"]
-            self.speed = self._track_or_switch.speed
+            self._track_or_switch = self._track_or_switch.next
+            self._endSpeed = self._track_or_switch.speed
+            self._track_or_switch.write({
+                "author": self,
+                "type": "pod_entry",
+                "pod": self,
+                "traveled_distance": self._traveled_distance
+            })
         else:
             raise ValueError("Invalid message: ", message)
 

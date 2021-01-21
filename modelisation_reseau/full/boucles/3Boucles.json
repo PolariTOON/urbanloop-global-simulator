@@ -1,0 +1,93 @@
+{
+"name": "Grand Nancy",
+"time": 28800,
+"state": 56565,
+"jerky": true,
+"running": false,
+"margin_min": 2,
+"max_speed": 30,
+"pod_size": 2,
+"places_number": 5,
+"dynamic_routing": false,
+"view_box": {
+	"x": 0,
+	"y": 200,
+	"width": 600,
+	"height": 500
+},
+"loops": [
+	{"name": "1",
+	"elements": [
+		{"type": "station", "name": "Curie","x":-99.81537992154176,"y":-21.793682326367193,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Ravel","x":-139.03292821382252,"y":-73.02339952178525,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Alb�tre","x":-117.73118469327048,"y":-107.14001483487205,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Ecoles","x":-66.39232474581203,"y":-144.96533406111666,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Coll�ge Monod","x":-63.329271908607595,"y":-101.44718316723934,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Baraques de Ludres","x":-52.71767005649019,"y":-39.54124366506574,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "switch_in", "x":-68.41254335504532,"y":-25.47643107994899,"id_bridge": 0, "pods": []},
+		{"type": "switch_out", "x":-84.12050662304216,"y":-35.858494911488535,"id_bridge": 1, "pods": []}
+	],
+	"sections": [
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}}
+	],
+	"pods": []
+	},
+	{"name": "2",
+	"elements": [
+		{"type": "switch_in", "x":-92.84278955978832,"y":15.898977195356984,"id_bridge": 1, "pods": []},
+		{"type": "station", "name": "Ader","x":-136.70291366241204,"y":7.483737678573497,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Eiffel","x":-138.06427047902136,"y":70.27792041966683,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Champs Moyen","x":-93.27039522655234,"y":105.13281582744325,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Chateau","x":-21.991148575151165,"y":100.7089030725589,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "switch_out", "x":-19.77894374827205,"y":72.89362372389152,"id_bridge": 2, "pods": []},
+		{"type": "switch_in", "x":-35.48690701621338,"y":62.51155989235656,"id_bridge": 3, "pods": []},
+		{"type": "station", "name": "Haut de Fléville","x":-33.27470218927875,"y":34.6962805436846,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "switch_out", "x":-77.13482629184698,"y":26.281041026896528,"id_bridge": 0, "pods": []}
+	],
+	"sections": [
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}}
+	],
+	"pods": []
+	},
+	{"name": "3",
+	"elements": [
+		{"type": "switch_out", "x":39.48371100326309,"y":60.11214958461988,"id_bridge": 3, "pods": []},
+		{"type": "station", "name": "Houdemont Porte Sud","x":86.83885693300253,"y":-2.500347039427727,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Morlaix","x":114.39760582199199,"y":74.27501499481016,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "L'Or�e du Bois","x":139.03292821387802,"y":144.96533406112124,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "station", "name": "Croix du Soldat","x":7.836528341464977,"y":133.10671004020705,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
+		{"type": "switch_in", "x":55.19167427125993,"y":70.49421341615485,"id_bridge": 2, "pods": []}
+	],
+	"sections": [
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}},
+		{"speed": 20.00, "path": {"type": "line"}}
+	],
+	"pods": []
+	}
+],
+"bridges": [
+	{"name": "Bridge 1-2", "section": {"speed": 19.44, "path": {"type": "line"}}, "pods": []},
+	{"name": "Bridge 2-1", "section": {"speed": 19.44, "path": {"type": "line"}}, "pods": []},
+	{"name": "Bridge 2-3", "section": {"speed": 19.44, "path": {"type": "line"}}, "pods": []},
+	{"name": "Bridge 3-2", "section": {"speed": 19.44, "path": {"type": "line"}}, "pods": []}
+]
+}

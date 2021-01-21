@@ -1,5 +1,6 @@
 from PIL import Image
-from numpy import *
+import numpy as np
+import math
 
 """
 permet de générer un fichier json qui correspond à un réseau
@@ -57,9 +58,23 @@ def create_json(infile, outfile):
     longitude_min = min(longitudes)
     longitude_max = max(longitudes)
 
+    latitude_centre = (math.radians(latitude_max) + math.radians(latitude_min)) / 2
+    longitude_centre = (math.radians(longitude_max) + math.radians(longitude_min)) / 2
+
     for i in range(len(latitudes)):
-        abscisses.append(round((latitudes[i] - latitude_min) / (latitude_max - latitude_min) * 10000) + 50)
-        ordonnees.append(round((longitudes[i] - longitude_min) / (longitude_max - longitude_min) * 5000) + 50)
+        # Projection cylindrique équidistante
+        # x  = cos(lat_centre) * (longitude(i) - longitude(centre))
+        # y = latitude(i) - latitude(centre)
+        # Projection de mercator 
+        # x = latitude(i) - latitude(centre)
+        # y = ln(tan((lat/2)+(pi/4))
+        y =  math.cos(latitude_centre) * (math.radians(longitudes[i]) - longitude_centre)
+        # y = np.log(math.tan( (math.radians(latitudes[i])/2) + (math.pi/4) ))
+        x =  math.radians(latitudes[i]) - latitude_centre
+        abscisses.append(x*500000)
+        ordonnees.append(y*500000)
+        #abscisses.append(round((latitudes[i] - latitude_min) / (latitude_max - latitude_min) * 5000) + 50)
+        #ordonnees.append(round((longitudes[i] - longitude_min) / (longitude_max - longitude_min) * 5000) + 50)
 
     # pour afficher une preview de la position des stations
     # pre_show_map(latitudes, latitude_min, latitude_max, longitude_min, longitude_max, longitudes, abscisses, ordonnees, is_station, boucles)
@@ -113,8 +128,10 @@ def create_json(infile, outfile):
     bridges = "\"bridges\": ["
 
     for bridge0 in bridge_indices.keys():
-        if len(bridge0) == 13:  # c'est les switch in
-            bridges += "\n\t{\"name\": \"Bridge " + bridge0[-3:] + "\", \"section\": {\"speed\": 19.44," \
+
+        if bridge0[7] == 'I':  # c'est les switch in
+            nomBridge = bridge0.split(" ")[2]
+            bridges += "\n\t{\"name\": \"Bridge " + nomBridge + "\", \"section\": {\"speed\": 19.44," \
                                                             " \"path\": {\"type\": \"line\"}}, \"pods\": []},"
     
     if len(bridge_indices.keys()) >= 1:
@@ -131,7 +148,7 @@ def create_json(infile, outfile):
 
 def pre_show_map(latitudes, latitude_min, latitude_max, longitude_min, longitude_max, longitudes, abscisses, ordonnees, is_station, boucles):
     ########### aperçu de la carte ############
-    image0 = zeros((280000, 140000, 3), dtype=uint8)
+    image0 = np.zeros((280000, 140000, 3), dtype=np.uint8)
 
     for i in range(len(latitudes)):
         if is_station[i] == "switch_in" or is_station[i] == "switch_out":

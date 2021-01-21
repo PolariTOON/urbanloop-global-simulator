@@ -100,7 +100,7 @@ class Section(Track):
         self.weight = self._length / self._speed
 
     def update(self):
-        print("%s  %s"%(self.name,self.next.name))
+        #print("%s  %s"%(self.name, self.next.name))
         return
 
     def handle_message(self, message):

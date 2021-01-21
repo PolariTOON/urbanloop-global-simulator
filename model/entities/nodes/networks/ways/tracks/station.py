@@ -256,12 +256,12 @@ class Station(Step):
                 if pod.travelers:
                     traveler = pod.travelers[0]
                     waiting_time = traveler.waiting_time
+                pod.during_departure = True
                 pod.write({
                     "author": self,
                     "type": "departure",
                     "destination": destination
                 })
-                pod.during_departure = True
                 # prévient le parent
                 self.parent.write({
                     "author": self,

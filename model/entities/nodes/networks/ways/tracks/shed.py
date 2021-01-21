@@ -90,13 +90,13 @@ class Shed(Step):
         if self._departure_pods and self._wait == -1:
             self._wait = 0
             pod = self._departure_pods.pop(0)
+            pod.during_departure = True
             destination = pod.destination
             pod.write({
                 "author": self,
                 "type": "departure",
                 "destination": destination
             })
-            pod.during_departure = True
             # prévient le parent
             self.parent.write({
                 "author": self,

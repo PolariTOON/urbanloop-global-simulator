@@ -270,7 +270,6 @@ class Pod(Token):
 
         # La capsule s'insère sur un bridge si elle en a reçu l'ordre
         if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ == "SwitchOut" and self._turn:
-            #print("a"+self._track_or_switch.name)
             self.position -= self._track_or_switch.length
             new_section = self._track_or_switch.beside.sections[0]
             self.track_or_switch = new_section
@@ -286,7 +285,6 @@ class Pod(Token):
 
         # La capsule arrive sur une nouvelle piste / aiguillage
         elif self._position > self._track_or_switch.length:
-            #print("a"+self._track_or_switch.name)
             bridge_to_switch = False
             self._position -= self._track_or_switch.length
             t = self._position / self._speed

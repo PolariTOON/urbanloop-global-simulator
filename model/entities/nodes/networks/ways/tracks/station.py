@@ -204,9 +204,7 @@ class Station(Step):
         if len(self._travelers) > 0 and self.pods_size > 0:
             for i in range(self._capacity-1, -1, -1):  # on commence par les premières capsules à partir
                 pod = self._pods[i]
-                #print("reading...")
                 if len(self._travelers) > 0 and pod != None and pod.is_empty() and pod not in self._departure_pods and not pod.during_departure:
-                    #print("launch.")
                     # s'il y a un traveler en attente, un pod avec de la place
                     # IDEA : on pourrait autoriser un passager à utiliser une capsule vide qui allait partir (mais attention à ce que ça ne génère pas de bug)
                     going_traveler = self._travelers.pop(0)
@@ -220,9 +218,8 @@ class Station(Step):
                     self._waiting_times_since_last_minute.append(going_traveler.waiting_time)
                     self._boarding[i] = 0  # début du décompte de l'embarquement
                 else:
-                    if pod:
-                        #print("no : %d" % i + str(pod.is_empty())+" "+str(pod not in self._departure_pods)+" "+str(not pod.during_departure))
-                        pass
+                    pass
+        
         # Attente de la montée des voyageurs pour l'envoi d'une capsule
         for i in range(len(self._boarding)):  # pour chaque capsule
             if self._boarding[i] != -1:       # si un voyageur embarque
@@ -328,9 +325,7 @@ class Station(Step):
                     "timestamp": self.env.time
                 })
             else:
-                print("ERROR: La station ne devrait pas être pleine.\n\t\t(station l.333)")
-                print(self.name)
-                print([p.name if p else None for p in self._pods])
+                print("ERROR: La station %s ne devrait pas être pleine.\n\t\t(station l.333)" % self.name)
                 pod.write({ # "passing" fait passer le pod à travers la station
                     "author": self,
                     "type": "passing"

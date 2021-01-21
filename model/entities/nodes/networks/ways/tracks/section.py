@@ -100,7 +100,6 @@ class Section(Track):
         self.weight = self._length / self._speed
 
     def update(self):
-        #print("%s  %s"%(self.name, self.next.name))
         return
 
     def handle_message(self, message):
@@ -111,7 +110,6 @@ class Section(Track):
             if pod in self._pods:
                 self._pods.remove(pod)
             else:
-                #print(pod._track_or_switch.name)
                 print("\u001B[31m [erreur pod non trouvé]", pod.name[:9], self.name, " (section l.103)\u001B[0m")
                 
         elif "pod_entry" == message["type"]:

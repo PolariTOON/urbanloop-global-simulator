@@ -96,6 +96,7 @@ class Shed(Step):
                 "type": "departure",
                 "destination": destination
             })
+            pod.during_departure = True
             # prévient le parent
             self.parent.write({
                 "author": self,
@@ -106,6 +107,10 @@ class Shed(Step):
                 "waiting_time": 0,
                 "traveler": False
             })
+
+    @property
+    def pods_during_departure(self):
+        return [pod for pod in self._pods if pod.during_departure]
 
     def handle_message(self, message):
         if "pod_entry" == message["type"]:
@@ -136,15 +141,16 @@ class Shed(Step):
             pod = message["pod"]
             if pod in self._pods:
                 self._pods.remove(pod)
+                pod.during_departure = False
             else:
                 # dans ce cas, le pod n'était pas docked dans le shed,
                 # et on accepte qu'il passe à travers.
                 pass
         elif "refill" == message["type"]:
             station = message["station"]
-            if len(self._pods) > 0 and len(self.pods) > len(self._departure_pods):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
+            if len(self._pods) > 0 and len(self._pods) > len(self._departure_pods) + len(self.pods_during_departure):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
                 i = 0
-                while i < len(self._pods) - 1 and self._pods[i] in self._departure_pods:
+                while i < len(self._pods) - 1 and (self._pods[i] in self._departure_pods or self._pods[i].during_departure):
                     i += 1
                 pod = self._pods[i]
                 pod.destination = station

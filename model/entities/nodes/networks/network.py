@@ -483,6 +483,7 @@ class Network(Node):
             # On demande à une station d'envoyer une capsule à un dépôt pour faire de la place
             #
             # TODO: ne pas choisir aléatoirement (vérifier que le shed a bien une place libre)
+            #       + mettre un warning s'il n'y a plus de place dans les sheds
             #
             sheds = self.sheds
             if sheds:

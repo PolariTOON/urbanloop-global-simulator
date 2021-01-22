@@ -185,20 +185,12 @@ class Station(Step):
 
     def update(self):
         """Fonction gérant le processus gare"""
-        #print( self._boarding)
-        #print("%s  %d  %d  %d(%d)  %d" % (self.name, len(self._travelers),
-        #                                  len([1 for t in self._boarding if t != -1]),
+        #print(self._boarding)
+        #print("%s  %d  %d  %d(%d)  %d" % (self.name,
+        #                                  len(self._travelers),
+        #                                  len([1 for t in self._boarding if t != -1]), # pods pour lesquels _boarding != -1
         #                                  len(self._departure_pods), len([p for p in self._departure_pods if p.is_empty()]),
         #                                  self.pods_size))
-        # On fait un appel pour libérer des capsules s'il y a trop de capsules vides en attente
-        if not self._waiting_empty and self.need_empty():
-            self._waiting_empty = True
-            # Vide la station de capsules
-            self.parent.write({
-                "author": self,
-                "type": "empty",
-                "station": self
-            })
 
         # On charge les voyageurs s'il y a de la place
         if len(self._travelers) > 0 and self.pods_size > 0:
@@ -280,7 +272,19 @@ class Station(Step):
                 #if len(self._departure_pods) > 0 and first_pod != None and not first_pod.during_departure and first_pod in self._departure_pods:
                 #    print("WARNING: in station.py: a pod is ready to leave, but not in front position.")
                 pass
-
+            
+        # On fait un appel pour libérer des capsules s'il y a trop de capsules vides en attente
+        if not self._waiting_empty and self.need_empty():
+            self._waiting_empty = True # TODO : remettre à False en cas de refus
+                                       # (le refus n'est pas implémenté pour l'instant, mais pourrait l'être
+                                       # s'il n'y a plus de places dans les sheds)
+            # Vide la station de capsules
+            self.parent.write({
+                "author": self,
+                "type": "empty",
+                "station": self
+            })
+        
         if self.need_refill():
             # Ré-approvisionnement des capsules
             self.parent.write({
@@ -354,6 +358,7 @@ class Station(Step):
             pod = self._pods[-1]
             if pod is not None and self._boarding[-1] == -1 and not pod.during_departure and not pod in self._departure_pods:  # on libère un pod vide (pas None, n'a pas de passager et n'est pas déjà sur le point de partir)
                 self.send_pod(pod, message["shed"].name)
+                # "self._waiting_empty = False" est réalisé à la réception de "pod_exit"
             else:
                 if pod is None:
                     print("\u001B[31mWARNING: ", self.name, ": pas de pod à libérer (station l.311)", len(self._departure_pods), "\u001B[0m")

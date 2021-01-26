@@ -846,8 +846,7 @@
 	"pods": []
 	},
 	{"name": "29",
-	"elements": [
-		
+	"elements": [	
 		{"type": "switch_in","x":281.9753939521,"y":-41.77171910848998,"id_bridge": 105, "pods": []},
 		{"type": "switch_out","x":281.9753931386,"y":-41.77171910848998,"id_bridge": 104, "pods": []},
 		{"type": "station", "name": "Douéra","x":329.5181627764876,"y":-56.84146394793166,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
@@ -860,7 +859,6 @@
 		{"type": "switch_in", "x":281.975393986,"y":-41.77171910848998,"id_bridge": 103, "pods": []},
 		{"type": "switch_out", "x":281.9759521386,"y":-41.77171910848998,"id_bridge": 102, "pods": []},
 		{"type": "station", "name": "Mac Mahon","x":281.9753939521386,"y":-41.77171910848998,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
-		
 	],
 	"sections": [
 		{"speed": 20.00, "path": {"type": "line"}},
@@ -889,7 +887,6 @@
 		{"type": "switch_in", "x":380.6475321365576,"y":-29.975249629965255,"id_bridge": 57, "pods": []},
 		{"type": "switch_out", "x":380.658321365576,"y":-29.975249629965255,"id_bridge": 56, "pods": []},
 		{"type": "station", "name": "Croix de Mission","x":380.64758321365576,"y":-29.975249629965255,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
-		
 	],
 	"sections": [
 		{"speed": 20.00, "path": {"type": "line"}},
@@ -935,7 +932,6 @@
 	},
 	{"name": "32",
 	"elements": [
-		
 		{"type": "switch_in","x":286.1990902,"y":-333.13932870017095,"id_bridge": 113, "pods": []},
 		{"type": "switch_out", "x":286.1990742012,"y":-333.13932870017095,"id_bridge": 112, "pods": []},
 		{"type": "station", "name": "Nancy Pôle de santé","x":275.62239547490594,"y":-278.2312870825022,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
@@ -943,10 +939,9 @@
 		{"type": "switch_out", "x":286.190742,"y":-333.13932870017095,"id_bridge": 96, "pods": []},
 		{"type": "station", "name": "Beauregard Saint-Anne","x":184.63838156845824,"y":-285.8381946113989,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "station", "name": "La Poste - Champ-le-Boeuf","x":247.2869750687612,"y":-327.5494042281808,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
-		{"type": "switch_in", "x":286.1990742012,"y":-333.13932870017095,"id_bridge": 114, "pods": []},
-		{"type": "switch_out", "x":286.2090742012,"y":-333.13932870017095,"id_bridge": 115, "pods": []},
+		{"type": "switch_in", "x":286.1990742012,"y":-333.13932870017095,"id_bridge": 20, "pods": []},
+		{"type": "switch_out", "x":286.2090742012,"y":-333.13932870017095,"id_bridge": 21, "pods": []},
 		{"type": "station", "name": "Maxeville EcoParc","x":286.199090742012,"y":-333.13932870017095,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
-		
 	],
 	"sections": [
 		{"speed": 20.00, "path": {"type": "line"}},
@@ -964,8 +959,8 @@
 	},
 	{"name": "33",
 	"elements": [
-		{"type": "switch_in", "x":201.84732799344,"y":-336.5566742794443,"id_bridge": 115, "pods": []},
-		{"type": "switch_out", "x":201.84732730544,"y":-336.5566742794443,"id_bridge": 116, "pods": []},
+		{"type": "switch_in", "x":201.84732799344,"y":-336.5566742794443,"id_bridge": 21, "pods": []},
+		{"type": "switch_out", "x":201.84732730544,"y":-336.5566742794443,"id_bridge": 20, "pods": []},
 		{"type": "station", "name": "Vezouze","x":201.8473279930544,"y":-336.5566742794443,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "switch_in", "x":201.84732930544,"y":-336.5566742794443,"id_bridge": 89, "pods": []},
 		{"type": "switch_out", "x":201.84279930544,"y":-336.5566742794443,"id_bridge": 88, "pods": []},
@@ -993,7 +988,7 @@
 		{"type": "switch_out","x":51.4435797092585,"y":-178.8747016993861,"id_bridge": 70, "pods": []},
 		{"type": "station", "name": "Baudricourt","x":51.443579702492585,"y":-178.8747016993861,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "switch_in", "x":51.443579702492585,"y":-178.8747016993861,"id_bridge": 91, "pods": []},
-		{"type": "switch_out", "x":51.4435797024985,"y":-178.8747016993861,"id_bridge": 92, "pods": []},
+		{"type": "switch_out", "x":51.4435797024985,"y":-178.8747016993861,"id_bridge": 90, "pods": []},
 		{"type": "station", "name": "Charlemagne","x":86.66432400772362,"y":-151.24203381979433,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "station", "name": "Commanderie","x":127.18214259277438,"y":-128.4385996593058,"pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}},
 		{"type": "switch_in", "x":51.443579792585,"y":-178.8747016993861,"id_bridge": 99, "pods": []},

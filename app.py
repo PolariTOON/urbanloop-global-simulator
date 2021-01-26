@@ -39,8 +39,10 @@ def stop_app(sig=None, frame=None):
     if _with_interface:
         print("(the server will be closed when it will receive any GET/POST request)")
 
-# handler for SIGINT (CTRL-C)
+# handler for SIGINT (CTRL-C), SIGHUP (terminal closed) and SIGTERM (`kill`)
 signal.signal(signal.SIGINT, stop_app)
+#signal.signal(signal.SIGHUP, stop_app)  # only on Unix
+signal.signal(signal.SIGTERM, stop_app)
     
 
 # init and main loop

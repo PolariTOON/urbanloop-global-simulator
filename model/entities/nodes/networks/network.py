@@ -6,6 +6,13 @@ from math import inf
 from random import choice
 import datetime
 
+#
+from collections import Counter
+import linecache
+import os
+import tracemalloc
+#
+
 from ....lines.bridge import Bridge
 from ....lines.loop import Loop
 from ..node import Node
@@ -46,6 +53,37 @@ class Network(Node):
         self.last_pods = {}
         self._last_minute = int(self.env.time % 60)
         #self.last_sec = 1
+
+        tracemalloc.start()
+        self._counts = Counter()
+
+
+    def display_top(self, snapshot, key_type='lineno', limit=6):
+        snapshot = snapshot.filter_traces((
+            tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+            tracemalloc.Filter(False, "<unknown>"),
+        ))
+        top_stats = snapshot.statistics(key_type)
+
+        print("Top %s lines" % limit)
+        for index, stat in enumerate(top_stats[:limit], 1):
+            frame = stat.traceback[0]
+            # replace "/path/to/module/file.py" with "module/file.py"
+            filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+            print("#%s: %s:%s: %.1f KiB"
+                % (index, filename, frame.lineno, stat.size / 1024))
+            line = linecache.getline(frame.filename, frame.lineno).strip()
+            if line:
+                print('    %s' % line)
+
+        other = top_stats[limit:]
+        if other:
+            size = sum(stat.size for stat in other)
+            print("%s other: %.1f KiB" % (len(other), size / 1024))
+        total = sum(stat.size for stat in top_stats)
+        print("Total allocated size: %.1f KiB\n" % (total / 1024))
+
+
     
     @property
     def name(self):
@@ -429,6 +467,14 @@ class Network(Node):
         current_minute = int(self.env.time / 60)
         if current_minute != self._last_minute:  # affichage et écriture en fichier toutes les minutes de simulations
             
+
+            print('\nTop prefixes:', self._counts.most_common(6))
+            snapshot = tracemalloc.take_snapshot()
+            self.display_top(snapshot)
+
+            tracemalloc.start()
+            self._counts = Counter()
+
             self._last_minute = current_minute
             print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
                   "]\u001B[0m\t\t\t\t\t\t\t\t\t\t(network l.402)")

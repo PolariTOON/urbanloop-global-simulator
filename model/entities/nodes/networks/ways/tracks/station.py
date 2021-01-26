@@ -30,6 +30,7 @@ class Station(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._average_waiting_time = 0
         self._waiting_times_since_last_minute = []
+        self._failed_deviation_since_last_minute = 0
         self._all_time_count = 0
         self._travelers = []
         if travelers is not None:       # initialisation des travelers et dépendances
@@ -149,6 +150,14 @@ class Station(Step):
         arr = self._waiting_times_since_last_minute
         self._waiting_times_since_last_minute = []
         return arr
+
+    def get_failed_deviation_since_last_minute_and_reset(self):
+        val = self._failed_deviation_since_last_minute
+        self._failed_deviation_since_last_minute = 0
+        return val
+
+    def failed_deviation(self):
+        self._failed_deviation_since_last_minute += 1
 
     def isFull(self):
         """

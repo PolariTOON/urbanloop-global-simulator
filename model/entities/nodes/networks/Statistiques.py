@@ -136,7 +136,7 @@ class Statistiques:
 		self.create_directory(folderPath)
 		filename = 'stats/stations/' + station.name + "/stats.csv"
 		csvfile = open(filename, 'a')
-		csvfile.write("Time, Waiting duration (in s)\n")
+		csvfile.write("Time, Failed Deviation To Station, Waiting duration (in s)\n")
 		csvfile.close()	
 
 
@@ -166,6 +166,9 @@ class Statistiques:
 		filename = 'stats/stations/' + station.name + "/stats.csv"
 		csvStationFile = open(filename, 'a')
 		csvStationFile.write(time + ",")
+
+		failed_deviation_since_last_minute = station.get_failed_deviation_since_last_minute_and_reset()
+		csvStationFile.write(str(failed_deviation_since_last_minute) + ",")
 
 		arr_waiting_times_since_last_minute = station.get_waiting_times_since_last_minute_and_reset()
 		csvStationFile.write(self.array_to_proper_string_for_csv(arr_waiting_times_since_last_minute) + "\n")

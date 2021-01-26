@@ -121,8 +121,12 @@ class SwitchOut(Switch):
                         #
                         # échec de déviation !!!
                         #
-                        # TODO : à prendre en compte
-                        #
+                        if (type(self._beside.steps[0]).__name__ == "Station"):
+                            self._beside.steps[0].failed_deviation()
+                        #else :
+                            # Cas d'un Shed
+                            # Pas encore de stats dessus
+
                         pass
                 else:
                     # pont vers une autre boucle

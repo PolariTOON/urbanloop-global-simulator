@@ -94,6 +94,7 @@ def make_stations_graphs(durationInterval):
                         stationCsv = open(fileInDirectory, 'r')
                         # Creation et remplissage arrWaitingTime   
                         arrTime = [] 
+                        arrFailedDeviationToStation = []
                         arrWaitingTime = []
 
                         # Parsage
@@ -101,6 +102,7 @@ def make_stations_graphs(durationInterval):
                         line = stationCsv.readline()
 
                         arrTimeInInterval = []
+                        arrFailedDeviationToStationInInterval = 0
                         arrWaitingTimeInInterval = []
                         comptMinutes = 0
 
@@ -111,8 +113,11 @@ def make_stations_graphs(durationInterval):
                             # On ajoute le time
                             arrTimeInInterval.append(arrLine[0])
 
+                            # On ajoute les deviations ratees vers la station
+                            arrFailedDeviationToStationInInterval += int(arrLine[1])
+
                             # On ajoute les valeurs contenues dans le tableau
-                            arrLineOfArrLine = arrLine[1].split('|')     
+                            arrLineOfArrLine = arrLine[2].split('|')     
                             for elt in arrLineOfArrLine:
                                 if (elt != "" and elt != " " and elt != "\n" and elt != " \n"):
                                     arrWaitingTimeInInterval.append(float(elt))
@@ -122,6 +127,9 @@ def make_stations_graphs(durationInterval):
                             if (comptMinutes == durationInterval):
                                 comptMinutes = 0
                                 arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
+                                arrFailedDeviationToStation.append(arrFailedDeviationToStationInInterval)
+                                arrFailedDeviationToStationInInterval = 0   # On reset
+                                
                                 # On ajoute les moyennes
                                 if (len(arrWaitingTimeInInterval) > 0):
                                     arrWaitingTime.append(statistics.mean(arrWaitingTimeInInterval))
@@ -134,6 +142,7 @@ def make_stations_graphs(durationInterval):
                                 # PS : si on veut afficher 10mn et qu'on regarde les intervalles de 3mn, on affichera pas la 10eme minute
 
                         make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "waitingTime", False)
+                        make_graph(arrTime, arrFailedDeviationToStation, "Failed deviation to station", f, "failedDeviation", False)
                         stationCsv.close()
 
 
@@ -230,6 +239,7 @@ def get_array_of_mean_from_array_of_array(array):
 
 
 def make_graph(x, y, title, fileNamePref, fileNameSuf, isXComposedOfInt):
+    plt.figure(figsize=(len(x), 2))
     plt.plot(x, y)
     plt.title(title)
     fileName = fileNamePref + "/" + fileNameSuf + ".png"
@@ -239,8 +249,8 @@ def make_graph(x, y, title, fileNamePref, fileNameSuf, isXComposedOfInt):
         plt.yticks(yint)
 
     plt.savefig(fileName)
-    # On clear la figure
-    plt.clf()
+    # On ferme la figure
+    plt.close()
 
 
 def intervalOfListOfStringDates(listOfStringDate):

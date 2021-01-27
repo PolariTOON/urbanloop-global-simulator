@@ -1,6 +1,5 @@
 from .token import Token
 
-
 class Traveler(Token):
     def __init__(self, env, generation_time=None, waiting_time=None, boarding_time=None, real_user=False, **kwargs):
         super().__init__(env, **kwargs)
@@ -10,6 +9,9 @@ class Traveler(Token):
         self._real_user = real_user
         self._changed_dest = False
         self._called_emergency_exit = False   
+
+    def disembark(self):
+        self._run_while_condition = False
 
     @property
     def name(self):

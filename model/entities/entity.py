@@ -3,7 +3,6 @@ from math import floor
 from simpy.events import Process, Timeout
 from simpy.resources.store import Store, StoreGet, StorePut
 
-
 class Entity:
     def __init__(self, env, id, name=None, **kwargs):
         self._env = env
@@ -11,6 +10,7 @@ class Entity:
         self._name = name or ""
         self._store = Store(env)
         Process(self._env, self.run())
+        self._run_while_condition = True
 
     @property
     def env(self):
@@ -98,7 +98,7 @@ class Entity:
         Fonction qui gère le processus, à chaque tour d'événement simpy les actions sont exécutées
         :return: void
         """
-        while True:
+        while self._run_while_condition:
             self.update()
             # réception des messages
             while True:

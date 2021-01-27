@@ -326,6 +326,9 @@ class Station(Step):
                     print("\033[4;31mERROR: mauvais comptage des incoming pods\u001B[0m",
 			  self._incoming_pods, " ", self.name, "\n\t\t(station l.277)")
 
+                if len(pod.travelers) > 0: 
+                    pod.travelers[0].disembark()        # On fait stopper les updates de Traveler
+
                 pod.travelers = []
                 pod.write({
                     "author": self,

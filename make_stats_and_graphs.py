@@ -23,20 +23,25 @@ def make_global_graphs(durationInterval):
     comptMinutes = 0
     
     while (line):
+        rightShift = 0          # de combien de champs on se deplace vers la droite
+
         arrLine = line.split(',')
         line = csvfileStats.readline()
 
+        if ("day" in arrLine[0]):
+            rightShift = 1          # On va sauter le champ avec le jour (format -> 1 day, 0:09:00)
+
         # On ajoute le time
-        arrTimeInInterval.append(arrLine[0])
+        arrTimeInInterval.append(arrLine[0 + rightShift])
 
         # arrLine[2] contient "travelers in a pod" a un moment donne
-        arrTravelersInAPodInInterval.append(int(arrLine[2]))
+        arrTravelersInAPodInInterval.append(int(arrLine[2 + rightShift]))
 
         # arrLine[3] contient "waiting travelers" a un moment donne
-        arrWaitingTravelersInInterval.append(int(arrLine[3]))
+        arrWaitingTravelersInInterval.append(int(arrLine[3 + rightShift]))
 
         # arrLine[4] contient "traveling pods" a un moment donne
-        arrTravelingPodsInInterval.append(int(arrLine[4]))
+        arrTravelingPodsInInterval.append(int(arrLine[4 + rightShift]))
 
         comptMinutes += 1  
 
@@ -107,17 +112,22 @@ def make_stations_graphs(durationInterval):
                         comptMinutes = 0
 
                         while (line):
+                            rightShift = 0          # de combien de champs on se deplace vers la droite
+
                             arrLine = line.split(',')
                             line = stationCsv.readline()
 
+                            if ("day" in arrLine[0]):
+                                rightShift = 1          # On va sauter le champ avec le jour (format -> 1 day, 0:09:00)
+
                             # On ajoute le time
-                            arrTimeInInterval.append(arrLine[0])
+                            arrTimeInInterval.append(arrLine[0 + rightShift])
 
                             # On ajoute les deviations ratees vers la station
-                            arrFailedDeviationToStationInInterval += int(arrLine[1])
+                            arrFailedDeviationToStationInInterval += int(arrLine[1 + rightShift])
 
                             # On ajoute les valeurs contenues dans le tableau
-                            arrLineOfArrLine = arrLine[2].split('|')     
+                            arrLineOfArrLine = arrLine[2 + rightShift].split('|')     
                             for elt in arrLineOfArrLine:
                                 if (elt != "" and elt != " " and elt != "\n" and elt != " \n"):
                                     arrWaitingTimeInInterval.append(float(elt))
@@ -164,14 +174,19 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(duratio
     comptMinutes = 0
     
     while (line):
+        rightShift = 0          # de combien de champs on se deplace vers la droite
+
         arrLine = line.split(',')
         line = csvfileStats.readline()
 
+        if ("day" in arrLine[0]):
+            rightShift = 1          # On va sauter le champ avec le jour (format -> 1 day, 0:09:00)
+
         # On ajoute le time
-        arrTimeInInterval.append(arrLine[0])
+        arrTimeInInterval.append(arrLine[0 + rightShift])
 
         # On ajoute les valeurs contenues dans le tableau
-        for i in range(1, len(arrLine)):
+        for i in range(1 + rightShift, len(arrLine)):
             arrLineOfArrLine = arrLine[i].split('|')     
             for elt in arrLineOfArrLine:
                 if (elt != "" and elt != " " and elt != "\n" and elt != " \n"):
@@ -205,13 +220,14 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(duratio
 
 
 def make_boxplot(array_time, array_of_array, title, filename):
+    plt.figure(figsize=(1.4*len(array_of_array), 4))
     plt.boxplot(array_of_array)
     plt.title('Boxplot : ' + title)
     filename += "_boxplot.png"
 
     plt.gca().xaxis.set_ticklabels(array_time)
 
-    plt.savefig(filename)
+    plt.savefig(filename, bbox_inches='tight')
     # On clear la figure
     plt.clf()
 
@@ -239,16 +255,17 @@ def get_array_of_mean_from_array_of_array(array):
 
 
 def make_graph(x, y, title, fileNamePref, fileNameSuf, isXComposedOfInt):
-    plt.figure(figsize=(len(x), 2))
+    plt.figure(figsize=(1.4*len(x), 4))
     plt.plot(x, y)
     plt.title(title)
     fileName = fileNamePref + "/" + fileNameSuf + ".png"
 
     if (isXComposedOfInt):
-        yint = range(min(y), math.ceil(max(y))+1)
+        yint = range(min(y), math.ceil(max(y)))
         plt.yticks(yint)
 
-    plt.savefig(fileName)
+    plt.margins(x=0)
+    plt.savefig(fileName, bbox_inches='tight')
     # On ferme la figure
     plt.close()
 
@@ -259,8 +276,11 @@ def intervalOfListOfStringDates(listOfStringDate):
 
     properDate1 = stringDate1[:-3]                                  # 8:00
     properDate2 = stringDate2[:-3]                                  # 8:02
+
+    if (properDate1[0] == ' '): properDate1 = properDate1[1:]
+    if (properDate2[0] == ' '): properDate2 = properDate2[1:]
     
-    interval = properDate1 + "-" + properDate2                      # 8:00-8:02
+    interval = properDate1 + "-" + properDate2 
 
     return interval
 

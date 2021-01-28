@@ -135,13 +135,13 @@ $ python3.7 test_project/lauch_simulators.py -h
 Pour lancer le calcul de statistiques finales et creer les figures des statistiques temporelles dans le dossier stats/, utilisez :
 
 ```sh
-$ python3.7 make_statsAndGraphs.py
+$ python3.7 make_stats_and_graphs.py
 ```
 
 Pour changer l'intervalle de temps (par defaut de 30 minutes), ajouter la commande -i et l'entier souhaite (5 par exemple) :
 
 ```sh
-$ python3.7 make_statsAndGraphs.py -i 5
+$ python3.7 make_stats_and_graphs.py -i 5
 ```
 
 ### Utilisation

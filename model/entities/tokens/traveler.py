@@ -10,9 +10,6 @@ class Traveler(Token):
         self._changed_dest = False
         self._called_emergency_exit = False   
 
-    def disembark(self):
-        self._run_while_condition = False
-
     @property
     def name(self):
         return super().name or "Traveler %s" % self.id
@@ -41,9 +38,19 @@ class Traveler(Token):
         self._waiting_time = time - self._generation_time
         return self._waiting_time
 
+    def disembark(self):
+        return
+
     def serialize(self):
         dict = super().serialize()
         return dict
+
+    def run(self):
+        # pas d'update à faire pour les travelers.
+        # on doit terminer le processus pour ne pas que
+        # les travelers restent après être arrivés à destination.
+        return
+        yield
 
     def update(self):
         return
@@ -55,4 +62,5 @@ class Traveler(Token):
         self._changed_dest = True
 
     def call_emergency_exit(self):
-        self._called_emergency_exit = True   
+        self._called_emergency_exit = True
+

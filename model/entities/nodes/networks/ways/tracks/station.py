@@ -225,11 +225,6 @@ class Station(Step):
         for i in range(len(self._boarding)):  # pour chaque capsule
             if self._boarding[i] != -1:       # si un voyageur embarque
                 self._boarding[i] += self.env.tick
-                #
-                # TODO : corriger bug :
-                #        des fois, "self._pods[i]" est None ici (ça ne devrait pas être le cas)
-                #        peut-être que ça arrive lorsqu'un pod arrive dans une station déjà pleine
-                #
                 if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                     destination = self._pods[i].travelers[0].destination
                     self._boarding[i] = -1  # reset du timer
@@ -326,8 +321,8 @@ class Station(Step):
                     print("\033[4;31mERROR: mauvais comptage des incoming pods\u001B[0m",
 			  self._incoming_pods, " ", self.name, "\n\t\t(station l.277)")
 
-                if len(pod.travelers) > 0: 
-                    pod.travelers[0].disembark()        # On fait stopper les updates de Traveler
+                for t in pod.travelers: 
+                    t.disembark()
 
                 pod.travelers = []
                 pod.write({
@@ -357,10 +352,8 @@ class Station(Step):
             if pod != self._pods[-1]:
                 print("ERROR: a pod left without being in the front position.\n\t\t(station l.327)")
             for i in range(self._capacity-1, 0, -1):  # on décale les autres pods vers l'avant
-                #
                 # TODO : ne pas faire ce décalage si un passager est en train de monter
                 #        (sinon la capsule bouge pendant que la personne monte dedans...)
-                #
                 self._pods[i] = self._pods[i-1]
                 self._boarding[i] = self._boarding[i-1]
             self._pods[0] = None

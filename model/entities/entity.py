@@ -10,7 +10,6 @@ class Entity:
         self._name = name or ""
         self._store = Store(env)
         Process(self._env, self.run())
-        self._run_while_condition = True
 
     @property
     def env(self):
@@ -95,10 +94,11 @@ class Entity:
 
     def run(self):
         """
-        Fonction qui gère le processus, à chaque tour d'événement simpy les actions sont exécutées
+        Fonction qui gère le processus, à chaque tour d'événement simpy les actions sont exécutées.
+        Attention, ici les entities resteront instanciéées pour toujours.
         :return: void
         """
-        while self._run_while_condition:
+        while True:
             self.update()
             # réception des messages
             while True:
@@ -113,3 +113,4 @@ class Entity:
 
     def handle_message(self):
         raise NotImplementedError()
+

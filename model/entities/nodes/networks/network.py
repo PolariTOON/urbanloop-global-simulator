@@ -509,7 +509,7 @@ class Network(Node):
             timestamp = message["timestamp"]
             if self.departure_arrival_printer:
                 print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) +
-                      "] Arrival\u001B[0m", message["pod"].destination, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.396)", end='')
+                      "] Arrival\u001B[0m", message["pod"].destination, "\t\t(network l.396)", end='')
                 print("\n\t\t\u001B[35m|\u001B[0m nom du pod:", message["pod"].name[:8], "\n")
             self._statistiques.remove_traveling_pod(message["pod"], timestamp)
             pass

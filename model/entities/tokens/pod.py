@@ -358,7 +358,6 @@ class Pod(Token):
             
         elif "docked" == message["type"]:
             # La capsule s'arrête dans une gare ou un dépôt
-            # TODO : check track_or_switch à ce niveau-là (je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être une problème...))
             self._speed = 0
             self._endSpeed = 0
             self._previous_station = None      # On reset la derniere station

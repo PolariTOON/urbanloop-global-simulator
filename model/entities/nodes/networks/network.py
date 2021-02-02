@@ -413,22 +413,16 @@ class Network(Node):
         
         """
         # initialisation d'une table globale
-        i=1
         for s in self._switches:
             if isinstance(s, SwitchOut):
                 self._routing_table[s.name] = []
-            print("a %d"%i)
-            i+=1
-        i=1
         # Switches menant aux stations/sheds
         for s in self._switches:
             if isinstance(s, SwitchOut) and s.is_destination():
                 for step in s.beside.steps:
                     self._routing_table[s.name].append(step.name)
-            print("b %d"%i)
-            i+=1
-        i=1
         # Remplissage pour les switchs entre 2 boucles différentes
+        #i=1
         for s1 in self._switches:
             if isinstance(s1, SwitchOut) and not s1.is_destination():
                 for s2 in self._switches:
@@ -446,8 +440,8 @@ class Network(Node):
                                 s2_steps = s2.next.steps[:]
                             for step in s2_steps:
                                 self._routing_table[s1.name].append(step.name)
-            print("c %d / %d"%(i,len(self.switches)))
-            i+=1
+            #print("c %d / %d"%(i,len(self.switches)))
+            #i+=1
         # Envoie des tables aux switchs
         if init:
             for switch in self._switches:

@@ -99,6 +99,10 @@ class Section(Track):
             self._speed = 0.000001
         self.weight = self._length / self._speed
 
+    @property
+    def updatable(self):
+        return False
+
     def update(self):
         return
 

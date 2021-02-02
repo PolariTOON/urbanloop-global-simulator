@@ -197,6 +197,9 @@ class Road(Way):
             if index < len(self._steps):
                 step = self._steps[index]
                 step.parent = self
+    @property
+    def updatable(self):
+        return False
 
     def update(self):
         return

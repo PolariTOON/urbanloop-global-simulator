@@ -14,6 +14,8 @@ class Pod(Token):
     au niveau des aiguillages
     """
     def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, ready=None, traveled_distance=None, traveled_distance_t=None, **kwargs):
+        self._speed = pod_speed
+        self._end_speed = self._speed # placé avant super().__init__() car on a besoin de _end_speed et _speed pour `self.updatable()`
         super().__init__(env, **kwargs)
         self._position = position or 0
         travelers = travelers or {
@@ -27,7 +29,6 @@ class Pod(Token):
         self._track_or_switch = track_or_switch
         self._source = self.source or None  # si la capsule a déjà été créée mais change de voie, source n'est pas changé, sinon on setup via track_or_switch
         self._destination = self.destination or None
-        self._speed = pod_speed
         self._turn = turn or False
         self._length_before_restore = length_before_restore or None
         self._speed_restore = speed_restore or None
@@ -43,7 +44,6 @@ class Pod(Token):
         self._contain_real_user = False
         self._changed_destination = False
         self._emergency_exit = False
-        self._endSpeed = self._speed
         self._acceleration = acceleration or 2
         self._brake = brake or 5
         self._ready = ready or False
@@ -140,7 +140,7 @@ class Pod(Token):
     @speed.setter
     def speed(self, value):
         """setter de l'attribut speed"""
-        self._endSpeed = value * self._coef
+        self._end_speed = value * self._coef
 
     @property
     def speed_restore(self):
@@ -203,6 +203,18 @@ class Pod(Token):
     def closest(self):
         return self._track_or_switch.closest(self)
 
+    @property
+    def updatable(self):
+        return self._end_speed != 0 and self._speed != 0
+
+    def activate_updates(self):
+        if self not in self._env.updatable_entities:
+            self._env.updatable_entities.append(self)
+
+    def deactivate_updates(self):
+        if self in self._env.updatable_entities:
+            self._env.updatable_entities.remove(self)
+
     def update(self):
 
         # OPTIMISATION : ne regarder que lors de l'embarquement !
@@ -233,14 +245,14 @@ class Pod(Token):
                     self._speed_restore = None
 
         # La capsule accélère ou freine
-        if self._speed < self._endSpeed:
+        if self._speed < self._end_speed:
             self._speed += self._acceleration
-            if self._speed > self._endSpeed:
-                self._speed = self._endSpeed
-        elif self._speed > self._endSpeed:
+            if self._speed > self._end_speed:
+                self._speed = self._end_speed
+        elif self._speed > self._end_speed:
             self._speed -= self._brake
-            if self._speed < self._endSpeed:
-                self._speed = self._endSpeed
+            if self._speed < self._end_speed:
+                self._speed = self._end_speed
 
         # La capsule détecte la capsule la plus proche devant elle
         if type(self._track_or_switch).__name__ == "Section":
@@ -361,11 +373,12 @@ class Pod(Token):
         elif "docked" == message["type"]:
             # La capsule s'arrête dans une gare ou un dépôt
 
-            # TODO : check track_or_switch à ce niveau-là (-> je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être une problème...))
+            # TODO : check track_or_switch à ce niveau-là (-> je pense qu'au tout début, c'est shed/station, mais au cours de la simulation, c'est une section (mais ça ne devrait pas être un problème...))
             
             self._speed = 0
-            self._endSpeed = 0
+            self._end_speed = 0
             self._previous_station = None      # On reset la derniere station
+            self.deactivate_updates()
         elif "insert" == message["type"]:
             # Ordre d'insertion, la capsule est autorisée à tourner
             if self._track_or_switch.stat_or_shed:  # si c'est un dépot ou station
@@ -402,6 +415,7 @@ class Pod(Token):
             self._source = message["author"].name
             self._destination = message["destination"]
             self.speed = self._track_or_switch.speed
+            self.activate_updates()
         else:
             raise ValueError("Invalid message: ", message)
 

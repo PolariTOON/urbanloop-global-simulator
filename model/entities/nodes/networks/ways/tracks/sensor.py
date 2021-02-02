@@ -21,6 +21,10 @@ class Sensor(Step):
     def name(self):
         return super().name or "Sensor %d" % self.id
 
+    @property
+    def updatable(self):
+        return False
+
     def update(self):
         return
     

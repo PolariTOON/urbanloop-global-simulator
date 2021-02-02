@@ -47,6 +47,10 @@ class Traveler(Token):
         dict = super().serialize()
         return dict
 
+    @property
+    def updatable(self):
+        return False
+
     def update(self):
         return
 

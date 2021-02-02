@@ -9,8 +9,15 @@ class Entity:
         self._env = env
         self._id = id
         self._name = name or ""
-        self._store = Store(env)
-        Process(self._env, self.run())
+        if self._env.with_messages:
+            self.write = self.write_1
+            self._store = Store(env)
+            Process(self._env, self.run())
+        else:
+            self.write = self.write_3
+            self.read = self.read_3
+            if self.updatable:
+                self._env.updatable_entities.append(self)
 
     @property
     def env(self):
@@ -32,34 +39,25 @@ class Entity:
 
     # mode 3
 
-    # ATTENTION :
-    #  certaines classes ("network" et "switch_in") font des choses dans "run",
-    #  et nécessitent qu'un "run" soit appelé (et ce, après que tous les objets soient instanciés)
-
-    def write3(self, message):
+    def write_3(self, message):
         if message is None:
             raise ValueError()
+        self._env.messages.append( (self, message) )
+        return
+
+    def read_3(self, message):
         self.handle_message(message)
         return
     
-    def run3(self):
-        """
-        Fonction qui gère le processus, à chaque tour d'événement simpy les actions sont exécutées
-        :return: void
-        """
-        while True:
-            # TODO : TIMEOUT ICI
-            self.update()
-
     # mode 2
 
-    def write(self, message):
+    def write_2(self, message):
         if message is None:
             raise ValueError()
         StorePut(self._store, message)
         return
 
-    def read(self):
+    def read_2(self):
         (timeout, getter) = (Timeout(self._env, 1 - (self._env.now - floor(self._env.now))), StoreGet(self._store))
         condition = yield timeout | getter
         if getter not in condition:
@@ -71,18 +69,18 @@ class Entity:
 
     # mode 1
 
-    def write1(self, message):
+    def write_1(self, message):
         if message is None:
             raise ValueError()
         Process(self._env, self._pipe(message))
         return
 
-    def _pipe1(self, message):
+    def _pipe(self, message):
         timeout = random() *  (1 - (self._env.now - floor(self._env.now)))
         yield Timeout(self._env, timeout) # Timeout pour simuler la durée d'envoi du message
         yield StorePut(self._store, message)
 
-    def read1(self):
+    def read(self):
         (timeout, getter) = (Timeout(self._env, 1 - (self._env.now - floor(self._env.now))), StoreGet(self._store))
         condition = yield timeout | getter
         if getter not in condition:
@@ -95,7 +93,8 @@ class Entity:
 
     def run(self):
         """
-        Fonction qui gère le processus, à chaque tour d'événement simpy les actions sont exécutées
+        Fonction qui gère le processus en mode "self._env.with_messages == True".
+        A chaque tour d'événement simpy les actions sont exécutées
         :return: void
         """
         while True:
@@ -107,7 +106,14 @@ class Entity:
                     break
                 else:
                     self.handle_message(message)
-
+    
+    def updatable(self):
+        """ Renvoie True si l'entity a besoin qu'on appelle son `update()`.
+            Cela permet de ne pas avoir à appeler les `update()` de toutes les entités,
+            et donc d'améliorer légèrement les performances.
+        """
+        raise NotImplementedError()
+    
     def update(self):
         raise NotImplementedError()
 

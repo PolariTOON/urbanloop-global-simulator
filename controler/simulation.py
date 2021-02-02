@@ -42,6 +42,13 @@ class Simulation:
             "activity_and_residential_fluctuation": 20
         }
         self._env = Environment()
+
+        self._env.with_messages = False
+        self._env.updatable_entities = []
+        self._env.messages = []
+        self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
+        self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
+        
         self._wave = wave
         self._running = running
         self._showing_travelers_waiting = False
@@ -51,11 +58,6 @@ class Simulation:
         self._state = state
         seed(self._state)  # à appeler avant d'utiliser random
         self._network = Network(self._env, id, **kwargs)
-
-        self._env.with_messages = False
-        self._env.updatable_entities = []
-        self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
-        self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
 
         self._travelers_per_day = traveler["travelers_per_day"]
         self._probability = Probability(prob, traveler, self._network.stations, self._network.statistiques, self._env.tick)
@@ -126,8 +128,18 @@ class Simulation:
         
         self._env.tick = tick
         for i in range(times):  # dans le mode jerky, on calcule plusieurs ticks à la fois
+            if self._env.with_messages:
+                self._env.run(until=self._env.now+1)
+            else:
+                updatables = self._env.updatable_entities[:] # 'self._env.messages' will be modified, so we need a copy
+                # updates
+                for entity in self._env.updatable_entities:
+                    entity.update()
+                #self._env.run(until=self._env.now+1) # will do nothing, except for incrementing '_env.now'
+                # messages
+                for receiver, message in self._env.messages:
+                    receiver.read(message)
             self._env.time += tick  # on incrémente le temps
-            self._env.run(until=self._env.now+1)
             self._state = random() * 2 ** 53
             seed(self._state)
 

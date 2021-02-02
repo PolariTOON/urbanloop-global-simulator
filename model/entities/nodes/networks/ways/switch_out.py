@@ -74,6 +74,10 @@ class SwitchOut(Switch):
         :return: True si la capsule doit être aiguillée, False sinon
         """
         return pod.destination in self._routing_table
+    
+    @property
+    def updatable(self):
+        return False
 
     def update(self):
         return

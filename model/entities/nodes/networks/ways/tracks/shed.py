@@ -74,6 +74,10 @@ class Shed(Step):
     def isFull(self):
         return self._capacity - len(self._pods) == 0
 
+    @property
+    def updatable(self):
+        return True
+    
     def update(self):
         """Fonction gérant le processus dépôt"""
         

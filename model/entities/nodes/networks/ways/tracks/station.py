@@ -184,6 +184,10 @@ class Station(Step):
                                 # suivre le nombre de capsule dans le réseau, suppression section l.121 (pod[0] = None)
         self._boarding[0] = -1
         self._pods_ready[0] = False
+    
+    @property
+    def updatable(self):
+        return True
 
     def update(self):
         """Fonction gérant le processus gare"""

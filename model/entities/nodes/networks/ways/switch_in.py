@@ -26,6 +26,7 @@ class SwitchIn(Switch):
         self._pod_to_add = None
         self._cursor = cursor or 0
         self._first_place = int(self._cursor)
+        self._initialized = False
 
     @property
     def switch_out(self):
@@ -113,7 +114,7 @@ class SwitchIn(Switch):
             self._discrete_places[index] = self._discrete_places[index + 1]
         self._discrete_places[self._first_place - 1] = None
 
-    def run(self):
+    def init(self):
         
         # Les distances importantes sur la boucle où l'on peut s'insérer
         self._discretize_length = self.place_size * self.max_speed / (self.max_speed - self.speed)
@@ -132,11 +133,18 @@ class SwitchIn(Switch):
                 for pod in self._pods:
                     if pod.id == place["id"]:
                         self._discrete_places[k] = pod
-                        
-        yield from super().run()
+        return
+    
+    @property
+    def updatable(self):
+        return True
     
     def update(self):
         """Fonction modélisant le processus aiguillage entrant"""
+        
+        if not self._initialized:
+            self.init()
+            self._initialized = True
         
         self._cursor = (self._cursor - self.speed * self.env.tick / self.place_size) % self._places_number
         if int(self._cursor) != self._first_place:

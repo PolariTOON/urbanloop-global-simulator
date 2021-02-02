@@ -407,6 +407,10 @@ class Network(Node):
                 if step["name"] == s.name:
                     return s
         raise ValueError("Step not in the network")
+    
+    @property
+    def updatable(self):
+        return True
 
     def update(self):
 
@@ -416,7 +420,9 @@ class Network(Node):
         #    last_sec += 1
         #    if (self.last_sec == 60):
         #        self.last_sec = 0
-
+        
+        print(self.env.time)
+        
         if round(self.env.time) % 60 == 1:  # pour éviter d'écrire plusieurs lignes pour un temps donné si le pas est bas
             one_print = True
         if round(self.env.time) % 60 == 0 and self.one_print:  # affichage et écriture en fichier toutes les minutes de simulations

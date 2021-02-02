@@ -1,0 +1,319 @@
+{
+  "name": "Grand Nancy",
+  "time": 28800,
+  "state": 56565,
+  "jerky": true,
+  "running": false,
+  "margin_min": 2,
+  "max_speed": 30,
+  "pod_size": 2,
+  "places_number": 5,
+  "dynamic_routing": false,
+  "view_box": {
+    "x": 0,
+    "y": 200,
+    "width": 600,
+    "height": 500
+  },
+  "loops": [
+    {
+      "name": "1",
+      "elements": [
+        {"type": "switch_out", "x": -95.67460221693293, "y": -18.99119057775947, "id_bridge": 4, "pods": []},
+        {"type": "switch_in", "x": -103.9561576261506, "y": -24.59617407497492, "id_bridge": 4, "pods": []},
+        {"type": "switch_out", "x": -138.2099031657914, "y": -68.09160169844401, "id_bridge": 5, "pods": []},
+        {"type": "switch_in", "x": -139.85595326185364, "y": -77.95519734512649, "id_bridge": 5, "pods": []},
+        {"type": "switch_out", "x": -121.42524799515714, "y": -103.77046051394855, "id_bridge": 6, "pods": []},
+        {"type": "switch_in", "x": -114.03712139138382, "y": -110.50956915579555, "id_bridge": 6, "pods": []},
+        {"type": "switch_out", "x": -71.3143380556309, "y": -145.8449845473701, "id_bridge": 7, "pods": []},
+        {"type": "switch_in", "x": -61.47031143599316, "y": -144.08568357486322, "id_bridge": 7, "pods": []},
+        {"type": "switch_out", "x": -63.74642114399583, "y": -106.42975143224234, "id_bridge": 8, "pods": []},
+        {"type": "switch_in", "x": -62.91212267321936, "y": -96.46461490223635, "id_bridge": 8, "pods": []},
+        {"type": "switch_out", "x": -52.3314097734661, "y": -44.52630163802435, "id_bridge": 9, "pods": []},
+        {"type": "switch_in", "x": -53.103930339514285, "y": -34.556185692107135, "id_bridge": 9, "pods": []},
+        {"type": "switch_in", "x": -68.41254335504532, "y": -25.47643107994899, "id_bridge": 0, "pods": []},
+        {"type": "switch_out", "x": -84.12050662304216, "y": -35.858494911488535, "id_bridge": 1, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "2",
+      "elements": [
+        {"type": "switch_in", "x": -92.84278955978832, "y": 15.898977195356984, "id_bridge": 1, "pods": []},
+        {"type": "switch_out", "x": -133.5059279721961, "y": 3.639354438500442, "id_bridge": 10, "pods": []},
+        {"type": "switch_in", "x": -139.89989935262798, "y": 11.328120918646551, "id_bridge": 10, "pods": []},
+        {"type": "switch_out", "x": -140.28991405800113, "y": 65.80058743458004, "id_bridge": 11, "pods": []},
+        {"type": "switch_in", "x": -135.8386269000416, "y": 74.75525340475362, "id_bridge": 11, "pods": []},
+        {"type": "switch_out", "x": -98.14532532713145, "y": 104.02148486212835, "id_bridge": 12, "pods": []},
+        {"type": "switch_in", "x": -88.39546512597323, "y": 106.24414679275816, "id_bridge": 12, "pods": []},
+        {"type": "switch_out", "x": -26.48810973685988, "y": 102.89461584190518, "id_bridge": 13, "pods": []},
+        {"type": "switch_in", "x": -17.49418741344245, "y": 98.52319030321262, "id_bridge": 13, "pods": []},
+        {"type": "switch_out", "x": -19.77894374827205, "y": 72.89362372389152, "id_bridge": 2, "pods": []},
+        {"type": "switch_in", "x": -35.48690701621338, "y": 62.51155989235656, "id_bridge": 3, "pods": []},
+        {"type": "switch_out", "x": -29.502344575274556, "y": 37.97794445579757, "id_bridge": 14, "pods": []},
+        {"type": "switch_in", "x": -37.04705980328294, "y": 31.414616631571636, "id_bridge": 14, "pods": []},
+        {"type": "switch_out", "x": -77.13482629184698, "y": 26.281041026896528, "id_bridge": 0, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "3",
+      "elements": [
+        {"type": "switch_out", "x": 39.48371100326309, "y": 60.11214958461988, "id_bridge": 3, "pods": []},
+        {"type": "switch_out", "x": 81.92588555718194, "y": -3.429170090588439, "id_bridge": 15, "pods": []},
+        {"type": "switch_in", "x": 91.75182830882312, "y": -1.571523988267015, "id_bridge": 15, "pods": []},
+        {"type": "switch_out", "x": 112.8622641081243, "y": 69.51657766500767, "id_bridge": 16, "pods": []},
+        {"type": "switch_in", "x": 115.93294753585968, "y": 79.03345232461265, "id_bridge": 16, "pods": []},
+        {"type": "switch_out", "x": 143.50464961687044, "y": 142.7284371716738, "id_bridge": 17, "pods": []},
+        {"type": "switch_in", "x": 134.5612068108856, "y": 147.2022309505687, "id_bridge": 17, "pods": []},
+        {"type": "switch_out", "x": 11.431829300062166, "y": 136.58144902567201, "id_bridge": 18, "pods": []},
+        {"type": "switch_in", "x": 4.241227382867788, "y": 129.63197105474208, "id_bridge": 18, "pods": []},
+        {"type": "switch_in", "x": 55.19167427125993, "y": 70.49421341615485, "id_bridge": 2, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    }
+  ],
+  "bridges": [
+    {
+      "name": "Bridge 1-2",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 2-1",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 2-3",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 3-2",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Deviation for Curie",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Curie", "x": -102.61787167014948, "y": -17.65290462175836, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Ravel",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Ravel", "x": -143.96472603716376, "y": -72.20037447375412, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Alb\u00ef\u00bf\u00bdtre",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Alb\u00ef\u00bf\u00bdtre", "x": -121.10073901419398, "y": -110.8340781367587, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Ecoles",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Ecoles", "x": -65.51267425955861, "y": -149.88734737093554, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Coll\u00ef\u00bf\u00bdge Monod",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Coll\u00ef\u00bf\u00bdge Monod", "x": -68.31184017361059, "y": -101.03003393185111, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Baraques de Ludres",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Baraques de Ludres", "x": -47.73261208353159, "y": -39.15498338204165, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Ader",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Ader", "x": -140.5472969024851, "y": 4.286751988357569, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Eiffel",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Eiffel", "x": -142.54160346410814, "y": 72.50356399864658, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Champs Moyen",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Champs Moyen", "x": -94.38172619186724, "y": 110.00774592802236, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Chateau",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Chateau", "x": -19.80543580580488, "y": 105.20586423426761, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Haut de Fl\u00c3\u00a9ville",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Haut de Fl\u00c3\u00a9ville", "x": -29.993038277165784, "y": 30.92392292968041, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Houdemont Porte Sud",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Houdemont Porte Sud", "x": 87.76767998416324, "y": -7.413318415248321, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Morlaix",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Morlaix", "x": 109.6391684921895, "y": 75.81035670867786, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for L'Or\u00ef\u00bf\u00bde du Bois",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "L'Or\u00ef\u00bf\u00bde du Bois", "x": 141.26982510332547, "y": 149.43705546411366, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Croix du Soldat",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Croix du Soldat", "x": 4.3617893560000045, "y": 136.70201099880424, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    }
+  ]
+}

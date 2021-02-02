@@ -103,6 +103,12 @@ Ajouter le paramètre `-e` permet de supprimer tous les voyageurs de la simulati
 $ python3.7 main.py -e [...]
 ```
 
+Utiliser `-d` permet de définir la durée à simuler, en secondes. Pour 24h :
+
+```sh
+$ python3.7 main.py -d 1440 [...]
+```
+
 Pour plus d'informations, utilisez la commande suivante :
 
 ```sh
@@ -129,13 +135,13 @@ $ python3.7 test_project/lauch_simulators.py -h
 Pour lancer le calcul de statistiques finales et creer les figures des statistiques temporelles dans le dossier stats/, utilisez :
 
 ```sh
-$ python3.7 make_statsAndGraphs.py
+$ python3.7 make_stats_and_graphs.py
 ```
 
 Pour changer l'intervalle de temps (par defaut de 30 minutes), ajouter la commande -i et l'entier souhaite (5 par exemple) :
 
 ```sh
-$ python3.7 make_statsAndGraphs.py -i 5
+$ python3.7 make_stats_and_graphs.py -i 5
 ```
 
 ### Utilisation
@@ -210,3 +216,43 @@ docker run -itp 80:8090 --env n='resources/test2jerky.json' urbanloop-simulator
 ### Editeur
 
 Pour utiliser l'éditeur, les instructions sont disponibles sur le ReadMe présent dans le dossier [`editeur_reseau`](editeur_reseau).
+
+### Informations pour les développeurs
+
+#### Convertion d'un réseau au nouveau format {upgrade-network-format}
+
+On rappelle que l'ancien format des fichiers décrivant les réseaux ne permettait pas de placer des stations/sheds en dérivation.
+Celles-ci étaient placées directement sur la route d'une boucle.
+
+Pour convertir un fichier de l'ancien format au nouveau format (avec dérivations vers les stations/sheds), utiliser :
+
+```sh
+python manip_format --upgrade old_file.json new_file.json
+```
+
+#### Génération automatique d'un réseau du Grand Nancy
+
+Pour générer automatiquement des réseaux du Grand Nancy, il est possible d'utiliser des fichiers de données listant les stations de bus et tramway de l'agglomération.
+Si on a un fichier `.csv` sous le format suivant :
+
+```
+Switch In 1-2,48.6635025,6.155294,1,Switch_In,0
+Art-sur-Meurthe,48.658634,6.269274,1,True,
+Bosserville,48.663563,6.241849,1,True,
+
+Switch In 2-1,48.6651491394043,6.160393690490723,2,Switch_In,1
+Callot,48.6661491394043,6.165993690490723,2,True,
+Campus Artem,48.672080993652344,6.172549724578857,2,True,
+
+...
+```
+
+Alors ce fichier peut être convertit en fichier `.json` décrivant un réseau avec :
+
+```sh
+python modelisation_reseau/make_network_from_csv input.csv
+```
+
+Cependant le fichier résultant sera généré selon l'ancien format de réseaux.
+Pour le convertir au nouveau format, utiliser la commande donnée dans le [paragraphe précédent](#upgrade-network-format).
+

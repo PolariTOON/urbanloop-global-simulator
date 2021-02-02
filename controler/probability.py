@@ -1,9 +1,8 @@
-from numpy import floor, sum
-from random import randint, random, choice
+from numpy import floor
+from random import seed, randint, random, choice
 from model.entities.tokens.traveler import Traveler
-from scipy.stats import norm
 import math
-from numpy.random import poisson
+import numpy.random as np_rand
 
 from model.entities.nodes.networks.ways.tracks import station
 
@@ -51,11 +50,23 @@ class Probability:
             coef_station[i] = coef_station[i]/tot_coef
         self.coef_station = coef_station       # répartition des voyageurs dans le réseau
 
+    def normal_law_density(x, mu=0, sigma=1):
+        """
+            Return the probability density function value for a normal law.
+            
+            @param x: position where the function is evaluated
+            @param mu: mean
+            @param sigma: standard deviation
+        """
+        sqrt = math.sqrt 
+        pi, e = math.pi, math.e
+        return 1 / (sigma * sqrt(2*pi)) * e ** (-0.5 * ((x-mu)/sigma) ** 2)
+    
     def station_probability(self, station_type, second, is_arrival=True):
         """
         This function gives you the probability to lead a traveler to a station_type
-        at a certain time in second. You can choose if the station is a departure or
-        destination station.
+        at a certain time in second. You can chose if the station is a departure or
+        a destination station.
         :param station_type: The type of station you want to find its probability
         :param second: The time in second
         :param is_arrival: If the station is a departure or destination station
@@ -65,13 +76,13 @@ class Probability:
         gaussian_factor = 250 * (self._activity_and_residential_fluctuation / 100)
         result = 0
         decimal_hour = round(second / 3600, 2)
-        norm_mph = norm.pdf(decimal_hour, self._morning_peak_hour, 1)
-        norm_eph = norm.pdf(decimal_hour, self._evening_peak_hour, 1)
+        norm_mph = normal_law_density(decimal_hour, self._morning_peak_hour, 1)
+        norm_eph = normal_law_density(decimal_hour, self._evening_peak_hour, 1)
         if station_type == station.station_types["city"]:
             result = self._city_percent
         if station_type == station.station_types["activity"]:
             if is_arrival:
-                if second < 43200:
+                if second < 43200: # 43200s = 12h00
                     result = self._activity_and_residential_percent + gaussian_factor * norm_mph
                 else:
                     result = self._activity_and_residential_percent - gaussian_factor * norm_eph
@@ -135,17 +146,19 @@ class Probability:
                                         "\n\t\t\u001B[32m|\u001B[0m taille de la station:", s.capacity, "\n")"""
                 s._all_time_count += 1
 
-    def generate_traveler_2(self, time, env, nb_ticks=1):
+    def generate_traveler_2(self, time, env, state, nb_ticks=1):
         """utilisation de la loi de Poisson"""
         hour = int(round(time / 3600, 2)) % 24
         travelers_to_generate = nb_ticks * self.traveler_per_tick[hour]  # nb de voyageurs que l'on génère au tick présent
                                                                          # (ou au groupe de ticks présent si nb_ticks > 1)
+        seed(state+12345)
+        np_rand.seed((int(state)+123456) % 2**32) # 'seed' must receive a number between 0 and 2**32 - 1 (also, 123456 cas be any number)
         travelers_to_generate_per_station = []
         for coef0 in self.coef_station:
             travelers_to_generate_per_station.append(coef0*travelers_to_generate)   # répartition des passagers à générer selon le type de station
         for i_station in range(len(self.stations)):     # pour chaque station on génère ou non des voyageurs
             station0 = self.stations[i_station]
-            for i_traveler in range(poisson(travelers_to_generate_per_station[i_station], 1)[0]):  # génération selon une loi de poisson
+            for i_traveler in range(np_rand.poisson(travelers_to_generate_per_station[i_station], 1)[0]):  # génération selon une loi de poisson
                 # get random destination
                 if len(self.coef_station) > 1:
                     destination = self.get_rand_station()

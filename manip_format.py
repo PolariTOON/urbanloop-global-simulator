@@ -1,6 +1,17 @@
 import json
 import math
 
+def upgrade_file(old_filename, new_filename):
+        """
+                Converts a file from the old format to the new network format
+                (where stations are located on deviations instead of mini-loops)
+        """
+        with open(old_filename, 'r') as f:
+                data = json.loads(f.read())
+        upgrade_format(data)
+        with open(new_filename, 'w') as f:
+                f.write(pretty_dump(data, 2))
+
 def pretty_dump(data, indent):
         """
             converts the dictionnary 'data' into a json text with
@@ -349,3 +360,18 @@ def create_mini_loops(data):
 	json.dump(data, s, sort_keys=True, indent=2)
 	s.close()
 	return data
+
+
+
+if __name__ == "__main__":
+        import sys
+        
+        if len(sys.argv) != 4 or sys.argv[1] not in ["-u", "--upgrade"]:
+                print("Error: wrong usage.")
+                print("Example: manip_format.py --upgrade network_to_upgrade.json output.json")
+                exit(1)
+        
+        infile = sys.argv[2]
+        outfile = sys.argv[3]
+        upgrade_file(infile, outfile)
+

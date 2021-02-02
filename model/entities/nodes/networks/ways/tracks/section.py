@@ -125,14 +125,12 @@ class Section(Track):
                 "type": "speed",
                 "speed": self._speed
             })
-            # si on est entré dans une Road, on la notifie (cette Road sera
-            # chargée de notifier la Road précédente que le pod l'a quittée)
-            if True: #self._parent.sections[0] == self:
-                self._parent.write({
-                    "author": self,
-                    "type": "pod_entry",
-                    "pod": pod
-                })
+            # on transmet le message à la Road
+            self._parent.write({
+                "author": self,
+                "type": "pod_entry",
+                "pod": pod
+            })
         else:
             raise ValueError("Invalid message")
 

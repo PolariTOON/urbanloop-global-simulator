@@ -6,6 +6,13 @@ from math import inf
 from random import choice
 import datetime
 
+#
+from collections import Counter
+import linecache
+import os
+import tracemalloc
+#
+
 from ....lines.bridge import Bridge
 from ....lines.loop import Loop
 from ..node import Node
@@ -30,13 +37,17 @@ class Network(Node):
         self._places_number = places_number or 5
         self._view_box = view_box or {}
         self._init_graph_from_json(env, max_speed, places_number)
+        print("_init_graph_from_json done")
         self._init_parent_of_children()
+        print("_init_parent_of_children done")
         self._init_weights()
+        print("_init_weights done")
         # Initialisation de la table de routage de chaque aiguillage
         # C'est une liste de dictionnaires de la forme {"switch": s, "table": t}
         # où t contient les destinations pour lesquelles il faut tourner en s1
         self._routing_table = {}
         self._update_routing(init=True)  # création des tables de routage
+        print("_update_routing done")
         self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
         self._statistiques = Statistiques()
         # On cree les csv puis on ecrit les noms des colonnes
@@ -44,8 +55,41 @@ class Network(Node):
         # pour débugguer / profiler
         self.last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
         self.last_pods = {}
-        self.one_print = True
+        self._last_minute = int(self.env.time % 60)
         #self.last_sec = 1
+
+        print("network okay")
+        tracemalloc.start()
+        self._counts = Counter()
+        print("tracemalloc")
+
+
+    def display_top(self, snapshot, key_type='lineno', limit=6):
+        snapshot = snapshot.filter_traces((
+            tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+            tracemalloc.Filter(False, "<unknown>"),
+        ))
+        top_stats = snapshot.statistics(key_type)
+
+        print("Top %s lines" % limit)
+        for index, stat in enumerate(top_stats[:limit], 1):
+            frame = stat.traceback[0]
+            # replace "/path/to/module/file.py" with "module/file.py"
+            filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+            print("#%s: %s:%s: %.1f KiB"
+                % (index, filename, frame.lineno, stat.size / 1024))
+            line = linecache.getline(frame.filename, frame.lineno).strip()
+            if line:
+                print('    %s' % line)
+
+        other = top_stats[limit:]
+        if other:
+            size = sum(stat.size for stat in other)
+            print("%s other: %.1f KiB" % (len(other), size / 1024))
+        total = sum(stat.size for stat in top_stats)
+        print("Total allocated size: %.1f KiB\n" % (total / 1024))
+
+
     
     @property
     def name(self):
@@ -288,6 +332,8 @@ class Network(Node):
                 del loop["id"]
             self._loops[i_loop] = Loop(i_loop, **loop)
 
+        print("NETWORK CREATED")
+
     def _init_parent_of_children(self):
         """
         Initialise le parent des routes et aiguillages comme étant le réseau
@@ -333,6 +379,15 @@ class Network(Node):
                 elt += 1
         raise ValueError("Element's index out of range")
 
+    def get_station_by_name(self, name):
+        """
+            return a station by its name
+        """
+        for station in self.stations:
+            if station.name == name:
+                return station
+        return None
+
     def _init_weights(self):
         # Initialisation des poids des routes
         for road in self._roads:
@@ -358,14 +413,21 @@ class Network(Node):
         
         """
         # initialisation d'une table globale
+        i=1
         for s in self._switches:
             if isinstance(s, SwitchOut):
                 self._routing_table[s.name] = []
+            print("a %d"%i)
+            i+=1
+        i=1
         # Switches menant aux stations/sheds
         for s in self._switches:
             if isinstance(s, SwitchOut) and s.is_destination():
                 for step in s.beside.steps:
                     self._routing_table[s.name].append(step.name)
+            print("b %d"%i)
+            i+=1
+        i=1
         # Remplissage pour les switchs entre 2 boucles différentes
         for s1 in self._switches:
             if isinstance(s1, SwitchOut) and not s1.is_destination():
@@ -384,6 +446,8 @@ class Network(Node):
                                 s2_steps = s2.next.steps[:]
                             for step in s2_steps:
                                 self._routing_table[s1.name].append(step.name)
+            print("c %d / %d"%(i,len(self.switches)))
+            i+=1
         # Envoie des tables aux switchs
         if init:
             for switch in self._switches:
@@ -420,15 +484,23 @@ class Network(Node):
         #    last_sec += 1
         #    if (self.last_sec == 60):
         #        self.last_sec = 0
-        
+
         print(self.env.time)
         
-        if round(self.env.time) % 60 == 1:  # pour éviter d'écrire plusieurs lignes pour un temps donné si le pas est bas
-            one_print = True
-        if round(self.env.time) % 60 == 0 and self.one_print:  # affichage et écriture en fichier toutes les minutes de simulations
-            self.one_print = False
+        current_minute = int(self.env.time / 60)
+        if current_minute != self._last_minute:  # affichage et écriture en fichier toutes les minutes de simulations
+            
+
+            print('\nTop prefixes:', self._counts.most_common(6))
+            snapshot = tracemalloc.take_snapshot()
+            self.display_top(snapshot)
+
+            tracemalloc.start()
+            self._counts = Counter()
+
+            self._last_minute = current_minute
             print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
-                  "]\u001B[0m\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.402)")
+                  "]\u001B[0m\t\t\t\t\t\t\t\t\t\t(network l.402)")
             if self.departure_arrival_printer:
                 self.statistiques.print_stats()
 
@@ -460,7 +532,7 @@ class Network(Node):
             timestamp = message["timestamp"]
             if self.departure_arrival_printer:
                 print("\u001B[35m[" + str(datetime.timedelta(seconds=round(timestamp))) +
-                      "] Arrival\u001B[0m", message["pod"].destination, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.396)", end='')
+                      "] Arrival\u001B[0m", message["pod"].destination, "\t\t(network l.396)", end='')
                 print("\n\t\t\u001B[35m|\u001B[0m nom du pod:", message["pod"].name[:8], "\n")
             self._statistiques.remove_traveling_pod(message["pod"], timestamp)
             pass
@@ -480,6 +552,7 @@ class Network(Node):
             # On demande à une station d'envoyer une capsule à un dépôt pour faire de la place
             #
             # TODO: ne pas choisir aléatoirement (vérifier que le shed a bien une place libre)
+            #       + mettre un warning s'il n'y a plus de place dans les sheds
             #
             sheds = self.sheds
             if sheds:
@@ -497,17 +570,16 @@ class Network(Node):
             waiting_time = message["waiting_time"]
             traveler = message["traveler"]
             self._statistiques.add_waiting_time(timestamp, waiting_time)
+            self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler, origin)
             if self.departure_arrival_printer:
-                print("\u001B[36m[" + str(datetime.timedelta(seconds=round(timestamp)))
-                      + "] Departure\u001B[0m ", origin, " -> ", destination,
-                      "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(network l.432)")
+                print("\u001B[36m[", str(datetime.timedelta(seconds=round(timestamp))),
+                      "] Departure\u001B[0m ", origin, " -> ", destination,
+                      "\n\t\t(network l.432)")
                 print("\t\t\u001B[36m|\u001B[0m nom du pod:\t", message["pod"].name[:8])
                 print("\t\t\u001B[36m|\u001B[0m waiting time:\t", str(round(waiting_time)) + " seconds")
                 print("\t\t\u001B[36m|\u001B[0m traveler:\t\t", str(traveler), "\n")
-            self._statistiques.add_traveling_pod(message["pod"], timestamp, traveler, origin)
             if traveler:
-                # dans le cas d'un voyage,
-                # ce n'est pas une capsule appelée par la station pour combler l'espace
+                # dans le cas d'un voyage (et non pas d'un appel pour combler l'espace dans une station),
                 # on met à jour le compteur ici
                 for station0 in self.stations:
                     if station0.name == destination:

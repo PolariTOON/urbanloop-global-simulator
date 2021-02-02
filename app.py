@@ -2,6 +2,7 @@ from asyncio import get_running_loop, run, sleep
 from json import load
 from threading import Thread
 from traceback import print_exc
+import time
 import signal
 
 from controler.simulation import Simulation
@@ -12,37 +13,55 @@ _wave = 0  # IDEA: calculer selon la vitesse et la précision des simulations, a
 _loop = None
 _simulations = {}
 _remove_travelers = False
+_with_interface = False
 
 _running_default = False
-_speed_default = 8  # but speed is also limited by simulation.max_rate
-
-# handler for SIGINT (CTRL-C)
+_speed_default = 7  # but speed is also limited by simulation.max_rate
+_duration = -1
 _quit = False
-def quit_func(sig, frame):
+
+def save_simulations():
+    """ lors de la fermeture de l'application, sauvegarde l'état des réseaux dans le dossier `./save` """
+    from manip_format import pretty_dump
+    for key in _simulations:
+        simulation = _simulations[key]
+        outfile = "./save/%d.json" % key
+        with open(outfile, 'w') as f:
+            f.write(pretty_dump(simulation.serialize(), 2))
+
+def stop_app(sig=None, frame=None):
     """ Quit the program """
-    # stop `_run_simulations()`
+    print("Closing app...")
+    global _with_interface
     global _quit
-    _quit = True
-    # IDEA: we should maybe properly close Flask process before exiting ?
-    exit(0)
-signal.signal(signal.SIGINT, quit_func)
+    _quit = True # stop `_run_simulations()`
+    save_simulations()
+    if _with_interface:
+        print("(the server will be closed when it will receive any GET/POST request)")
+
+# handler for SIGINT (CTRL-C), SIGHUP (terminal closed) and SIGTERM (`kill`)
+signal.signal(signal.SIGINT, stop_app)
+#signal.signal(signal.SIGHUP, stop_app)  # only on Unix
+signal.signal(signal.SIGTERM, stop_app)
+    
 
 # init and main loop
-async def _run_simulations(with_interface, networks, wave, remove_travelers):
+async def _run_simulations(networks):
     """ Lancement de simulation(s) """
     print("Log format : receiver  --  author  --  message type")
-    global _wave
     global _loop
     global _simulations
-    global _remove_travelers
     global _running_default
     global _speed_default
+    global _with_interface
+    global _duration
 
-    _wave = wave
-    _remove_travelers = remove_travelers
-    if not with_interface:
+    if not _with_interface:
+        print("WARNING : dans app.py : en mode sans interface, il est recommandé d'utiliser speed=7 pour optimiser la génération des travelers.")
+    
+    if not _with_interface:
         _running_default = True
-    if not with_interface:
+    if not _with_interface:
         #print("strating with ..." ...)
         #_speed_default = ...
         pass
@@ -68,13 +87,14 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
     _loop = get_running_loop()
     i=0
     while not _quit:
-        if with_interface:
+        if _with_interface:
             #print("sleep start")
             await sleep(0.04) # ralentit la simulation pour utiliser l'interface (0.04s -> 25 images par secondes)
             #print("sleep end")
         else:
             pass # à tester (remplacer par await sleep(0.000001) ?)
         crashed_simulations = []
+        terminated = False
         for key in _simulations:
             simulation = _simulations[key]
             try:
@@ -87,27 +107,41 @@ async def _run_simulations(with_interface, networks, wave, remove_travelers):
             except Exception:
                 crashed_simulations.append(key)
                 print_exc()
+            # check if the simulation is terminated
+            if _duration >= 0 and simulation.env.now * simulation.env.tick >= _duration:
+                terminated = True
         for key in crashed_simulations:
             del _simulations[key]
-    
-    print("Terminated")
+        if terminated:
+            print("A simulation reached its total duration.")
+            stop_app()
+
+    #print("Terminated.")
 
 
-def run_app(port, networks, wave, remove_travelers):
+def run_app(port, networks, wave, remove_travelers, duration=-1):
     """ Fonction permettant de lancer l'application
      port: n° de port si on souhaite l'interface web (sinon -1)"
      networks: contient les réseaux préchargés"
      wave: contient la vitesse de tic de simulation"
     """
-    if port != -1:
-        with_interface = True
-    else:
-        with_interface = False
+    global _remove_travelers
+    global _with_interface
+    global _duration
+    global _wave
+    _remove_travelers = remove_travelers
+    _with_interface = port >= 0
+    _duration = duration
+    _wave = wave
     
-    Thread(target=lambda: run(_run_simulations(with_interface, networks, wave, remove_travelers))).start()
-    if with_interface:  # utilisation de l'interface web
+    Thread(target=lambda: run(_run_simulations(networks))).start()
+    if _with_interface:  # utilisation de l'interface web
         from config_Flask import run_app
         run_app(port, networks, wave)
+    else:
+        # the main thread needs to continue running in order to catch signals (such as CTRL-C)
+        while not _quit:
+            time.sleep(1.0)
 
 
 def set_defaut(running, speed):

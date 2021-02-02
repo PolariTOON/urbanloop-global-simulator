@@ -1,6 +1,5 @@
 from .token import Token
 
-
 class Traveler(Token):
     def __init__(self, env, generation_time=None, waiting_time=None, boarding_time=None, real_user=False, **kwargs):
         super().__init__(env, **kwargs)
@@ -18,10 +17,6 @@ class Traveler(Token):
     @property
     def waiting_time(self):
         return self._waiting_time
-
-    @classmethod
-    def boarding_time(self):
-        return self._boarding_time
 
     @property
     def boarding_time(self):
@@ -43,6 +38,9 @@ class Traveler(Token):
         self._waiting_time = time - self._generation_time
         return self._waiting_time
 
+    def disembark(self):
+        return
+
     def serialize(self):
         dict = super().serialize()
         return dict
@@ -50,6 +48,13 @@ class Traveler(Token):
     @property
     def updatable(self):
         return False
+
+    def run(self):
+        # pas d'update à faire pour les travelers.
+        # on doit terminer le processus pour ne pas que
+        # les travelers restent après être arrivés à destination.
+        return
+        yield
 
     def update(self):
         return
@@ -61,4 +66,5 @@ class Traveler(Token):
         self._changed_dest = True
 
     def call_emergency_exit(self):
-        self._called_emergency_exit = True   
+        self._called_emergency_exit = True
+

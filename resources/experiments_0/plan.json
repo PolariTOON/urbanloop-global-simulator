@@ -1,0 +1,27 @@
+{
+	"name": "Calibration experiments",
+	"description": "Experiments of short duration needed to estimate the best ranges of parameters for the 24h simulations.",
+	"network": "Grand_Nancy.json",
+	"experiments": [
+		{
+			"name": "expA1",
+			"duration": 3600,
+			"parameters": { "nb_travelers_per_day": 1000 }
+		},
+		{
+			"name": "expA2",
+			"duration": 3600,
+			"parameters": { "nb_travelers_per_day": 2000 }
+		},
+		{
+			"name": "expB1",
+			"duration": 3600,
+			"parameters": { "nb_pods_by_station": 3 }
+		},
+		{
+			"name": "expB2",
+			"duration": 3600,
+			"parameters": { "nb_pods_by_station": 6 }
+		},
+	]
+}

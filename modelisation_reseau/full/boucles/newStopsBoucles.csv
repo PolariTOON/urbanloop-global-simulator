@@ -1,0 +1,214 @@
+1g
+Switch In 1-2,48.618551499999995 , 6.1789445,"Switch_In",1
+Curie,48.616753,6.181383,1,True,
+Ravel,48.612259,6.172501,1,True,
+Albatre,48.6147,6.166586,1,True,
+Ecoles,48.620583,6.160028,1,True,
+Collège Monod,48.620934,6.167573,1,True,
+Baraques de Ludres,48.62215,6.178306,1,True,
+Switch Out 1-2,48.6203515 , 6.180744499999999,"Switch_Out",1
+
+2g
+Switch In 2-1,48.617552 , 6.187918,"Switch_In",1
+Ader,48.612526,6.186459,1,True,
+Eiffel,48.61237,6.197346,1,True,
+Champs Moyen,48.617503,6.203389,1,True,
+Chateau,48.625671,6.202622,1,True,
+Haut de Fléville,48.624378,6.191177,1,True,
+Switch_Out 2-1,48.619352000000006 , 6.189717999999999,"Switch_Out",1
+
+3g
+Houdemont Porte Sud,48.638142,6.184728,1,True,
+Morlaix,48.6413,6.198039,1,True,
+L'Orée du Bois,48.644123,6.210295,1,True,
+Croix du Soldat,48.629089,6.208239,1,True,
+
+4g
+Parc Embanie,48.647469,6.196514,1,True,
+Emile Gallé,48.652714,6.193534,1,True,
+Port Cros,48.653408,6.202944,1,True,
+Besançon,48.648548,6.208763,1,True,
+
+5g
+Les Muriers,48.650139,6.183645,1,True,
+La Ronchère,48.650135,6.176487,1,True,
+Houdemont Mairie,48.645271,6.175272,1,True,
+Rouzé,48.638508,6.177639,1,True,
+Erables,48.642376,6.182207,1,True,
+
+6g
+Mermoz,48.654865,6.186032,1,True,
+Européen,48.663883,6.188832,1,True,
+Kehl,48.660587,6.176117,1,True,
+Rimbaud,48.654701,6.176457,1,True,
+
+7g
+La Rotonde,48.657188,6.198538,1,True,
+Clemenceau,48.668587,6.199181,1,True,
+Alsace-Bonsecours,48.676182,6.199772,1,True,
+Jarville Californie,48.673759,6.206726,1,True,
+L'Atelier,48.668873,6.207696,1,True,
+Montaigu,48.663692,6.207703,1,True,
+Emmaus,48.659061,6.20649,1,True,
+
+8g
+Robert Damery,48.658863,6.216092,1,True,
+Gabriel Fauré,48.66642,6.213476,1,True,
+Cartonneries,48.658653,6.224458,1,True,
+Les Aulnois,48.653572,6.226551,1,True,
+
+9g
+Gérardcourt,48.649204,6.232337,1,True,
+Napoléon,48.666561,6.235433,1,True,
+Bosserville,48.663563,6.241849,1,True,
+Repentir,48.661663,6.254966,1,True,
+
+10g
+Champagne,48.678566,6.239592,1,True,
+La Vahotte,48.68573,6.240482,1,True,
+Saulxures - Eglise,48.689266,6.249217,1,True,
+
+11g
+Sainte-Marguerite,48.672089,6.226878,1,True,
+Galilée,48.675995,6.221674,1,True,
+Porte de Bosserville,48.675854,6.230704,1,True,
+
+12
+Tomblaine Maria Deraismes,48.680607,6.223836,1,True,
+Les Ensanges,48.680069,6.216559,1,True,
+Barbusse,48.684425,6.213772,1,True,
+Pottier,48.68972,6.215322,1,True,
+Leroux,48.68404,6.229373,1,True,
+
+13
+Art-sur-Meurthe,48.658634,6.269274,1,True,
+Art-sur-Meurthe - Chateau,48.658787,6.260877,1,True,
+
+14
+Lebrun,48.699669,6.255533,1,True,
+Renaissance,48.704651,6.251273,1,True,
+Essey Porte Verte,48.706951,6.244985,1,True,
+Brassens,48.711735,6.245169,1,True,
+Blés d'Or,48.705448,6.258974,1,True,
+
+15
+Les Bijoins,48.712547,6.253566,1,True,
+Saint-Laurent,48.715248,6.259006,1,True,
+Seichamps Haie Cerlin,48.71954,6.265858,1,True,
+Donon,48.714901,6.269193,1,True,
+Semoir,48.709763,6.264385,1,True,
+
+16
+Quartier Kléber,48.703671,6.230204,1,True,
+Alouettes,48.710125,6.219197,1,True,
+Beaupré,48.717255,6.22181,1,True,
+Colonies,48.70742,6.234632,1,True,
+
+17
+Clinique Pasteur,48.703278,6.217435,1,True,
+Jean Moulin,48.694508,6.21122,1,True,
+Joseph Huet,48.701443,6.206095,1,True,
+Balzac,48.70826,6.2041,1,True,
+Dommartemont,48.711235,6.209652,1,True,
+Saint-Médard,48.706825,6.21188,1,True,
+
+18
+Cinéma,48.692543,6.197205,1,True,
+Austrasie,48.687496,6.204649,1,True,
+Krug,48.682922,6.203032,1,True,
+Loritz,48.687119,6.195542,1,True,
+
+19
+Hopital Central - Maternité,48.682289,6.192085,1,True,
+Place des Justes,48.685829,6.180943,1,True,
+Brice,48.679668,6.181888,1,True,
+Cimetière de Sud,48.676643,6.191082,1,True,
+
+20
+Biancamaria,48.669235,6.185574,1,True,
+Exelmans,48.675808,6.176643,1,True,
+Campus ARTEM Blandan,48.672028,6.172736,1,True,
+Norvège,48.667183,6.176998,1,True,
+
+21
+Montet Octroi,48.668339,6.16855,1,True,
+Général Frère,48.662945,6.168239,1,True,
+Clair Matin,48.658096,6.170215,1,True,
+Saint André,48.66032,6.159592,1,True,
+Grande Corvée,48.665657,6.156302,1,True,
+
+22
+Faisanderie,48.654213,6.152813,1,True,
+Vandoeuvre CHU Brabois,48.649532,6.146593,1,True,
+Longchamp,48.657124,6.135653,1,True,
+
+23
+La Sance,48.657101,6.121103,1,True,
+Saint-Bernard,48.657234,6.111251,1,True,
+Monument,48.670696,6.141712,1,True,
+Villers G. Chepfer,48.664909,6.140352,1,True,
+
+24
+Grange aux Moines,48.667625,6.147112,1,True,
+Albert 1er,48.672905,6.147771,1,True,
+Villers Mairie,48.672192,6.15488,1,True,
+
+25
+Mareville,48.678284,6.144377,1,True,
+Europe,48.680054,6.151325,1,True,
+Domaine Sainte-Anne,48.684757,6.156183,1,True,
+
+26
+Chemin Blanc,48.69043,6.156042,1,True,
+La Côte,48.691738,6.149532,1,True,
+Buthegnémont,48.696499,6.146281,1,True,
+La Foucotte,48.696896,6.159305,1,True,
+
+27
+Cavallier,48.693226,6.165404,1,True,
+Nancy Gare,48.689137,6.175507,1,True,
+Amerval,48.693136,6.180888,1,True,
+Sainte-Catherine,48.694763,6.189598,1,True,
+Citadelle,48.700363,6.178465,1,True,
+Baron Louis,48.696369,6.174437,1,True,
+
+28
+Cristalleries,48.697388,6.198792,1,True,
+Massenet,48.705048,6.198504,1,True,
+Libremont,48.710152,6.197753,1,True,
+Driant,48.708775,6.188256,1,True,
+
+29
+Mac Mahon,48.704273,6.183014,1,True,
+Douéra,48.709721,6.180399,1,True,
+Améthyste,48.714573,6.167265,1,True,
+Deville,48.70768,6.172202,1,True,
+
+30
+Croix de Mission,48.71558,6.185061,1,True,
+Le Bourgarel,48.723228,6.176558,1,True,
+Malzéville Pixerécourt,48.731663,6.182253,1,True,
+
+31
+Alix Le Clerc,48.701424,6.164246,1,True,
+Les Aulnes,48.70557,6.155971,1,True,
+Stade Darnys,48.706219,6.148976,1,True,
+Cheverny,48.713318,6.157316,1,True,
+Montée de Pinchard,48.707844,6.162176,1,True,
+
+32
+Maxeville EcoParc,48.704757,6.132454,1,True,
+Nancy Pôle de santé,48.703545,6.141982,1,True,
+Beauregard Saint-Anne,48.693119,6.140662,1,True,
+La Poste - Champ-le-Boeuf,48.700298,6.133424,1,True,
+
+33
+Vezouze,48.695091,6.131861,1,True,
+Croix Saint-Claude,48.68927,6.132211,1,True,
+Laxou Champ-le-Boeuf,48.698002,6.124475,1,True,
+
+34
+Baudricourt,48.677856,6.159223,1,True,
+Charlemagne,48.681892,6.164018,1,True,
+Commanderie,48.686535,6.167975,1,True,
+Maréchal Juin,48.677624,6.170268,1,True,

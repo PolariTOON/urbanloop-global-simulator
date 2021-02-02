@@ -1,9 +1,6 @@
 from asyncio import run, run_coroutine_threadsafe, sleep
 from flask import Flask, jsonify, request, Response
 from functools import wraps
-from asyncio import run, run_coroutine_threadsafe, sleep
-from flask import Flask, jsonify, request, Response
-from functools import wraps
 from logging import ERROR, getLogger
 from controler.simulation import Simulation
 
@@ -17,6 +14,20 @@ _simulation_for_api = None
 _running_default = False    # par défaut on ne lance pas les simulations
 _speed_default = 0          # par défaut la vitesse de simulation est x1
 
+def shutdown():
+    """
+        Permet de fermer l'application si :
+            - les simulations sont terminées
+            ou
+            - un signal CTRL-C a été reçu
+        ATTENTION :
+        Cette méthode ne sera appelée que lors du traitement d'une requête HTTP.
+        Si le programme est lancé avec l'interface web, le serveur ne sera donc
+        jamais fermé tant qu'aucun client web ne fera de requête au serveur.
+    """
+    func = request.environ.get('werkzeug.server.shutdown')
+    func()
+
 def _synchronize(key=None):
     """ Synchronisation du serveur flask avec le thread des simulations, NE PAS TOUCHER """
     if not isinstance(key, str):
@@ -24,6 +35,12 @@ def _synchronize(key=None):
     def synchronize(coroutine):
         @wraps(coroutine)
         def routine(*args, **kwargs):
+            # check if the app was closed
+            from app import _quit
+            if _quit:
+                shutdown()
+                return jsonify(None)
+            # else, handle request
             if key is not None:
                 kwargs[key] = request.get_json()
             from app import _loop, _simulations

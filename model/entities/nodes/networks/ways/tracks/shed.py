@@ -72,7 +72,10 @@ class Shed(Step):
         return self._capacity
 
     def isFull(self):
-        return self._capacity - len(self._pods) == 0
+        return len(self._pods) == self._capacity
+
+    def is_available(self):
+        return len(self._pods) < self._capacity
 
     @property
     def updatable(self):
@@ -91,6 +94,7 @@ class Shed(Step):
         if self._departure_pods and self._wait == -1:
             self._wait = 0
             pod = self._departure_pods.pop(0)
+            pod.during_departure = True
             destination = pod.destination
             pod.write({
                 "author": self,
@@ -107,6 +111,10 @@ class Shed(Step):
                 "waiting_time": 0,
                 "traveler": False
             })
+
+    @property
+    def pods_during_departure(self):
+        return [pod for pod in self._pods if pod.during_departure]
 
     def handle_message(self, message):
         if "pod_entry" == message["type"]:
@@ -137,26 +145,26 @@ class Shed(Step):
             pod = message["pod"]
             if pod in self._pods:
                 self._pods.remove(pod)
+                pod.during_departure = False
             else:
                 # dans ce cas, le pod n'était pas docked dans le shed,
                 # et on accepte qu'il passe à travers.
                 pass
         elif "refill" == message["type"]:
             station = message["station"]
-            if len(self._pods) > 0 and len(self.pods) > len(self._departure_pods):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
+            if len(self._pods) > 0 and len(self._pods) > len(self._departure_pods) + len(self.pods_during_departure):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
                 i = 0
-                while i < len(self._pods) - 1 and self._pods[i] in self._departure_pods:
+                while i < len(self._pods) - 1 and (self._pods[i] in self._departure_pods or self._pods[i].during_departure):
                     i += 1
                 pod = self._pods[i]
                 pod.destination = station
                 self._departure_pods.append(pod)
             else:
-                # print("\u001B[31m", self.name, "envoie de pod impossible, shed vide", len(self._pods), "\u001B[0m", "(shed l.141)\n")
-                #
-                # TODO : corriger ça ??!! (il faut juste décrémenter incoming_pods pour UNE station)
-                #
-                for station0 in self.parent.parent.stations:
-                    if station0.name == station:
-                        station0._incoming_pods -= 1
+                # on cherche la station concernée,
+                # et on l'informe qu'elle ne recevra pas le pod.
+                network = self.parent.parent
+                found_station = network.get_station_by_name(station)
+                found_station.down_incoming_pods()
+
         else:
             raise ValueError("Invalid message")

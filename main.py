@@ -34,7 +34,8 @@ if __name__ == '__main__':
     argument_parser.add_argument("-p", "--port", type=port, default=-1, const=8090, nargs='?', help="run a web application on the given port or 8090 by default")
     argument_parser.add_argument("-w", "--wave", type=wave, default=.042, help="set the duration of each wave to the given value (in seconds) or .042 seconds by default")
     argument_parser.add_argument("-e", "--empty", action="store_true", help="remove all the travelers (useful to test the mobile app)")
+    argument_parser.add_argument("-d", "--duration", type=float, default=-1, help="launch the simulation with a given simulation duration")
     arguments = argument_parser.parse_args()
     
-    run_app(arguments.port, arguments.networks, arguments.wave, arguments.empty)
+    run_app(arguments.port, arguments.networks, arguments.wave, arguments.empty, arguments.duration)
 

@@ -1,8 +1,7 @@
 from math import floor
-from random import random
+#from random import random
 from simpy.events import Process, Timeout
 from simpy.resources.store import Store, StoreGet, StorePut
-
 
 class Entity:
     def __init__(self, env, id, name=None, **kwargs):
@@ -11,6 +10,7 @@ class Entity:
         self._name = name or ""
         if self._env.with_messages:
             self.write = self.write_1
+            self.read = self.read_1
             self._store = Store(env)
             Process(self._env, self.run())
         else:
@@ -42,7 +42,7 @@ class Entity:
     def write_3(self, message):
         if message is None:
             raise ValueError()
-        self._env.messages.append( (self, message) )
+        self._env.messages_queue.put( (self, message) )
         return
 
     def read_3(self, message):
@@ -80,7 +80,7 @@ class Entity:
         yield Timeout(self._env, timeout) # Timeout pour simuler la durée d'envoi du message
         yield StorePut(self._store, message)
 
-    def read(self):
+    def read_1(self):
         (timeout, getter) = (Timeout(self._env, 1 - (self._env.now - floor(self._env.now))), StoreGet(self._store))
         condition = yield timeout | getter
         if getter not in condition:
@@ -95,6 +95,8 @@ class Entity:
         """
         Fonction qui gère le processus en mode "self._env.with_messages == True".
         A chaque tour d'événement simpy les actions sont exécutées
+        Attention, ici les entities resteront instanciéées pour toujours.
+
         :return: void
         """
         while True:
@@ -119,3 +121,4 @@ class Entity:
 
     def handle_message(self):
         raise NotImplementedError()
+

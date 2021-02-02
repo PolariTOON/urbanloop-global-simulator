@@ -4,6 +4,7 @@ from simpy import Environment
 from model.entities.nodes.networks.network import Network
 from model.entities.tokens.traveler import Traveler
 from .probability import Probability
+from queue import SimpleQueue
 
 
 class Simulation:
@@ -22,7 +23,7 @@ class Simulation:
         "state" (flottant) un seed permettant de choisir le générateur pseudo-aléatoire utilisé et donc de relancer une même simulation dans les mêmes conditions
         """
         running = running or False
-        max_rate = max_rate or 8
+        max_rate = max_rate or 10
         rate = rate or 0
         jerky = jerky or False
         time = time or 0
@@ -57,8 +58,15 @@ class Simulation:
         self._jerky = jerky
         self._state = state
         seed(self._state)  # à appeler avant d'utiliser random
-        self._network = Network(self._env, id, **kwargs)
 
+        self._env.with_messages = False
+        self._env.updatable_entities = []
+        self._env.messages_queue = SimpleQueue()  # contains one tuple for each message : (receiver, message)
+        self._env.tick = wave if jerky else wave * 2 ** rate  # Durée d'un tick
+        self._env.time = time  # Heure dans le monde simulé, en secondes (ex, pour 8h00 : 8*3600 = 28800 secondes)
+
+        self._network = Network(self._env, id, **kwargs)
+        
         self._travelers_per_day = traveler["travelers_per_day"]
         self._probability = Probability(prob, traveler, self._network.stations, self._network.statistiques, self._env.tick)
 
@@ -128,18 +136,30 @@ class Simulation:
         
         self._env.tick = tick
         for i in range(times):  # dans le mode jerky, on calcule plusieurs ticks à la fois
-            if self._env.with_messages:
-                self._env.run(until=self._env.now+1)
-            else:
+            
+            if self._env.with_messages == False:
                 updatables = self._env.updatable_entities[:] # 'self._env.messages' will be modified, so we need a copy
                 # updates
                 for entity in self._env.updatable_entities:
                     entity.update()
-                #self._env.run(until=self._env.now+1) # will do nothing, except for incrementing '_env.now'
+                self._env.run(until=self._env.now+1) # will do nothing, except for incrementing '_env.now'
                 # messages
-                for receiver, message in self._env.messages:
+                while self._env.messages_queue.empty() == False:
+                    # Attention, ici on fait l'hypothèse que tous les messages seront traités dans l'intervalle du tick            
+                    # (y compris les nouveaux messages créés suite à la réception d'autres messages)
+                    receiver, message = self._env.messages_queue.get()
                     receiver.read(message)
+            else:
+                # updates and messages will be handles by 'self._env.run()', nothing to do here
+                pass
+
+            # les 2 lignes ci-dessous sont nécessaires même sans utiliser simpy pour les updates,
+            # car on utilise 'self._env.now' et 'self._env.time' peu import la valeur de 'self._env.with_message'
+            self._env.run(until=self._env.now+1)
             self._env.time += tick  # on incrémente le temps
+                                    # TODO : time = time % (24*60) (ou pas ??)
+            self._env.run(until=self._env.now+1)
+            
             self._state = random() * 2 ** 53
             seed(self._state)
 
@@ -150,7 +170,7 @@ class Simulation:
                 # alors on considère que l'approximation est mauvaise
                 print("Warning: simulation.py: travelers generation will be too much approximated,"
                       "         you need to improve the source code (or reduce tick or rate) to fix this eventual problem.")
-            self._probability.generate_traveler_2(self._env.time, self._env, nb_ticks=times)
+            self._probability.generate_traveler_2(self._env.time, self._env, self._state, nb_ticks=times)
 
     def serialize(self):
         dict = self._network.serialize()
@@ -167,14 +187,14 @@ class Simulation:
         return dict
 
     def add_traveler(self, new_traveler_source, new_traveler_destination, user_id):
-        """ Ajout d'un voyageur dans la simulation .
+        """ Ajout d'un voyageur dans la simulation.
         fonction appelee quand un utilisateur scan sur l'application reader son ticket, et non pas quand il en reserve un """
 
         # Creation de l'objet Traveler
         new_traveler = Traveler(self._env, generation_time=self._env.time, source=new_traveler_source, destination=new_traveler_destination, id=user_id, real_user=True)
 
         for s in self._network.stations:
-            if (new_traveler.source == s.name):
+            if new_traveler.source == s.name:
                 s.travelers.append(new_traveler)
                 #print("station trouvee !")
                 self._network.statistiques.add_waiting_traveler(s.name)

@@ -479,7 +479,7 @@ class Network(Node):
         #    if (self.last_sec == 60):
         #        self.last_sec = 0
 
-        print(self.env.time)
+        #print(self.env.time)
         
         current_minute = int(self.env.time / 60)
         if current_minute != self._last_minute:  # affichage et écriture en fichier toutes les minutes de simulations

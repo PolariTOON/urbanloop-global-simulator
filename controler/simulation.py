@@ -159,7 +159,6 @@ class Simulation:
             self._env.time += tick  # on incrémente le temps
                                     # TODO : time = time % (24*60) (ou pas ??)
             self._env.run(until=self._env.now+1)
-            
             self._state = random() * 2 ** 53
             seed(self._state)
 

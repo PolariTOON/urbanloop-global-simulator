@@ -19,7 +19,8 @@ class Network(Node):
     def __init__(self, env, id, bridges=None, loops=None, switches=None, roads=None, view_box=None, margin_min=None,
                  pod_size=None, max_speed=None, places_number=None, dynamic_routing=None, **kwargs):
         super().__init__(env, id, **kwargs)
-        self._dynamic_routing = dynamic_routing or True
+        self._dynamic_routing = dynamic_routing or False
+        self._last_routing_update = env.time
         self._margin_min = margin_min or 2
         self._pod_size = pod_size or 2
         self._bridges = bridges or []
@@ -30,18 +31,19 @@ class Network(Node):
         self._places_number = places_number or 5
         self._view_box = view_box or {}
         self._init_graph_from_json(env, max_speed, places_number)
-        print("_init_graph_from_json done")
+        #print("_init_graph_from_json done")
         self._init_parent_of_children()
-        print("_init_parent_of_children done")
+        #print("_init_parent_of_children done")
         self._init_weights()
-        print("_init_weights done")
+        #print("_init_weights done")
         # Initialisation de la table de routage de chaque aiguillage
         # C'est une liste de dictionnaires de la forme {"switch": s, "table": t}
         # où t contient les destinations pour lesquelles il faut tourner en s1
         self._routing_table = {}
         self._update_routing(init=True)  # création des tables de routage
-        print("_update_routing done")
+        print("updating routing tables...")
         self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
+        print("routing tables updated.")
         self._statistiques = Statistiques()
         # On cree les csv puis on ecrit les noms des colonnes
         self._statistiques.write_columns_names_for_all_stations(self.stations)
@@ -293,7 +295,7 @@ class Network(Node):
                 del loop["id"]
             self._loops[i_loop] = Loop(i_loop, **loop)
 
-        print("NETWORK CREATED")
+        #print("NETWORK CREATED")
 
     def _init_parent_of_children(self):
         """
@@ -447,7 +449,7 @@ class Network(Node):
 
             self._last_minute = current_minute
             print("\u001B[34m Temps de simulation: [" + str(datetime.timedelta(seconds=round(self.env.time))) +
-                  "]\u001B[0m\t\t\t\t\t\t\t\t\t\t(network l.402)")
+                  "]\u001B[0m\n\t\t(network l.402)")
             if self.departure_arrival_printer:
                 self.statistiques.print_stats()
 
@@ -457,21 +459,17 @@ class Network(Node):
             self.statistiques.write_stats_insertion(str(datetime.timedelta(seconds=round(self.env.time))), self.switches)
             self.statistiques.write_travel_time_global(str(datetime.timedelta(seconds=round(self.env.time))))
             # ligne calcul stats autres (voir txt perso)
-            #print("\n")
-            
-        #
-        # TODO : permettre de paramétrer l'activation / désactivation de cette ligne ?
-        #
+
+        # si on veut tracer les pods du réseau pour débugguer :
         #self.last_count, self.last_pods = self.pods_du_reseau(self.last_count, self.last_pods)
         
-        #print("-------------------------------------------------------------")
-        #print("     Tick n°", int(self.env.now), " | Réseau :", self.name, "     ")
-        #print("-------------------------------------------------------------")
-        if self._dynamic_routing and int(int(self.env.now) % (30 / self.env.tick)) == 0:  # TODO: utilise self.env.time plutôt que self.env.tick
+        if self._dynamic_routing and (self.env.time > self._last_routing_update + 30 or self.env.time < self._last_routing_update):
             # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
-            #print("Updated routing tables...")
+            # ("self.env.time < self._last_routing_update" = passage de 23h59 à 00h00)
+            print("Updated routing tables...")
             self.maj_routing_tables()
-            #print("Routing tables updated")
+            self._last_routing_update = self.env.time
+            print("Routing tables updated")
     
     def handle_message(self, message):
         if "docked" == message["type"]:
@@ -534,10 +532,6 @@ class Network(Node):
         else:
             raise ValueError("Invalid message")
 
-    #
-    # TODO : trouver où cette fonction est utilisée,
-    #        il faudra peut-être la désactiver hors du débuggage (pour ne pas ralentir les simulations)
-    #
     def pods_du_reseau(self, last_count, last_pods):
         """ permet d'afficher dans le terminal les pods du réseau, leur position et les compter quand un pod est manquant"""
         pods_du_reseau = {}

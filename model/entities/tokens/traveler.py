@@ -8,7 +8,7 @@ class Traveler(Token):
         self._boarding_time = boarding_time or 5
         self._real_user = real_user
         self._changed_dest = False
-        self._called_emergency_exit = False   
+        self._called_emergency_exit = False
 
     @property
     def name(self):

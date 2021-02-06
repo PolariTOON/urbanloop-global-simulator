@@ -466,10 +466,10 @@ class Network(Node):
         if self._dynamic_routing and (self.env.time > self._last_routing_update + 30 or self.env.time < self._last_routing_update):
             # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
             # ("self.env.time < self._last_routing_update" = passage de 23h59 à 00h00)
-            print("Updated routing tables...")
+            #print("Updated routing tables...")
             self.maj_routing_tables()
             self._last_routing_update = self.env.time
-            print("Routing tables updated")
+            #print("Routing tables updated")
     
     def handle_message(self, message):
         if "docked" == message["type"]:

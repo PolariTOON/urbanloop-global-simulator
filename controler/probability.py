@@ -117,7 +117,7 @@ class Probability:
 
     # todo - trouver comment corriger cette fonction,
     #  je n'ai pas eu le temps de comprendre j'ai refait une autre fonction
-    def generate_traveler_poisson(self, time, env):
+    def generate_traveler_poisson(self, boarding_time, time, env):
         """
         genere des voyageurs de manière aléatoire à chaque tick
         :param traveler_per_hour: number of traveler per day
@@ -140,13 +140,13 @@ class Probability:
                     stations.append(station0.name)
                 stations.remove(s.name)
                 traveler_destination = choice(stations)     # la destination une des autres stations
-                s.travelers.append(Traveler(env, time, source=traveler_source, destination=traveler_destination))  # alors un voyageur est généré
+                s.travelers.append(Traveler(env, time, source=traveler_source, destination=traveler_destination, boarding_time=boarding_time))  # alors un voyageur est généré
                 """print("\u001B[32mNew Traveler", "\u001B[0m", traveler_source, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(simulation l.123)",
                                         "\n\t\t\u001B[32m|\u001B[0m nombre de travelers dans la station:", len(s.travelers),
                                         "\n\t\t\u001B[32m|\u001B[0m taille de la station:", s.capacity, "\n")"""
                 s._all_time_count += 1
 
-    def generate_traveler_2(self, time, env, state, nb_ticks=1):
+    def generate_traveler_2(self, time, env, state, boarding_time, nb_ticks=1):
         """utilisation de la loi de Poisson"""
         hour = int(round(time / 3600, 2)) % 24
         travelers_to_generate = nb_ticks * self.traveler_per_tick[hour]  # nb de voyageurs que l'on génère au tick présent
@@ -168,7 +168,7 @@ class Probability:
                     destination = station0
                 # add traveler
                 self.statistiques.add_waiting_traveler(station0.name)
-                station0.travelers.append(Traveler(env, time, source=station0.name, destination=destination.name))
+                station0.travelers.append(Traveler(env, time, source=station0.name, destination=destination.name, boarding_time=boarding_time))
                 station0.up_all_time_count()
 
     def get_rand_station(self):

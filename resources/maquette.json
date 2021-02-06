@@ -8,6 +8,7 @@
   "max_speed": 10,
   "pod_size": 1,
   "places_number": 3,
+  "boarding_time": 5,
   "dynamic_routing": false,
   "view_box": {
     "x": 0,

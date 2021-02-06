@@ -1,6 +1,6 @@
 {
   "name": "Grand Nancy",
-  "time": 28800,
+  "time": 18000,
   "state": 56565,
   "jerky": true,
   "running": false,
@@ -9,7 +9,7 @@
   "pod_size": 2,
   "places_number": 5,
   "boarding_time": 5,
-  "dynamic_routing": false,
+  "dynamic_routing": true,
   "view_box": {
     "x": 0,
     "y": 0,

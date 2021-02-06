@@ -9,7 +9,7 @@ from queue import SimpleQueue
 
 class Simulation:
     """Simulation du réseau se basant sur simpy"""
-    def __init__(self, id, wave, remove_travelers=False, traveler=None, prob=None, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
+    def __init__(self, id, wave, remove_travelers=False, traveler=None, boarding_time=None, prob=None, running=None, rate=None, max_rate=None, jerky=None, time=None, state=None, **kwargs):
         """
         "id" (entier positif) id du réseau
         "wave" (flottant positif) pas de simulation
@@ -53,6 +53,7 @@ class Simulation:
         self._wave = wave
         self._running = running
         self._showing_travelers_waiting = False
+        self._boarding_time = boarding_time or 5
         self._max_rate = max_rate
         self._rate = rate
         self._jerky = jerky
@@ -167,7 +168,7 @@ class Simulation:
                 # alors on considère que l'approximation est mauvaise
                 print("Warning: simulation.py: travelers generation will be too much approximated,"
                       "         you need to improve the source code (or reduce tick or rate) to fix this eventual problem.")
-            self._probability.generate_traveler_2(self._env.time, self._env, self._state, nb_ticks=times)
+            self._probability.generate_traveler_2(self._env.time, self._env, self._state, self._boarding_time, nb_ticks=times)
 
     def serialize(self):
         dict = self._network.serialize()
@@ -188,7 +189,7 @@ class Simulation:
         fonction appelee quand un utilisateur scan sur l'application reader son ticket, et non pas quand il en reserve un """
 
         # Creation de l'objet Traveler
-        new_traveler = Traveler(self._env, generation_time=self._env.time, source=new_traveler_source, destination=new_traveler_destination, id=user_id, real_user=True)
+        new_traveler = Traveler(self._env, generation_time=self._env.time, source=new_traveler_source, destination=new_traveler_destination, boarding_time=self._boarding_time, id=user_id, real_user=True)
 
         for s in self._network.stations:
             if new_traveler.source == s.name:

@@ -1,0 +1,2 @@
+
+Grand_Nancy_full.json contient 33 sheds et 143 stations, soit 1 shed pour 4,3 stations en moyenne.

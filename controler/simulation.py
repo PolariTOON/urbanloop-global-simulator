@@ -142,7 +142,6 @@ class Simulation:
                 # updates
                 for entity in self._env.updatable_entities:
                     entity.update()
-                self._env.run(until=self._env.now+1) # will do nothing, except for incrementing '_env.now'
                 # messages
                 while self._env.messages_queue.empty() == False:
                     # Attention, ici on fait l'hypothèse que tous les messages seront traités dans l'intervalle du tick            
@@ -158,7 +157,6 @@ class Simulation:
             self._env.run(until=self._env.now+1)
             self._env.time += tick  # on incrémente le temps
                                     # TODO : time = time % (24*60) (ou pas ??)
-            self._env.run(until=self._env.now+1)
             self._state = random() * 2 ** 53
             seed(self._state)
 

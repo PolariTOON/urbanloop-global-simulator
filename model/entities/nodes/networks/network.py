@@ -40,17 +40,17 @@ class Network(Node):
         # C'est une liste de dictionnaires de la forme {"switch": s, "table": t}
         # où t contient les destinations pour lesquelles il faut tourner en s1
         self._routing_table = {}
-        self._update_routing(init=True)  # création des tables de routage
         print("updating routing tables...")
-        self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
+        self._update_routing(init=True)  # création des tables de routage
         print("routing tables updated.")
+        self.departure_arrival_printer = False  # mettre à vrai pour afficher des informations dans le terminal
         self._statistiques = Statistiques()
         # On cree les csv puis on ecrit les noms des colonnes
         self._statistiques.write_columns_names_for_all_stations(self.stations)
         # pour débugguer / profiler
         self.last_count = -1  # les 2 variables servent à afficher lorsqu'un pod est manquant dans le réseau
         self.last_pods = {}
-        self._last_minute = int(self.env.time % 60)
+        self._last_minute = int(self.env.time / 60)
         #self.last_sec = 1
 
     

@@ -463,7 +463,7 @@ class Network(Node):
         # si on veut tracer les pods du réseau pour débugguer :
         #self.last_count, self.last_pods = self.pods_du_reseau(self.last_count, self.last_pods)
         
-        if self._dynamic_routing and (self.env.time > self._last_routing_update + 30 or self.env.time < self._last_routing_update):
+        if self._dynamic_routing and (self.env.time > self._last_routing_update + 30*60 or self.env.time < self._last_routing_update):
             # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
             # ("self.env.time < self._last_routing_update" = passage de 23h59 à 00h00)
             #print("Updated routing tables...")

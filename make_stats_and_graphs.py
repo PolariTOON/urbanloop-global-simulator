@@ -151,8 +151,8 @@ def make_stations_graphs(durationInterval):
 
                                 # PS : si on veut afficher 10mn et qu'on regarde les intervalles de 3mn, on affichera pas la 10eme minute
 
-                        make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "waitingTime", False)
-                        make_graph(arrTime, arrFailedDeviationToStation, "Failed deviation to station", f, "failedDeviation", False)
+                        make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "waitingTimeAverage", False)
+                        make_graph(arrTime, arrFailedDeviationToStation, "Number failed deviation to station", f, "failedDeviationNumber", False)
                         stationCsv.close()
 
 

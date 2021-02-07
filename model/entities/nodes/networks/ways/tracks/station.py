@@ -393,7 +393,7 @@ class Station(Step):
         elif self.capacity == 1:
             return self.pods_size - len(self._departure_pods) >= 1
         else:
-            return self.pods_size - len(self._departure_pods) > self._pods_size/2
+            return self.pods_size - len(self._departure_pods) > self.pods_size/2
 
     def need_refill(self):
         """

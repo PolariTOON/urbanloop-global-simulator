@@ -4,11 +4,13 @@ import matplotlib.pyplot as plt
 import math, os, glob, statistics
     
 
-def make_global_graphs(durationInterval):        
+def make_global_graphs(durationInterval):
     csvfileStats = open('stats/global/stat_log.csv', 'r')
 
-    line = csvfileStats.readline()
-    line = csvfileStats.readline()      # La ligne avec les noms de colonnes
+    lines = csvfileStats.readlines()   # La ligne avec les noms de colonnes
+    csvfileStats.close()
+    
+    lines = lines[1:] # remove header
 
     arrTime = [] 
     arrTravelersInAPod = []    
@@ -22,11 +24,14 @@ def make_global_graphs(durationInterval):
 
     comptMinutes = 0
     
-    while (line):
+    for line in lines:
+        if not line:
+            # skip possible empty line
+            continue
+        
         rightShift = 0          # de combien de champs on se deplace vers la droite
 
         arrLine = line.split(',')
-        line = csvfileStats.readline()
 
         if ("day" in arrLine[0]):
             rightShift = 1          # On va sauter le champ avec le jour (format -> 1 day, 0:09:00)
@@ -85,79 +90,77 @@ def make_global_graphs(durationInterval):
     make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrTravelingPods), "Standard deviation traveling Pods", "stats/global/travelingPods", "travelingPods_standardDeviation", False)
 
 
-
-
-
 def make_stations_graphs(durationInterval):
     files = glob.glob('stats/stations/*')
     for f in files:
-        if (f != "stats/stations/infos.txt"):
-            if (os.path.isdir(f)):
-                filesInDirectory = glob.glob(f + "/*")
-                for fileInDirectory in filesInDirectory:
-                    if (fileInDirectory == (f + "/stats.csv")):
-                        stationCsv = open(fileInDirectory, 'r')
-                        # Creation et remplissage arrWaitingTime   
-                        arrTime = [] 
-                        arrFailedDeviationToStation = []
-                        arrWaitingTime = []
+        if f != "stats/stations/infos.txt" and os.path.isdir(f):
+            files_in_dir = glob.glob(f + "/*")
+            for file_in_dir in files_in_dir:
+                if file_in_dir == (f + "/stats.csv"):
+                    stationCsv = open(file_in_dir, 'r')
 
-                        # Parsage
+                    # Parsage
+                    lines = stationCsv.readlines()
+                    lines = lines[1:] #remove header
+                    stationCsv.close()
+                    
+                    # Creation et remplissage arrWaitingTime   
+                    arrTime = [] 
+                    arrFailedDeviationToStation = []
+                    arrWaitingTime = []
+
+                    arrTimeInInterval = []
+                    arrFailedDeviationToStationInInterval = 0
+                    arrWaitingTimeInInterval = []
+                    comptMinutes = 0
+
+                    for line in lines:
+                        if not line:
+                            # skip possible empty last line
+                            continue
+                        
+                        rightShift = 0          # de combien de champs on se deplace vers la droite
+
+                        arrLine = line.split(',')
                         line = stationCsv.readline()
-                        line = stationCsv.readline()
 
-                        arrTimeInInterval = []
-                        arrFailedDeviationToStationInInterval = 0
-                        arrWaitingTimeInInterval = []
-                        comptMinutes = 0
+                        if ("day" in arrLine[0]):
+                            rightShift = 1          # On va sauter le champ avec le jour (format -> 1 day, 0:09:00)
 
-                        while (line):
-                            rightShift = 0          # de combien de champs on se deplace vers la droite
+                        # On ajoute le time
+                        arrTimeInInterval.append(arrLine[0 + rightShift])
 
-                            arrLine = line.split(',')
-                            line = stationCsv.readline()
+                        # On ajoute les deviations ratees vers la station
+                        arrFailedDeviationToStationInInterval += int(arrLine[1 + rightShift])
 
-                            if ("day" in arrLine[0]):
-                                rightShift = 1          # On va sauter le champ avec le jour (format -> 1 day, 0:09:00)
+                        # On ajoute les valeurs contenues dans le tableau
+                        arrLineOfArrLine = arrLine[2 + rightShift].split('|')     
+                        for elt in arrLineOfArrLine:
+                            if (elt != "" and elt != " " and elt != "\n" and elt != " \n"):
+                                arrWaitingTimeInInterval.append(float(elt))
 
-                            # On ajoute le time
-                            arrTimeInInterval.append(arrLine[0 + rightShift])
+                        comptMinutes += 1       
 
-                            # On ajoute les deviations ratees vers la station
-                            arrFailedDeviationToStationInInterval += int(arrLine[1 + rightShift])
+                        if (comptMinutes == durationInterval):
+                            comptMinutes = 0
+                            arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
+                            arrFailedDeviationToStation.append(arrFailedDeviationToStationInInterval)
+                            arrFailedDeviationToStationInInterval = 0   # On reset
+                            
+                            # On ajoute les moyennes
+                            if (len(arrWaitingTimeInInterval) > 0):
+                                arrWaitingTime.append(statistics.mean(arrWaitingTimeInInterval))
+                            else:           # Pas de valeurs ds l'array
+                                arrWaitingTime.append(0)
 
-                            # On ajoute les valeurs contenues dans le tableau
-                            arrLineOfArrLine = arrLine[2 + rightShift].split('|')     
-                            for elt in arrLineOfArrLine:
-                                if (elt != "" and elt != " " and elt != "\n" and elt != " \n"):
-                                    arrWaitingTimeInInterval.append(float(elt))
+                            arrTimeInInterval = []
+                            arrWaitingTimeInInterval = []
 
-                            comptMinutes += 1       
+                            # PS : si on veut afficher 10mn et qu'on regarde les intervalles de 3mn, on affichera pas la 10eme minute
 
-                            if (comptMinutes == durationInterval):
-                                comptMinutes = 0
-                                arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
-                                arrFailedDeviationToStation.append(arrFailedDeviationToStationInInterval)
-                                arrFailedDeviationToStationInInterval = 0   # On reset
-                                
-                                # On ajoute les moyennes
-                                if (len(arrWaitingTimeInInterval) > 0):
-                                    arrWaitingTime.append(statistics.mean(arrWaitingTimeInInterval))
-                                else:           # Pas de valeurs ds l'array
-                                    arrWaitingTime.append(0)
-
-                                arrTimeInInterval = []
-                                arrWaitingTimeInInterval = []
-
-                                # PS : si on veut afficher 10mn et qu'on regarde les intervalles de 3mn, on affichera pas la 10eme minute
-
-                        make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "waitingTimeAverage", False)
-                        make_graph(arrTime, arrFailedDeviationToStation, "Number failed deviation to station", f, "failedDeviationNumber", False)
-                        stationCsv.close()
-
-
-
-
+                    make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "waitingTime", False)
+                    make_graph(arrTime, arrFailedDeviationToStation, "Failed deviation to station", f, "failedDeviation", False)
+                    stationCsv.close()
 
 
 
@@ -173,13 +176,13 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(duratio
       
     comptMinutes = 0
     
-    while (line):
+    while line:
         rightShift = 0          # de combien de champs on se deplace vers la droite
 
         arrLine = line.split(',')
         line = csvfileStats.readline()
 
-        if ("day" in arrLine[0]):
+        if "day" in arrLine[0]:
             rightShift = 1          # On va sauter le champ avec le jour (format -> 1 day, 0:09:00)
 
         # On ajoute le time
@@ -189,7 +192,7 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(duratio
         for i in range(1 + rightShift, len(arrLine)):
             arrLineOfArrLine = arrLine[i].split('|')     
             for elt in arrLineOfArrLine:
-                if (elt != "" and elt != " " and elt != "\n" and elt != " \n"):
+                if elt not in ["", " ", "\n", " \n"]:
                     arrStatInInterval.append(float(elt))
 
         comptMinutes += 1  
@@ -214,18 +217,30 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(duratio
     make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrStat), "Standard deviation " + title, "stats/global", filename + "/" + filename + "_standardDeviation", False)
 
 
-
-
-
-
-
 def make_boxplot(array_time, array_of_array, title, filename):
-    plt.figure(figsize=(1.4*len(array_of_array), 4))
+
+    # size of the graph
+    streched = False  # étire le graphe horizontalement pour espacer suffisament chaque abscisse
+    if streched:
+        plt.figure(figsize=(1.4*len(array_of_array), 4))
+    else:
+        plt.figure(figsize=(9, 4))
+    
     plt.boxplot(array_of_array)
     plt.title('Boxplot : ' + title)
     filename += "_boxplot.png"
 
-    plt.gca().xaxis.set_ticklabels(array_time)
+    if streched:
+        plt.gca().xaxis.set_ticklabels(array_of_array)
+    else:
+        # x-axis : "8:00:00", "", "", "", "10:00:00", "", "", "", "12:00:00", "", ...
+        nb_x_labels = 12 # 12 hours indication for a 24h simulation (one label each 2 hours)
+        x_labels = []
+        for i in range(len(array_time)):
+            label = array_time[i] if i % (len(array_time) // nb_x_labels) == 0 else ""
+            label = label.split('-')[0]  # c'est peut-être pas très propre de faire ainsi ?
+            x_labels.append(label)
+        plt.gca().xaxis.set_ticklabels(x_labels)
 
     plt.savefig(filename, bbox_inches='tight')
     # On clear la figure
@@ -255,8 +270,20 @@ def get_array_of_mean_from_array_of_array(array):
 
 
 def make_graph(x, y, title, fileNamePref, fileNameSuf, isXComposedOfInt):
-    plt.figure(figsize=(1.4*len(x), 4))
-    plt.plot(x, y)
+    
+    # size of the graph
+    streched = False  # étire le graphe horizontalement pour espacer suffisament chaque abscisse
+    plt.figure( figsize = (1.4*len(x), 4) if streched else (9, 4) )
+
+    if streched:
+        plt.plot(x, y)  # keep x as is
+    else:
+        nb_x_labels = 12 # one x-label each 2 hours
+        x_range  = [i for i in range(len(x))]
+        x_labels = [x[i].split('-')[0] if i % (len(x) // nb_x_labels) == 0 else "" for i in range(len(x))]
+        plt.xticks(x_range, x_labels)
+        plt.plot(x_range, y)
+    
     plt.title(title)
     fileName = fileNamePref + "/" + fileNameSuf + ".png"
 

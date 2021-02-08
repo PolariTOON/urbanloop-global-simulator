@@ -2,9 +2,17 @@ from argparse import ArgumentParser, ArgumentTypeError # bibliothèque pour réc
 import matplotlib
 import matplotlib.pyplot as plt
 import math, os, glob, statistics
-    
 
-def make_global_graphs(durationInterval):
+streched = False  # pour étirer ler graphes horizontalement afin d'espacer suffisament chaque abscisse
+                  # (cela va créer des images très allongées horizontalement)
+nb_x_labels = 12  # number of labels to put on the x-axis (only if `streched == False`)
+durationIntervall = 30
+no_delete = False # by default, delete all previous pictures
+curve = True
+boxplot = True
+
+def make_global_graphs():
+    
     csvfileStats = open('stats/global/stat_log.csv', 'r')
 
     lines = csvfileStats.readlines()   # La ligne avec les noms de colonnes
@@ -50,7 +58,7 @@ def make_global_graphs(durationInterval):
 
         comptMinutes += 1  
 
-        if (comptMinutes == durationInterval):
+        if (comptMinutes == durationIntervall):
             comptMinutes = 0
             arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
 
@@ -77,25 +85,33 @@ def make_global_graphs(durationInterval):
 
     csvfileStats.close()
 
-    make_boxplot(arrTime, arrTravelersInAPod, "Travelers in a pod", "stats/global/travelersInAPod/travelersInAPod")
-    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelersInAPod), "Average travelers in a pod", "stats/global/travelersInAPod", "travelersInAPod_average", False)
-    make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrTravelersInAPod), "Standard deviation travelers in a pod", "stats/global/travelersInAPod", "travelersInAPod_standardDeviation", False)
+    if boxplot:
+        make_boxplot(arrTime, arrTravelersInAPod, "Travelers in a pod", "stats/global/travelersInAPod/travelersInAPod")
+    if curve:
+        make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelersInAPod), "Average travelers in a pod", "stats/global/travelersInAPod", "travelersInAPod_average", False)
+        make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrTravelersInAPod), "Standard deviation travelers in a pod", "stats/global/travelersInAPod", "travelersInAPod_standardDeviation", False)
 
-    make_boxplot(arrTime, arrWaitingTravelers, "Waiting Travelers", "stats/global/waitingTravelers/waitingTravelers")
-    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrWaitingTravelers), "Average waiting Travelers", "stats/global/waitingTravelers", "waitingTravelers_average", False)
-    make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrWaitingTravelers), "Standard deviation waiting Travelers", "stats/global/waitingTravelers", "waitingTravelers_standardDeviation", False)
+    if boxplot:
+        make_boxplot(arrTime, arrWaitingTravelers, "Waiting Travelers", "stats/global/waitingTravelers/waitingTravelers")
+    if curve:
+        make_graph(arrTime, get_array_of_mean_from_array_of_array(arrWaitingTravelers), "Average waiting Travelers", "stats/global/waitingTravelers", "waitingTravelers_average", False)
+        make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrWaitingTravelers), "Standard deviation waiting Travelers", "stats/global/waitingTravelers", "waitingTravelers_standardDeviation", False)
 
-    make_boxplot(arrTime, arrTravelingPods, "Traveling Pods", "stats/global/travelingPods/travelingPods")
-    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelingPods), "Average traveling Pods", "stats/global/travelingPods", "travelingPods_average", False)
-    make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrTravelingPods), "Standard deviation traveling Pods", "stats/global/travelingPods", "travelingPods_standardDeviation", False)
+    if boxplot:
+        make_boxplot(arrTime, arrTravelingPods, "Traveling Pods", "stats/global/travelingPods/travelingPods")
+    if curve:
+        make_graph(arrTime, get_array_of_mean_from_array_of_array(arrTravelingPods), "Average traveling Pods", "stats/global/travelingPods", "travelingPods_average", False)
+        make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrTravelingPods), "Standard deviation traveling Pods", "stats/global/travelingPods", "travelingPods_standardDeviation", False)
 
 
-def make_stations_graphs(durationInterval):
+def make_stations_graphs():
     files = glob.glob('stats/stations/*')
     for f in files:
+        f = f.replace('\\', '/')
         if f != "stats/stations/infos.txt" and os.path.isdir(f):
             files_in_dir = glob.glob(f + "/*")
             for file_in_dir in files_in_dir:
+                file_in_dir = file_in_dir.replace('\\', '/')
                 if file_in_dir == (f + "/stats.csv"):
                     stationCsv = open(file_in_dir, 'r')
 
@@ -122,7 +138,6 @@ def make_stations_graphs(durationInterval):
                         rightShift = 0          # de combien de champs on se deplace vers la droite
 
                         arrLine = line.split(',')
-                        line = stationCsv.readline()
 
                         if ("day" in arrLine[0]):
                             rightShift = 1          # On va sauter le champ avec le jour (format -> 1 day, 0:09:00)
@@ -141,7 +156,7 @@ def make_stations_graphs(durationInterval):
 
                         comptMinutes += 1       
 
-                        if (comptMinutes == durationInterval):
+                        if (comptMinutes == durationIntervall):
                             comptMinutes = 0
                             arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
                             arrFailedDeviationToStation.append(arrFailedDeviationToStationInInterval)
@@ -158,13 +173,13 @@ def make_stations_graphs(durationInterval):
 
                             # PS : si on veut afficher 10mn et qu'on regarde les intervalles de 3mn, on affichera pas la 10eme minute
 
-                    make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "waitingTime", False)
-                    make_graph(arrTime, arrFailedDeviationToStation, "Failed deviation to station", f, "failedDeviation", False)
-                    stationCsv.close()
+                    if curve:
+                        make_graph(arrTime, arrWaitingTime, "Average waiting time", f, "waitingTime", False)
+                        make_graph(arrTime, arrFailedDeviationToStation, "Failed deviation to station", f, "failedDeviation", False)
 
 
-
-def make_global_graph_with_global_csv_containing_stats_from_all_stations(durationInterval, filename, title):   # mettre bool pr conversion int/float ?
+def make_global_graph_with_global_csv_containing_stats_from_all_stations(filename, title):   # mettre bool pr conversion int/float ?
+    
     csvfileStats = open("stats/global/" + filename + "/" + filename + ".csv", 'r')
 
     line = csvfileStats.readline()      # Pas de ligne avec les noms de colonnes dans ces csv-la
@@ -197,7 +212,7 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(duratio
 
         comptMinutes += 1  
 
-        if (comptMinutes == durationInterval):
+        if (comptMinutes == durationIntervall):
             comptMinutes = 0
             arrTime.append(intervalOfListOfStringDates(arrTimeInInterval))
 
@@ -212,15 +227,16 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(duratio
 
     csvfileStats.close()
 
-    make_boxplot(arrTime, arrStat, title, "stats/global/" + filename + "/" + filename)
-    make_graph(arrTime, get_array_of_mean_from_array_of_array(arrStat), "Average " + title, "stats/global",  filename + "/" + filename + "_average", False)
-    make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrStat), "Standard deviation " + title, "stats/global", filename + "/" + filename + "_standardDeviation", False)
+    if boxplot:
+        make_boxplot(arrTime, arrStat, title, "stats/global/" + filename + "/" + filename)
+    if curve:
+        make_graph(arrTime, get_array_of_mean_from_array_of_array(arrStat), "Average " + title, "stats/global",  filename + "/" + filename + "_average", False)
+        make_graph(arrTime, get_array_of_standard_deviation_from_array_of_array(arrStat), "Standard deviation " + title, "stats/global", filename + "/" + filename + "_standardDeviation", False)
 
 
 def make_boxplot(array_time, array_of_array, title, filename):
 
     # size of the graph
-    streched = False  # étire le graphe horizontalement pour espacer suffisament chaque abscisse
     if streched:
         plt.figure(figsize=(1.4*len(array_of_array), 4))
     else:
@@ -234,7 +250,7 @@ def make_boxplot(array_time, array_of_array, title, filename):
         plt.gca().xaxis.set_ticklabels(array_of_array)
     else:
         # x-axis : "8:00:00", "", "", "", "10:00:00", "", "", "", "12:00:00", "", ...
-        nb_x_labels = 12 # 12 hours indication for a 24h simulation (one label each 2 hours)
+        # `nb_x_labels = 12` => 12 hour labels for a 24h simulation (one label each 2 hours)
         x_labels = []
         for i in range(len(array_time)):
             label = array_time[i] if i % (len(array_time) // nb_x_labels) == 0 else ""
@@ -272,13 +288,12 @@ def get_array_of_mean_from_array_of_array(array):
 def make_graph(x, y, title, fileNamePref, fileNameSuf, isXComposedOfInt):
     
     # size of the graph
-    streched = False  # étire le graphe horizontalement pour espacer suffisament chaque abscisse
     plt.figure( figsize = (1.4*len(x), 4) if streched else (9, 4) )
 
     if streched:
         plt.plot(x, y)  # keep x as is
     else:
-        nb_x_labels = 12 # one x-label each 2 hours
+        # `nb_x_labels == 12` => one x-label each 2 hours
         x_range  = [i for i in range(len(x))]
         x_labels = [x[i].split('-')[0] if i % (len(x) // nb_x_labels) == 0 else "" for i in range(len(x))]
         plt.xticks(x_range, x_labels)
@@ -310,7 +325,7 @@ def intervalOfListOfStringDates(listOfStringDate):
     interval = properDate1 + "-" + properDate2 
 
     return interval
-
+    
 
 def delete_png_files_in_stats():
     files = glob.glob('stats/global/*')
@@ -333,18 +348,36 @@ def delete_png_files_in_stats():
                     os.remove(fileInDirectory)
 
     
-def main(durationInterval):
-    delete_png_files_in_stats()
-    make_global_graphs(durationInterval)
-    make_global_graph_with_global_csv_containing_stats_from_all_stations(durationInterval, "globalWaitingTime", "waiting time")
-    make_global_graph_with_global_csv_containing_stats_from_all_stations(durationInterval, "globalTravelTime", "travel time")
-    make_global_graph_with_global_csv_containing_stats_from_all_stations(durationInterval, "failedInsertions", "failed insertion")
-    make_stations_graphs(durationInterval)
+def main():
+    if not no_delete:
+        delete_png_files_in_stats()
+    make_global_graphs()
+    make_global_graph_with_global_csv_containing_stats_from_all_stations("globalWaitingTime", "waiting time")
+    make_global_graph_with_global_csv_containing_stats_from_all_stations("globalTravelTime", "travel time")
+    make_global_graph_with_global_csv_containing_stats_from_all_stations("failedInsertions", "failed insertion")
+    make_stations_graphs()
     
 
 if __name__ == "__main__":
     argument_parser = ArgumentParser(description="Run the making-stats_and_images script")
-    argument_parser.add_argument("-i", "--durationInterval", type=int, default=30)
+    argument_parser.add_argument("-i", "--durationIntervall", type=int, default=30)
+    argument_parser.add_argument("-s", "--streched", type=bool, nargs='?', const=True, default=False)
+    argument_parser.add_argument("-c", "--curve", type=bool, nargs='?', const=True, default=False)
+    argument_parser.add_argument("-b", "--boxplot", type=bool, nargs='?', const=True, default=False)
+    argument_parser.add_argument("-n", "--noDelete", type=bool, nargs='?', const=True, default=False)
+    argument_parser.add_argument("-x", "--xLabels", type=int, default=12)
     arguments = argument_parser.parse_args()
+    
+    streched = arguments.streched
+    nb_x_labels = arguments.xLabels
+    durationIntervall = arguments.durationIntervall
+    curve = arguments.curve
+    boxplot = arguments.boxplot
+    no_delete = arguments.noDelete
+    
+    if not boxplot and not curve:
+        boxplot = True
+        curve = True
+    
+    main()
 
-    main(arguments.durationInterval)

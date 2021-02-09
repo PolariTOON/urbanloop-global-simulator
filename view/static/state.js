@@ -97,8 +97,7 @@ class State extends EventTarget { // TODO: utiliser un polyfill pour Safari
         return this._origin;
     }
     /*
-    get showingTravelersWaiting()
-    {
+    get showingTravelersWaiting() {
         return this._showingTravelersWaiting;
     }
     */

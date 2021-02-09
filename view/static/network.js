@@ -8,6 +8,9 @@ const {Group, Layer, Stage} = Konva;
 const zoomIntensity = 0.8;
 const minScale = 0.01;
 
+const useCache = false; // to translate view quicker (but zoom and update are slower)
+const veryFast = false; // very fast translations and zooms, but slow updates (do not adapt widgets' sizes to zoom level)
+
 const article = document.querySelector("main > article");
 const stage = new Stage({
     container: article,
@@ -86,12 +89,27 @@ var chartOptions = {
         }
     }
 }
-    
+
+function cache() {
+  elementsLayer.children.cache();  // Il faut à la fois la version avec "children", et celle sans.
+  sectionsLayer.children.cache();
+  podsLayer.children.cache();
+  hintsLayer.children.cache();
+}
+
+function clearCache() {
+  elementsLayer.children.clearCache();
+  sectionsLayer.children.clearCache();
+  podsLayer.children.clearCache();
+  hintsLayer.children.clearCache();
+}
+
 const statistics = new Statisctics(chartOptions);
 var chart = new Highcharts.Chart(chartOptions);
 statistics.chart = chart;
 
 state.addEventListener("load", async (event) => {
+    if (useCache || veryFast) clearCache();
     const networkJSON = event.detail;
     const name = networkJSON["name"];
     heading.textContent = name;
@@ -131,6 +149,7 @@ state.addEventListener("load", async (event) => {
         pod._keepFlag = 0;
     }
     resize();
+    if (useCache || veryFast) cache();
     layer.batchDraw();
 });
 
@@ -155,6 +174,7 @@ state.addEventListener("unload", async (event) => {
 });
 
 state.addEventListener("update", (event) => {
+    if (useCache || veryFast) clearCache();
     const networkJSON = event.detail;
 
     const name = networkJSON["name"];
@@ -206,7 +226,8 @@ state.addEventListener("update", (event) => {
             }
             pod._keepFlag = 0;
         }
-    }
+    };
+    if (useCache || veryFast) cache();
     layer.batchDraw();
 });
 
@@ -295,7 +316,7 @@ window.addEventListener("resize", async (event) => {
     state.resize();
 });
 
-stage.on("dragstart", async (event) => {
+stage.on("dragstart", async (event) => {;
     event.evt.preventDefault();
     setCursor("move");
 });
@@ -306,9 +327,11 @@ stage.on("dragend", async (event) => {
 });
 
 stage.on("wheel", async (event) => {
+    if (useCache) clearCache();
     event.evt.preventDefault();
     zoom(event.evt.deltaY);
-    layer.batchDraw();
+    if (useCache) cache();
+    layer.draw();
 });
 
 stage.on("mouseover", async (event) => {

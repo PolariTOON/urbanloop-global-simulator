@@ -42,6 +42,13 @@ export class Station extends Entity {
             fill: outerColor,
         });
 
+/*
+        outerShape.perfectDrawEnabled(false);
+        innerShape.perfectDrawEnabled(false);
+        outerShape.listening(false);
+        innerShape.listening(false);
+*/
+
         super(hintsLayer);
         super.add(outerShape);
         super.add(innerShape);

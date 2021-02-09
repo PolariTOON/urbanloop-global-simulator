@@ -82,5 +82,7 @@ export class Shed extends Entity {
         this._y = y;
         this._podCount = podCount;
         this._podMax = podMax;
+       // this.__outerShape.cache();
+       // this.__innerShape.cache();
     }
 }

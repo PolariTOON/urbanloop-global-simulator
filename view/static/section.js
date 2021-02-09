@@ -43,6 +43,7 @@ export class Section extends Entity {
                     ],
                     dashEnabled: true,
                     fill: shadowColor,
+                    draggable: true,
                     stroke: shadowColor,
                 });
                 innerPath = new Arrow({
@@ -52,6 +53,7 @@ export class Section extends Entity {
                     strokeWidth: innerStrokeWidth,
                     pointerLength: pointerLength,
                     pointerWidth: pointerWidth,
+                    draggable: true,
                     dash: [
                         loopOrBridge ? loopDashSize : bridgeDashSize,
                         loopOrBridge ? loopDashMargin : bridgeDashMargin,
@@ -62,6 +64,12 @@ export class Section extends Entity {
             }
         }
         super(hintsLayer);
+/*
+        outerPath.perfectDrawEnabled(false);
+        innerPath.perfectDrawEnabled(false);
+        outerPath.listening(false);
+        innerPath.listening(false);
+*/
         super.add(outerPath);
         super.add(innerPath);
         this.__outerPath = outerPath;

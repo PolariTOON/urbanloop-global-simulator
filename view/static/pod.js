@@ -115,6 +115,12 @@ export class Pod extends Entity {
         });
         const keepFlag = 0;
         super(hintsLayer);
+/*
+        outerShape.perfectDrawEnabled(false);
+        innerShape.perfectDrawEnabled(false);
+        outerShape.listening(false);
+        innerShape.listening(false);
+*/
         super.add(outerShape);
         super.add(innerShape);
         this.__outerShape = outerShape;

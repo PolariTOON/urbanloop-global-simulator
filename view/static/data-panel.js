@@ -73,11 +73,9 @@ state.addEventListener("close", (event) => {
 
 closeButton.addEventListener("click", async (event) => {
     if (closeButton["value"].localeCompare("Close section") == 0){
-        console.log("a")
         closeButton["value"] = "Open section";
     }
     else {
-        console.log("b")
         closeButton["value"] = "Close section";
     }
     state.close();

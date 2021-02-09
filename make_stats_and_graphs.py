@@ -21,14 +21,14 @@ def make_global_graphs():
     lines = lines[1:] # remove header
 
     arrTime = [] 
-    arrTravelersInAPod = []    
-    arrWaitingTravelers = []              
-    arrTravelingPods = []          
+    arrTravelersInAPod = []
+    arrWaitingTravelers = []
+    arrTravelingPods = []
 
     arrTimeInInterval = [] 
-    arrTravelersInAPodInInterval = []    
-    arrWaitingTravelersInInterval = []              
-    arrTravelingPodsInInterval = []          
+    arrTravelersInAPodInInterval = []
+    arrWaitingTravelersInInterval = []
+    arrTravelingPodsInInterval = []
 
     comptMinutes = 0
     
@@ -121,7 +121,7 @@ def make_stations_graphs():
                     stationCsv.close()
                     
                     # Creation et remplissage arrWaitingTime   
-                    arrTime = [] 
+                    arrTime = []
                     arrFailedDeviationToStation = []
                     arrWaitingTime = []
 
@@ -184,10 +184,10 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(filenam
 
     line = csvfileStats.readline()      # Pas de ligne avec les noms de colonnes dans ces csv-la
 
-    arrTime = [] 
-    arrStat = []    
-    arrTimeInInterval = [] 
-    arrStatInInterval = [] 
+    arrTime = []
+    arrStat = []
+    arrTimeInInterval = []
+    arrStatInInterval = []
       
     comptMinutes = 0
     
@@ -210,7 +210,7 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(filenam
                 if elt not in ["", " ", "\n", " \n"]:
                     arrStatInInterval.append(float(elt))
 
-        comptMinutes += 1  
+        comptMinutes += 1
 
         if (comptMinutes == durationIntervall):
             comptMinutes = 0
@@ -222,8 +222,8 @@ def make_global_graph_with_global_csv_containing_stats_from_all_stations(filenam
             else:           # Pas de valeurs ds l'array
                 arrStat.append(0)
 
-            arrTimeInInterval = [] 
-            arrStatInInterval = []        
+            arrTimeInInterval = []
+            arrStatInInterval = []
 
     csvfileStats.close()
 

@@ -92,14 +92,14 @@ var chartOptions = {
 
 function cache() {
   elementsLayer.children.cache();  // Il faut à la fois la version avec "children", et celle sans.
-  sectionsLayer.children.cache();
+  //sectionsLayer.children.cache();
   podsLayer.children.cache();
   hintsLayer.children.cache();
 }
 
 function clearCache() {
   elementsLayer.children.clearCache();
-  sectionsLayer.children.clearCache();
+  //sectionsLayer.children.clearCache();
   podsLayer.children.clearCache();
   hintsLayer.children.clearCache();
 }
@@ -109,7 +109,8 @@ var chart = new Highcharts.Chart(chartOptions);
 statistics.chart = chart;
 
 state.addEventListener("load", async (event) => {
-    if (useCache || veryFast) clearCache();
+    if (veryFast) layer.clearCache()
+    else if (useCache) clearCache();
     const networkJSON = event.detail;
     const name = networkJSON["name"];
     heading.textContent = name;
@@ -149,7 +150,8 @@ state.addEventListener("load", async (event) => {
         pod._keepFlag = 0;
     }
     resize();
-    if (useCache || veryFast) cache();
+    if (veryFast) layer.cache()
+    else if (useCache) cache();
     layer.batchDraw();
 });
 
@@ -174,7 +176,8 @@ state.addEventListener("unload", async (event) => {
 });
 
 state.addEventListener("update", (event) => {
-    if (useCache || veryFast) clearCache();
+    if (veryFast) layer.clearCache()
+    else if (useCache) clearCache();
     const networkJSON = event.detail;
 
     const name = networkJSON["name"];
@@ -227,7 +230,8 @@ state.addEventListener("update", (event) => {
             pod._keepFlag = 0;
         }
     };
-    if (useCache || veryFast) cache();
+    if (veryFast) layer.cache()
+    else if (useCache) cache();
     layer.batchDraw();
 });
 
@@ -327,10 +331,8 @@ stage.on("dragend", async (event) => {
 });
 
 stage.on("wheel", async (event) => {
-    if (useCache) clearCache();
     event.evt.preventDefault();
     zoom(event.evt.deltaY);
-    if (useCache) cache();
     layer.draw();
 });
 

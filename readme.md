@@ -138,10 +138,36 @@ Pour lancer le calcul de statistiques finales et creer les figures des statistiq
 $ python3.7 make_stats_and_graphs.py
 ```
 
-Pour changer l'intervalle de temps (par defaut de 30 minutes), ajouter la commande -i et l'entier souhaite (5 par exemple) :
+Pour changer l'intervalle de temps pour les courbes (par defaut de 30 minutes), ajouter la commande -i (--durationInterval) et l'entier souhaite (5 par exemple) :
 
 ```sh
 $ python3.7 make_stats_and_graphs.py -i 5
+```
+
+Pour changer le nombre de labels en abscisses (par defaut 12), ajouter la commande -x et l'entier souhaite (15 par exemple) :
+
+```sh
+$ python3.7 make_stats_and_graphs.py -x 15
+```
+
+Pour ne generer que les courbes (sans les boxplots), ajouter la commande --curve  :
+```sh
+$ python3.7 make_stats_and_graphs.py --curve
+```
+
+Pour ne generer que les boxplots (sans les courbes), ajouter la commande --boxplot  :
+```sh
+$ python3.7 make_stats_and_graphs.py --boxplot
+```
+
+Pour etirer le graphe, ce qui affiche toutes les abscisses, ajouter la commande -s (ou --stretched) :
+```sh
+$ python3.7 make_stats_and_graphs.py -s
+```
+
+Pour ne pas effacer les images precedentes, ajouter la commande --noDelete:
+```sh
+$ python3.7 make_stats_and_graphs.py --noDelete
 ```
 
 ### Utilisation

@@ -226,6 +226,7 @@ class Pod(Token):
     def update(self):
 
         # OPTIMISATION : ne pas regarder à chaque update ?
+        self._contain_real_user = False
         for traveler in self._travelers:       
             # On regarde si un de nos passagers a été genéré avec un ticket via l'appli mobile
             self._contain_real_user = traveler.real_user   

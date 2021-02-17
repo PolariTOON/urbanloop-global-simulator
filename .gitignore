@@ -10,3 +10,4 @@ stats/
 stat_log.csv
 save/*.json
 log.txt
+resources/simul_Grand_Nancy/*/*

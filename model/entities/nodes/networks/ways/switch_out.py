@@ -122,9 +122,7 @@ class SwitchOut(Switch):
                             "type": "insert"
                         })
                     else:
-                        #
-                        # échec de déviation !!!
-                        #
+                        # échec de déviation vers une station
                         if (type(self._beside.steps[0]).__name__ == "Station"):
                             self._beside.steps[0].failed_deviation()
                         #else :

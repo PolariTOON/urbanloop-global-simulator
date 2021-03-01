@@ -586,6 +586,17 @@ class Network(Node):
         
         return None         # Le voyageur n'est pas encore dans une capsule
 
+    def get_total_sections_length(self):
+        sections = [s for road in self._roads for s in road.sections]
+        return sum([section.length for section in sections])
+    
+    def get_total_switches_length(self):
+        for s in self._switches:
+            if s.length == None:
+                print("ERROR in network.py: switch not initialized.")
+                return None
+        return sum([switch.length for switch in self._switches])
+    
     def get_station_with_name(self, name_of_station):
         for station in self.stations:
             if (station.name == name_of_station):

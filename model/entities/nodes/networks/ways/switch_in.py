@@ -196,6 +196,19 @@ class SwitchIn(Switch):
         elif "pod_exit" == message["type"]:
             pod = message["pod"]
             if pod in self.pods:
+                #p
+                if(self._previous is self._next):
+                    print(f"ATTENTION : self._previous is self._next is {self._previous}")
+                try:
+                    print(pod.distance_avant_revision)
+                    pod.distance_avant_revision-=self._previous.sections[-1]._length
+                    print(pod.distance_avant_revision)
+                except:
+                    print("erreur SwitchIn self._previous.sections[-1]._length")
+                    print(self._previous)
+                #print(f"SwitchIn : Section précédente.length={self._previous.sections[-1]._length}")
+                #print(f"SwitchIn : Section suivante.length={self._next.sections[0]._length}")
+                #fin #p
                 self.pods.remove(pod)
         else:
             raise ValueError("Invalid message")

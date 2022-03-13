@@ -11,6 +11,8 @@ from .way import Way
 class Road(Way):
     """Classe modélisant une route du réseau, c'est une entitée intermédiaire au même niveau que les aiguillages
     Cette entité est aussi vue comme un sous graphe."""
+    #p
+    count = 0
 
     def __init__(self, env, id, margin_min, pod_size, is_bridge, steps=None, sections=None, **kwargs):
         super().__init__(env, id, pod_size, **kwargs)
@@ -20,6 +22,12 @@ class Road(Way):
         self._next = None
         self._is_bridge = is_bridge
         self._weight = 0
+        #p
+        print(f"Road{Road.count}")
+        Road.count+=1
+        for el in self._sections:
+            print(f"\t{el}")
+        #fin p
 
         #  Etape 42 : On instancie les pistes mais pas les liaisons de la premiere et de la dernière section
         for section_index in range(len(self._sections)):

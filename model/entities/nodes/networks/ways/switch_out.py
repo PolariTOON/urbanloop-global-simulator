@@ -156,6 +156,19 @@ class SwitchOut(Switch):
                         })
         elif "pod_exit" == message["type"]:
             pod = message["pod"]
+            #p
+            if(self._previous is self._next):
+                print(f"ATTENTION : self._previous is self._next is {self._previous}")
+            try:
+                print(pod.distance_avant_revision)
+                pod.distance_avant_revision-=self._previous.sections[-1]._length
+                print(pod.distance_avant_revision)
+            except:
+                print("erreur SwitchOut self._previous.sections[-1]._length")
+                print(self._previous)
+            #print(f"SwitchOut : Section précédente.length={self._previous.sections[-1]._length}")
+            #print(f"SwitchOut : Section suivante.length={self._next.sections[0]._length}")
+            #fin #p
             self._pods.remove(pod)
         elif "update_routing" == message["type"]:
             new_table = message["table"]

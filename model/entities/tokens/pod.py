@@ -57,6 +57,9 @@ class Pod(Token):
         self._traveled_distance_t = traveled_distance_t or 0
         self._previous_station = None
 
+        self.temps_avant_revision = 1000 #p
+        self.distance_avant_revision = 1000 #p
+
     @property
     def position(self):
         """
@@ -560,4 +563,7 @@ class Pod(Token):
         if (has_found_traveler == False):
             print("Error in call_emergency_exit")
 
-            
+    def doitAllerEnRevision(self):
+        if(min(self.temps_avant_revision,self.distance_avant_revision)<=0):
+            return True
+        return False

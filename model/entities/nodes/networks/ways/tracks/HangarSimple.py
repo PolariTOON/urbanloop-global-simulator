@@ -3,7 +3,7 @@ from .....tokens.pod import Pod
 from .step import Step
 
 
-class Shed(Hangar):
+class HangarSimple(Hangar):
     """ Classe modélisant un dépôt, y est géré le départ des capsules, le réapprovisionnement et
     les interactions avec les autres éléments du réseau"""
 

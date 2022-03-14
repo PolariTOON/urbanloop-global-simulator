@@ -243,13 +243,15 @@ class Station(Step):
                 else:
                     pass
         #p debut
-        print(f"station:{self}, parent:{self.parent}, grand-parent:{self.parent.parent}")
+        #print(f"station:{self}, parent:{self.parent}, grand-parent:{self.parent.parent}")
         for pod in self.doiventAllerEnRevision:
             print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
             #self.send_pod(pod, destination, True)
             print("Pour l'instant on ne fait qu'annuler l'ordre d'aller en révision")
             # Pour trouver où aller, il faut faire une sorte de get
             # ordre : self : Station, self.parent : Road, self.parent.parent : Network
+            # Network.sheds() = [shed for road in self._roads for shed in road.sheds]
+            # road.sheds = [step for step in self._steps if isinstance(step, Shed)]
             nw = self.parent.parent
             if(nw is None):
                 raise ValueError("nw is None")

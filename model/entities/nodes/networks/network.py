@@ -94,6 +94,12 @@ class Network(Node):
     def stations(self):
         return [station for road in self._roads for station in road.stations]
 
+    #p debut
+    @property
+    def hangarsSimples(self):
+        return [hangar for road in self._roads for hangar in road.hangarsSimples]
+    #p fin
+
     @property
     def stations_names(self):
         return [station.name for road in self._roads for station in road.stations]

@@ -1,11 +1,15 @@
 from math import inf
 
 from .switch import Switch
+from .tracks.HangarSimple import HangarSimple
+from .tracks.HangarLavage import HangarLavage
+from .tracks.HangarRevision import HangarRevision
 from .tracks.section import Section
 from .tracks.sensor import Sensor
 from .tracks.shed import Shed
 from .tracks.station import Station
 from .way import Way
+
 
 
 class Road(Way):
@@ -48,6 +52,14 @@ class Road(Way):
                 step = Shed(env, step_index, **step)
             elif step["type"] == "station":
                 step = Station(env, step_index, **step)
+            #p debut
+            elif step["type"] == "HangarSimple":
+                step = HangarSimple(env, step_index, **step)
+            elif step["type"] == "HangarRevision":
+                step = HangarRevision(env, step_index, **step)
+            elif step["type"] == "HangarLavage":
+                step = HangarLavage(env, step_index, **step)
+            #p fin
             else:
                 raise TypeError("invalid element type")
             self._steps[step_index] = step
@@ -89,6 +101,12 @@ class Road(Way):
     def sheds(self):
         """Liste des dépôts au sein de la route"""
         return [step for step in self._steps if isinstance(step, Shed)]
+    
+    #p debut
+    @property
+    def hangarsSimples(self):
+        return [step for step in self._steps if isinstance(step, HangarSimple)]
+    #p fin
 
     @property
     def stations(self):

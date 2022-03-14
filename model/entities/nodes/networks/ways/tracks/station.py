@@ -2,6 +2,8 @@ from .....tokens.pod import Pod
 from .....tokens.traveler import Traveler
 from .step import Step
 
+from random import randint
+
 station_types = {
     "city": 0,
     "residential": 1,
@@ -246,8 +248,6 @@ class Station(Step):
         #print(f"station:{self}, parent:{self.parent}, grand-parent:{self.parent.parent}")
         for pod in self.doiventAllerEnRevision:
             print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
-            #self.send_pod(pod, destination, True)
-            print("Pour l'instant on ne fait qu'annuler l'ordre d'aller en révision")
             # Pour trouver où aller, il faut faire une sorte de get
             # ordre : self : Station, self.parent : Road, self.parent.parent : Network
             # Network.sheds() = [shed for road in self._roads for shed in road.sheds]
@@ -255,9 +255,9 @@ class Station(Step):
             nw = self.parent.parent
             if(nw is None):
                 raise ValueError("nw is None")
-            # Maintentant implémenter au niveau du network la persistance des nouveaux types de hangar
-            i = self.doiventAllerEnRevision.index(pod)
-            self.doiventAllerEnRevision.pop(i)
+            # Choix aléatoire pour l'instant
+            destination = nw.hangarsSimples[randint(0, len(nw.hangarsSimples)-1)]
+            self.send_pod(pod, destination, False) # traveler=False
         #p fin
         
         # Attente de la montée des voyageurs pour l'envoi d'une capsule

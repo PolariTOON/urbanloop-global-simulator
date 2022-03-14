@@ -55,6 +55,9 @@ class Station(Step):
         self._waiting_empty = False # permet d'évacuer les pods superflus
         self.wait = -1 # pour décompter le départ entre 2 capsules
 
+        #p
+        self.doiventAllerEnRevision = []
+
     def serialize(self):
         """Permet la serialisation des informations"""
         dict = super().serialize()
@@ -205,8 +208,21 @@ class Station(Step):
         #                                  len(self._departure_pods), len([p for p in self._departure_pods if p.is_empty()]),
         #                                  self.pods_size))
 
+        #p debut
+        for i in range(self._capacity - 1, -1, -1):
+            pod = self._pods[i]
+            if pod.doitAllerEnRevsion() and pod not in self.doiventAllerEnRevision:
+                self.doiventAllerEnRevision.append(pod)
+        #p fin
+        # de Tommy pour Théo :
+        # Maintenant il faudrait faire un cas en plus en dessous
+        # permettant à fois de ne pas prendre en compte
+        # le pod dans l'embarquement et de lui choisir une destination
+        # qui doit être un hangar de révision
+
         # On charge les voyageurs s'il y a de la place
-        if len(self._travelers) > 0 and self.pods_size > 0:
+        #p if len(self._travelers) > 0 and self.pods_size > 0:
+        if len(self._travelers) > 0 and self.pods_size-len(self.doiventAllerEnRevision) > 0:
             for i in range(self._capacity-1, -1, -1):  # on commence par les premières capsules à partir
                 pod = self._pods[i]
                 if len(self._travelers) > 0 and pod != None and pod.is_empty() and pod not in self._departure_pods and not pod.during_departure:

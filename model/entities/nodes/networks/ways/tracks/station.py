@@ -211,7 +211,7 @@ class Station(Step):
         #p debut
         for i in range(self._capacity - 1, -1, -1):
             pod = self._pods[i]
-            if pod.doitAllerEnRevsion() and pod not in self.doiventAllerEnRevision:
+            if pod is not None and pod.doitAllerEnRevision() and pod not in self.doiventAllerEnRevision:
                 self.doiventAllerEnRevision.append(pod)
         #p fin
         # de Tommy pour Théo :
@@ -225,7 +225,9 @@ class Station(Step):
         if len(self._travelers) > 0 and self.pods_size-len(self.doiventAllerEnRevision) > 0:
             for i in range(self._capacity-1, -1, -1):  # on commence par les premières capsules à partir
                 pod = self._pods[i]
-                if len(self._travelers) > 0 and pod != None and pod.is_empty() and pod not in self._departure_pods and not pod.during_departure:
+                #p if len(self._travelers) > 0 and pod != None and pod.is_empty() and pod not in self._departure_pods and not pod.during_departure:
+                #p
+                if len(self._travelers) > 0 and pod != None and pod.is_empty() and pod not in self._departure_pods and not pod.during_departure and not pod in self.doiventAllerEnRevision:
                     # s'il y a un traveler en attente, un pod avec de la place
                     # IDEA : on pourrait autoriser un passager à utiliser une capsule vide qui allait partir (mais attention à ce que ça ne génère pas de bug)
                     going_traveler = self._travelers.pop(0)
@@ -240,6 +242,21 @@ class Station(Step):
                     self._boarding[i] = 0  # début du décompte de l'embarquement
                 else:
                     pass
+        #p debut
+        print(f"station:{self}, parent:{self.parent}, grand-parent:{self.parent.parent}")
+        for pod in self.doiventAllerEnRevision:
+            print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
+            #self.send_pod(pod, destination, True)
+            print("Pour l'instant on ne fait qu'annuler l'ordre d'aller en révision")
+            # Pour trouver où aller, il faut faire une sorte de get
+            # ordre : self : Station, self.parent : Road, self.parent.parent : Network
+            nw = self.parent.parent
+            if(nw is None):
+                raise ValueError("nw is None")
+            # Maintentant implémenter au niveau du network la persistance des nouveaux types de hangar
+            i = self.doiventAllerEnRevision.index(pod)
+            self.doiventAllerEnRevision.pop(i)
+        #p fin
         
         # Attente de la montée des voyageurs pour l'envoi d'une capsule
         for i in range(len(self._boarding)):  # pour chaque capsule

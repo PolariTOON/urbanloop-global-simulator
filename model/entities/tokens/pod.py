@@ -57,8 +57,9 @@ class Pod(Token):
         self._traveled_distance_t = traveled_distance_t or 0
         self._previous_station = None
 
-        self.temps_avant_revision = 300 #p
-        self.distance_avant_revision = 300 #p
+        self.temps_avant_revision = 100 #p
+        self.distance_avant_revision = 100 #p
+        self.temps_restant_attente_en_revision = -1 #p
 
     @property
     def position(self):
@@ -338,7 +339,9 @@ class Pod(Token):
                     "pod": self
                 })
             # on vérifie si le pod n'est pas allé trop loin
-            if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in ["SwitchOut", "Shed", "Station", "Sensor"]:
+            #if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in ["SwitchOut", "Shed", "Station", "Sensor"]:
+            if self._position > self._track_or_switch.length and type(self._track_or_switch).__name__ not in [
+                    "SwitchOut", "Shed", "Station", "Sensor", "HangarSimple", "HangarRevision", "HangarLavage"]:
                 print("Warning: pod.py: a pod has travelled to much distance while arriving on '%s'." % self._track_or_switch.name)
         
         return
@@ -392,7 +395,9 @@ class Pod(Token):
             # La capsule part d'un dépôt ou d'une gare
             self._source = message["author"].name
             self._destination = message["destination"]
+            print(f"pod {str(self)} : self._track_or_switch est {self._track_or_switch.name}")
             self._track_or_switch = self._track_or_switch.next
+            print(f"self._track_or_switch passe à {self._track_or_switch.name}")
             self._endSpeed = self._track_or_switch.speed
             self.activate_updates()
             self._track_or_switch.write({

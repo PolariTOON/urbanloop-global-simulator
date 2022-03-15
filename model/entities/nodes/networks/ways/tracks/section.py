@@ -114,7 +114,10 @@ class Section(Track):
             if pod in self._pods:
                 self._pods.remove(pod)
             else:
-                print("\u001B[31m [erreur pod non trouvé]", pod.name[:9], self.name, " (section l.103)\u001B[0m")
+                #print("\u001B[31m [erreur pod non trouvé]", pod.name[:9], self.name, " (section l.103)\u001B[0m")
+                print("\u001B[31m [erreur pod non trouvé]", pod, self.name, " (section l.118)\u001B[0m")
+                print(message)
+                print(pod.destination)
                 
         elif "pod_entry" == message["type"]:
             # Une capsule entre dans la section : il faut lui donner la bonne vitesse

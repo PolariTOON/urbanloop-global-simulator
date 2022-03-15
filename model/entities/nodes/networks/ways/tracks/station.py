@@ -258,7 +258,7 @@ class Station(Step):
             if(nw is None):
                 raise ValueError("nw is None")
             # Choix aléatoire pour l'instant
-            destination = nw.hangarsRevision[randint(0, len(nw.hangarsRevision)-1)]
+            destination = nw.hangarsRevision[randint(0, len(nw.hangarsRevision)-1)].name
             if pod.travelers != []:
                 raise ValueError("pod.travelers is not None")
             self.send_pod(pod, destination, False) # traveler=False

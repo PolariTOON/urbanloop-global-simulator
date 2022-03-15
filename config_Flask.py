@@ -52,6 +52,9 @@ def _synchronize(key=None):
                 print("\u001b[31m", exception, "\u001b[0m")
             else:
                 result = future.result()
+            #try:
+            #    return jsonify(result)
+            #except Exception: raise ValueError(f"{result} non jsonifiable")
             return jsonify(result)
         return routine
     return synchronize

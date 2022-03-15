@@ -8,8 +8,9 @@ class HangarRevision(Hangar):
     def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None, **kwargs):
         super().__init__(env, id, departure_pods, pods, element_of_loop, **kwargs)
         #p_tb il faudra rendre les nouveaux attributs inscriptibles dans les json produits
+        print("Hangar révision créé")
         self.temps_revision = 20
-        self.enRevisions = {}
+        self.enRevision = []
 
 
     def update(self):
@@ -22,28 +23,36 @@ class HangarRevision(Hangar):
                 self._wait = -1
 
         #p_tb MAJ des temps de révision
-        for pod in self.enRevisions:
-            self.enRevisions[pod] -= 1
-            if self.enRevisions[pod] == 0:
+        for pod in self.enRevision:
+            pod.temps_restant_attente_en_revision -= 1
+            print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_revision}")
+            if pod.temps_restant_attente_en_revision == 0:
+                print(f"{pod} : revision terminée")
                 self._departure_pods.append(pod)
                 pod.temps_avant_revision = 300
                 pod.distance_avant_revision = 300
-                del self.enRevisions[pod]
+                pod.temps_restant_attente_en_revision = -1
+                self.enRevision.remove(pod)
 
         # Départ des capsules #p_tb
         if self._departure_pods and self._wait == -1:
             self._wait = 0
-            for pod in self._departure_pods:
-                road = self.parent
-                nw = road.parent
-                destination = nw.hangarsSimples[randint(0, len(nw.hangarsSimples) - 1)]
+            road = self.parent
+            nw = road.parent
+            #pod = self._departure_pods[0]
+            pod = self._departure_pods.pop(0)
+            if pod not in self.enRevision:
+                destination = nw.hangarsSimples[randint(0, len(nw.hangarsSimples) - 1)].name
                 pod.during_departure = True
+                print(f"En sortie de révision, {self.name} écrit à {pod} departure vers {destination}")
                 pod.write({
                     "author": self,
                     "type": "departure",
                     "destination": destination
                 })
                 # prévient le parent
+                print(f"En sortie de révision, {self.name} écrit à {self.parent.name} departure vers {destination}")
+                print(f"En sortie de révision, {pod} : track_or_switch est {pod.track_or_switch.name}")
                 self.parent.write({
                     "author": self,
                     "pod": pod,
@@ -64,8 +73,11 @@ class HangarRevision(Hangar):
             })
             if pod.destination == self.name:
                 self._pods.append(pod)
+                print(f"Le pod {pod} entre en hangar de révision")
+                print(f"Son track_or_switch est {pod.track_or_switch.name}")
                 #p_tb debut
-                self.enRevisions[pod] = self.temps_revision
+                self.enRevision.append(pod)
+                pod.temps_restant_attente_en_revision = self.temps_revision
                 #p_tb fin
                 pod.write({
                     "author": self,
@@ -78,6 +90,7 @@ class HangarRevision(Hangar):
                     "timestamp": self.env.time
                 })
             else:
+                print(f"Le pod {pod} passe devant un hangar de révision")
                 pod.write({
                     "author": self,
                     "type": "passing"

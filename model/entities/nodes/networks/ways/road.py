@@ -102,11 +102,19 @@ class Road(Way):
         """Liste des dépôts au sein de la route"""
         return [step for step in self._steps if isinstance(step, Shed)]
     
-    #p debut
+    #p_tb debut
     @property
     def hangarsSimples(self):
         return [step for step in self._steps if isinstance(step, HangarSimple)]
-    #p fin
+
+    @property
+    def hangarsRevision(self):
+        return [step for step in self._steps if isinstance(step, HangarRevision)]
+
+    @property
+    def hangarsLavage(self):
+        return [step for step in self._steps if isinstance(step, HangarLavage)]
+    #p_tb fin
 
     @property
     def stations(self):

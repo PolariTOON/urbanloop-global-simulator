@@ -98,6 +98,14 @@ class Network(Node):
     @property
     def hangarsSimples(self):
         return [hangar for road in self._roads for hangar in road.hangarsSimples]
+
+    @property
+    def hangarsRevision(self):
+        return [hangar for road in self._roads for hangar in road.hangarsRevision]
+
+    @property
+    def hangarsLavage(self):
+        return [hangar for road in self._roads for hangar in road.hangarsLavage]
     #p fin
 
     @property
@@ -491,10 +499,19 @@ class Network(Node):
             # On demande à un dépôt d'envoyer une capsule à la station qui le demande
             # TODO:  ne pas choisir aléatoirement
             sheds = self.sheds
+            hangarsSimples = self.hangarsSimples #p_tb
             if sheds:
                 station = message["station"]
                 shed = choice(sheds)
                 shed.write({
+                    "author": self,
+                    "type": "refill",
+                    "station": station
+                })
+            elif hangarsSimples: #p_tb
+                station = message["station"]
+                hangarSimple = choice(hangarsSimples)
+                hangarSimple.write({
                     "author": self,
                     "type": "refill",
                     "station": station
@@ -506,6 +523,7 @@ class Network(Node):
             #       + mettre un warning s'il n'y a plus de place dans les sheds
             #
             sheds = self.sheds
+            hangarsSimples = self.hangarsSimples #p_tb
             if sheds:
                 station = message["station"]
                 shed = choice(sheds)
@@ -513,6 +531,14 @@ class Network(Node):
                     "author": self,
                     "type": "empty",
                     "shed": shed
+                })
+            elif hangarsSimples:  # p_tb
+                station = message["station"]
+                hangarSimple = choice(hangarsSimples)
+                hangarSimple.write({
+                    "author": self,
+                    "type": "refill",
+                    "station": station
                 })
         elif "departure" == message["type"]:
             timestamp = message["timestamp"]

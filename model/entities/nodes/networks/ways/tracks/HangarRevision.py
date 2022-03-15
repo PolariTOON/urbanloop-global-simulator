@@ -1,7 +1,113 @@
+from random import randint
+
 from .Hangar import Hangar
-from .shed import Shed
 
 
 class HangarRevision(Hangar):
+    """ Classe modélisant un hangar=dépôt de révision"""
     def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None, **kwargs):
         super().__init__(env, id, departure_pods, pods, element_of_loop, **kwargs)
+        #p_tb il faudra rendre les nouveaux attributs inscriptibles dans les json produits
+        self.temps_revision = 20
+        self.enRevisions = {}
+
+
+    def update(self):
+        """Fonction gérant le processus dépôt"""
+
+        # Attente pour le prochain départ
+        if self._wait != -1:
+            self._wait += self.env.tick
+            if self._wait > self.next.margin / self.next.speed:
+                self._wait = -1
+
+        #p_tb MAJ des temps de révision
+        for pod in self.enRevisions:
+            self.enRevisions[pod] -= 1
+            if self.enRevisions[pod] == 0:
+                self._departure_pods.append(pod)
+                pod.temps_avant_revision = 300
+                pod.distance_avant_revision = 300
+                del self.enRevisions[pod]
+
+        # Départ des capsules #p_tb
+        if self._departure_pods and self._wait == -1:
+            self._wait = 0
+            for pod in self._departure_pods:
+                road = self.parent
+                nw = road.parent
+                destination = nw.hangarsSimples[randint(0, len(nw.hangarsSimples) - 1)]
+                pod.during_departure = True
+                pod.write({
+                    "author": self,
+                    "type": "departure",
+                    "destination": destination
+                })
+                # prévient le parent
+                self.parent.write({
+                    "author": self,
+                    "pod": pod,
+                    "type": "departure",
+                    "destination": destination,
+                    "timestamp": self.env.time,
+                    "waiting_time": 0,
+                    "traveler": False
+                })
+
+    def handle_message(self, message):
+        if "pod_entry" == message["type"]:
+            pod = message["pod"]
+            self._parent.write({
+                "author": self,
+                "type": "pod_entry",
+                "pod": pod
+            })
+            if pod.destination == self.name:
+                self._pods.append(pod)
+                #p_tb debut
+                self.enRevisions[pod] = self.temps_revision
+                #p_tb fin
+                pod.write({
+                    "author": self,
+                    "type": "docked"
+                })
+                self.parent.write({
+                    "author": self,
+                    "type": "docked",
+                    "pod": pod,
+                    "timestamp": self.env.time
+                })
+            else:
+                pod.write({
+                    "author": self,
+                    "type": "passing"
+                })
+        elif "pod_exit" == message["type"]:
+            pod = message["pod"]
+            if pod in self._pods:
+                self._pods.remove(pod)
+                pod.during_departure = False
+            else:
+                # dans ce cas, le pod n'était pas docked dans le shed,
+                # et on accepte qu'il passe à travers.
+                pass
+        elif "refill" == message["type"]:
+            station = message["station"]
+            if len(self._pods) > 0 and len(self._pods) > len(self._departure_pods) + len(
+                    self.pods_during_departure):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
+                i = 0
+                while i < len(self._pods) - 1 and (
+                        self._pods[i] in self._departure_pods or self._pods[i].during_departure):
+                    i += 1
+                pod = self._pods[i]
+                pod.destination = station
+                self._departure_pods.append(pod)
+            else:
+                # on cherche la station concernée,
+                # et on l'informe qu'elle ne recevra pas le pod.
+                network = self.parent.parent
+                found_station = network.get_station_by_name(station)
+                found_station.down_incoming_pods()
+
+        else:
+            raise ValueError("Invalid message")

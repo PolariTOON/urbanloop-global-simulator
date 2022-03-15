@@ -104,7 +104,7 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "shed", "name": "Marie-Jeanne", "x": 145.0172712087756, "y": 330.4152273992687, "pods": {"max": 100, "count": 100}}
+        {"type": "HangarSimple", "name": "Marie-Jeanne", "x": 145.0172712087756, "y": 330.4152273992687, "pods": {"max": 100, "count": 100}}
       ],
       "pods": []
     },
@@ -115,7 +115,7 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "HangarSimple", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 100}}
+        {"type": "HangarRevision", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 100}}
       ],
       "pods": []
     }

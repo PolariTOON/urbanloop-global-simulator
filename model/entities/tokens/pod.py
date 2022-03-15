@@ -57,8 +57,8 @@ class Pod(Token):
         self._traveled_distance_t = traveled_distance_t or 0
         self._previous_station = None
 
-        self.temps_avant_revision = 500 #p
-        self.distance_avant_revision = 500 #p
+        self.temps_avant_revision = 300 #p
+        self.distance_avant_revision = 300 #p
 
     @property
     def position(self):

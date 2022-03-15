@@ -3,7 +3,8 @@ from .step import Step
 
 
 class Hangar(Step):
-    """ Classe modélisant un dépôt, y est géré le départ des capsules, le réapprovisionnement et
+    """ Classe abstraite modélisant un dépôt, dont les classes descendantes remplacent Shed
+    Y est géré le départ des capsules, le réapprovisionnement et
     les interactions avec les autres éléments du réseau"""
 
     def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None, **kwargs):
@@ -55,7 +56,7 @@ class Hangar(Step):
     @property
     def name(self):
         """Nom du dépôt"""
-        return super().name or "Hangar %d" % self.id
+        return super().name or "Shed %d" % self.id
 
     @property
     def pods(self):

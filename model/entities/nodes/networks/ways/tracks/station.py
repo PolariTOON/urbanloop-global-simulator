@@ -247,17 +247,18 @@ class Station(Step):
         #p debut
         #print(f"station:{self}, parent:{self.parent}, grand-parent:{self.parent.parent}")
         for pod in self.doiventAllerEnRevision:
-            print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
-            # Pour trouver où aller, il faut faire une sorte de get
-            # ordre : self : Station, self.parent : Road, self.parent.parent : Network
-            # Network.sheds() = [shed for road in self._roads for shed in road.sheds]
-            # road.sheds = [step for step in self._steps if isinstance(step, Shed)]
-            nw = self.parent.parent
-            if(nw is None):
-                raise ValueError("nw is None")
-            # Choix aléatoire pour l'instant
-            destination = nw.hangarsSimples[randint(0, len(nw.hangarsSimples)-1)]
-            self.send_pod(pod, destination, False) # traveler=False
+            if pod not in self._departure_pods:
+                print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
+                # Pour trouver où aller, il faut faire une sorte de get
+                # ordre : self : Station, self.parent : Road, self.parent.parent : Network
+                # Network.sheds() = [shed for road in self._roads for shed in road.sheds]
+                # road.sheds = [step for step in self._steps if isinstance(step, Shed)]
+                nw = self.parent.parent
+                if(nw is None):
+                    raise ValueError("nw is None")
+                # Choix aléatoire pour l'instant
+                destination = nw.hangarsSimples[randint(0, len(nw.hangarsSimples)-1)]
+                self.send_pod(pod, destination, False) # traveler=False
         #p fin
         
         # Attente de la montée des voyageurs pour l'envoi d'une capsule

@@ -213,14 +213,10 @@ class Station(Step):
         #p debut
         for i in range(self._capacity - 1, -1, -1):
             pod = self._pods[i]
+            # ici, il faudra remplacer tout ça par une interrogation du gestionnaire de flotte
             if pod is not None and pod.doitAllerEnRevision() and pod not in self.doiventAllerEnRevision:
                 self.doiventAllerEnRevision.append(pod)
         #p fin
-        # de Tommy pour Théo :
-        # Maintenant il faudrait faire un cas en plus en dessous
-        # permettant à fois de ne pas prendre en compte
-        # le pod dans l'embarquement et de lui choisir une destination
-        # qui doit être un hangar de révision
 
         # On charge les voyageurs s'il y a de la place
         #p if len(self._travelers) > 0 and self.pods_size > 0:
@@ -249,19 +245,20 @@ class Station(Step):
         for pod in self.doiventAllerEnRevision:
             if pod in self._departure_pods:
                 print("\u001B[31mERROR: ", self.name, pod.name, "doitAllerEnRevision et depart en même temps\u001B[0m")
-            print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
+            #print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
             # Pour trouver où aller, il faut faire une sorte de get
             # ordre : self : Station, self.parent : Road, self.parent.parent : Network
             # Network.sheds() = [shed for road in self._roads for shed in road.sheds]
             # road.sheds = [step for step in self._steps if isinstance(step, Shed)]
             nw = self.parent.parent
             if(nw is None):
-                raise ValueError("nw is None")
+                raise ValueError("station, attribution d'un hangar de révision : le network nw est None")
             # Choix aléatoire pour l'instant
             destination = nw.hangarsRevision[randint(0, len(nw.hangarsRevision)-1)].name
             if pod.travelers != []:
-                raise ValueError("pod.travelers is not None")
+                raise ValueError(f"Le pod {pod} doit aller en révision mais pod.travelers n'est pas None")
             self.send_pod(pod, destination, False) # traveler=False
+            print(f"Le pod {pod} est usé, il lui est ordonné d'aller en révision à {destination}")
         #p fin
         
         # Attente de la montée des voyageurs pour l'envoi d'une capsule

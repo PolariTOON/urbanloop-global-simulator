@@ -38,6 +38,7 @@ class Hangar(Step):
             "name": self.name
         })
         dict.update({
+#            "type": f"{self.__class__.__name__}",
             "type": "shed",
             "pods": {
                 "count": len(self.pods),

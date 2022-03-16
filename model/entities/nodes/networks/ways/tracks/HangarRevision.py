@@ -25,7 +25,7 @@ class HangarRevision(Hangar):
         #p_tb MAJ des temps de révision
         for pod in self.enRevision:
             pod.temps_restant_attente_en_revision -= 1
-            print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_revision}")
+            #print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_revision}")
             if pod.temps_restant_attente_en_revision == 0:
                 print(f"{pod} : revision terminée")
                 self._departure_pods.append(pod)
@@ -44,15 +44,16 @@ class HangarRevision(Hangar):
             if pod not in self.enRevision:
                 destination = nw.hangarsSimples[randint(0, len(nw.hangarsSimples) - 1)].name
                 pod.during_departure = True
-                print(f"En sortie de révision, {self.name} écrit à {pod} departure vers {destination}")
+                #print(f"En sortie de révision, {self.name} écrit à {pod} departure vers {destination}")
                 pod.write({
                     "author": self,
                     "type": "departure",
                     "destination": destination
                 })
+                print(f"En sortie de révision, le pod {pod} est redirigé vers {destination}")
                 # prévient le parent
-                print(f"En sortie de révision, {self.name} écrit à {self.parent.name} departure vers {destination}")
-                print(f"En sortie de révision, {pod} : track_or_switch est {pod.track_or_switch.name}")
+                #print(f"En sortie de révision, {self.name} écrit à {self.parent.name} departure vers {destination}")
+                #print(f"En sortie de révision, {pod} : track_or_switch est {pod.track_or_switch.name}")
                 self.parent.write({
                     "author": self,
                     "pod": pod,
@@ -115,6 +116,7 @@ class HangarRevision(Hangar):
                 pod = self._pods[i]
                 pod.destination = station
                 self._departure_pods.append(pod)
+                print(f"Entrée de {pod} en révision")
             else:
                 # on cherche la station concernée,
                 # et on l'informe qu'elle ne recevra pas le pod.

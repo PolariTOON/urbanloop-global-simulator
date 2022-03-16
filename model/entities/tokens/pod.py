@@ -395,9 +395,9 @@ class Pod(Token):
             # La capsule part d'un dépôt ou d'une gare
             self._source = message["author"].name
             self._destination = message["destination"]
-            print(f"pod {str(self)} : self._track_or_switch est {self._track_or_switch.name}")
+            #print(f"pod {str(self)} : self._track_or_switch est {self._track_or_switch.name}")
             self._track_or_switch = self._track_or_switch.next
-            print(f"self._track_or_switch passe à {self._track_or_switch.name}")
+            #print(f"self._track_or_switch passe à {self._track_or_switch.name}")
             self._endSpeed = self._track_or_switch.speed
             self.activate_updates()
             self._track_or_switch.write({

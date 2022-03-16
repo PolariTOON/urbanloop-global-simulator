@@ -247,7 +247,7 @@ class Road(Way):
                 track = new_track.previous.sections[-1]
             else:
                 track = new_track.previous
-            print(f"{self.name} écrit pod_exit à {track.name}")
+            #print(f"{self.name} écrit pod_exit à {track.name}")
             track.write({
                 "author": self,
                 "type": "pod_exit",

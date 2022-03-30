@@ -1,6 +1,7 @@
 from math import hypot, nan
 import sys
 
+from .GestionnaireRevision import GestionnaireRevision
 from .....tokens.pod import Pod
 from .shed import Shed
 from .station import Station
@@ -156,11 +157,11 @@ class Section(Track):
             if pods[k].position > pod["position"]:
                 if "id" in pod:
                     del pod["id"]
-                self._pods.insert(k, Pod(env, self, speed, **pod))
+                self._pods.insert(k, Pod(env, self, GestionnaireRevision.genererDistanceAleatoire(), GestionnaireRevision.genererTempsAleatoire(), speed, **pod))
                 return
         if "id" in pod:
             del pod["id"]
-        self._pods.append(Pod(env, self, self._speed, **pod))
+        self._pods.append(Pod(env, self, GestionnaireRevision.genererDistanceAleatoire(), GestionnaireRevision.genererTempsAleatoire(), self._speed, **pod))
 
     def closest(self, pod):
         min_dist = sys.maxsize

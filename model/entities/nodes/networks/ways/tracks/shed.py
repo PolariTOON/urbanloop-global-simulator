@@ -1,3 +1,4 @@
+from .GestionnaireRevision import GestionnaireRevision
 from .....tokens.pod import Pod
 from .step import Step
 
@@ -21,11 +22,11 @@ class Shed(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
-        self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
+        self._pods = [Pod(env, self, GestionnaireRevision.genererDistanceAleatoire(), GestionnaireRevision.genererTempsAleatoire(), 0) for k in range(pods["count"])]
         self._departure_pods = departure_pods or []
         for dico in self._departure_pods:  # pour initialiser des pods quand on charge un réseau
             p = dico["pod"]
-            dico["pod"] = Pod(env, self, 0, p)
+            dico["pod"] = Pod(env, self, GestionnaireRevision.genererDistanceAleatoire(), GestionnaireRevision.genererTempsAleatoire(), 0, p)
         self._wait = -1
 
     def serialize(self):

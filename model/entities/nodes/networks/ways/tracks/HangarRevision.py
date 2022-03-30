@@ -42,7 +42,10 @@ class HangarRevision(Hangar):
             #pod = self._departure_pods[0]
             pod = self._departure_pods.pop(0)
             if pod not in self.enRevision:
-                destination = nw.hangarsSimples[randint(0, len(nw.hangarsSimples) - 1)].name
+                destination = nw.gestionnaireRevision.obtenirDestination(
+                    nom_station_source=self.name,
+                    categorie_destination="HangarSimple"
+                )
                 pod.during_departure = True
                 #print(f"En sortie de révision, {self.name} écrit à {pod} departure vers {destination}")
                 pod.write({

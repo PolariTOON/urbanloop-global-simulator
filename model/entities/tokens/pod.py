@@ -14,7 +14,7 @@ class Pod(Token):
     au niveau des aiguillages
     """
 
-    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, during_departure=None, traveled_distance=None, traveled_distance_t=None, **kwargs):
+    def __init__(self, env, track_or_switch, distance, temps, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, during_departure=None, traveled_distance=None, traveled_distance_t=None, **kwargs):
         self._speed = pod_speed
         self._end_speed = self._speed # placé avant super().__init__() car on a besoin de _end_speed et _speed pour `self.updatable()`
         super().__init__(env, **kwargs)
@@ -57,9 +57,11 @@ class Pod(Token):
         self._traveled_distance_t = traveled_distance_t or 0
         self._previous_station = None
 
-        self.temps_avant_revision = 100 #p
-        self.distance_avant_revision = 100 #p
-        self.temps_restant_attente_en_revision = -1 #p
+        #p_tb debut
+        self.temps_depuis_revision = temps or 0
+        self.distance_depuis_revision = distance or 0
+        self.temps_restant_attente_en_revision = -1
+        #p_tb fin
 
     @property
     def position(self):
@@ -228,6 +230,10 @@ class Pod(Token):
             self._env.updatable_entities.remove(self)
 
     def update(self):
+
+        #p_tb debut
+        self.temps_depuis_revision += self.env.tick
+        #p_tb fin
 
         # OPTIMISATION : ne pas regarder à chaque update ?
         self._contain_real_user = False
@@ -567,8 +573,3 @@ class Pod(Token):
                 has_found_traveler = True
         if (has_found_traveler == False):
             print("Error in call_emergency_exit")
-
-    def doitAllerEnRevision(self):
-        if(min(self.temps_avant_revision,self.distance_avant_revision)<=0):
-            return True
-        return False

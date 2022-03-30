@@ -1,3 +1,4 @@
+from .tracks.GestionnaireRevision import GestionnaireRevision
 from ....tokens.pod import Pod
 from .way import Way
 
@@ -21,7 +22,9 @@ class Switch(Way):
         # Ajout des capsules
         for pod in pods:
             speed = pod["speed"]
-            self._pods.append(Pod(env, self, speed, **pod))
+            distance = GestionnaireRevision.genererDistanceAleatoire() # à mettre dans json
+            temps = GestionnaireRevision.genererTempsAleatoire() # à mettre dans json
+            self._pods.append(Pod(env, self, speed, distance, temps, **pod))
 
         # Liaison des routes et sections de la boucle à l'aiguillage
         # Route précédente

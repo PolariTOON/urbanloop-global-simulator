@@ -6,6 +6,7 @@ from math import inf
 from random import choice
 import datetime
 
+from .ways.tracks.GestionnaireRevision import GestionnaireRevision
 from ....lines.bridge import Bridge
 from ....lines.loop import Loop
 from ..node import Node
@@ -52,6 +53,10 @@ class Network(Node):
         self.last_pods = {}
         self._last_minute = int(self.env.time / 60)
         #self.last_sec = 1
+
+        #p_tb debut
+        self.gestionnaireRevision = GestionnaireRevision(network=self)
+        #p_tb fin
 
     
     @property

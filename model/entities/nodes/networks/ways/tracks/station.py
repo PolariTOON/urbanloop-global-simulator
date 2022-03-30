@@ -1,3 +1,4 @@
+from .GestionnaireRevision import GestionnaireRevision
 from .....tokens.pod import Pod
 from .....tokens.traveler import Traveler
 from .step import Step
@@ -50,7 +51,7 @@ class Station(Step):
         self._element_of_loop = element_of_loop
         self._pods = [None for _ in range(self._capacity)]
         for i in range(pods['count']):
-            self._pods[-1-i] = Pod(env, self, 0)
+            self._pods[-1-i] = Pod(env, self, GestionnaireRevision.genererDistanceAleatoire(), GestionnaireRevision.genererTempsAleatoire(), 0)
         self._departure_pods = departure_pods or [] # pods en attente d'insertion dans le réseau
                                                     # TODO: revoir l'initialisation de departure_pods en cas de chargement reseau
         self._incoming_pods = 0  # à serialiser si on veut télécharger/recharger le réseau, c'est le nombre de pods en chemin vers la station
@@ -211,10 +212,14 @@ class Station(Step):
         #                                  self.pods_size))
 
         #p debut
+        gestionnaireRevision = self.parent.parent.gestionnaireRevision
         for i in range(self._capacity - 1, -1, -1):
             pod = self._pods[i]
             # ici, il faudra remplacer tout ça par une interrogation du gestionnaire de flotte
-            if pod is not None and pod.doitAllerEnRevision() and pod not in self.doiventAllerEnRevision:
+            if \
+                    pod is not None and \
+                    gestionnaireRevision.podDoitAllerEnRevision(pod) and \
+                    pod not in self.doiventAllerEnRevision:
                 self.doiventAllerEnRevision.append(pod)
         #p fin
 
@@ -254,11 +259,14 @@ class Station(Step):
             if(nw is None):
                 raise ValueError("station, attribution d'un hangar de révision : le network nw est None")
             # Choix aléatoire pour l'instant
-            destination = nw.hangarsRevision[randint(0, len(nw.hangarsRevision)-1)].name
+            destination = nw.gestionnaireRevision.obtenirDestination(
+                nom_station_source=self.name,
+                categorie_destination="HangarRevision"
+            )
             if pod.travelers != []:
                 raise ValueError(f"Le pod {pod} doit aller en révision mais pod.travelers n'est pas None")
             self.send_pod(pod, destination, False) # traveler=False
-            print(f"Le pod {pod} est usé, il lui est ordonné d'aller en révision à {destination}")
+            print(f"Le pod {pod} est usé - distance = {pod.distance_depuis_revision}, temps = {pod.temps_depuis_revision}\n\tIl lui est ordonné d'aller en révision à {destination}")
         #p fin
         
         # Attente de la montée des voyageurs pour l'envoi d'une capsule

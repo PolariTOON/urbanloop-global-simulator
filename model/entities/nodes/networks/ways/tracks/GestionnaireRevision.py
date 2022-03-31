@@ -43,3 +43,9 @@ class GestionnaireRevision:
                 pod.temp_depuis_revision >= self.limite_temps_ecoule_avant_revision:
             return True
         return False
+
+    def serialize(self):
+        return {
+            "limite_distance_parcourue_avant_revision": self.limite_distance_parcourue_avant_revision,
+            "limite_temps_ecoule_avant_revision": self.limite_temps_ecoule_avant_revision
+        }

@@ -175,7 +175,10 @@ class Network(Node):
             "pod_size": self.pod_size,
             "places_number": self.places_number,
             "dynamic_routing": self.dynamic_routing,
-            "stats": self._statistiques.serialize()
+            "stats": self._statistiques.serialize(),
+            #p_tb debut
+            "gestionnaireRevision": self.gestionnaireRevision.serialize()
+            #p_tb fin
         })
         return dict
 

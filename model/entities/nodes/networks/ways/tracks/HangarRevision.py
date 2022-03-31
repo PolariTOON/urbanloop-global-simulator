@@ -12,6 +12,16 @@ class HangarRevision(Hangar):
         self.temps_revision = 20
         self.enRevision = []
 
+    def serialize(self):
+        """sérialise les informations du dépôt"""
+        dico = super().serialize()
+        enRevision = [{"pod": pod.serialize()} for pod in self.enRevision]
+        dico.update({
+            "type": f"{self.__class__.__name__}",
+            "temps_revision": self.temps_revision,
+            "enRevision": enRevision
+        })
+        return dico
 
     def update(self):
         """Fonction gérant le processus dépôt"""

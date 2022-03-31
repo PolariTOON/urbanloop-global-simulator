@@ -5,6 +5,10 @@ import {Sensor} from "./sensor.js";
 import {Shed} from "./shed.js";
 import {Station} from "./station.js";
 import {Switch} from "./switch.js";
+//p_tb debut
+import {HangarSimple} from "./HangarSimple.js";
+import {HangarRevision} from "./HangarRevision.js";
+//p_tb fin
 const {Group} = Konva;
 
 export class Line extends Group {
@@ -37,8 +41,19 @@ export class Line extends Group {
                     element = new Switch(hintsLayer);
                     break;
                 }
+                //p_tb debut
+                case "HangarSimple":{
+                	element = new HangarSimple(hintsLayer);
+                	break;
+                }
+                case "HangarRevision":{
+                	element = new HangarRevision(hintsLayer);
+                	break;
+                }
+                //p_tb fin
             }
             elements.push(element);
+            //console.log(element);//p_tb
             elementsLayer.add(element);
             state.nodes.push(element);
         }

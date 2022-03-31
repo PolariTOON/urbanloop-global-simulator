@@ -112,6 +112,7 @@ state.addEventListener("load", async (event) => {
     if (veryFast) layer.clearCache()
     else if (useCache) clearCache();
     const networkJSON = event.detail;
+    //console.log(event.detail);//p_tb
     const name = networkJSON["name"];
     heading.textContent = name;
     const jerky = networkJSON["jerky"];

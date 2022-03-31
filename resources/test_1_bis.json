@@ -1,5 +1,5 @@
 {
-  "name": "Test 1",
+  "name": "PIDR 2022 : test_1_bis",
   "time": 28800,
   "jerky": true,
   "state": 56565,
@@ -115,9 +115,13 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "HangarRevision", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 100}}
+        {"type": "HangarRevision", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 100}, "temps_revision": 20, "enRevision": []}
       ],
       "pods": []
     }
-  ]
+  ],
+  "gestionnaireRevision": {
+    "limite_distance_parcourue_avant_revision": 300,
+    "limite_temps_ecoule_avant_revision": 300
+  }
 }

@@ -210,7 +210,11 @@ class Pod(Token):
             "brake": self._brake,
             "during_departure": self._during_departure,
             "traveled_distance": self._traveled_distance,
-            "traveled_distance_t": self._traveled_distance_t
+            "traveled_distance_t": self._traveled_distance_t,
+            #p_tb debut
+            "distance_depuis_revision": self.distance_depuis_revision,
+            "temp_depuis_revision": self.temps_depuis_revision
+            #p_tb fin
         })
         return dict
 

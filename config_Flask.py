@@ -44,6 +44,10 @@ def _synchronize(key=None):
             if key is not None:
                 kwargs[key] = request.get_json()
             from app import _loop, _simulations
+            #p_tb C'est durant cet appel que se produit l'erreur lors du rechargement d'un json
+            #p_tb L'erreur est dans network.py, à _get_elt_of_loop()
+            #p_tb print(f"args = {args}\n")
+            #p_tb print(f"kwargs = {kwargs}\n")
             future = run_coroutine_threadsafe(coroutine(_simulations, *args, **kwargs), _loop)
             exception = future.exception()
             if exception is not None:

@@ -334,6 +334,10 @@ class Network(Node):
         if "pods" not in line:
             line["pods"] = []
         for pod in line["pods"]:
+            #p_tb C'est à cet endroit que se produit l'erreur lors du rechargement d'un json
+            #p_tb L'excepetion est traitée dans config_Flask.py
+            #p_tb print(f"pods = {pod}")
+            #p_tb print(f"pods['source'] = {pod['source']}")
             pod["source"] = self._get_elt_of_loop(**pod["source"])
             pod["destination"] = self._get_elt_of_loop(**pod["destination"])
             _init_pod_of_line(line, pod)

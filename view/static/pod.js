@@ -12,7 +12,7 @@ const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
 const fullInnerColor = "#333";
 
-const outerColorWhenGoingToRevision = "#00f"; //p_tb
+const outerColorWhenGoingToRevision = "#d2b"; //p_tb
 
 function calcLength(startElement, endElement, path) {
     let d = 0;

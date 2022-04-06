@@ -214,7 +214,7 @@ class Pod(Token):
             "traveled_distance_t": self._traveled_distance_t,
             #p_tb debut
             "distance_depuis_revision": self.distance_depuis_revision,
-            "temp_depuis_revision": self.temps_depuis_revision,
+            "temps_depuis_revision": self.temps_depuis_revision,
             "en_direction_revision": self.en_direction_revision
             #p_tb fin
         })

@@ -2,7 +2,10 @@ import {Entity} from "./entity.js";
 const {RegularPolygon} = Konva;
 
 const shadowColor = "#333"
-const outerColor = "#ff0";
+
+const outerColor = "#d2b";
+//p_tb https://rangevoting.org/ColorCode.html#
+
 const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
 

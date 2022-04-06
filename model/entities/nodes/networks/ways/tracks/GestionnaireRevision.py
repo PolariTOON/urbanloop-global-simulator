@@ -5,8 +5,8 @@ from random import randint
 
 
 class GestionnaireRevision:
-    LIMITE_DISTANCE_PARCOURUE_AVANT_REVISION_DEFAUT = 300
-    LIMITE_TEMPS_ECOULE_AVANT_REVISION_DEFAUT = 300
+    LIMITE_DISTANCE_PARCOURUE_AVANT_REVISION_DEFAUT = 2000
+    LIMITE_TEMPS_ECOULE_AVANT_REVISION_DEFAUT = 2000
 
     @classmethod
     def genererDistanceAleatoire(cls):
@@ -40,7 +40,7 @@ class GestionnaireRevision:
     def podDoitAllerEnRevision(self, pod):
         if \
                 pod.distance_depuis_revision >= self.limite_distance_parcourue_avant_revision or \
-                pod.temp_depuis_revision >= self.limite_temps_ecoule_avant_revision:
+                pod.temps_depuis_revision >= self.limite_temps_ecoule_avant_revision:
             return True
         return False
 

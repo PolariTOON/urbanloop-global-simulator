@@ -201,6 +201,11 @@ class Station(Step):
     @property
     def updatable(self):
         return True
+
+    @property
+    def gestionnaireRevision(self):
+        nw = self.parent.parent
+        return nw.gestionnaireRevision
     
     def update(self):
         """Fonction gérant le processus gare"""
@@ -212,13 +217,12 @@ class Station(Step):
         #                                  self.pods_size))
 
         #p debut
-        gestionnaireRevision = self.parent.parent.gestionnaireRevision
         for i in range(self._capacity - 1, -1, -1):
             pod = self._pods[i]
             # ici, il faudra remplacer tout ça par une interrogation du gestionnaire de flotte
             if \
                     pod is not None and \
-                    gestionnaireRevision.podDoitAllerEnRevision(pod) and \
+                    self.gestionnaireRevision.podDoitAllerEnRevision(pod) and \
                     pod not in self.doiventAllerEnRevision:
                 pod.en_direction_revision = True
                 self.doiventAllerEnRevision.append(pod)
@@ -249,31 +253,29 @@ class Station(Step):
         #p debut
         #print(f"station:{self}, parent:{self.parent}, grand-parent:{self.parent.parent}")
         for pod in self.doiventAllerEnRevision:
-            if pod in self._departure_pods:
-                print("\u001B[31mERROR: ", self.name, pod.name, "doitAllerEnRevision et depart en même temps\u001B[0m")
+            #if pod in self._departure_pods:
+                #print("\u001B[31mERROR: ", self.name, pod.name, "doitAllerEnRevision et depart en même temps\u001B[0m")
             #print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
             # Pour trouver où aller, il faut faire une sorte de get
             # ordre : self : Station, self.parent : Road, self.parent.parent : Network
             # Network.sheds() = [shed for road in self._roads for shed in road.sheds]
             # road.sheds = [step for step in self._steps if isinstance(step, Shed)]
-            nw = self.parent.parent
-            if(nw is None):
-                raise ValueError("station, attribution d'un hangar de révision : le network nw est None")
             # Choix aléatoire pour l'instant
-            destination = nw.gestionnaireRevision.obtenirDestination(
-                nom_station_source=self.name,
-                categorie_destination="HangarRevision"
-            )
-            if pod.travelers != []:
-                raise ValueError(f"Le pod {pod} doit aller en révision mais pod.travelers n'est pas None")
-            self.send_pod(pod, destination, False) # traveler=False
-            print(f"Le pod {pod} est usé - distance = {pod.distance_depuis_revision}, temps = {pod.temps_depuis_revision}\n\tIl lui est ordonné d'aller en révision à {destination}")
+            if pod not in self._departure_pods:
+                destination = self.gestionnaireRevision.obtenirDestination(
+                    nom_station_source=self.name,
+                    categorie_destination="HangarRevision"
+                )
+                if pod.travelers != []:
+                    raise ValueError(f"Le pod {pod} doit aller en révision mais pod.travelers n'est pas None")
+                self.send_pod(pod, destination, False) # traveler=False
+                print(f"Le pod {pod} est usé - distance = {pod.distance_depuis_revision}, temps = {pod.temps_depuis_revision}\n\tIl lui est ordonné d'aller en révision à {destination}")
         #p fin
         
         # Attente de la montée des voyageurs pour l'envoi d'une capsule
         for i in range(len(self._boarding)):  # pour chaque capsule
             #p if self._boarding[i] != -1:       # si un voyageur embarque
-            if self._boarding[i] != -1 and not self._pods[i].doitAllerEnRevision():
+            if self._boarding[i] != -1 and not self.gestionnaireRevision.podDoitAllerEnRevision(self._pods[i]):
                 self._boarding[i] += self.env.tick
                 if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                     destination = self._pods[i].travelers[0].destination

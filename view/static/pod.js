@@ -12,6 +12,8 @@ const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
 const fullInnerColor = "#333";
 
+const outerColorWhenGoingToRevision = "#00f"; //p_tb
+
 function calcLength(startElement, endElement, path) {
     let d = 0;
     switch (path["type"]) {
@@ -244,6 +246,8 @@ export class Pod extends Entity {
         }
         this._failing = failing;
 
+        this.__en_direction_revision = json["en_direction_revision"]//p_tb
+
         if (this._contain_real_user)
         {   
             if (this._changed_destination)
@@ -271,7 +275,14 @@ export class Pod extends Entity {
         }
         else
         {
-            this.__outerShape.fill(outerColor); 
+            //p_tb this.__outerShape.fill(outerColor);
+            if(this.__en_direction_revision){
+            	this.__outerShape.fill(outerColorWhenGoingToRevision);
+            }
+            else
+            {
+            	this.__outerShape.fill(outerColor);
+            }
         }
     }
 }

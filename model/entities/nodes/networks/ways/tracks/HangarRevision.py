@@ -1,5 +1,6 @@
 from random import randint
 
+from .GestionnaireRevision import GestionnaireRevision
 from .Hangar import Hangar
 
 
@@ -39,8 +40,8 @@ class HangarRevision(Hangar):
             if pod.temps_restant_attente_en_revision == 0:
                 print(f"{pod} : revision terminée")
                 self._departure_pods.append(pod)
-                pod.temps_avant_revision = 300
-                pod.distance_avant_revision = 300
+                pod.temps_avant_revision = 0
+                pod.distance_avant_revision = 0
                 pod.temps_restant_attente_en_revision = -1
                 self.enRevision.remove(pod)
 
@@ -90,6 +91,7 @@ class HangarRevision(Hangar):
                 print(f"Le pod {pod} entre en hangar de révision")
                 print(f"Son track_or_switch est {pod.track_or_switch.name}")
                 #p_tb debut
+                pod.en_direction_revision = False
                 self.enRevision.append(pod)
                 pod.temps_restant_attente_en_revision = self.temps_revision
                 #p_tb fin

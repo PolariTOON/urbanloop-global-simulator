@@ -61,6 +61,7 @@ class Pod(Token):
         self.temps_depuis_revision = temps or 0
         self.distance_depuis_revision = distance or 0
         self.temps_restant_attente_en_revision = -1
+        self.en_direction_revision = False
         #p_tb fin
 
     @property
@@ -213,7 +214,8 @@ class Pod(Token):
             "traveled_distance_t": self._traveled_distance_t,
             #p_tb debut
             "distance_depuis_revision": self.distance_depuis_revision,
-            "temp_depuis_revision": self.temps_depuis_revision
+            "temp_depuis_revision": self.temps_depuis_revision,
+            "en_direction_revision": self.en_direction_revision
             #p_tb fin
         })
         return dict

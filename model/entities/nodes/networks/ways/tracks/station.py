@@ -220,6 +220,7 @@ class Station(Step):
                     pod is not None and \
                     gestionnaireRevision.podDoitAllerEnRevision(pod) and \
                     pod not in self.doiventAllerEnRevision:
+                pod.en_direction_revision = True
                 self.doiventAllerEnRevision.append(pod)
         #p fin
 

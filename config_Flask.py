@@ -357,3 +357,22 @@ def call_emergency_exit(user_id):
         pod_of_user.call_emergency_exit(user_id)
         return jsonify({ 'msg': 'Appel d\'urgence demande' })
 
+
+#p_tb
+@_app.route('/envoi_lavage/<string:user_id>', methods=['POST'])
+def demander_envoi_au_lavage(user_id):
+    """ Fonction permettant de demander l'envoi d'une capsule au lavage après le voyage, par l'utilisateur qui est dedans """
+
+    global _simulation_for_api
+    if _simulation_for_api == None:
+        return jsonify({ 'msg': 'Aucune simulation n\'a été chargée' })
+
+    network = _simulation_for_api.get_network()
+    pod_of_user = network.get_pod_of_user(user_id)
+
+    if (pod_of_user == None):
+        return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
+    else :
+        pod_of_user.demander_envoi_lavage(user_id)
+        return jsonify({ 'msg': 'Demande d\'envoi au lavage faite' })
+

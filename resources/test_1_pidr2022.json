@@ -130,7 +130,7 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "HangarRevision", "name": "Critobule", "x": 270, "y": 325, "pods": {"max": 100, "count": 20}, "temps_revision": 20, "enRevision": []}
+        {"type": "HangarLavage", "name": "Critobule", "x": 270, "y": 325, "pods": {"max": 100, "count": 20}, "temps_lavage": 20, "enLavage": []}
       ],
       "pods": []
     }
@@ -138,5 +138,6 @@
   "gestionnaireRevision": {
     "limite_distance_parcourue_avant_revision": 2000,
     "limite_temps_ecoule_avant_revision": 2000
-  }
+  },
+  "gestionnaireLavage": {}
 }

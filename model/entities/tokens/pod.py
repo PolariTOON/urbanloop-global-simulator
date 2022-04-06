@@ -57,12 +57,16 @@ class Pod(Token):
         self._traveled_distance_t = traveled_distance_t or 0
         self._previous_station = None
 
-        #p_tb debut
+        #p_tbtc debut
         self.temps_depuis_revision = temps or 0
         self.distance_depuis_revision = distance or 0
         self.temps_restant_attente_en_revision = -1
         self.en_direction_revision = False
-        #p_tb fin
+
+        self.doit_aller_au_lavage = False
+        self.temps_restant_attente_au_lavage = -1
+        self.en_direction_lavage = False
+        #p_tbtc fin
 
     @property
     def position(self):
@@ -212,11 +216,14 @@ class Pod(Token):
             "during_departure": self._during_departure,
             "traveled_distance": self._traveled_distance,
             "traveled_distance_t": self._traveled_distance_t,
-            #p_tb debut
+            #p_tbtc debut
             "distance_depuis_revision": self.distance_depuis_revision,
             "temps_depuis_revision": self.temps_depuis_revision,
-            "en_direction_revision": self.en_direction_revision
-            #p_tb fin
+            "en_direction_revision": self.en_direction_revision,
+            "doit_aller_au_lavage": self.doit_aller_au_lavage,
+            "temps_restant_attente_au_lavage": self.temps_restant_attente_au_lavage,
+            "en_direction_lavage": self.en_direction_lavage
+            #p_tbtc fin
         })
         return dict
 
@@ -237,9 +244,9 @@ class Pod(Token):
 
     def update(self):
 
-        #p_tb debut
+        #p_tbtc debut
         self.temps_depuis_revision += self.env.tick
-        #p_tb fin
+        #p_tbtc fin
 
         # OPTIMISATION : ne pas regarder à chaque update ?
         self._contain_real_user = False
@@ -579,3 +586,6 @@ class Pod(Token):
                 has_found_traveler = True
         if (has_found_traveler == False):
             print("Error in call_emergency_exit")
+
+    def demander_envoi_lavage(self, user_id):
+        self.doit_aller_au_lavage = True

@@ -8,6 +8,7 @@ import {Switch} from "./switch.js";
 //p_tb debut
 import {HangarSimple} from "./HangarSimple.js";
 import {HangarRevision} from "./HangarRevision.js";
+import {HangarLavage} from "./HangarLavage.js";
 //p_tb fin
 const {Group} = Konva;
 
@@ -48,6 +49,10 @@ export class Line extends Group {
                 }
                 case "HangarRevision":{
                 	element = new HangarRevision(hintsLayer);
+                	break;
+                }
+                case "HangarLavage":{
+                	element = new HangarLavage(hintsLayer);
                 	break;
                 }
                 //p_tb fin

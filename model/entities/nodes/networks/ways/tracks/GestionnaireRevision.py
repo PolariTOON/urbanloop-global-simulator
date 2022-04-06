@@ -34,7 +34,7 @@ class GestionnaireRevision:
         elif categorie_destination == "HangarSimple":
             destination = self.network.hangarsSimples[randint(0, len(self.network.hangarsSimples) - 1)].name
         else:
-            raise ValueError(f"Catégorie {categorie_destination} non traitée dans obtenirDestinationHangarRevision")
+            raise ValueError(f"Catégorie {categorie_destination} non traitée dans obtenirDestination de GestionnaireRevision")
         return destination
 
     def podDoitAllerEnRevision(self, pod):

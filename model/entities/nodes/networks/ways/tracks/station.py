@@ -60,6 +60,7 @@ class Station(Step):
 
         #p
         self.doiventAllerEnRevision = []
+        self.doiventAllerAuLavage = []
 
     def serialize(self):
         """Permet la serialisation des informations"""
@@ -87,6 +88,13 @@ class Station(Step):
             "station_type": self.station_type,
             # "departure_pods": departure_pods,
             "element_of_loop": self.element_of_loop
+
+            #p_tbtc
+            # La gestion de certains attributs n'est même pas encore implémentée sur master
+            # Si elle était opérationnelle, il faudrait aussi s'occuper des attributs suivants, et ne pas les initialiser à []
+            # dans le __init__
+            #"doiventAllerEnRevision": [],
+            #"doiventAllerAuLavage": []
         })
         return dict
 
@@ -202,10 +210,23 @@ class Station(Step):
     def updatable(self):
         return True
 
+#p_tbtc debut
     @property
     def gestionnaireRevision(self):
         nw = self.parent.parent
         return nw.gestionnaireRevision
+
+    @property
+    def gestionnaireLavage(self):
+        nw = self.parent.parent
+        return nw.gestionnaireLavage
+
+    def attendDepartVers_RevisionOuLavage(self, pod):
+        return pod in self.doiventAllerEnRevision or pod in self.doiventAllerAuLavage
+
+    def doitAllerEn_RevisionOuLavage(self, pod):
+        return self.gestionnaireRevision.podDoitAllerEnRevision(pod) or self.gestionnaireLavage.podDoitAllerAuLavage(pod)
+#p_tbtc fin
     
     def update(self):
         """Fonction gérant le processus gare"""
@@ -219,23 +240,28 @@ class Station(Step):
         #p debut
         for i in range(self._capacity - 1, -1, -1):
             pod = self._pods[i]
-            # ici, il faudra remplacer tout ça par une interrogation du gestionnaire de flotte
             if \
                     pod is not None and \
                     self.gestionnaireRevision.podDoitAllerEnRevision(pod) and \
                     pod not in self.doiventAllerEnRevision:
                 pod.en_direction_revision = True
                 self.doiventAllerEnRevision.append(pod)
+            elif \
+                    pod is not None and \
+                    self.gestionnaireLavage.podDoitAllerAuLavage(pod) and \
+                    pod not in self.doiventAllerAuLavage:
+                pod.en_direction_lavage = True
+                self.doiventAllerAuLavage.append(pod)
         #p fin
 
         # On charge les voyageurs s'il y a de la place
         #p if len(self._travelers) > 0 and self.pods_size > 0:
-        if len(self._travelers) > 0 and self.pods_size-len(self.doiventAllerEnRevision) > 0:
+        if len(self._travelers) > 0 and self.pods_size-len(self.doiventAllerEnRevision)-len(self.doiventAllerAuLavage) > 0:
             for i in range(self._capacity-1, -1, -1):  # on commence par les premières capsules à partir
                 pod = self._pods[i]
                 #p if len(self._travelers) > 0 and pod != None and pod.is_empty() and pod not in self._departure_pods and not pod.during_departure:
                 #p
-                if len(self._travelers) > 0 and pod != None and pod.is_empty() and pod not in self._departure_pods and not pod.during_departure and not pod in self.doiventAllerEnRevision:
+                if len(self._travelers) > 0 and pod != None and pod.is_empty() and pod not in self._departure_pods and not pod.during_departure and not self.attendDepartVers_RevisionOuLavage(pod):
                     # s'il y a un traveler en attente, un pod avec de la place
                     # IDEA : on pourrait autoriser un passager à utiliser une capsule vide qui allait partir (mais attention à ce que ça ne génère pas de bug)
                     going_traveler = self._travelers.pop(0)
@@ -270,12 +296,31 @@ class Station(Step):
                     raise ValueError(f"Le pod {pod} doit aller en révision mais pod.travelers n'est pas None")
                 self.send_pod(pod, destination, False) # traveler=False
                 print(f"Le pod {pod} est usé - distance = {pod.distance_depuis_revision}, temps = {pod.temps_depuis_revision}\n\tIl lui est ordonné d'aller en révision à {destination}")
+        for pod in self.doiventAllerAuLavage:
+            # if pod in self._departure_pods:
+            # print("\u001B[31mERROR: ", self.name, pod.name, "doitAllerEnRevision et depart en même temps\u001B[0m")
+            # print(f"Une destination doit être trouvée pour ce pod {pod}, ce doit être une station d'entretien")
+            # Pour trouver où aller, il faut faire une sorte de get
+            # ordre : self : Station, self.parent : Road, self.parent.parent : Network
+            # Network.sheds() = [shed for road in self._roads for shed in road.sheds]
+            # road.sheds = [step for step in self._steps if isinstance(step, Shed)]
+            # Choix aléatoire pour l'instant
+            if pod not in self._departure_pods:
+                destination = self.gestionnaireLavage.obtenirDestination(
+                    nom_station_source=self.name,
+                    categorie_destination="HangarLavage"
+                )
+                if pod.travelers != []:
+                    raise ValueError(f"Le pod {pod} doit aller au lavage mais pod.travelers n'est pas None")
+                self.send_pod(pod, destination, False)  # traveler=False
+                print(
+                    f"Il est constaté que le pod {pod} est signalé comme sale\n\tIl lui est ordonné d'aller au lavage à {destination}")
         #p fin
         
         # Attente de la montée des voyageurs pour l'envoi d'une capsule
         for i in range(len(self._boarding)):  # pour chaque capsule
             #p if self._boarding[i] != -1:       # si un voyageur embarque
-            if self._boarding[i] != -1 and not self.gestionnaireRevision.podDoitAllerEnRevision(self._pods[i]):
+            if self._boarding[i] != -1 and not self.doitAllerEn_RevisionOuLavage(self._pods[i]):
                 self._boarding[i] += self.env.tick
                 if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                     destination = self._pods[i].travelers[0].destination
@@ -300,6 +345,8 @@ class Station(Step):
                 self._departure_pods.remove(pod)
                 if pod in self.doiventAllerEnRevision:
                     self.doiventAllerEnRevision.remove(pod)
+                if pod in self.doiventAllerAuLavage:
+                    self.doiventAllerAuLavage.remove(pod)
                 destination = pod.destination
                 traveler = None
                 waiting_time = 0

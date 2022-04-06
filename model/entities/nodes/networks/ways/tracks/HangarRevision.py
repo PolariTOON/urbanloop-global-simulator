@@ -5,10 +5,10 @@ from .Hangar import Hangar
 
 
 class HangarRevision(Hangar):
-    """ Classe modélisant un hangar=dépôt de révision"""
+    """ Classe modélisant un hangar de révision=dépôt de révision"""
     def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None, **kwargs):
         super().__init__(env, id, departure_pods, pods, element_of_loop, **kwargs)
-        #p_tb il faudra rendre les nouveaux attributs inscriptibles dans les json produits
+        #p_tbtc
         print("Hangar révision créé")
         self.temps_revision = 20
         self.enRevision = []
@@ -33,7 +33,7 @@ class HangarRevision(Hangar):
             if self._wait > self.next.margin / self.next.speed:
                 self._wait = -1
 
-        #p_tb MAJ des temps de révision
+        #p_tbtc MAJ des temps de révision
         for pod in self.enRevision:
             pod.temps_restant_attente_en_revision -= 1
             #print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_revision}")
@@ -45,7 +45,7 @@ class HangarRevision(Hangar):
                 pod.temps_restant_attente_en_revision = -1
                 self.enRevision.remove(pod)
 
-        # Départ des capsules #p_tb
+        # Départ des capsules #p_tbtc
         if self._departure_pods and self._wait == -1:
             self._wait = 0
             road = self.parent
@@ -90,11 +90,11 @@ class HangarRevision(Hangar):
                 self._pods.append(pod)
                 print(f"Le pod {pod} entre en hangar de révision")
                 print(f"Son track_or_switch est {pod.track_or_switch.name}")
-                #p_tb debut
+                #p_tbtc debut
                 pod.en_direction_revision = False
                 self.enRevision.append(pod)
                 pod.temps_restant_attente_en_revision = self.temps_revision
-                #p_tb fin
+                #p_tbtc fin
                 pod.write({
                     "author": self,
                     "type": "docked"

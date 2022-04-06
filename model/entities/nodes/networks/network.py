@@ -6,6 +6,7 @@ from math import inf
 from random import choice
 import datetime
 
+from .ways.tracks.GestionnaireLavage import GestionnaireLavage
 from .ways.tracks.GestionnaireRevision import GestionnaireRevision
 from ....lines.bridge import Bridge
 from ....lines.loop import Loop
@@ -54,9 +55,10 @@ class Network(Node):
         self._last_minute = int(self.env.time / 60)
         #self.last_sec = 1
 
-        #p_tb debut
+        #p_tbtc debut
         self.gestionnaireRevision = GestionnaireRevision(network=self)
-        #p_tb fin
+        self.gestionnaireLavage = GestionnaireLavage(network=self)
+        #p_tbtc fin
 
     
     @property
@@ -176,9 +178,9 @@ class Network(Node):
             "places_number": self.places_number,
             "dynamic_routing": self.dynamic_routing,
             "stats": self._statistiques.serialize(),
-            #p_tb debut
+            #p_tbtc debut
             "gestionnaireRevision": self.gestionnaireRevision.serialize()
-            #p_tb fin
+            #p_tbtc fin
         })
         return dict
 
@@ -334,10 +336,10 @@ class Network(Node):
         if "pods" not in line:
             line["pods"] = []
         for pod in line["pods"]:
-            #p_tb C'est à cet endroit que se produit l'erreur lors du rechargement d'un json
-            #p_tb L'excepetion est traitée dans config_Flask.py
-            #p_tb print(f"pods = {pod}")
-            #p_tb print(f"pods['source'] = {pod['source']}")
+            #p_tbtc C'est à cet endroit que se produit l'erreur lors du rechargement d'un json
+            #p_tbtc L'excepetion est traitée dans config_Flask.py
+            #p_tbtc print(f"pods = {pod}")
+            #p_tbtc print(f"pods['source'] = {pod['source']}")
             pod["source"] = self._get_elt_of_loop(**pod["source"])
             pod["destination"] = self._get_elt_of_loop(**pod["destination"])
             _init_pod_of_line(line, pod)
@@ -511,7 +513,7 @@ class Network(Node):
             # On demande à un dépôt d'envoyer une capsule à la station qui le demande
             # TODO:  ne pas choisir aléatoirement
             sheds = self.sheds
-            hangarsSimples = self.hangarsSimples #p_tb
+            hangarsSimples = self.hangarsSimples #p_tbtc
             if sheds:
                 station = message["station"]
                 shed = choice(sheds)
@@ -520,7 +522,7 @@ class Network(Node):
                     "type": "refill",
                     "station": station
                 })
-            elif hangarsSimples: #p_tb
+            elif hangarsSimples: #p_tbtc
                 station = message["station"]
                 hangarSimple = choice(hangarsSimples)
                 hangarSimple.write({
@@ -535,7 +537,7 @@ class Network(Node):
             #       + mettre un warning s'il n'y a plus de place dans les sheds
             #
             sheds = self.sheds
-            hangarsSimples = self.hangarsSimples #p_tb
+            hangarsSimples = self.hangarsSimples #p_tbtc
             if sheds:
                 station = message["station"]
                 shed = choice(sheds)
@@ -544,7 +546,7 @@ class Network(Node):
                     "type": "empty",
                     "shed": shed
                 })
-            elif hangarsSimples:  # p_tb
+            elif hangarsSimples:  # p_tbtc
                 station = message["station"]
                 hangarSimple = choice(hangarsSimples)
                 hangarSimple.write({

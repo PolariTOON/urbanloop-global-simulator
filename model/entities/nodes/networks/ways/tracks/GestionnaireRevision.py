@@ -10,11 +10,11 @@ class GestionnaireRevision:
 
     @classmethod
     def genererDistanceAleatoire(cls):
-        return randint(0, 2*cls.LIMITE_DISTANCE_PARCOURUE_AVANT_REVISION_DEFAUT)
+        return randint(0, cls.LIMITE_DISTANCE_PARCOURUE_AVANT_REVISION_DEFAUT//10)
 
     @classmethod
     def genererTempsAleatoire(cls):
-        return randint(0, 2*cls.LIMITE_TEMPS_ECOULE_AVANT_REVISION_DEFAUT)
+        return randint(0, cls.LIMITE_TEMPS_ECOULE_AVANT_REVISION_DEFAUT//10)
 
     def __init__(
             self,

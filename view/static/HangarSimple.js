@@ -2,7 +2,7 @@ import {Entity} from "./entity.js";
 const {RegularPolygon} = Konva;
 
 const shadowColor = "#333"
-const outerColor = "#f03";
+const outerColor = "#000";
 const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
 

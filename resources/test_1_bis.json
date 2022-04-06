@@ -82,7 +82,7 @@
         {"speed": 16.67, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "station", "name": "Velodrome", "x": 394.9029033784546, "y": 500.98058067569093, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 20, "average_waiting_time": 0, "all_time_count": 0}}
+        {"type": "station", "name": "Velodrome", "x": 394.9029033784546, "y": 500.98058067569093, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 5, "average_waiting_time": 0, "all_time_count": 0}}
       ],
       "pods": []
     },
@@ -93,7 +93,7 @@
         {"speed": 16.67, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "station", "name": "Gare", "x": 318.49560391453946, "y": 504.7683112752893, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 20, "average_waiting_time": 0, "all_time_count": 0}}
+        {"type": "station", "name": "Gare", "x": 318.49560391453946, "y": 504.7683112752893, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 5, "average_waiting_time": 0, "all_time_count": 0}}
       ],
       "pods": []
     },
@@ -104,7 +104,7 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "HangarSimple", "name": "Marie-Jeanne", "x": 145.0172712087756, "y": 330.4152273992687, "pods": {"max": 100, "count": 100}}
+        {"type": "HangarSimple", "name": "Marie-Jeanne", "x": 145.0172712087756, "y": 330.4152273992687, "pods": {"max": 100, "count": 20}}
       ],
       "pods": []
     },
@@ -115,13 +115,13 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "HangarRevision", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 100}, "temps_revision": 20, "enRevision": []}
+        {"type": "HangarRevision", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 20}, "temps_revision": 20, "enRevision": []}
       ],
       "pods": []
     }
   ],
   "gestionnaireRevision": {
-    "limite_distance_parcourue_avant_revision": 300,
-    "limite_temps_ecoule_avant_revision": 300
+    "limite_distance_parcourue_avant_revision": 2000,
+    "limite_temps_ecoule_avant_revision": 2000
   }
 }

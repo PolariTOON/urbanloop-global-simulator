@@ -15,7 +15,9 @@ station_types = {
 class Station(Step):
     """ Classe modélisant une gare, y sont gérés le départ des capsules, le réapprovisionnement, la génération des voyageurs et leur montée
     dans les capsules, les échanges de messages avec les autres éléments du réseau"""
-    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, boarding=None, departure_count=None, station_type=None, element_of_loop=None, parallel=None, **kwargs):
+    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, boarding=None, departure_count=None,
+                 station_type=None, element_of_loop=None, parallel=None,
+                 doiventAllerEnRevision=None, doiventAllerAuLavage=None, **kwargs):
         super().__init__(env, id, **kwargs)
         pods = pods or {
             "count": 0,
@@ -58,9 +60,9 @@ class Station(Step):
         self._waiting_empty = False # permet d'évacuer les pods superflus
         self.wait = -1 # pour décompter le départ entre 2 capsules
 
-        #p
-        self.doiventAllerEnRevision = []
-        self.doiventAllerAuLavage = []
+        #p_tbtc # TODO: revoir ces initialisations en cas de chargement reseau
+        self.doiventAllerEnRevision = doiventAllerEnRevision or []
+        self.doiventAllerAuLavage = doiventAllerAuLavage or []
 
     def serialize(self):
         """Permet la serialisation des informations"""
@@ -75,6 +77,8 @@ class Station(Step):
                 "count": self.pods_size,
                 "max": self.capacity,
                 "pos": [True if pod else False for pod in self._pods],
+                "doiventAllerEnRevision": [True if pod in self.doiventAllerEnRevision else False for pod in self._pods],
+                "doiventAllerAuLavage": [True if pod in self.doiventAllerAuLavage else False for pod in self._pods],
                 "boarding": self._boarding,
                 "full": [not pod.is_empty() if pod else False for pod in self._pods]
             },

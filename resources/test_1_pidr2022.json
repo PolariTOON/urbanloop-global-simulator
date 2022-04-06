@@ -136,8 +136,8 @@
     }
   ],
   "gestionnaireRevision": {
-    "limite_distance_parcourue_avant_revision": 2000,
-    "limite_temps_ecoule_avant_revision": 2000
+    "limite_distance_parcourue_avant_revision": 1000,
+    "limite_temps_ecoule_avant_revision": 1000
   },
   "gestionnaireLavage": {}
 }

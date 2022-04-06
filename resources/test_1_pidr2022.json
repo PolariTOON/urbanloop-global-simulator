@@ -45,9 +45,13 @@
         {"type": "switch_in", "x": 149.5847726007313, "y": 325.0172712087756, "id_bridge": 4, "pods": []},
         {"type": "switch_out", "x": 195.25535669477554, "y": 318.4225463854082, "id_bridge": 5, "pods": []},
         {"type": "switch_in", "x": 204.74464330522446, "y": 321.5774536145918, "id_bridge": 5, "pods": []},
+        {"type": "switch_out", "x": 250, "y": 320, "id_bridge": 6, "pods": []},
+        {"type": "switch_in", "x": 270, "y": 340, "id_bridge": 6, "pods": []},
         {"type": "switch_out", "x": 330, "y": 385, "id_bridge": 0, "pods": []}
       ],
       "sections": [
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}},
         {"speed": 22.22, "path": {"type": "line"}},
@@ -116,6 +120,17 @@
       ],
       "elements": [
         {"type": "HangarRevision", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 20}, "temps_revision": 20, "enRevision": []}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Critobule",
+      "sections": [
+        {"speed": 22.22, "path": {"type": "line"}},
+        {"speed": 22.22, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "HangarRevision", "name": "Critobule", "x": 270, "y": 325, "pods": {"max": 100, "count": 20}, "temps_revision": 20, "enRevision": []}
       ],
       "pods": []
     }

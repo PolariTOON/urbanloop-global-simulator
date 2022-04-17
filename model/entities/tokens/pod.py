@@ -2,6 +2,7 @@ from numpy.random import normal, seed
 
 from .token import Token
 from .traveler import Traveler
+from ..nodes.networks.ways.tracks.GestionnaireRevision import GestionnaireRevision
 
 _moving_pods = []
 _moving_travelers = 0
@@ -14,7 +15,17 @@ class Pod(Token):
     au niveau des aiguillages
     """
 
-    def __init__(self, env, track_or_switch, distance, temps, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, during_departure=None, traveled_distance=None, traveled_distance_t=None, **kwargs):
+    name_id = 0
+
+    def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, during_departure=None, traveled_distance=None, traveled_distance_t=None,
+                 temps_depuis_revision=None,
+                 distance_depuis_revision=None,
+                 temps_restant_attente_en_revision=None,
+                 en_direction_revision=None,
+                 doit_aller_au_lavage=None,
+                 temps_restant_attente_au_lavage=None,
+                 en_direction_lavage=None,
+                 **kwargs):
         self._speed = pod_speed
         self._end_speed = self._speed # placé avant super().__init__() car on a besoin de _end_speed et _speed pour `self.updatable()`
         super().__init__(env, **kwargs)
@@ -58,14 +69,19 @@ class Pod(Token):
         self._previous_station = None
 
         #p_tbtc debut
-        self.temps_depuis_revision = temps or 0
-        self.distance_depuis_revision = distance or 0
-        self.temps_restant_attente_en_revision = -1
-        self.en_direction_revision = False
+        self.temps_depuis_revision = temps_depuis_revision or GestionnaireRevision.genererTempsAleatoire()
+        self.distance_depuis_revision = distance_depuis_revision or GestionnaireRevision.genererDistanceAleatoire()
+        self.temps_restant_attente_en_revision = temps_restant_attente_en_revision or -1
+        self.en_direction_revision = en_direction_revision or False
 
-        self.doit_aller_au_lavage = False
-        self.temps_restant_attente_au_lavage = -1
-        self.en_direction_lavage = False
+        self.doit_aller_au_lavage = doit_aller_au_lavage or False
+        self.temps_restant_attente_au_lavage = temps_restant_attente_au_lavage or -1
+        self.en_direction_lavage = en_direction_lavage or False
+
+        self.name_id = f"Pod {Pod.name_id}"
+        Pod.name_id += 1
+
+        print(f"Pod créé : {self} - ID : {self.name_id}")
         #p_tbtc fin
 
     @property
@@ -219,6 +235,7 @@ class Pod(Token):
             #p_tbtc debut
             "distance_depuis_revision": self.distance_depuis_revision,
             "temps_depuis_revision": self.temps_depuis_revision,
+            "temps_restant_attente_en_revision": self.temps_restant_attente_en_revision,
             "en_direction_revision": self.en_direction_revision,
             "doit_aller_au_lavage": self.doit_aller_au_lavage,
             "temps_restant_attente_au_lavage": self.temps_restant_attente_au_lavage,

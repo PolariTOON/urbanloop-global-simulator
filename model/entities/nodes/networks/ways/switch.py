@@ -22,9 +22,7 @@ class Switch(Way):
         # Ajout des capsules
         for pod in pods:
             speed = pod["speed"]
-            distance = GestionnaireRevision.genererDistanceAleatoire() # à mettre dans json
-            temps = GestionnaireRevision.genererTempsAleatoire() # à mettre dans json
-            self._pods.append(Pod(env, self, speed, distance, temps, **pod))
+            self._pods.append(Pod(env, self, speed, **pod))
 
         # Liaison des routes et sections de la boucle à l'aiguillage
         # Route précédente

@@ -15,9 +15,11 @@ station_types = {
 class Station(Step):
     """ Classe modélisant une gare, y sont gérés le départ des capsules, le réapprovisionnement, la génération des voyageurs et leur montée
     dans les capsules, les échanges de messages avec les autres éléments du réseau"""
-    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, boarding=None, departure_count=None,
-                 station_type=None, element_of_loop=None, parallel=None,
-                 doiventAllerEnRevision=None, doiventAllerAuLavage=None, **kwargs):
+    def __init__(self, env, id, departure_pods=None, pods=None, travelers=None, boarding=None, departure_count=None, station_type=None, element_of_loop=None, parallel=None,
+                 incoming_pods=None, #p_tbtc
+                 doiventAllerEnRevision=None,
+                 doiventAllerAuLavage=None,
+                 **kwargs):
         super().__init__(env, id, **kwargs)
         pods = pods or {
             "count": 0,
@@ -53,10 +55,11 @@ class Station(Step):
         self._element_of_loop = element_of_loop
         self._pods = [None for _ in range(self._capacity)]
         for i in range(pods['count']):
-            self._pods[-1-i] = Pod(env, self, GestionnaireRevision.genererDistanceAleatoire(), GestionnaireRevision.genererTempsAleatoire(), 0)
+            self._pods[-1-i] = Pod(env, self, 0)
         self._departure_pods = departure_pods or [] # pods en attente d'insertion dans le réseau
                                                     # TODO: revoir l'initialisation de departure_pods en cas de chargement reseau
-        self._incoming_pods = 0  # à serialiser si on veut télécharger/recharger le réseau, c'est le nombre de pods en chemin vers la station
+        #p_tbtc self._incoming_pods = 0  # à serialiser si on veut télécharger/recharger le réseau, c'est le nombre de pods en chemin vers la station
+        self._incoming_pods = incoming_pods or 0 #p_tbtc
         self._waiting_empty = False # permet d'évacuer les pods superflus
         self.wait = -1 # pour décompter le départ entre 2 capsules
 
@@ -91,7 +94,8 @@ class Station(Step):
             "departure_count": self._departure_count,
             "station_type": self.station_type,
             # "departure_pods": departure_pods,
-            "element_of_loop": self.element_of_loop
+            "element_of_loop": self.element_of_loop,
+            "incoming_pods": self._incoming_pods #p_tbtc
 
             #p_tbtc
             # La gestion de certains attributs n'est même pas encore implémentée sur master
@@ -299,6 +303,7 @@ class Station(Step):
                 if pod.travelers != []:
                     raise ValueError(f"Le pod {pod} doit aller en révision mais pod.travelers n'est pas None")
                 self.send_pod(pod, destination, False) # traveler=False
+                print(f"station : assignation en révision : pod.destination = {pod.destination}")
                 print(f"Le pod {pod} est usé - distance = {pod.distance_depuis_revision}, temps = {pod.temps_depuis_revision}\n\tIl lui est ordonné d'aller en révision à {destination}")
         for pod in self.doiventAllerAuLavage:
             # if pod in self._departure_pods:
@@ -317,6 +322,7 @@ class Station(Step):
                 if pod.travelers != []:
                     raise ValueError(f"Le pod {pod} doit aller au lavage mais pod.travelers n'est pas None")
                 self.send_pod(pod, destination, False)  # traveler=False
+                print(f"station : assignation au lavage : pod.destination = {pod.destination}")
                 print(
                     f"Il est constaté que le pod {pod} est signalé comme sale\n\tIl lui est ordonné d'aller au lavage à {destination}")
         #p fin
@@ -328,6 +334,7 @@ class Station(Step):
                 self._boarding[i] += self.env.tick
                 if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                     destination = self._pods[i].travelers[0].destination
+                    print(f"destination : {destination}")
                     self._boarding[i] = -1  # reset du timer
                     self.send_pod(self._pods[i], destination, True)  # on l'ajoute à la liste des pods au départ
 
@@ -391,11 +398,15 @@ class Station(Step):
             self.parent.write({
                 "author": self,
                 "type": "empty",
-                "station": self
+#p_tbtc                "station": self
+                "station": self.name
             })
         
         if self.need_refill():
             # Ré-approvisionnement des capsules
+            print("")
+            print(f"{self.name}({self}) demande refill à {self.parent}")
+            print("")
             self.parent.write({
                 "author": self,
                 "type": "refill",

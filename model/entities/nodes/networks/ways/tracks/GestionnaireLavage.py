@@ -8,7 +8,8 @@ class GestionnaireLavage:
 
     def __init__(
             self,
-            network
+            network,
+            **kwargs
     ):
         self.network = network
         self.liste_pods = self.network.pods

@@ -59,6 +59,12 @@ def _synchronize(key=None):
             #try:
             #    return jsonify(result)
             #except Exception: raise ValueError(f"{result} non jsonifiable")
+            #print("-----------------------------------------------------")
+            #print("config_Flask : synchronize, print(result) (résultat du dico à donner à jsonify)")
+            #print("")
+            #print(result)
+            #print("")
+            #print("-----------------------------------------------------")
             return jsonify(result)
         return routine
     return synchronize

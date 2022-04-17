@@ -86,7 +86,7 @@
         {"speed": 16.67, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "station", "name": "Velodrome", "x": 394.9029033784546, "y": 500.98058067569093, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 5, "average_waiting_time": 0, "all_time_count": 0}}
+        {"type": "station", "name": "Velodrome", "x": 394.9029033784546, "y": 500.98058067569093, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
       ],
       "pods": []
     },
@@ -97,7 +97,7 @@
         {"speed": 16.67, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "station", "name": "Gare", "x": 318.49560391453946, "y": 504.7683112752893, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 5, "average_waiting_time": 0, "all_time_count": 0}}
+        {"type": "station", "name": "Gare", "x": 318.49560391453946, "y": 504.7683112752893, "pods": {"max": 5, "count": 0}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
       ],
       "pods": []
     },

@@ -19,12 +19,12 @@ class GestionnaireRevision:
     def __init__(
             self,
             network,
-            limite_distance_parcourue_avant_revision=LIMITE_DISTANCE_PARCOURUE_AVANT_REVISION_DEFAUT,
-            limite_temps_ecoule_avant_revision=LIMITE_TEMPS_ECOULE_AVANT_REVISION_DEFAUT
+            limite_distance_parcourue_avant_revision=None,
+            limite_temps_ecoule_avant_revision=None
     ):
         self.network = network
-        self.limite_distance_parcourue_avant_revision = limite_distance_parcourue_avant_revision
-        self.limite_temps_ecoule_avant_revision = limite_temps_ecoule_avant_revision
+        self.limite_distance_parcourue_avant_revision = limite_distance_parcourue_avant_revision or GestionnaireRevision.LIMITE_DISTANCE_PARCOURUE_AVANT_REVISION_DEFAUT
+        self.limite_temps_ecoule_avant_revision = limite_temps_ecoule_avant_revision or GestionnaireRevision.LIMITE_TEMPS_ECOULE_AVANT_REVISION_DEFAUT
         self.liste_pods = self.network.pods
 
     def obtenirDestination(self, nom_station_source, categorie_destination="HangarRevision"):

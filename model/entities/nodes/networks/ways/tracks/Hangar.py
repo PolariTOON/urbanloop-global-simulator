@@ -24,11 +24,11 @@ class Hangar(Step):
         element_of_loop["element"] = element_of_loop["element"] or 0
         self._capacity = pods["max"]
         self._element_of_loop = element_of_loop
-        self._pods = [Pod(env, self, GestionnaireRevision.genererDistanceAleatoire(), GestionnaireRevision.genererTempsAleatoire(), 0) for k in range(pods["count"])]
+        self._pods = [Pod(env, self, 0) for k in range(pods["count"])]
         self._departure_pods = departure_pods or []
         for dico in self._departure_pods:  # pour initialiser des pods quand on charge un réseau
             p = dico["pod"]
-            dico["pod"] = Pod(env, self, GestionnaireRevision.genererDistanceAleatoire(), GestionnaireRevision.genererTempsAleatoire(), 0, p)
+            dico["pod"] = Pod(env, self, 0, p)
         self._wait = -1
 
     def serialize(self):
@@ -48,6 +48,11 @@ class Hangar(Step):
             "departure_pods": departure_pods,
             "element_of_loop": self.element_of_loop
         })
+        #print(f"\nDEBUT TEST HANGARS : Problèmes lors de jsonify")
+        #print(f"Type : {self.__class__.__name__} - Nom : {self.name}")
+        #print(f"departure_pods : ")
+        #print(f"{departure_pods}")
+        #print(f"FIN TEST HANGARS : Problèmes lors de jsonify\n")
         return dict
 
     @property
@@ -163,8 +168,14 @@ class Hangar(Step):
                         self._pods[i] in self._departure_pods or self._pods[i].during_departure):
                     i += 1
                 pod = self._pods[i]
+                print("")
+                print(f"Un pod se voit assigner la destination {station} lorsque le {self.__class__.__name__} {self.name} traite un refill")
+                print("")
                 pod.destination = station
                 self._departure_pods.append(pod)
+                print(f"{self.name} : pod ajouté à self._departure_pods")
+                print(f"self._departure_pods = ")
+                print(f"{self._departure_pods}")
             else:
                 # on cherche la station concernée,
                 # et on l'informe qu'elle ne recevra pas le pod.

@@ -19,7 +19,10 @@ from .Statistiques import *
 
 class Network(Node):
     def __init__(self, env, id, bridges=None, loops=None, switches=None, roads=None, view_box=None, margin_min=None,
-                 pod_size=None, max_speed=None, places_number=None, dynamic_routing=None, **kwargs):
+                 pod_size=None, max_speed=None, places_number=None, dynamic_routing=None,
+                 gestionnaireRevision=None,
+                 gestionnaireLavage=None,
+                 **kwargs):
         super().__init__(env, id, **kwargs)
         self._dynamic_routing = dynamic_routing or False
         self._last_routing_update = env.time
@@ -56,8 +59,8 @@ class Network(Node):
         #self.last_sec = 1
 
         #p_tbtc debut
-        self.gestionnaireRevision = GestionnaireRevision(network=self)
-        self.gestionnaireLavage = GestionnaireLavage(network=self)
+        self.gestionnaireRevision = GestionnaireRevision(network=self, **gestionnaireRevision)
+        self.gestionnaireLavage = GestionnaireLavage(network=self, **gestionnaireLavage)
         #p_tbtc fin
 
     
@@ -179,7 +182,8 @@ class Network(Node):
             "dynamic_routing": self.dynamic_routing,
             "stats": self._statistiques.serialize(),
             #p_tbtc debut
-            "gestionnaireRevision": self.gestionnaireRevision.serialize()
+            "gestionnaireRevision": self.gestionnaireRevision.serialize(),
+            "gestionnaireLavage": self.gestionnaireLavage.serialize()
             #p_tbtc fin
         })
         return dict
@@ -340,8 +344,16 @@ class Network(Node):
             #p_tbtc L'excepetion est traitée dans config_Flask.py
             #p_tbtc print(f"pods = {pod}")
             #p_tbtc print(f"pods['source'] = {pod['source']}")
-            pod["source"] = self._get_elt_of_loop(**pod["source"])
-            pod["destination"] = self._get_elt_of_loop(**pod["destination"])
+
+            #p_tbtc Nous commentons ces deux lignes car elles empêchent le rechargement
+            #pod["source"] = self._get_elt_of_loop(**pod["source"])
+            #pod["destination"] = self._get_elt_of_loop(**pod["destination"])
+
+            #p_tbtc essai
+            print(f"network : avant appel _get_elt_of_loop")
+            print(f"\tpod['source']={pod['source']} et pod['destination']={pod['destination']}")
+            pod["source"] = self._get_elt_of_loop(**{"name": pod["source"]})
+            pod["destination"] = self._get_elt_of_loop(**{"name": pod["destination"]})
             _init_pod_of_line(line, pod)
 
     def _get_elt_of_loop(self, loop=None, element=None, **kwargs):
@@ -362,11 +374,17 @@ class Network(Node):
         for r in range(len(roads)):
             if elt == element:  # L'element est un switch
                 return switches[r]
+            elif switches[r].name == kwargs["name"]: #p_tbtc
+                print(f"network _get_elt_of_loop avec name = {kwargs['name']} donne {switches[r]}")
+                return switches[r] #p_tbtc
             elt += 1
             steps = roads[r].steps
             for s in range(len(steps)):
                 if elt == element:  # L'element est une etape
                     return steps[s]
+                elif steps[s].name == kwargs["name"]: #p_tbtc
+                    print(f"network _get_elt_of_loop avec name = {kwargs['name']} donne {steps[s]}")
+                    return steps[s] #p_tbtc
                 elt += 1
         raise ValueError("Element's index out of range")
 

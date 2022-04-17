@@ -220,8 +220,6 @@ class SwitchIn(Switch):
         pods_init = []
         for pod in pods:
             if pod is not None:
-                distance = GestionnaireRevision.genererDistanceAleatoire() # à mettre dans json
-                temps = GestionnaireRevision.genererTempsAleatoire() # à mettre dans json
-                pod = Pod(env, self, pod["speed"], distance, temps, **pod)
+                pod = Pod(env, self, pod["speed"], **pod)
             pods_init.append(pod)
         return []

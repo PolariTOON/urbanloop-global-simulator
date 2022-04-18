@@ -59,10 +59,17 @@ class Network(Node):
         #self.last_sec = 1
 
         #p_tbtc debut
-        self.gestionnaireRevision = GestionnaireRevision(network=self, **gestionnaireRevision)
-        self.gestionnaireLavage = GestionnaireLavage(network=self, **gestionnaireLavage)
+        self._gestionnaireRevision = GestionnaireRevision(network=self, **gestionnaireRevision)
+        self._gestionnaireLavage = GestionnaireLavage(network=self, **gestionnaireLavage)
         #p_tbtc fin
 
+    @property
+    def gestionnaireRevision(self):
+        return self._gestionnaireRevision
+
+    @property
+    def gestionnaireLavage(self):
+        return self._gestionnaireLavage
     
     @property
     def name(self):
@@ -570,10 +577,10 @@ class Network(Node):
             elif hangarsSimples:  # p_tbtc
                 station = message["station"]
                 hangarSimple = choice(hangarsSimples)
-                hangarSimple.write({
+                station.write({
                     "author": self,
-                    "type": "refill",
-                    "station": station
+                    "type": "empty",
+                    "shed": hangarSimple
                 })
         elif "departure" == message["type"]:
             timestamp = message["timestamp"]

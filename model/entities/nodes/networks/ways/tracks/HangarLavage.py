@@ -7,16 +7,28 @@ class HangarLavage(Hangar):
         super().__init__(env, id, departure_pods, pods, element_of_loop, **kwargs)
         #p_tbtc
         print("Hangar lavage créé")
-        self.temps_lavage = 20
-        self.enLavage = []
+        self._temps_lavage = 20
+        self._enLavage = []
+
+    @property
+    def temps_lavage(self):
+        return self._temps_lavage
+
+    def ajouterEnLavage(self, pod):
+        if pod not in self._enLavage:
+            self._enLavage.append(pod)
+
+    def retirerEnLavage(self, pod):
+        if pod in self._enLavage:
+            self._enLavage.append(pod)
 
     def serialize(self):
         """sérialise les informations du dépôt"""
         dico = super().serialize()
-        enLavage = [{"pod": pod.serialize()} for pod in self.enLavage]
+        enLavage = [{"pod": pod.serialize()} for pod in self._enLavage]
         dico.update({
             "type": f"{self.__class__.__name__}",
-            "temps_lavage": self.temps_lavage,
+            "temps_lavage": self._temps_lavage,
             "enLavage": enLavage
         })
         return dico
@@ -31,7 +43,7 @@ class HangarLavage(Hangar):
                 self._wait = -1
 
         #p_tbtc MAJ des temps de révision
-        for pod in self.enLavage:
+        for pod in self._enLavage:
             pod.temps_restant_attente_en_lavage -= 1
             #print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_lavage}")
             if pod.temps_restant_attente_en_lavage == 0:
@@ -39,7 +51,7 @@ class HangarLavage(Hangar):
                 self._departure_pods.append(pod)
                 pod.doit_aller_au_lavage = False
                 pod.temps_restant_attente_au_lavage = -1
-                self.enLavage.remove(pod)
+                self._enLavage.remove(pod)
 
         # Départ des capsules #p_tbtc
         if self._departure_pods and self._wait == -1:
@@ -48,7 +60,7 @@ class HangarLavage(Hangar):
             nw = road.parent
             #pod = self._departure_pods[0]
             pod = self._departure_pods.pop(0)
-            if pod not in self.enLavage:
+            if pod not in self._enLavage:
                 destination = nw.gestionnaireLavage.obtenirDestination(
                     nom_station_source=self.name,
                     categorie_destination="HangarSimple"
@@ -88,8 +100,8 @@ class HangarLavage(Hangar):
                 print(f"Son track_or_switch est {pod.track_or_switch.name}")
                 #p_tbtc debut
                 pod.en_direction_lavage = False
-                self.enLavage.append(pod)
-                pod.temps_restant_attente_en_lavage = self.temps_lavage
+                self._enLavage.append(pod)
+                pod.temps_restant_attente_en_lavage = self._temps_lavage
                 #p_tbtc fin
                 pod.write({
                     "author": self,

@@ -249,6 +249,8 @@ export class Pod extends Entity {
 
         this.__en_direction_revision = json["en_direction_revision"]//p_tb
         this.__en_direction_lavage = json["en_direction_lavage"]//p_tb
+        const quickInfos = json["quickInfos"]
+        this._quickInfos = quickInfos
 
         if (this._contain_real_user)
         {   

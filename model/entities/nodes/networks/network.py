@@ -337,6 +337,7 @@ class Network(Node):
             road.init_parent_of_children()
 
     def _init_pods_of_line(self, line):
+        print(f"network _init_pods_of_line appelée avec comme argument line={line}")
         if "pods" not in line:
             line["pods"] = []
         for pod in line["pods"]:
@@ -352,8 +353,8 @@ class Network(Node):
             #p_tbtc essai
             print(f"network : avant appel _get_elt_of_loop")
             print(f"\tpod['source']={pod['source']} et pod['destination']={pod['destination']}")
-            pod["source"] = self._get_elt_of_loop(**{"name": pod["source"]})
-            pod["destination"] = self._get_elt_of_loop(**{"name": pod["destination"]})
+            #pod["source"] = self._get_elt_of_loop(**{"name": pod["source"]})
+            #pod["destination"] = self._get_elt_of_loop(**{"name": pod["destination"]})
             _init_pod_of_line(line, pod)
 
     def _get_elt_of_loop(self, loop=None, element=None, **kwargs):
@@ -361,6 +362,8 @@ class Network(Node):
         :param loop, element: numéro de la boucle et de l'élément s'y trouvant
         :return: l'objet retourné correspondant au numéro d'élément présent dans la boucle spécifiée
         """
+        print(f"network _get_elt_of_loop appelée avec comme arguments :")
+        print(f"loop={loop}, element={element}, kwargs={kwargs}")
         #  Initialisation des variables
         if loop < 0 or loop > len(self._loops):
             raise ValueError("Loop's index out of range")

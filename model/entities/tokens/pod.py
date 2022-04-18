@@ -15,7 +15,7 @@ class Pod(Token):
     au niveau des aiguillages
     """
 
-    name_id = 0
+    quickInfos_nextIndex = 0
 
     def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, during_departure=None, traveled_distance=None, traveled_distance_t=None,
                  temps_depuis_revision=None,
@@ -25,6 +25,7 @@ class Pod(Token):
                  doit_aller_au_lavage=None,
                  temps_restant_attente_au_lavage=None,
                  en_direction_lavage=None,
+                 quickInfos_index=None,
                  **kwargs):
         self._speed = pod_speed
         self._end_speed = self._speed # placé avant super().__init__() car on a besoin de _end_speed et _speed pour `self.updatable()`
@@ -78,11 +79,23 @@ class Pod(Token):
         self.temps_restant_attente_au_lavage = temps_restant_attente_au_lavage or -1
         self.en_direction_lavage = en_direction_lavage or False
 
-        self.name_id = f"Pod {Pod.name_id}"
-        Pod.name_id += 1
+        self.quickInfos_index = quickInfos_index
+        if self.quickInfos_index is None:
+            self.quickInfos_index = Pod.quickInfos_nextIndex
+            Pod.quickInfos_nextIndex += 1
+        self.set_quickInfos()
 
-        print(f"Pod créé : {self} - ID : {self.name_id}")
+        print(f"Pod créé - quickInfos : {self.quickInfos} - objet : {self}")
         #p_tbtc fin
+
+    def set_quickInfos(self): #p_tbtc
+        self.quickInfos = f"Pod {self.quickInfos_index}\n{self.source}->{self.destination}"
+        if self.en_direction_lavage:
+            self.quickInfos += "\nVers lavage"
+        elif self.doit_aller_au_lavage:
+            self.quickInfos += "\nÀ laver"
+        if self.en_direction_revision:
+            self.quickInfos += "\nVers révision"
 
     @property
     def position(self):
@@ -239,7 +252,9 @@ class Pod(Token):
             "en_direction_revision": self.en_direction_revision,
             "doit_aller_au_lavage": self.doit_aller_au_lavage,
             "temps_restant_attente_au_lavage": self.temps_restant_attente_au_lavage,
-            "en_direction_lavage": self.en_direction_lavage
+            "en_direction_lavage": self.en_direction_lavage,
+            "quickInfos_index": self.quickInfos_index,
+            "quickInfos": self.quickInfos
             #p_tbtc fin
         })
         return dict
@@ -263,6 +278,7 @@ class Pod(Token):
 
         #p_tbtc debut
         self.temps_depuis_revision += self.env.tick
+        self.set_quickInfos()
         #p_tbtc fin
 
         # OPTIMISATION : ne pas regarder à chaque update ?

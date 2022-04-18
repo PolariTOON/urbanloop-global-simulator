@@ -20,6 +20,14 @@ export class Entity extends Group {
     get _name() {
         return this.__name;
     }
+    set _quickInfos(value) {
+        this.__quickInfos = value;
+        this.__hint._name = value;
+    }
+    get _quickInfos() {
+        return this.__quickInfos;
+    }
+
     set _x(value) {
         super.x(value);
         super.offsetX(value);

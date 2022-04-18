@@ -72,7 +72,7 @@ export class HangarSimple extends Entity {
         this.__outerShape.fill(outerColor);
     }
     update(json) {
-        const name = json["name"];
+        const name = json["name"] + "Hangar";
         const x = json["x"];
         const y = json["y"];
         const podCount = json["pods"]["count"];

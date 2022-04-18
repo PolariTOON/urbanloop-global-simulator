@@ -158,7 +158,7 @@ export class Station extends Entity {
         this.__outerShape.fill(outerColor);
     }
     update(json, showing_travelers_waiting) {
-        const name = json["name"];
+        const name = json["name"] + "\nStation";
         const x = json["x"];
         const y = json["y"];
         const podCount = json["pods"]["count"];

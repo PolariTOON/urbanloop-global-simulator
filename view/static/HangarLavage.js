@@ -75,7 +75,7 @@ export class HangarLavage extends Entity {
         this.__outerShape.fill(outerColor);
     }
     update(json) {
-        const name = json["name"];
+        const name = json["name"] + "\nHangarLavage";
         const x = json["x"];
         const y = json["y"];
         const podCount = json["pods"]["count"];

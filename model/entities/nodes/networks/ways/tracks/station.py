@@ -56,16 +56,29 @@ class Station(Step):
         self._pods = [None for _ in range(self._capacity)]
         for i in range(pods['count']):
             self._pods[-1-i] = Pod(env, self, 0)
-        self._departure_pods = departure_pods or [] # pods en attente d'insertion dans le réseau
+        #self._departure_pods = departure_pods or [] # pods en attente d'insertion dans le réseau
                                                     # TODO: revoir l'initialisation de departure_pods en cas de chargement reseau
         #p_tbtc self._incoming_pods = 0  # à serialiser si on veut télécharger/recharger le réseau, c'est le nombre de pods en chemin vers la station
         self._incoming_pods = incoming_pods or 0 #p_tbtc
         self._waiting_empty = False # permet d'évacuer les pods superflus
         self.wait = -1 # pour décompter le départ entre 2 capsules
 
-        #p_tbtc # TODO: revoir ces initialisations en cas de chargement reseau
-        self.doiventAllerEnRevision = doiventAllerEnRevision or []
-        self.doiventAllerAuLavage = doiventAllerAuLavage or []
+        #p_tbtc tentative de complétion du todo_ plus haut
+        # et d'adaptation de la solution aux listes de révision et de lavage
+        #p_tbtc # TODO: Surveiller ces initialisations
+        doiventAllerEnRevision = doiventAllerEnRevision or [False for _ in self._pods]
+        doiventAllerAuLavage = doiventAllerAuLavage or [False for _ in self._pods]
+        departure_pods = departure_pods or [False for _ in self._pods]
+        self.doiventAllerEnRevision = []
+        self.doiventAllerAuLavage = []
+        self._departure_pods = []
+        for i in range(len(self._pods)):
+            if doiventAllerEnRevision[i]:
+                self.doiventAllerEnRevision.append(self._pods[i])
+            if doiventAllerAuLavage[i]:
+                self.doiventAllerAuLavage.append(self._pods[i])
+            if departure_pods[i]:
+                self._departure_pods.append(self._pods[i])
 
     def serialize(self):
         """Permet la serialisation des informations"""
@@ -80,8 +93,6 @@ class Station(Step):
                 "count": self.pods_size,
                 "max": self.capacity,
                 "pos": [True if pod else False for pod in self._pods],
-                "doiventAllerEnRevision": [True if pod in self.doiventAllerEnRevision else False for pod in self._pods],
-                "doiventAllerAuLavage": [True if pod in self.doiventAllerAuLavage else False for pod in self._pods],
                 "boarding": self._boarding,
                 "full": [not pod.is_empty() if pod else False for pod in self._pods]
             },
@@ -95,7 +106,12 @@ class Station(Step):
             "station_type": self.station_type,
             # "departure_pods": departure_pods,
             "element_of_loop": self.element_of_loop,
-            "incoming_pods": self._incoming_pods #p_tbtc
+            "incoming_pods": self._incoming_pods, #p_tbtc
+
+            "doiventAllerEnRevision": [True if pod in self.doiventAllerEnRevision else False for pod in self._pods],
+            "doiventAllerAuLavage": [True if pod in self.doiventAllerAuLavage else False for pod in self._pods],
+
+            "departure_pods": [True if pod in self._departure_pods else False for pod in self._pods]
 
             #p_tbtc
             # La gestion de certains attributs n'est même pas encore implémentée sur master
@@ -334,7 +350,11 @@ class Station(Step):
                 self._boarding[i] += self.env.tick
                 if self._boarding[i] > self._pods[i].travelers[0].boarding_time:  # si le temps d'embarquement est atteint
                     destination = self._pods[i].travelers[0].destination
-                    print(f"destination : {destination}")
+                    print(f"destination = {self}._pods[i].travelers[0].destination = {destination}")
+                    if destination is None:
+                        print(f"\u001B[31mATTENTION : Le passager {self._pods[i].travelers[0].destination} a une destination égale à None\u001B[0m")
+                        print(f"\u001B[31mCela pourrait provenir du fait que le réseau ait été chargé à partir d'un json téléchargé lors d'une simulation en cours\u001B[0m")
+                        print(f"\u001B[31mOr le rechargement des json ne fonctionne pas encore\u001B[0m")
                     self._boarding[i] = -1  # reset du timer
                     self.send_pod(self._pods[i], destination, True)  # on l'ajoute à la liste des pods au départ
 

@@ -10,6 +10,9 @@ class Traveler(Token):
         self._changed_dest = False
         self._called_emergency_exit = False
 
+    #TODO def signalerAleatoirementLavage(self, pod):
+    #
+
     @property
     def name(self):
         return super().name or "Traveler %s" % self.id

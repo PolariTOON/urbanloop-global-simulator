@@ -165,22 +165,35 @@ class Hangar(Step):
                     self.pods_during_departure):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
                 i = 0
                 while i < len(self._pods) - 1 and (
-                        self._pods[i] in self._departure_pods or self._pods[i].during_departure):
+                        self._pods[i] in self._departure_pods
+                        or self._pods[i].during_departure\
+                        or self.parent.parent.gestionnaireRevision.podDoitAllerEnRevision(self._pods[i])\
+                        or self.parent.parent.gestionnaireLavage.podDoitAllerAuLavage(self._pods[i])
+                ):
                     i += 1
                 pod = self._pods[i]
-                print("")
-                print(f"Un pod se voit assigner la destination {station} lorsque le {self.__class__.__name__} {self.name} traite un refill")
-                print("")
+                #print("")
+                #print(f"Un pod se voit assigner la destination {station} lorsque le {self.__class__.__name__} {self.name} traite un refill")
+                #print("")
                 pod.destination = station
                 self._departure_pods.append(pod)
-                print(f"{self.name} : pod ajouté à self._departure_pods")
-                print(f"self._departure_pods = ")
-                print(f"{self._departure_pods}")
+                #print(f"{self.name} : pod ajouté à self._departure_pods")
+                #print(f"self._departure_pods = ")
+                #print(f"{self._departure_pods}")
             else:
                 # on cherche la station concernée,
                 # et on l'informe qu'elle ne recevra pas le pod.
                 network = self.parent.parent
                 found_station = network.get_station_by_name(station)
+                if found_station is None:
+                    import inspect
+                    stack = inspect.stack()
+                    the_class = stack[1][0].f_locals["self"].__class__.__name__
+                    the_name = stack[1][0].f_locals["self"].name
+                    the_method = stack[1][0].f_code.co_name
+                    print(f"méthode courante {self.name}.handle_message()-->refill appelée par {the_name}.{the_method}()")
+                    print(f"auteur : {message['author']}")
+
                 found_station.down_incoming_pods()
 
         else:

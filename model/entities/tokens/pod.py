@@ -70,32 +70,96 @@ class Pod(Token):
         self._previous_station = None
 
         #p_tbtc debut
-        self.temps_depuis_revision = temps_depuis_revision or GestionnaireRevision.genererTempsAleatoire()
-        self.distance_depuis_revision = distance_depuis_revision or GestionnaireRevision.genererDistanceAleatoire()
-        self.temps_restant_attente_en_revision = temps_restant_attente_en_revision or -1
-        self.en_direction_revision = en_direction_revision or False
+        self._temps_depuis_revision = temps_depuis_revision or GestionnaireRevision.genererTempsAleatoire()
+        self._distance_depuis_revision = distance_depuis_revision or GestionnaireRevision.genererDistanceAleatoire()
+        self._temps_restant_attente_en_revision = temps_restant_attente_en_revision or -1
+        self._en_direction_revision = en_direction_revision or False
 
-        self.doit_aller_au_lavage = doit_aller_au_lavage or False
-        self.temps_restant_attente_au_lavage = temps_restant_attente_au_lavage or -1
-        self.en_direction_lavage = en_direction_lavage or False
+        self._doit_aller_au_lavage = doit_aller_au_lavage or False
+        self._temps_restant_attente_au_lavage = temps_restant_attente_au_lavage or -1
+        self._en_direction_lavage = en_direction_lavage or False
 
-        self.quickInfos_index = quickInfos_index
-        if self.quickInfos_index is None:
-            self.quickInfos_index = Pod.quickInfos_nextIndex
+        self._quickInfos_index = quickInfos_index
+        if self._quickInfos_index is None:
+            self._quickInfos_index = Pod.quickInfos_nextIndex
             Pod.quickInfos_nextIndex += 1
+        self._quickInfos = ""
         self.set_quickInfos()
 
-        print(f"Pod créé - quickInfos : {self.quickInfos} - objet : {self}")
+        print(f"Pod créé - quickInfos : {self._quickInfos} - objet : {self}")
         #p_tbtc fin
 
+    @property
+    def temps_depuis_revision(self):
+        return self._temps_depuis_revision
+
+    @temps_depuis_revision.setter
+    def temps_depuis_revision(self, value):
+        self._temps_depuis_revision = value
+
+    @property
+    def distance_depuis_revision(self):
+        return self._distance_depuis_revision
+
+    @distance_depuis_revision.setter
+    def distance_depuis_revision(self, value):
+        self._distance_depuis_revision = value
+
+    @property
+    def temps_restant_attente_en_revision(self):
+        return self._temps_restant_attente_en_revision
+
+    @temps_restant_attente_en_revision.setter
+    def temps_restant_attente_en_revision(self, value):
+        self._temps_restant_attente_en_revision = value
+
+    @property
+    def en_direction_revision(self):
+        return self._en_direction_revision
+
+    @en_direction_revision.setter
+    def en_direction_revision(self, value):
+        self._en_direction_revision = value
+
+    @property
+    def doit_aller_au_lavage(self):
+        return self._doit_aller_au_lavage
+
+    @doit_aller_au_lavage.setter
+    def doit_aller_au_lavage(self, value):
+        self._doit_aller_au_lavage = value
+
+    @property
+    def temps_restant_attente_au_lavage(self):
+        return self._temps_restant_attente_au_lavage
+
+    @temps_restant_attente_au_lavage.setter
+    def temps_restant_attente_au_lavage(self, value):
+        self._temps_restant_attente_au_lavage = value
+
+    @property
+    def en_direction_lavage(self):
+        return self._en_direction_lavage
+
+    @en_direction_lavage.setter
+    def en_direction_lavage(self, value):
+        self._en_direction_lavage = value
+
+    @property
+    def quickInfos_index(self):
+        return self._quickInfos_index
+
     def set_quickInfos(self): #p_tbtc
-        self.quickInfos = f"Pod {self.quickInfos_index}\n{self.source}->{self.destination}"
-        if self.en_direction_lavage:
-            self.quickInfos += "\nVers lavage"
+        self._quickInfos = f"Pod {self._quickInfos_index}\n{self.source}->{self.destination}"
+        if self._en_direction_lavage:
+            self._quickInfos += "\nVers lavage"
         elif self.doit_aller_au_lavage:
-            self.quickInfos += "\nÀ laver"
-        if self.en_direction_revision:
-            self.quickInfos += "\nVers révision"
+            self._quickInfos += "\nÀ laver"
+        if self._en_direction_revision:
+            self._quickInfos += "\nVers révision"
+
+    def demander_envoi_lavage(self, user_id):
+        self._doit_aller_au_lavage = True
 
     @property
     def position(self):
@@ -246,15 +310,15 @@ class Pod(Token):
             "traveled_distance": self._traveled_distance,
             "traveled_distance_t": self._traveled_distance_t,
             #p_tbtc debut
-            "distance_depuis_revision": self.distance_depuis_revision,
-            "temps_depuis_revision": self.temps_depuis_revision,
-            "temps_restant_attente_en_revision": self.temps_restant_attente_en_revision,
-            "en_direction_revision": self.en_direction_revision,
-            "doit_aller_au_lavage": self.doit_aller_au_lavage,
-            "temps_restant_attente_au_lavage": self.temps_restant_attente_au_lavage,
-            "en_direction_lavage": self.en_direction_lavage,
-            "quickInfos_index": self.quickInfos_index,
-            "quickInfos": self.quickInfos
+            "distance_depuis_revision": self._distance_depuis_revision,
+            "temps_depuis_revision": self._temps_depuis_revision,
+            "temps_restant_attente_en_revision": self._temps_restant_attente_en_revision,
+            "en_direction_revision": self._en_direction_revision,
+            "doit_aller_au_lavage": self._doit_aller_au_lavage,
+            "temps_restant_attente_au_lavage": self._temps_restant_attente_au_lavage,
+            "en_direction_lavage": self._en_direction_lavage,
+            "quickInfos_index": self._quickInfos_index,
+            "quickInfos": self._quickInfos
             #p_tbtc fin
         })
         return dict
@@ -277,7 +341,7 @@ class Pod(Token):
     def update(self):
 
         #p_tbtc debut
-        self.temps_depuis_revision += self.env.tick
+        self._temps_depuis_revision += self.env.tick
         self.set_quickInfos()
         #p_tbtc fin
 
@@ -619,6 +683,3 @@ class Pod(Token):
                 has_found_traveler = True
         if (has_found_traveler == False):
             print("Error in call_emergency_exit")
-
-    def demander_envoi_lavage(self, user_id):
-        self.doit_aller_au_lavage = True

@@ -10,16 +10,27 @@ class HangarRevision(Hangar):
         super().__init__(env, id, departure_pods, pods, element_of_loop, **kwargs)
         #p_tbtc
         print("Hangar révision créé")
-        self.temps_revision = 20
-        self.enRevision = []
+        self._temps_revision = 20
+        self._enRevision = []
+
+    @property
+    def temps_revision(self):
+        return self._temps_revision
+
+    @property
+    def enRevision(self):
+        return self._enRevision
+
+    def ajouterEnRevision(self, pod):
+        self._enRevision.append(pod)
 
     def serialize(self):
         """sérialise les informations du dépôt"""
         dico = super().serialize()
-        enRevision = [{"pod": pod.serialize()} for pod in self.enRevision]
+        enRevision = [{"pod": pod.serialize()} for pod in self._enRevision]
         dico.update({
             "type": f"{self.__class__.__name__}",
-            "temps_revision": self.temps_revision,
+            "temps_revision": self._temps_revision,
             "enRevision": enRevision
         })
         return dico
@@ -34,16 +45,16 @@ class HangarRevision(Hangar):
                 self._wait = -1
 
         #p_tbtc MAJ des temps de révision
-        for pod in self.enRevision:
+        for pod in self._enRevision:
             pod.temps_restant_attente_en_revision -= 1
             #print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_revision}")
             if pod.temps_restant_attente_en_revision == 0:
                 print(f"{pod} : revision terminée")
                 self._departure_pods.append(pod)
-                pod.temps_avant_revision = 0
-                pod.distance_avant_revision = 0
+                pod.temps_depuis_revision = 0
+                pod.distance_depuis_revision = 0
                 pod.temps_restant_attente_en_revision = -1
-                self.enRevision.remove(pod)
+                self._enRevision.remove(pod)
 
         # Départ des capsules #p_tbtc
         if self._departure_pods and self._wait == -1:
@@ -52,7 +63,7 @@ class HangarRevision(Hangar):
             nw = road.parent
             #pod = self._departure_pods[0]
             pod = self._departure_pods.pop(0)
-            if pod not in self.enRevision:
+            if pod not in self._enRevision:
                 destination = nw.gestionnaireRevision.obtenirDestination(
                     nom_station_source=self.name,
                     categorie_destination="HangarSimple"
@@ -92,8 +103,8 @@ class HangarRevision(Hangar):
                 print(f"Son track_or_switch est {pod.track_or_switch.name}")
                 #p_tbtc debut
                 pod.en_direction_revision = False
-                self.enRevision.append(pod)
-                pod.temps_restant_attente_en_revision = self.temps_revision
+                self._enRevision.append(pod)
+                pod.temps_restant_attente_en_revision = self._temps_revision
                 #p_tbtc fin
                 pod.write({
                     "author": self,

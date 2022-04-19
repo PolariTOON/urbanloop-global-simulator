@@ -20,6 +20,10 @@ lavage(){
   curl -X POST -H "Content-Type:application/json" localhost:8090/envoi_lavage/123
 }
 
+revision(){
+  curl -X POST -H "Content-Type:application/json" localhost:8090/envoi_revision/123
+}
+
 DefaultFunc(){
   launch
 }

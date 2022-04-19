@@ -138,23 +138,7 @@ class HangarLavage(Hangar):
                 # et on accepte qu'il passe à travers.
                 pass
         elif "refill" == message["type"]:
-            station = message["station"]
-            if len(self._pods) > 0 and len(self._pods) > len(self._departure_pods) + len(
-                    self.pods_during_departure):  # on vérifie qu'il y a des pods et qu'il ne s'agit pas de pods déjà affectés à une station
-                i = 0
-                while i < len(self._pods) - 1 and (
-                        self._pods[i] in self._departure_pods or self._pods[i].during_departure):
-                    i += 1
-                pod = self._pods[i]
-                pod.destination = station
-                self._departure_pods.append(pod)
-                print(f"Entrée de Pod {pod.quickInfos_index} en lavage")
-            else:
-                # on cherche la station concernée,
-                # et on l'informe qu'elle ne recevra pas le pod.
-                network = self.parent.parent
-                found_station = network.get_station_by_name(station)
-                found_station.down_incoming_pods()
-
+            # Type de message pas encore utilisé
+            raise ValueError(f"{self.__class__.__name__} : message refill reçu alors qu'il n'est pas encore utilisé")
         else:
             raise ValueError("Invalid message")

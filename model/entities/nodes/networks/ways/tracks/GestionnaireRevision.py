@@ -8,6 +8,14 @@ class GestionnaireRevision:
     LIMITE_DISTANCE_PARCOURUE_AVANT_REVISION_DEFAUT = 2000
     LIMITE_TEMPS_ECOULE_AVANT_REVISION_DEFAUT = 2000
     TEMPS_REVISION_DEFAUT = 100
+    LIMITE_NOMBRE_SIGNALEMENTS_AVANT_REVISION_DEFAUT = 2
+
+    @classmethod
+    def genererNombreSignalementsAleatoire(cls):
+        #if randint(0, 1):
+        #    return randint(0, cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_REVISION_DEFAUT-1)
+        #return randint(cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_REVISION_DEFAUT-1, cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_REVISION_DEFAUT+2)
+        return 0
 
     @classmethod
     def genererDistanceAleatoire(cls):
@@ -26,17 +34,20 @@ class GestionnaireRevision:
             network,
             limite_distance_parcourue_avant_revision=None,
             limite_temps_ecoule_avant_revision=None,
-            temps_revision=None
+            temps_revision=None,
+            limite_nombre_signalements_avant_revision=None,
     ):
         self._network = network
         self._limite_distance_parcourue_avant_revision = limite_distance_parcourue_avant_revision or GestionnaireRevision.LIMITE_DISTANCE_PARCOURUE_AVANT_REVISION_DEFAUT
         self._limite_temps_ecoule_avant_revision = limite_temps_ecoule_avant_revision or GestionnaireRevision.LIMITE_TEMPS_ECOULE_AVANT_REVISION_DEFAUT
         self._temps_revision = temps_revision or GestionnaireRevision.TEMPS_REVISION_DEFAUT
+        self._limite_nombre_signalements_avant_revision = limite_nombre_signalements_avant_revision or GestionnaireRevision.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_REVISION_DEFAUT
 
         self._liste_pods = self._network.pods
 
     def serialize(self):
         return {
+            "limite_nombre_signalements_avant_revision": self._limite_nombre_signalements_avant_revision,
             "limite_distance_parcourue_avant_revision": self._limite_distance_parcourue_avant_revision,
             "limite_temps_ecoule_avant_revision": self._limite_temps_ecoule_avant_revision,
             "temps_revision": self._temps_revision
@@ -57,6 +68,7 @@ class GestionnaireRevision:
     def podDoitAllerEnRevision(self, pod):
         if \
                 pod.distance_depuis_revision >= self._limite_distance_parcourue_avant_revision or \
-                pod.temps_depuis_revision >= self._limite_temps_ecoule_avant_revision:
+                pod.temps_depuis_revision >= self._limite_temps_ecoule_avant_revision or \
+                pod.nombre_signalements_doit_aller_en_revision >= self._limite_nombre_signalements_avant_revision:
             return True
         return False

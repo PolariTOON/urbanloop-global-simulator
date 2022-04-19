@@ -180,6 +180,20 @@ class Hangar(Step):
                 ):
                     i += 1
                 pod = self._pods[i]
+                if self.gestionnaireRevision.podDoitAllerEnRevision(pod) or self.gestionnaireLavage.podDoitAllerAuLavage(pod):
+                    network = self.parent.parent
+                    found_station = network.get_station_by_name(station)
+                    if found_station is None:
+                        import inspect
+                        stack = inspect.stack()
+                        the_class = stack[1][0].f_locals["self"].__class__.__name__
+                        the_name = stack[1][0].f_locals["self"].name
+                        the_method = stack[1][0].f_code.co_name
+                        print(
+                            f"méthode courante {self.name}.handle_message()-->refill appelée par {the_name}.{the_method}()")
+                        print(f"auteur : {message['author']}")
+
+                    found_station.down_incoming_pods()
                 #print("")
                 #print(f"Un pod se voit assigner la destination {station} lorsque le {self.__class__.__name__} {self.name} traite un refill")
                 #print("")

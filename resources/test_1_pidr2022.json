@@ -136,6 +136,7 @@
     }
   ],
   "gestionnaireRevision": {
+    "limite_nombre_signalements_avant_revision": 1,
     "limite_distance_parcourue_avant_revision": 2000,
     "limite_temps_ecoule_avant_revision": 2000
   },

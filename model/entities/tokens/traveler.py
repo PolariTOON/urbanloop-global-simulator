@@ -16,6 +16,10 @@ class Traveler(Token):
         if not randint(0, 1):
             pod.demander_envoi_lavage(self.id)
 
+    def signalerAleatoirementRevision(self, pod): #TODO: Voir s'il serait possible de stocker la probabilité qu'un voyageur signale un pod
+        if not randint(0, 1):
+            pod.demander_envoi_revision(self.id)
+
     @property
     def name(self):
         return super().name or "Traveler %s" % self.id

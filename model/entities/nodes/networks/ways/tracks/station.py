@@ -455,6 +455,7 @@ class Station(Step):
                 #p_tbtc debut
                 if pod.travelers:
                     pod.travelers[0].signalerAleatoirementLavage(pod)
+                    pod.travelers[0].signalerAleatoirementRevision(pod)
                 #p_tbtc fin
                 for t in pod.travelers: 
                     t.disembark()

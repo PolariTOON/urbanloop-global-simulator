@@ -19,6 +19,7 @@ class Pod(Token):
     quickInfos_nextIndex = 0
 
     def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, during_departure=None, traveled_distance=None, traveled_distance_t=None,
+                 nombre_signalements_doit_aller_en_revision=None,
                  temps_depuis_revision=None,
                  distance_depuis_revision=None,
                  temps_restant_attente_en_revision=None,
@@ -71,6 +72,7 @@ class Pod(Token):
         self._previous_station = None
 
         #p_tbtc debut
+        self._nombre_signalements_doit_aller_en_revision = nombre_signalements_doit_aller_en_revision or GestionnaireRevision.genererNombreSignalementsAleatoire()
         self._temps_depuis_revision = temps_depuis_revision or GestionnaireRevision.genererTempsAleatoire()
         self._distance_depuis_revision = distance_depuis_revision or GestionnaireRevision.genererDistanceAleatoire()
         self._temps_restant_attente_en_revision = temps_restant_attente_en_revision or -1
@@ -89,6 +91,15 @@ class Pod(Token):
 
         print(f"Pod créé - quickInfos : {self._quickInfos} - objet : {self}")
         #p_tbtc fin
+
+
+    @property
+    def nombre_signalements_doit_aller_en_revision(self):
+        return self._nombre_signalements_doit_aller_en_revision
+
+    @nombre_signalements_doit_aller_en_revision.setter
+    def nombre_signalements_doit_aller_en_revision(self, value):
+        self._nombre_signalements_doit_aller_en_revision = value
 
     @property
     def temps_depuis_revision(self):
@@ -158,10 +169,16 @@ class Pod(Token):
             self._quickInfos += "\nÀ laver"
         if self._en_direction_revision:
             self._quickInfos += "\nVers révision"
+        elif self.nombre_signalements_doit_aller_en_revision:
+            self._quickInfos += "\nÀ réviser"
 
     def demander_envoi_lavage(self, user_id):
         self._nombre_signalements_doit_aller_au_lavage += 1
-        print(f"Pod {self._quickInfos_index} est signalé comme étant sale ({self._nombre_signalements_doit_aller_au_lavage})")
+        print(f"Pod {self._quickInfos_index} est signalé comme étant à laver ({self._nombre_signalements_doit_aller_au_lavage})")
+
+    def demander_envoi_revision(self, user_id):
+        self._nombre_signalements_doit_aller_en_revision += 1
+        print(f"Pod {self._quickInfos_index} est signalé comme étant à réviser ({self._nombre_signalements_doit_aller_en_revision})")
 
     @property
     def position(self):
@@ -312,6 +329,7 @@ class Pod(Token):
             "traveled_distance": self._traveled_distance,
             "traveled_distance_t": self._traveled_distance_t,
             #p_tbtc debut
+            "nombre_signalements_doit_aller_en_revision": self._nombre_signalements_doit_aller_en_revision,
             "distance_depuis_revision": self._distance_depuis_revision,
             "temps_depuis_revision": self._temps_depuis_revision,
             "temps_restant_attente_en_revision": self._temps_restant_attente_en_revision,

@@ -39,7 +39,7 @@ class GestionnaireRevision:
         return {
             "limite_distance_parcourue_avant_revision": self._limite_distance_parcourue_avant_revision,
             "limite_temps_ecoule_avant_revision": self._limite_temps_ecoule_avant_revision,
-            "temp_revision": self._temps_revision
+            "temps_revision": self._temps_revision
         }
 
     def obtenirDestination(self, nom_station_source, categorie_destination="HangarRevision"):

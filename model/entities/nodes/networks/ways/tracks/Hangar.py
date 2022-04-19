@@ -56,6 +56,14 @@ class Hangar(Step):
         return dict
 
     @property
+    def gestionnaireRevision(self):
+        return self.parent.parent.gestionnaireRevision
+
+    @property
+    def gestionnaireLavage(self):
+        return self.parent.parent.gestionnaireLavage
+
+    @property
     def element_of_loop(self):
         """Retourne le numéro du dépôt au sein des éléments de sa boucle"""
         return self._element_of_loop
@@ -167,8 +175,8 @@ class Hangar(Step):
                 while i < len(self._pods) - 1 and (
                         self._pods[i] in self._departure_pods
                         or self._pods[i].during_departure\
-                        or self.parent.parent.gestionnaireRevision.podDoitAllerEnRevision(self._pods[i])\
-                        or self.parent.parent.gestionnaireLavage.podDoitAllerAuLavage(self._pods[i])
+                        or self.gestionnaireRevision.podDoitAllerEnRevision(self._pods[i])\
+                        or self.gestionnaireLavage.podDoitAllerAuLavage(self._pods[i])
                 ):
                     i += 1
                 pod = self._pods[i]

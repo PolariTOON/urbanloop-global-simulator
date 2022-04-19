@@ -10,19 +10,7 @@ class HangarRevision(Hangar):
         super().__init__(env, id, departure_pods, pods, element_of_loop, **kwargs)
         #p_tbtc
         print("Hangar révision créé")
-        self._temps_revision = 20
-        self._enRevision = []
-
-    @property
-    def temps_revision(self):
-        return self._temps_revision
-
-    @property
-    def enRevision(self):
-        return self._enRevision
-
-    def ajouterEnRevision(self, pod):
-        self._enRevision.append(pod)
+        self._enRevision = [] # TODO à changer pour sérialisation
 
     def serialize(self):
         """sérialise les informations du dépôt"""
@@ -30,10 +18,20 @@ class HangarRevision(Hangar):
         enRevision = [{"pod": pod.serialize()} for pod in self._enRevision]
         dico.update({
             "type": f"{self.__class__.__name__}",
-            "temps_revision": self._temps_revision,
             "enRevision": enRevision
         })
         return dico
+
+    @property
+    def temps_revision(self):
+        return self.parent.parent.gestionnaireRevision.temps_revision
+
+    @property
+    def enRevision(self):
+        return self._enRevision
+
+    def ajouterEnRevision(self, pod):
+        self._enRevision.append(pod)
 
     def update(self):
         """Fonction gérant le processus dépôt"""
@@ -49,12 +47,12 @@ class HangarRevision(Hangar):
             pod.temps_restant_attente_en_revision -= 1
             #print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_revision}")
             if pod.temps_restant_attente_en_revision == 0:
-                print(f"{pod} : revision terminée")
-                self._departure_pods.append(pod)
+                print(f"Pod {pod.quickInfos_index} : revision terminée")
                 pod.temps_depuis_revision = 0
                 pod.distance_depuis_revision = 0
                 pod.temps_restant_attente_en_revision = -1
                 self._enRevision.remove(pod)
+                self._departure_pods.append(pod)
 
         # Départ des capsules #p_tbtc
         if self._departure_pods and self._wait == -1:
@@ -75,7 +73,7 @@ class HangarRevision(Hangar):
                     "type": "departure",
                     "destination": destination
                 })
-                print(f"En sortie de révision, le pod {pod} est redirigé vers {destination}")
+                print(f"En sortie de révision, Pod {pod.quickInfos_index} est redirigé vers {destination}")
                 # prévient le parent
                 #print(f"En sortie de révision, {self.name} écrit à {self.parent.name} departure vers {destination}")
                 #print(f"En sortie de révision, {pod} : track_or_switch est {pod.track_or_switch.name}")
@@ -88,6 +86,8 @@ class HangarRevision(Hangar):
                     "waiting_time": 0,
                     "traveler": False
                 })
+            else:
+                raise Exception(f"Pod {pod.quickInfos_index} extrait de HangarRevision._departure_pods est encore dans HangarRevision._enRevision")
 
     def handle_message(self, message):
         if "pod_entry" == message["type"]:
@@ -99,12 +99,12 @@ class HangarRevision(Hangar):
             })
             if pod.destination == self.name:
                 self._pods.append(pod)
-                print(f"Le pod {pod} entre en hangar de révision")
+                print(f"Pod {pod.quickInfos_index} entre en hangar de révision")
                 print(f"Son track_or_switch est {pod.track_or_switch.name}")
                 #p_tbtc debut
                 pod.en_direction_revision = False
                 self._enRevision.append(pod)
-                pod.temps_restant_attente_en_revision = self._temps_revision
+                pod.temps_restant_attente_en_revision = self.temps_revision
                 #p_tbtc fin
                 pod.write({
                     "author": self,
@@ -117,7 +117,7 @@ class HangarRevision(Hangar):
                     "timestamp": self.env.time
                 })
             else:
-                print(f"Le pod {pod} passe devant un hangar de révision")
+                print(f"Pod {pod.quickInfos_index} passe devant un hangar de révision")
                 pod.write({
                     "author": self,
                     "type": "passing"
@@ -142,7 +142,7 @@ class HangarRevision(Hangar):
                 pod = self._pods[i]
                 pod.destination = station
                 self._departure_pods.append(pod)
-                print(f"Entrée de {pod} en révision")
+                print(f"Entrée de Pod {pod.quickInfos_index} en révision")
             else:
                 # on cherche la station concernée,
                 # et on l'informe qu'elle ne recevra pas le pod.

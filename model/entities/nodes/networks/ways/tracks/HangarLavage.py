@@ -3,16 +3,27 @@ from .Hangar import Hangar
 
 class HangarLavage(Hangar):
     """ Classe modélisant un hangar de lavage=dépôt de lavage"""
-    def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None, **kwargs):
+    def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None,
+                 enLavage=None,
+                 **kwargs):
         super().__init__(env, id, departure_pods, pods, element_of_loop, **kwargs)
         #p_tbtc
         print("Hangar lavage créé")
-        self._temps_lavage = 20
-        self._enLavage = []
+        self._enLavage = enLavage or []
+
+    def serialize(self):
+        """sérialise les informations du dépôt"""
+        dico = super().serialize()
+        enLavage = [{"pod": pod.serialize()} for pod in self._enLavage]
+        dico.update({
+            "type": f"{self.__class__.__name__}",
+            "enLavage": enLavage
+        })
+        return dico
 
     @property
     def temps_lavage(self):
-        return self._temps_lavage
+        return self.parent.parent.gestionnaireLavage.temps_lavage
 
     def ajouterEnLavage(self, pod):
         if pod not in self._enLavage:
@@ -21,17 +32,6 @@ class HangarLavage(Hangar):
     def retirerEnLavage(self, pod):
         if pod in self._enLavage:
             self._enLavage.append(pod)
-
-    def serialize(self):
-        """sérialise les informations du dépôt"""
-        dico = super().serialize()
-        enLavage = [{"pod": pod.serialize()} for pod in self._enLavage]
-        dico.update({
-            "type": f"{self.__class__.__name__}",
-            "temps_lavage": self._temps_lavage,
-            "enLavage": enLavage
-        })
-        return dico
 
     def update(self):
         """Fonction gérant le processus dépôt"""
@@ -47,10 +47,10 @@ class HangarLavage(Hangar):
             pod.temps_restant_attente_en_lavage -= 1
             #print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_lavage}")
             if pod.temps_restant_attente_en_lavage == 0:
-                print(f"{pod} : lavage terminé")
-                self._departure_pods.append(pod)
+                print(f"Pod {pod.quickInfos_index} : lavage terminé")
                 pod.doit_aller_au_lavage = False
                 pod.temps_restant_attente_au_lavage = -1
+                self._departure_pods.append(pod)
                 self._enLavage.remove(pod)
 
         # Départ des capsules #p_tbtc
@@ -72,7 +72,7 @@ class HangarLavage(Hangar):
                     "type": "departure",
                     "destination": destination
                 })
-                print(f"En sortie de lavage, le pod {pod} est redirigé vers {destination}")
+                print(f"En sortie de lavage, Pod {pod.quickInfos_index} est redirigé vers {destination}")
                 # prévient le parent
                 #print(f"En sortie de révision, {self.name} écrit à {self.parent.name} departure vers {destination}")
                 #print(f"En sortie de révision, {pod} : track_or_switch est {pod.track_or_switch.name}")
@@ -85,6 +85,8 @@ class HangarLavage(Hangar):
                     "waiting_time": 0,
                     "traveler": False
                 })
+            else:
+                raise Exception(f"Pod {pod.quickInfos_index} extrait de HangarLavage._departure_pods est encore dans HangarLavage._enLavage")
 
     def handle_message(self, message):
         if "pod_entry" == message["type"]:
@@ -96,12 +98,12 @@ class HangarLavage(Hangar):
             })
             if pod.destination == self.name:
                 self._pods.append(pod)
-                print(f"Le pod {pod} entre en hangar de lavage")
+                print(f"Pod {pod.quickInfos_index} entre en hangar de lavage")
                 print(f"Son track_or_switch est {pod.track_or_switch.name}")
                 #p_tbtc debut
                 pod.en_direction_lavage = False
                 self._enLavage.append(pod)
-                pod.temps_restant_attente_en_lavage = self._temps_lavage
+                pod.temps_restant_attente_en_lavage = self.temps_lavage
                 #p_tbtc fin
                 pod.write({
                     "author": self,
@@ -114,7 +116,7 @@ class HangarLavage(Hangar):
                     "timestamp": self.env.time
                 })
             else:
-                print(f"Le pod {pod} passe devant un hangar de lavage")
+                print(f"Pod {pod.quickInfos_index} passe devant un hangar de lavage")
                 pod.write({
                     "author": self,
                     "type": "passing"
@@ -139,7 +141,7 @@ class HangarLavage(Hangar):
                 pod = self._pods[i]
                 pod.destination = station
                 self._departure_pods.append(pod)
-                print(f"Entrée de {pod} en lavage")
+                print(f"Entrée de Pod {pod.quickInfos_index} en lavage")
             else:
                 # on cherche la station concernée,
                 # et on l'informe qu'elle ne recevra pas le pod.

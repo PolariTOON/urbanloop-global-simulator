@@ -5,14 +5,26 @@ from random import randint
 
 
 class GestionnaireLavage:
+    TEMPS_LAVAGE_DEFAUT = 100
 
     def __init__(
             self,
             network,
-            **kwargs
+            temps_lavage=None
     ):
         self._network = network
+        self._temps_lavage = temps_lavage or GestionnaireLavage.TEMPS_LAVAGE_DEFAUT
+
         self._liste_pods = self._network.pods
+
+    def serialize(self):
+        return {
+            "temps_lavage": self._temps_lavage
+        }
+
+    @property
+    def temps_lavage(self):
+        return self._temps_lavage
 
     def obtenirDestination(self, nom_station_source, categorie_destination="HangarLavage"):
         # nom_station_source pourrait être ustilisé dans une recherche plus élaborée
@@ -28,6 +40,3 @@ class GestionnaireLavage:
         if pod.doit_aller_au_lavage:
             return True
         return False
-
-    def serialize(self):
-        return {}

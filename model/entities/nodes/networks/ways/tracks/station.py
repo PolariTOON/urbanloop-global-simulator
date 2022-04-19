@@ -266,18 +266,18 @@ class Station(Step):
             pod = self._pods[i]
             if \
                     pod is not None and \
-                    self.gestionnaireRevision.podDoitAllerEnRevision(pod) and \
-                    pod not in self._doiventAllerEnRevision:
-                pod.en_direction_revision = True
-                self._doiventAllerEnRevision.append(pod)
-                print(f"Pod {pod.quickInfos_index} est prévu comme à réviser")
-            elif \
-                    pod is not None and \
                     self.gestionnaireLavage.podDoitAllerAuLavage(pod) and \
                     pod not in self._doiventAllerAuLavage:
                 pod.en_direction_lavage = True
                 self._doiventAllerAuLavage.append(pod)
                 print(f"Pod {pod.quickInfos_index} est prévu comme à laver")
+            elif \
+                    pod is not None and \
+                    self.gestionnaireRevision.podDoitAllerEnRevision(pod) and \
+                    pod not in self._doiventAllerEnRevision:
+                pod.en_direction_revision = True
+                self._doiventAllerEnRevision.append(pod)
+                print(f"Pod {pod.quickInfos_index} est prévu comme à réviser")
         #p fin
 
         # On charge les voyageurs s'il y a de la place
@@ -319,10 +319,9 @@ class Station(Step):
                     categorie_destination="HangarRevision"
                 )
                 if pod.travelers != []:
-                    raise ValueError(f"Le pod {pod} doit aller en révision mais pod.travelers n'est pas None")
+                    raise ValueError(f"Pod {pod.quickInfos_index} doit aller en révision mais pod.travelers n'est pas None\nadresse {pod}")
                 self.send_pod(pod, destination, False) # traveler=False
-                print(f"station : assignation en révision : pod.destination = {pod.destination}")
-                print(f"Le pod {pod} est usé - distance = {pod.distance_depuis_revision}, temps = {pod.temps_depuis_revision}\n\tIl lui est ordonné d'aller en révision à {destination}")
+                print(f"Pod {pod.quickInfos_index} est usé - distance = {pod.distance_depuis_revision}, temps = {pod.temps_depuis_revision}\n\tIl lui est ordonné d'aller en révision à {destination}")
         for pod in self._doiventAllerAuLavage:
             # if pod in self._departure_pods:
             # print("\u001B[31mERROR: ", self.name, pod.name, "doitAllerEnRevision et depart en même temps\u001B[0m")
@@ -338,11 +337,10 @@ class Station(Step):
                     categorie_destination="HangarLavage"
                 )
                 if pod.travelers != []:
-                    raise ValueError(f"Le pod {pod} doit aller au lavage mais pod.travelers n'est pas None")
+                    raise ValueError(f"Pod {pod.quickInfos_index} doit aller au lavage mais pod.travelers n'est pas None\nadresse {pod}")
                 self.send_pod(pod, destination, False)  # traveler=False
-                print(f"station : assignation au lavage : pod.destination = {pod.destination}")
                 print(
-                    f"Il est constaté que le pod {pod} est signalé comme sale\n\tIl lui est ordonné d'aller au lavage à {destination}")
+                    f"Il est constaté que Pod {pod.quickInfos_index} est signalé comme sale\n\tIl lui est ordonné d'aller au lavage à {destination}")
         #p fin
         
         # Attente de la montée des voyageurs pour l'envoi d'une capsule

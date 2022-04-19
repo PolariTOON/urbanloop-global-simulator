@@ -201,9 +201,9 @@ class SwitchIn(Switch):
                 if(self._previous is self._next):
                     print(f"ATTENTION : self._previous est self._next is {self._previous}")
                 try:
-                    print(pod.distance_depuis_revision)
+                    #print(pod.distance_depuis_revision)
                     pod.distance_depuis_revision += self._previous.sections[-1]._length
-                    print(pod.distance_depuis_revision)
+                    #print(pod.distance_depuis_revision)
                 except:
                     print("erreur : SwitchIn self._previous.sections[-1]._length")
                     print(self._previous)

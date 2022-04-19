@@ -159,6 +159,7 @@ class Pod(Token):
             self._quickInfos += "\nVers révision"
 
     def demander_envoi_lavage(self, user_id):
+        print(f"Pod {self._quickInfos_index} est signalé comme étant sale")
         self._doit_aller_au_lavage = True
 
     @property

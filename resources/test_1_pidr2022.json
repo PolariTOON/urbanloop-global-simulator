@@ -119,7 +119,7 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "HangarRevision", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 20}, "temps_revision": 20, "enRevision": []}
+        {"type": "HangarRevision", "name": "Jean-Paul", "x": 201.5774536145918, "y": 315.2553566947755, "pods": {"max": 100, "count": 20}, "temps_revision": 500, "enRevision": []}
       ],
       "pods": []
     },
@@ -130,14 +130,16 @@
         {"speed": 22.22, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "HangarLavage", "name": "Critobule", "x": 270, "y": 325, "pods": {"max": 100, "count": 20}, "temps_lavage": 20, "enLavage": []}
+        {"type": "HangarLavage", "name": "Critobule", "x": 270, "y": 325, "pods": {"max": 100, "count": 20}, "temps_lavage": 500, "enLavage": []}
       ],
       "pods": []
     }
   ],
   "gestionnaireRevision": {
-    "limite_distance_parcourue_avant_revision": 500,
-    "limite_temps_ecoule_avant_revision": 500
+    "limite_distance_parcourue_avant_revision": 2000,
+    "limite_temps_ecoule_avant_revision": 2000
   },
-  "gestionnaireLavage": {}
+  "gestionnaireLavage": {
+    "limite_nombre_signalements_avant_lavage": 1
+  }
 }

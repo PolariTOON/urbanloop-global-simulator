@@ -2,6 +2,7 @@ from numpy.random import normal, seed
 
 from .token import Token
 from .traveler import Traveler
+from ..nodes.networks.ways.tracks.GestionnaireLavage import GestionnaireLavage
 from ..nodes.networks.ways.tracks.GestionnaireRevision import GestionnaireRevision
 
 _moving_pods = []
@@ -75,7 +76,7 @@ class Pod(Token):
         self._temps_restant_attente_en_revision = temps_restant_attente_en_revision or -1
         self._en_direction_revision = en_direction_revision or False
 
-        self._nombre_signalements_doit_aller_au_lavage = nombre_signalements_doit_aller_au_lavage or 0
+        self._nombre_signalements_doit_aller_au_lavage = nombre_signalements_doit_aller_au_lavage or GestionnaireLavage.genererNombreSignalementsAleatoire()
         self._temps_restant_attente_au_lavage = temps_restant_attente_au_lavage or -1
         self._en_direction_lavage = en_direction_lavage or False
 

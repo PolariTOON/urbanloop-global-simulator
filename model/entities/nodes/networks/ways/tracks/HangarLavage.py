@@ -61,10 +61,17 @@ class HangarLavage(Hangar):
             #pod = self._departure_pods[0]
             pod = self._departure_pods.pop(0)
             if pod not in self._enLavage:
-                destination = nw.gestionnaireLavage.obtenirDestination(
-                    nom_station_source=self.name,
-                    categorie_destination="HangarSimple"
-                )
+                if self.gestionnaireRevision.podDoitAllerEnRevision(pod):
+                    pod.en_direction_revision = True
+                    destination = nw.gestionnaireRevision.obtenirDestination(
+                        nom_station_source=self.name,
+                        categorie_destination="HangarRevision"
+                    )
+                else:
+                    destination = nw.gestionnaireLavage.obtenirDestination(
+                        nom_station_source=self.name,
+                        categorie_destination="HangarSimple"
+                    )
                 pod.during_departure = True
                 #print(f"En sortie de révision, {self.name} écrit à {pod} departure vers {destination}")
                 pod.write({

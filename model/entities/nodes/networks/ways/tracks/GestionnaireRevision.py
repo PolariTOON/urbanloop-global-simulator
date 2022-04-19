@@ -46,6 +46,8 @@ class GestionnaireRevision:
         # nom_station_source pourrait être ustilisé dans une recherche plus élaborée
         if categorie_destination == "HangarRevision":
             destination = self._network.hangarsRevision[randint(0, len(self._network.hangarsRevision) - 1)].name
+        elif categorie_destination == "HangarLavage":
+            destination = self._network.hangarsLavage[randint(0, len(self._network.hangarsLavage) - 1)].name
         elif categorie_destination == "HangarSimple":
             destination = self._network.hangarsSimples[randint(0, len(self._network.hangarsSimples) - 1)].name
         else:

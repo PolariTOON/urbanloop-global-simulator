@@ -8,6 +8,11 @@ class GestionnaireLavage:
     TEMPS_LAVAGE_DEFAUT = 100
     LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT = 2
 
+    @classmethod
+    def genererNombreSignalementsAleatoire(cls):
+        #return randint(0, cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT*2)
+        return 0
+
     def __init__(
             self,
             network,
@@ -33,7 +38,9 @@ class GestionnaireLavage:
     def obtenirDestination(self, nom_station_source, categorie_destination="HangarLavage"):
         # nom_station_source pourrait être ustilisé dans une recherche plus élaborée
         if categorie_destination == "HangarLavage":
-            destination = self._network.hangarsLavage[randint(0, len(self._network.hangarsRevision) - 1)].name
+            destination = self._network.hangarsLavage[randint(0, len(self._network.hangarsLavage) - 1)].name
+        elif categorie_destination == "HangarRevision":
+            destination = self._network.hangarsRevision[randint(0, len(self._network.hangarsRevision) - 1)].name
         elif categorie_destination == "HangarSimple":
             destination = self._network.hangarsSimples[randint(0, len(self._network.hangarsSimples) - 1)].name
         else:

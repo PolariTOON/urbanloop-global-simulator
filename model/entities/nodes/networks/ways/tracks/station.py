@@ -453,8 +453,8 @@ class Station(Step):
                     print("\033[4;31mERROR: mauvais comptage des incoming pods\u001B[0m", self._incoming_pods, " ", self.name, "\n\t\t(station l.277)")
 
                 #p_tbtc debut
-                #if pod.travelers:
-                #    pod.travelers[0].signalerAleatoirementLavage(pod)
+                if pod.travelers:
+                    pod.travelers[0].signalerAleatoirementLavage(pod)
                 #p_tbtc fin
                 for t in pod.travelers: 
                     t.disembark()

@@ -1,3 +1,5 @@
+from random import randint
+
 from .token import Token
 
 class Traveler(Token):
@@ -10,8 +12,9 @@ class Traveler(Token):
         self._changed_dest = False
         self._called_emergency_exit = False
 
-    #TODO def signalerAleatoirementLavage(self, pod):
-    #
+    def signalerAleatoirementLavage(self, pod): #TODO: Voir s'il serait possible de stocker la probabilité qu'un voyageur signale un pod
+        if not randint(0, 1):
+            pod.demander_envoi_lavage(self.id)
 
     @property
     def name(self):

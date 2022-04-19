@@ -22,7 +22,7 @@ class Pod(Token):
                  distance_depuis_revision=None,
                  temps_restant_attente_en_revision=None,
                  en_direction_revision=None,
-                 doit_aller_au_lavage=None,
+                 nombre_signalements_doit_aller_au_lavage=None,
                  temps_restant_attente_au_lavage=None,
                  en_direction_lavage=None,
                  quickInfos_index=None,
@@ -75,7 +75,7 @@ class Pod(Token):
         self._temps_restant_attente_en_revision = temps_restant_attente_en_revision or -1
         self._en_direction_revision = en_direction_revision or False
 
-        self._doit_aller_au_lavage = doit_aller_au_lavage or False
+        self._nombre_signalements_doit_aller_au_lavage = nombre_signalements_doit_aller_au_lavage or 0
         self._temps_restant_attente_au_lavage = temps_restant_attente_au_lavage or -1
         self._en_direction_lavage = en_direction_lavage or False
 
@@ -122,12 +122,12 @@ class Pod(Token):
         self._en_direction_revision = value
 
     @property
-    def doit_aller_au_lavage(self):
-        return self._doit_aller_au_lavage
+    def nombre_signalements_doit_aller_au_lavage(self):
+        return self._nombre_signalements_doit_aller_au_lavage
 
-    @doit_aller_au_lavage.setter
-    def doit_aller_au_lavage(self, value):
-        self._doit_aller_au_lavage = value
+    @nombre_signalements_doit_aller_au_lavage.setter
+    def nombre_signalements_doit_aller_au_lavage(self, value):
+        self._nombre_signalements_doit_aller_au_lavage = value
 
     @property
     def temps_restant_attente_au_lavage(self):
@@ -153,14 +153,14 @@ class Pod(Token):
         self._quickInfos = f"Pod {self._quickInfos_index}\n{self.source}->{self.destination}"
         if self._en_direction_lavage:
             self._quickInfos += "\nVers lavage"
-        elif self.doit_aller_au_lavage:
+        elif self.nombre_signalements_doit_aller_au_lavage:
             self._quickInfos += "\nÀ laver"
         if self._en_direction_revision:
             self._quickInfos += "\nVers révision"
 
     def demander_envoi_lavage(self, user_id):
-        print(f"Pod {self._quickInfos_index} est signalé comme étant sale")
-        self._doit_aller_au_lavage = True
+        self._nombre_signalements_doit_aller_au_lavage += 1
+        print(f"Pod {self._quickInfos_index} est signalé comme étant sale ({self._nombre_signalements_doit_aller_au_lavage})")
 
     @property
     def position(self):
@@ -315,7 +315,7 @@ class Pod(Token):
             "temps_depuis_revision": self._temps_depuis_revision,
             "temps_restant_attente_en_revision": self._temps_restant_attente_en_revision,
             "en_direction_revision": self._en_direction_revision,
-            "doit_aller_au_lavage": self._doit_aller_au_lavage,
+            "nombre_signalements_doit_aller_au_lavage": self._nombre_signalements_doit_aller_au_lavage,
             "temps_restant_attente_au_lavage": self._temps_restant_attente_au_lavage,
             "en_direction_lavage": self._en_direction_lavage,
             "quickInfos_index": self._quickInfos_index,

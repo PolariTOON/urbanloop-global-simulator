@@ -48,7 +48,7 @@ class HangarLavage(Hangar):
             #print(f"{pod} : compteur de révision a décru de 1 : {pod.temps_restant_attente_en_lavage}")
             if pod.temps_restant_attente_en_lavage == 0:
                 print(f"Pod {pod.quickInfos_index} : lavage terminé")
-                pod.doit_aller_au_lavage = False
+                pod.nombre_signalements_doit_aller_au_lavage = 0
                 pod.temps_restant_attente_au_lavage = -1
                 self._departure_pods.append(pod)
                 self._enLavage.remove(pod)

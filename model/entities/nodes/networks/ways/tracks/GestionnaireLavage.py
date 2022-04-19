@@ -6,20 +6,24 @@ from random import randint
 
 class GestionnaireLavage:
     TEMPS_LAVAGE_DEFAUT = 100
+    LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT = 2
 
     def __init__(
             self,
             network,
-            temps_lavage=None
+            temps_lavage=None,
+            limite_nombre_signalements_avant_lavage=None
     ):
         self._network = network
         self._temps_lavage = temps_lavage or GestionnaireLavage.TEMPS_LAVAGE_DEFAUT
+        self._limite_nombre_signalements_avant_lavage = limite_nombre_signalements_avant_lavage or GestionnaireLavage.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT
 
         self._liste_pods = self._network.pods
 
     def serialize(self):
         return {
-            "temps_lavage": self._temps_lavage
+            "temps_lavage": self._temps_lavage,
+            "limite_nombre_signalements_avant_lavage": self._limite_nombre_signalements_avant_lavage
         }
 
     @property
@@ -37,6 +41,6 @@ class GestionnaireLavage:
         return destination
 
     def podDoitAllerAuLavage(self, pod):
-        if pod.doit_aller_au_lavage:
+        if pod.nombre_signalements_doit_aller_au_lavage >= self._limite_nombre_signalements_avant_lavage:
             return True
         return False

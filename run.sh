@@ -28,6 +28,7 @@ launch(){
   python3 main.py -p
 }
 
+
 if [ -z "$1" ]
 then
     "DefaultFunc"

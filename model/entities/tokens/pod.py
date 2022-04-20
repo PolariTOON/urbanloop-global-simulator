@@ -20,11 +20,13 @@ class Pod(Token):
 
     def __init__(self, env, track_or_switch, pod_speed, position=None, travelers=None, speed_restore=None, length_before_restore=None, turn=None, coef=None, acceleration=None, brake=None, during_departure=None, traveled_distance=None, traveled_distance_t=None,
                  nombre_signalements_doit_aller_en_revision=None,
+                 dernier_signalement_revision_par_vrai_utilisateur=None,
                  temps_depuis_revision=None,
                  distance_depuis_revision=None,
                  temps_restant_attente_en_revision=None,
                  en_direction_revision=None,
                  nombre_signalements_doit_aller_au_lavage=None,
+                 dernier_signalement_lavage_par_vrai_utilisateur=None,
                  temps_restant_attente_au_lavage=None,
                  en_direction_lavage=None,
                  quickInfos_index=None,
@@ -73,12 +75,14 @@ class Pod(Token):
 
         #p_tbtc debut
         self._nombre_signalements_doit_aller_en_revision = nombre_signalements_doit_aller_en_revision or GestionnaireRevision.genererNombreSignalementsAleatoire()
+        self._dernier_signalement_lavage_par_vrai_utilisateur = dernier_signalement_lavage_par_vrai_utilisateur or False
         self._temps_depuis_revision = temps_depuis_revision or GestionnaireRevision.genererTempsAleatoire()
         self._distance_depuis_revision = distance_depuis_revision or GestionnaireRevision.genererDistanceAleatoire()
         self._temps_restant_attente_en_revision = temps_restant_attente_en_revision or -1
         self._en_direction_revision = en_direction_revision or False
 
         self._nombre_signalements_doit_aller_au_lavage = nombre_signalements_doit_aller_au_lavage or GestionnaireLavage.genererNombreSignalementsAleatoire()
+        self._dernier_signalement_revision_par_vrai_utilisateur = dernier_signalement_revision_par_vrai_utilisateur or False
         self._temps_restant_attente_au_lavage = temps_restant_attente_au_lavage or -1
         self._en_direction_lavage = en_direction_lavage or False
 
@@ -100,6 +104,14 @@ class Pod(Token):
     @nombre_signalements_doit_aller_en_revision.setter
     def nombre_signalements_doit_aller_en_revision(self, value):
         self._nombre_signalements_doit_aller_en_revision = value
+
+    @property
+    def dernier_signalement_revision_par_vrai_utilisateur(self):
+        return self._dernier_signalement_revision_par_vrai_utilisateur
+
+    @dernier_signalement_revision_par_vrai_utilisateur.setter
+    def dernier_signalement_revision_par_vrai_utilisateur(self, value):
+        self._dernier_signalement_revision_par_vrai_utilisateur = value
 
     @property
     def temps_depuis_revision(self):
@@ -140,6 +152,14 @@ class Pod(Token):
     @nombre_signalements_doit_aller_au_lavage.setter
     def nombre_signalements_doit_aller_au_lavage(self, value):
         self._nombre_signalements_doit_aller_au_lavage = value
+
+    @property
+    def dernier_signalement_lavage_par_vrai_utilisateur(self):
+        return self._dernier_signalement_lavage_par_vrai_utilisateur
+
+    @dernier_signalement_lavage_par_vrai_utilisateur.setter
+    def dernier_signalement_lavage_par_vrai_utilisateur(self, value):
+        self._dernier_signalement_lavage_par_vrai_utilisateur = value
 
     @property
     def temps_restant_attente_au_lavage(self):
@@ -330,9 +350,11 @@ class Pod(Token):
             "traveled_distance_t": self._traveled_distance_t,
             #p_tbtc debut
             "nombre_signalements_doit_aller_en_revision": self._nombre_signalements_doit_aller_en_revision,
+            "dernier_signalement_revision_par_vrai_utilisateur": self._dernier_signalement_revision_par_vrai_utilisateur,
             "distance_depuis_revision": self._distance_depuis_revision,
             "temps_depuis_revision": self._temps_depuis_revision,
             "temps_restant_attente_en_revision": self._temps_restant_attente_en_revision,
+            "dernier_signalement_lavage_par_vrai_utilisateur": self._dernier_signalement_lavage_par_vrai_utilisateur,
             "en_direction_revision": self._en_direction_revision,
             "nombre_signalements_doit_aller_au_lavage": self._nombre_signalements_doit_aller_au_lavage,
             "temps_restant_attente_au_lavage": self._temps_restant_attente_au_lavage,

@@ -49,6 +49,7 @@ class HangarLavage(Hangar):
             if pod.temps_restant_attente_en_lavage == 0:
                 print(f"Pod {pod.quickInfos_index} : lavage terminé")
                 pod.nombre_signalements_doit_aller_au_lavage = 0
+                pod.dernier_signalement_lavage_par_vrai_utilisateur = False
                 pod.temps_restant_attente_au_lavage = -1
                 self._departure_pods.append(pod)
                 self._enLavage.remove(pod)

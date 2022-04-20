@@ -380,6 +380,7 @@ def demander_envoi_au_lavage(user_id):
         return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
     else :
         pod_of_user.demander_envoi_lavage(user_id)
+        pod_of_user.dernier_signalement_lavage_par_vrai_utilisateur = True
         return jsonify({ 'msg': 'Demande d\'envoi au lavage faite' })
 
 
@@ -399,5 +400,6 @@ def demander_envoi_en_revision(user_id):
         return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
     else :
         pod_of_user.demander_envoi_revision(user_id)
+        pod_of_user.dernier_signalement_revision_par_vrai_utilisateur = True
         return jsonify({ 'msg': 'Demande d\'envoi en révision faite' })
 

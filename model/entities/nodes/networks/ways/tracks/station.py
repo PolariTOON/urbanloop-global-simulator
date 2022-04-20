@@ -267,14 +267,16 @@ class Station(Step):
             if \
                     pod is not None and \
                     self.gestionnaireLavage.podDoitAllerAuLavage(pod) and \
-                    pod not in self._doiventAllerAuLavage:
+                    pod not in self._doiventAllerAuLavage and \
+                    pod not in self._doiventAllerEnRevision:
                 pod.en_direction_lavage = True
                 self._doiventAllerAuLavage.append(pod)
                 print(f"Pod {pod.quickInfos_index} est prévu comme à laver")
             elif \
                     pod is not None and \
                     self.gestionnaireRevision.podDoitAllerEnRevision(pod) and \
-                    pod not in self._doiventAllerEnRevision:
+                    pod not in self._doiventAllerEnRevision and \
+                    pod not in self._doiventAllerAuLavage:
                 pod.en_direction_revision = True
                 self._doiventAllerEnRevision.append(pod)
                 print(f"Pod {pod.quickInfos_index} est prévu comme à réviser")

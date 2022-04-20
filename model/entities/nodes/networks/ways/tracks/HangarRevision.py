@@ -49,6 +49,7 @@ class HangarRevision(Hangar):
             if pod.temps_restant_attente_en_revision == 0:
                 print(f"Pod {pod.quickInfos_index} : revision terminée")
                 pod.nombre_signalements_doit_aller_en_revision = 0
+                pod.dernier_signalement_revision_par_vrai_utilisateur = False
                 pod.temps_depuis_revision = 0
                 pod.distance_depuis_revision = 0
                 pod.temps_restant_attente_en_revision = -1

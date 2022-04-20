@@ -12,8 +12,12 @@ const innerColor = "#fff";
 const selectedOuterColor = "#0fc";
 const fullInnerColor = "#333";
 
-const outerColor_VersRevision = "#d2b"; //p_tb
-const outerColor_VersLavage = "#888"; //p_tb
+//p_tbtc Début
+const outerColor_VersRevision = "#d2b";
+const outerColor_VersRevisionVraiUtilisateur = "#92f";
+const outerColor_VersLavage = "#888";
+const outerColor_VersLavageVraiUtilisateur = "#a70";
+//p_tbtc Fin
 
 function calcLength(startElement, endElement, path) {
     let d = 0;
@@ -133,6 +137,12 @@ export class Pod extends Entity {
         this.outerColorWhenCommandedAndChangedDest = outerColorWhenCommandedAndChangedDest;
         this.outerColorWhenCommandedAndEmergencyExit = outerColorWhenCommandedAndEmergencyExit;
         this.outerColorWhenCommandedAndChangedDestAndEmergencyExit = outerColorWhenCommandedAndChangedDestAndEmergencyExit;
+        //p_tbtc Début
+		this.outerColor_VersRevision = outerColor_VersRevision;
+		this.outerColor_VersRevisionVraiUtilisateur = outerColor_VersRevisionVraiUtilisateur;
+		this.outerColor_VersLavage = outerColor_VersLavage;
+		this.outerColor_VersLavageVraiUtilisateur = outerColor_VersLavageVraiUtilisateur;
+		//p_tbtc Fin
         this._failing = false;
         this._contain_real_user = false;
         this._keepFlag = keepFlag;
@@ -247,10 +257,18 @@ export class Pod extends Entity {
         }
         this._failing = failing;
 
-        this.__en_direction_revision = json["en_direction_revision"]//p_tb
-        this.__en_direction_lavage = json["en_direction_lavage"]//p_tb
+		//p_tbtc Début
+		const en_direction_revision = json["en_direction_revision"]
+		const dernier_signalement_revision_par_vrai_utilisateur = json["dernier_signalement_revision_par_vrai_utilisateur"]
+		const en_direction_lavage = json["en_direction_lavage"]
+		const dernier_signalement_lavage_par_vrai_utilisateur = json["dernier_signalement_lavage_par_vrai_utilisateur"]
         const quickInfos = json["quickInfos"]
+        this.__en_direction_revision = en_direction_revision
+        this.__dernier_signalement_revision_par_vrai_utilisateur = dernier_signalement_revision_par_vrai_utilisateur
+        this.__en_direction_lavage = en_direction_lavage
+        this.__dernier_signalement_lavage_par_vrai_utilisateur = dernier_signalement_lavage_par_vrai_utilisateur
         this._quickInfos = quickInfos
+        //p_tbtc Fin
 
         if (this._contain_real_user)
         {   
@@ -281,10 +299,18 @@ export class Pod extends Entity {
         {
             //p_tb this.__outerShape.fill(outerColor);
             if(this.__en_direction_revision){
-            	this.__outerShape.fill(outerColor_VersRevision);
+            	if(this.__dernier_signalement_revision_par_vrai_utilisateur) {
+            		this.__outerShape.fill(outerColor_VersRevisionVraiUtilisateur);
+            	} else {
+            		this.__outerShape.fill(outerColor_VersRevision);
+            	}
             }
             else if(this.__en_direction_lavage) {
-            	this.__outerShape.fill(outerColor_VersLavage);
+            	if(this.__dernier_signalement_lavage_par_vrai_utilisateur) {
+            		this.__outerShape.fill(outerColor_VersLavageVraiUtilisateur);
+            	} else {
+            		this.__outerShape.fill(outerColor_VersLavage);
+            	}
             }
             else
             {

@@ -16,12 +16,20 @@ emergency(){
   curl localhost:8090/emergency_exit/123
 }
 
-lavage(){
+lavage_actuelle(){
   curl -X POST -H "Content-Type:application/json" localhost:8090/envoi_lavage/123
 }
 
-revision(){
+revision_actuelle(){
   curl -X POST -H "Content-Type:application/json" localhost:8090/envoi_revision/123
+}
+
+lavage() {
+  curl -X POST -H "Content-Type:application/json" localhost:8090/capsule_lavage/"$1"
+}
+
+revision() {
+  curl -X POST -H "Content-Type:application/json" localhost:8090/capsule_revision/"$1"
 }
 
 DefaultFunc(){

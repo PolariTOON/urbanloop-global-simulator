@@ -50,6 +50,4 @@ class GestionnaireLavage:
         return destination
 
     def podDoitAllerAuLavage(self, pod):
-        if pod.nombre_signalements_doit_aller_au_lavage >= self._limite_nombre_signalements_avant_lavage:
-            return True
-        return False
+        return pod.nombre_signalements_doit_aller_au_lavage >= self._limite_nombre_signalements_avant_lavage or pod.dernier_signalement_lavage_par_vrai_utilisateur

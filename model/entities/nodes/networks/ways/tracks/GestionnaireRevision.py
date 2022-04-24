@@ -66,9 +66,8 @@ class GestionnaireRevision:
         return destination
 
     def podDoitAllerEnRevision(self, pod):
-        if \
-                pod.distance_depuis_revision >= self._limite_distance_parcourue_avant_revision or \
-                pod.temps_depuis_revision >= self._limite_temps_ecoule_avant_revision or \
-                pod.nombre_signalements_doit_aller_en_revision >= self._limite_nombre_signalements_avant_revision:
-            return True
-        return False
+        return \
+                pod.distance_depuis_revision >= self._limite_distance_parcourue_avant_revision \
+                or pod.temps_depuis_revision >= self._limite_temps_ecoule_avant_revision \
+                or (pod.nombre_signalements_doit_aller_en_revision >= self._limite_nombre_signalements_avant_revision
+                    and pod.dernier_signalement_revision_par_vrai_utilisateur)

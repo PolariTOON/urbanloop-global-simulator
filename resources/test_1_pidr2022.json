@@ -136,11 +136,11 @@
     }
   ],
   "gestionnaireRevision": {
-    "limite_nombre_signalements_avant_revision": 1,
+    "limite_nombre_signalements_avant_revision": 2,
     "limite_distance_parcourue_avant_revision": 2000,
     "limite_temps_ecoule_avant_revision": 2000
   },
   "gestionnaireLavage": {
-    "limite_nombre_signalements_avant_lavage": 1
+    "limite_nombre_signalements_avant_lavage": 2
   }
 }

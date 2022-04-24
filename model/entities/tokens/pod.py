@@ -185,12 +185,14 @@ class Pod(Token):
         self._quickInfos = f"Pod {self._quickInfos_index}\n{self.source}->{self.destination}"
         if self._en_direction_lavage:
             self._quickInfos += "\nVers lavage"
-        elif self.nombre_signalements_doit_aller_au_lavage:
-            self._quickInfos += "\nÀ laver"
+        if self.nombre_signalements_doit_aller_au_lavage:
+            self._quickInfos += f"\nÀ laver ({self.nombre_signalements_doit_aller_au_lavage} signalements) "
         if self._en_direction_revision:
             self._quickInfos += "\nVers révision"
-        elif self.nombre_signalements_doit_aller_en_revision:
-            self._quickInfos += "\nÀ réviser"
+        if self.nombre_signalements_doit_aller_en_revision:
+            self._quickInfos += f"\nÀ réviser ({self.nombre_signalements_doit_aller_en_revision} signalements) "
+        self._quickInfos += f"\nDistance parcourue : {int(self.distance_depuis_revision)} "
+        self._quickInfos += f"\nTemps depuis révision : {int(self.temps_depuis_revision)}"
 
     def demander_envoi_lavage(self, user_id):
         self._nombre_signalements_doit_aller_au_lavage += 1

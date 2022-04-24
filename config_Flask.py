@@ -385,6 +385,56 @@ def demander_envoi_au_lavage(user_id):
 
 
 #p_tbtc
+@_app.route('/capsule_lavage/<string:pod_id>', methods=['POST'])
+def demander_revision_capsule(pod_id):
+    """Fonction permettant de demander l'envoi d'une capsule au lavage après le voyage, par son pod_id"""
+
+    global _simulation_for_api
+
+    if _simulation_for_api is None:
+        return jsonify({"msg": "Aucune simulation n'a été chargée"})
+    else:
+
+        network = _simulation_for_api.get_network()
+        pod = network.get_pod_of_id(int(pod_id))
+        print("***")
+        print(pod.id if pod is not None else None)
+        print("***")
+
+        if pod is None:
+            return jsonify({"status_user": "Capsule non trouvée"})
+        else:
+            pod.demander_envoi_lavage(None)
+            pod.dernier_signalement_lavage_par_vrai_utilisateur = True
+            return jsonify({"msg": f"Demande d'envoi au lavage pour la capsule {pod_id} faite"})
+
+
+#p_tbtc
+@_app.route('/capsule_revision/<string:pod_id>', methods=['POST'])
+def demander_lavage_capsule(pod_id):
+    """Fonction permettant de demander l'envoi d'une capsule à la révision après le voyage, par son pod_id"""
+
+    global _simulation_for_api
+
+    if _simulation_for_api is None:
+        return jsonify({"msg": "Aucune simulation n'a été chargée"})
+    else:
+
+        network = _simulation_for_api.get_network()
+        pod = network.get_pod_of_id(int(pod_id))
+        print("***")
+        print(pod.id if pod is not None else None)
+        print("***")
+
+        if pod is None:
+            return jsonify({"status_user": "Capsule non trouvée"})
+        else:
+            pod.demander_envoi_revision(None)
+            pod.dernier_signalement_revision_par_vrai_utilisateur = True
+            return jsonify({"msg": f"Demande d'envoi à la révision pour la capsule {pod_id} faite"})
+
+
+#p_tbtc
 @_app.route('/envoi_revision/<string:user_id>', methods=['POST'])
 def demander_envoi_en_revision(user_id):
     """ Fonction permettant de demander l'envoi d'une capsule en révision après le voyage, par l'utilisateur qui est dedans """

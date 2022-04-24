@@ -70,7 +70,7 @@ class Network(Node):
     @property
     def gestionnaireLavage(self):
         return self._gestionnaireLavage
-    
+
     @property
     def name(self):
         return super().name or "Network %d" % self.id
@@ -200,7 +200,7 @@ class Network(Node):
         Création du model à partir du dictionnaire obtenu à partir du fichier json
         :return: (void) Le réseau est construit
         """
-        
+
         #  Etape 1 : Récupérer les infos du json sous forme pratique
         for bridge in self._bridges:
             if "switch_in" in bridge:
@@ -221,7 +221,7 @@ class Network(Node):
                 section = self._loops[i_loop]["sections"][i_node]
                 if n["type"] in ["switch_in", "switch_out"]:
                     id_bridge = n["id_bridge"]
-                    
+
                     if n["type"] == "switch_in":
                         if "switch_in" in self._bridges[id_bridge]:
                             raise ValueError("Error: in network.py: bridge %d already has a switch in" % id_bridge)
@@ -246,7 +246,7 @@ class Network(Node):
                         steps = []
                         sections = []
                     sections.append(section)
-                
+
                 else:
                     # type: station, shed, sensor
                     n["element_of_loop"] = {
@@ -255,13 +255,13 @@ class Network(Node):
                     }
                     steps.append(n)
                     sections.append(section)
-                    
+
             # on ajoute la dernière road
             roads.append({
                 "steps": steps,
                 "sections": sections
             })
-        
+
         loops_elems_count = [len(loop["elements"]) for loop in self._loops] # permettra de compter aussi les éléments des bridges rattachés aux boucles pour leur indexation
         for bridge in self._bridges: # pour les éléments des bridges, n["element_of_loop"]["loop"] est la boucle qui possède le switchOut vers ce bridge
             i_loop = bridge["switch_out"]["loop"]
@@ -271,7 +271,7 @@ class Network(Node):
                     "element": loops_elems_count[i_loop]
                 }
                 loops_elems_count[i_loop] += 1
-        
+
         #  Etape 2 : Instanciation des routes
         for i_loop in range(len(self._loops)):
             roads = self._loops[i_loop]["roads"]
@@ -282,7 +282,7 @@ class Network(Node):
                     road])  # Ici se fait la liaison des pistes (sections internes et étapes) : étape 42
                 self._roads.append(new_road)
                 roads[road] = new_road
-        
+
         nb_roads = len(self._roads)  # nombre de routes du réseau qui sont internes aux boucles
 
         for b in range(len(self._bridges)):
@@ -293,7 +293,7 @@ class Network(Node):
             })  # La liaison se fait au niveau de l'instanciation des switches (plus tard dans l'algo)
             self._roads.append(new_road)
             self._bridges[b]["roads"] = [new_road]  # On ajoute sa route au bridge
-        
+
         #  Etape 3 : Instanciation des aiguillages, ajout de leurs capsules et liaison avec les routes
         for i_loop in range(len(self._loops)):
             first_switch = len(self._switches)
@@ -315,7 +315,7 @@ class Network(Node):
                     new_switch = SwitchOut(env, id_switch, self._margin_min, self._pod_size, max_speed, **switch)
                 self._switches.append(new_switch)
                 self._loops[i_loop]["switches"][s] = new_switch
-        
+
         #  Etape 4 : Instanciation des boucles et des ponts (sert pour la vue)
         for b in range(len(self._bridges)):
             bridge = self._bridges[b]
@@ -419,7 +419,7 @@ class Network(Node):
         """ Renvoie True si le switch fait partie d'une sérivation vers une station / shed. """
         # TODO : à déplacer dans les Switchs
         return len(switch.beside.sections) >= 2
-    
+
     def _update_routing(self, init=False):
         """
         Envoie aux aiguillages sortant une nouvelle table de routage
@@ -484,7 +484,7 @@ class Network(Node):
                 if step["name"] == s.name:
                     return s
         raise ValueError("Step not in the network")
-    
+
     @property
     def updatable(self):
         return True
@@ -499,7 +499,7 @@ class Network(Node):
         #        self.last_sec = 0
 
         #print(self.env.time)
-        
+
         current_minute = int(self.env.time / 60)
         if current_minute != self._last_minute:  # affichage et écriture en fichier toutes les minutes de simulations
 
@@ -518,7 +518,7 @@ class Network(Node):
 
         # si on veut tracer les pods du réseau pour débugguer :
         #self.last_count, self.last_pods = self.pods_du_reseau(self.last_count, self.last_pods)
-        
+
         if self._dynamic_routing and (self.env.time > self._last_routing_update + 30*60 or self.env.time < self._last_routing_update):
             # Toutes les 30 secondes on met à jour les tables de routage si l'option est activée
             # ("self.env.time < self._last_routing_update" = passage de 23h59 à 00h00)
@@ -526,7 +526,7 @@ class Network(Node):
             self.maj_routing_tables()
             self._last_routing_update = self.env.time
             #print("Routing tables updated")
-    
+
     def handle_message(self, message):
         if "docked" == message["type"]:
             # Une capsule stationne
@@ -657,20 +657,33 @@ class Network(Node):
                     if (a_traveler.id == str(user_id)):
                         #print("User trouve !")
                         return a_moving_pod[0]
-        
+
         return None         # Le voyageur n'est pas encore dans une capsule
+
+    def get_pod_of_id(self, pod_id):
+        """Renvoie un objet pod qui est celui ayant le numéro en argument"""
+
+        moving_pods = self._statistiques.traveling_pods()
+        for a_moving_pod in moving_pods.values():
+            if a_moving_pod:
+                pod = a_moving_pod[0]
+                print(pod.id)
+                if pod.id == pod_id:
+                    return pod
+
+        return None     # Si aucune capsule avec le numéro 'pod_id' n'a été trouvée
 
     def get_total_sections_length(self):
         sections = [s for road in self._roads for s in road.sections]
         return sum([section.length for section in sections])
-    
+
     def get_total_switches_length(self):
         for s in self._switches:
             if s.length == None:
                 print("ERROR in network.py: switch not initialized.")
                 return None
         return sum([switch.length for switch in self._switches])
-    
+
     def get_station_with_name(self, name_of_station):
         for station in self.stations:
             if (station.name == name_of_station):

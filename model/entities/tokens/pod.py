@@ -178,6 +178,10 @@ class Pod(Token):
         self._en_direction_lavage = value
 
     @property
+    def id(self):
+        return self._quickInfos_index
+
+    @property
     def quickInfos_index(self):
         return self._quickInfos_index
 

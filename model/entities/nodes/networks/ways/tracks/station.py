@@ -457,7 +457,7 @@ class Station(Step):
                     raise ValueError("") #p_tbtc
 
                 #p_tbtc debut
-                if pod.travelers:
+                if pod.travelers and not pod.contain_real_user:
                     pod.travelers[0].signalerAleatoirementLavage(pod)
                     pod.travelers[0].signalerAleatoirementRevision(pod)
                 #p_tbtc fin

@@ -10,10 +10,10 @@ class GestionnaireLavage:
 
     @classmethod
     def genererNombreSignalementsAleatoire(cls):
-        #if randint(0, 1):
-        #    return randint(0, cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT-1)
-        #return randint(cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT-1, cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT+2)
-        return 0
+        if randint(0, 1):
+            return randint(0, cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT-1)
+        return randint(0, cls.LIMITE_NOMBRE_SIGNALEMENTS_AVANT_LAVAGE_DEFAUT-1)
+        #return 0
 
     def __init__(
             self,

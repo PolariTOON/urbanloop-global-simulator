@@ -6,11 +6,13 @@ from .Hangar import Hangar
 
 class HangarRevision(Hangar):
     """ Classe modélisant un hangar de révision=dépôt de révision"""
-    def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None, **kwargs):
+    def __init__(self, env, id, departure_pods=None, pods=None, element_of_loop=None,
+                 enRevision=None,
+                 **kwargs):
         super().__init__(env, id, departure_pods, pods, element_of_loop, **kwargs)
         #p_tbtc
         print("Hangar révision créé")
-        self._enRevision = [] # TODO à changer pour sérialisation
+        self._enRevision = enRevision or []
 
     def serialize(self):
         """sérialise les informations du dépôt"""

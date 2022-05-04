@@ -344,7 +344,7 @@ class Network(Node):
             road.init_parent_of_children()
 
     def _init_pods_of_line(self, line):
-        print(f"network _init_pods_of_line appelée avec comme argument line={line}")
+        #print(f"network _init_pods_of_line appelée avec comme argument line={line}")
         if "pods" not in line:
             line["pods"] = []
         for pod in line["pods"]:

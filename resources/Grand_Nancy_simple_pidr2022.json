@@ -1,0 +1,1211 @@
+{
+  "name": "Grand Nancy",
+  "time": 28800,
+  "jerky": true,
+  "state": 56565,
+  "running": false,
+  "margin_min": 2,
+  "max_speed": 30,
+  "pod_size": 2,
+  "places_number": 5,
+  "boarding_time": 5,
+  "dynamic_routing": false,
+  "view_box": {
+    "x": 0,
+    "y": 200,
+    "width": 600,
+    "height": 500
+  },
+  "loops": [
+    {
+      "name": "1",
+      "elements": [
+        {"type": "switch_in", "x": 2648, "y": 1167, "id_bridge": 0, "pods": []},
+        {"type": "switch_out", "x": 2468.523921762385, "y": 1043.1293501092632, "id_bridge": 18, "pods": []},
+        {"type": "switch_in", "x": 2459.476078237615, "y": 1038.8706498907368, "id_bridge": 18, "pods": []},
+        {"type": "switch_out", "x": 2055.6622836180586, "y": 887.8064084435099, "id_bridge": 19, "pods": []},
+        {"type": "switch_in", "x": 2046.3377163819416, "y": 884.1935915564901, "id_bridge": 19, "pods": []},
+        {"type": "switch_out", "x": 892.6134244496559, "y": 431.9277745841559, "id_bridge": 20, "pods": []},
+        {"type": "switch_in", "x": 883.3865755503441, "y": 428.0722254158441, "id_bridge": 20, "pods": []},
+        {"type": "switch_out", "x": 54.353117370805066, "y": 47.54025018426768, "id_bridge": 21, "pods": []},
+        {"type": "switch_in", "x": 45.646882629194934, "y": 52.45974981573232, "id_bridge": 21, "pods": []},
+        {"type": "switch_out", "x": 161.09517572362356, "y": 830.877125143298, "id_bridge": 22, "pods": []},
+        {"type": "switch_in", "x": 168.90482427637644, "y": 837.122874856702, "id_bridge": 22, "pods": []},
+        {"type": "switch_out", "x": 1398.1060455831118, "y": 1136.9756903957202, "id_bridge": 23, "pods": []},
+        {"type": "switch_in", "x": 1407.8939544168882, "y": 1139.0243096042798, "id_bridge": 23, "pods": []},
+        {"type": "switch_out", "x": 2648, "y": 1356, "id_bridge": 1, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "2",
+      "elements": [
+        {"type": "switch_in", "x": 2951, "y": 1488, "id_bridge": 1, "pods": []},
+        {"type": "switch_out", "x": 3129.7134262730506, "y": 1838.4260369692965, "id_bridge": 24, "pods": []},
+        {"type": "switch_in", "x": 3138.2865737269494, "y": 1843.5739630307035, "id_bridge": 24, "pods": []},
+        {"type": "switch_out", "x": 4220.133923512899, "y": 2251.850522022096, "id_bridge": 25, "pods": []},
+        {"type": "switch_in", "x": 4229.866076487101, "y": 2254.149477977904, "id_bridge": 25, "pods": []},
+        {"type": "switch_out", "x": 5570, "y": 2418, "id_bridge": 2, "pods": []},
+        {"type": "switch_in", "x": 5754, "y": 2192, "id_bridge": 3, "pods": []},
+        {"type": "switch_out", "x": 5390.810222815203, "y": 2162.3644619701913, "id_bridge": 26, "pods": []},
+        {"type": "switch_in", "x": 5381.189777184797, "y": 2159.6355380298087, "id_bridge": 26, "pods": []},
+        {"type": "switch_out", "x": 4785.669402617876, "y": 1917.787925947062, "id_bridge": 27, "pods": []},
+        {"type": "switch_in", "x": 4776.330597382124, "y": 1914.212074052938, "id_bridge": 27, "pods": []},
+        {"type": "switch_out", "x": 3558.680138655572, "y": 1461.7596312581386, "id_bridge": 28, "pods": []},
+        {"type": "switch_in", "x": 3549.319861344428, "y": 1458.2403687418614, "id_bridge": 28, "pods": []},
+        {"type": "switch_out", "x": 3285.8675361223504, "y": 1353.1432812854289, "id_bridge": 29, "pods": []},
+        {"type": "switch_in", "x": 3276.1324638776496, "y": 1350.8567187145711, "id_bridge": 29, "pods": []},
+        {"type": "switch_out", "x": 3097, "y": 1352, "id_bridge": 0, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "3",
+      "elements": [
+        {"type": "switch_in", "x": 7095, "y": 960, "id_bridge": 4, "pods": []},
+        {"type": "switch_out", "x": 7429.156924160662, "y": 922.2428259791377, "id_bridge": 30, "pods": []},
+        {"type": "switch_in", "x": 7438.843075839338, "y": 919.7571740208623, "id_bridge": 30, "pods": []},
+        {"type": "switch_in", "x": 7586, "y": 834, "id_bridge": 7, "pods": []},
+        {"type": "switch_out", "x": 7586, "y": 778, "id_bridge": 6, "pods": []},
+        {"type": "switch_out", "x": 7589.894209158386, "y": 667.1361018846238, "id_bridge": 31, "pods": []},
+        {"type": "switch_in", "x": 7582.105790841614, "y": 660.8638981153762, "id_bridge": 31, "pods": []},
+        {"type": "switch_out", "x": 6989.965281947599, "y": 294.58819654950395, "id_bridge": 32, "pods": []},
+        {"type": "switch_in", "x": 6980.034718052401, "y": 293.41180345049605, "id_bridge": 32, "pods": []},
+        {"type": "switch_out", "x": 5745.2765466655355, "y": 438.54833342672225, "id_bridge": 33, "pods": []},
+        {"type": "switch_in", "x": 5740.7234533344645, "y": 447.45166657327775, "id_bridge": 33, "pods": []},
+        {"type": "switch_out", "x": 6650.420007472385, "y": 926.9940916155036, "id_bridge": 34, "pods": []},
+        {"type": "switch_in", "x": 6659.579992527615, "y": 931.0059083844964, "id_bridge": 34, "pods": []},
+        {"type": "switch_out", "x": 6906.007538116202, "y": 959.7255472011017, "id_bridge": 35, "pods": []},
+        {"type": "switch_in", "x": 6915.992461883798, "y": 960.2744527988983, "id_bridge": 35, "pods": []},
+        {"type": "switch_out", "x": 7187, "y": 960, "id_bridge": 5, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "4",
+      "elements": [
+        {"type": "switch_in", "x": 6121, "y": 2318, "id_bridge": 2, "pods": []},
+        {"type": "switch_out", "x": 6306.177928161342, "y": 2414.7763736475617, "id_bridge": 36, "pods": []},
+        {"type": "switch_in", "x": 6313.822071838658, "y": 2421.2236263524383, "id_bridge": 36, "pods": []},
+        {"type": "switch_out", "x": 6595.01060206423, "y": 2721.674564540143, "id_bridge": 37, "pods": []},
+        {"type": "switch_in", "x": 6604.98939793577, "y": 2722.325435459857, "id_bridge": 37, "pods": []},
+        {"type": "switch_out", "x": 6798.9113435510135, "y": 2457.542853094489, "id_bridge": 38, "pods": []},
+        {"type": "switch_in", "x": 6803.0886564489865, "y": 2448.457146905511, "id_bridge": 38, "pods": []},
+        {"type": "switch_out", "x": 6801, "y": 2296, "id_bridge": 13, "pods": []},
+        {"type": "switch_in", "x": 6801, "y": 2138, "id_bridge": 12, "pods": []},
+        {"type": "switch_out", "x": 6482.1250305053145, "y": 1957.9030993250049, "id_bridge": 39, "pods": []},
+        {"type": "switch_in", "x": 6475.8749694946855, "y": 1950.0969006749951, "id_bridge": 39, "pods": []},
+        {"type": "switch_in", "x": 6556, "y": 1832, "id_bridge": 10, "pods": []},
+        {"type": "switch_out", "x": 6464, "y": 1744, "id_bridge": 11, "pods": []},
+        {"type": "switch_out", "x": 6309.2888059744955, "y": 1691.4297581216676, "id_bridge": 40, "pods": []},
+        {"type": "switch_in", "x": 6300.7111940255045, "y": 1696.5702418783324, "id_bridge": 40, "pods": []},
+        {"type": "switch_out", "x": 5902.958913087149, "y": 2077.969512021765, "id_bridge": 41, "pods": []},
+        {"type": "switch_in", "x": 5897.041086912851, "y": 2086.030487978235, "id_bridge": 41, "pods": []},
+        {"type": "switch_out", "x": 5937, "y": 2192, "id_bridge": 3, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "5",
+      "elements": [
+        {"type": "switch_in", "x": 6512, "y": 1687, "id_bridge": 11, "pods": []},
+        {"type": "switch_out", "x": 6395.160270724898, "y": 1522.1153295911906, "id_bridge": 42, "pods": []},
+        {"type": "switch_in", "x": 6400.839729275102, "y": 1513.8846704088094, "id_bridge": 42, "pods": []},
+        {"type": "switch_out", "x": 6699, "y": 1416, "id_bridge": 4, "pods": []},
+        {"type": "switch_out", "x": 6878.0, "y": 1416.0, "id_bridge": 43, "pods": []},
+        {"type": "switch_in", "x": 6888.0, "y": 1416.0, "id_bridge": 43, "pods": []},
+        {"type": "switch_in", "x": 7067, "y": 1416, "id_bridge": 5, "pods": []},
+        {"type": "switch_out", "x": 7384.559057817504, "y": 1480.3723400246552, "id_bridge": 44, "pods": []},
+        {"type": "switch_in", "x": 7391.440942182496, "y": 1487.6276599753448, "id_bridge": 44, "pods": []},
+        {"type": "switch_out", "x": 7199.555201756033, "y": 1548.4842439683766, "id_bridge": 45, "pods": []},
+        {"type": "switch_in", "x": 7192.444798243967, "y": 1555.5157560316234, "id_bridge": 45, "pods": []},
+        {"type": "switch_out", "x": 7205, "y": 1672, "id_bridge": 9, "pods": []},
+        {"type": "switch_out", "x": 7209.09406787509, "y": 1732.1297024136595, "id_bridge": 46, "pods": []},
+        {"type": "switch_in", "x": 7200.90593212491, "y": 1737.8702975863405, "id_bridge": 46, "pods": []},
+        {"type": "switch_in", "x": 7021, "y": 1801, "id_bridge": 8, "pods": []},
+        {"type": "switch_out", "x": 6883.97518595105, "y": 1842.502481404895, "id_bridge": 47, "pods": []},
+        {"type": "switch_in", "x": 6874.02481404895, "y": 1843.497518595105, "id_bridge": 47, "pods": []},
+        {"type": "switch_out", "x": 6711, "y": 1832, "id_bridge": 10, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "6",
+      "elements": [
+        {"type": "switch_in", "x": 8666, "y": 692, "id_bridge": 6, "pods": []},
+        {"type": "switch_out", "x": 8859.102057958524, "y": 607.9949309683677, "id_bridge": 48, "pods": []},
+        {"type": "switch_in", "x": 8868.897942041476, "y": 610.0050690316323, "id_bridge": 48, "pods": []},
+        {"type": "switch_out", "x": 9353.806293595617, "y": 831.2773493441429, "id_bridge": 49, "pods": []},
+        {"type": "switch_in", "x": 9362.193706404383, "y": 836.7226506558571, "id_bridge": 49, "pods": []},
+        {"type": "switch_out", "x": 9730.632391606337, "y": 1166.596089181845, "id_bridge": 50, "pods": []},
+        {"type": "switch_in", "x": 9735.367608393663, "y": 1175.403910818155, "id_bridge": 50, "pods": []},
+        {"type": "switch_out", "x": 9923.75014860449, "y": 1873.316307027334, "id_bridge": 51, "pods": []},
+        {"type": "switch_in", "x": 9920.24985139551, "y": 1882.683692972666, "id_bridge": 51, "pods": []},
+        {"type": "switch_out", "x": 9429.951029373078, "y": 2005.301925400172, "id_bridge": 52, "pods": []},
+        {"type": "switch_in", "x": 9420.048970626922, "y": 2006.698074599828, "id_bridge": 52, "pods": []},
+        {"type": "switch_out", "x": 9456.019127981037, "y": 1952.9028451007978, "id_bridge": 53, "pods": []},
+        {"type": "switch_in", "x": 9457.980872018963, "y": 1943.0971548992022, "id_bridge": 53, "pods": []},
+        {"type": "switch_in", "x": 9457, "y": 1822, "id_bridge": 16, "pods": []},
+        {"type": "switch_out", "x": 9225.526750011344, "y": 1282.5442960313003, "id_bridge": 54, "pods": []},
+        {"type": "switch_in", "x": 9218.473249988656, "y": 1275.4557039686997, "id_bridge": 54, "pods": []},
+        {"type": "switch_out", "x": 8854, "y": 1216, "id_bridge": 17, "pods": []},
+        {"type": "switch_out", "x": 8668.44697924906, "y": 1074.360308768272, "id_bridge": 55, "pods": []},
+        {"type": "switch_in", "x": 8663.55302075094, "y": 1065.639691231728, "id_bridge": 55, "pods": []},
+        {"type": "switch_out", "x": 8666, "y": 881, "id_bridge": 7, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "7",
+      "elements": [
+        {"type": "switch_in", "x": 7860, "y": 1811, "id_bridge": 17, "pods": []},
+        {"type": "switch_in", "x": 7750, "y": 1811, "id_bridge": 9, "pods": []},
+        {"type": "switch_out", "x": 7681.209395694819, "y": 1827.301669426398, "id_bridge": 56, "pods": []},
+        {"type": "switch_in", "x": 7672.790604305181, "y": 1832.698330573602, "id_bridge": 56, "pods": []},
+        {"type": "switch_out", "x": 7598.150531448286, "y": 1908.211974050194, "id_bridge": 57, "pods": []},
+        {"type": "switch_in", "x": 7589.849468551714, "y": 1913.788025949806, "id_bridge": 57, "pods": []},
+        {"type": "switch_out", "x": 7392.9999345404085, "y": 2023.9744150115569, "id_bridge": 58, "pods": []},
+        {"type": "switch_in", "x": 7383.0000654595915, "y": 2024.0255849884431, "id_bridge": 58, "pods": []},
+        {"type": "switch_out", "x": 7357.9999999489255, "y": 1915.000714664213, "id_bridge": 59, "pods": []},
+        {"type": "switch_in", "x": 7348.0000000510745, "y": 1914.999285335787, "id_bridge": 59, "pods": []},
+        {"type": "switch_out", "x": 7204, "y": 2024, "id_bridge": 8, "pods": []},
+        {"type": "switch_out", "x": 7204, "y": 2087, "id_bridge": 12, "pods": []},
+        {"type": "switch_out", "x": 7183.0, "y": 2145.0, "id_bridge": 60, "pods": []},
+        {"type": "switch_in", "x": 7183.0, "y": 2155.0, "id_bridge": 60, "pods": []},
+        {"type": "switch_in", "x": 7204, "y": 2251, "id_bridge": 13, "pods": []},
+        {"type": "switch_out", "x": 7270.514554831699, "y": 2331.790750887255, "id_bridge": 61, "pods": []},
+        {"type": "switch_in", "x": 7279.485445168301, "y": 2336.209249112745, "id_bridge": 61, "pods": []},
+        {"type": "switch_out", "x": 7467.004000044076, "y": 2382.8000389027593, "id_bridge": 62, "pods": []},
+        {"type": "switch_in", "x": 7476.995999955924, "y": 2383.1999610972407, "id_bridge": 62, "pods": []},
+        {"type": "switch_out", "x": 7694.048406395147, "y": 2353.6940610725164, "id_bridge": 63, "pods": []},
+        {"type": "switch_in", "x": 7703.951593604853, "y": 2352.3059389274836, "id_bridge": 63, "pods": []},
+        {"type": "switch_out", "x": 7828, "y": 2334, "id_bridge": 14, "pods": []},
+        {"type": "switch_out", "x": 7878.577015684897, "y": 2273.331782525954, "id_bridge": 64, "pods": []},
+        {"type": "switch_in", "x": 7887.422984315103, "y": 2268.668217474046, "id_bridge": 64, "pods": []},
+        {"type": "switch_in", "x": 8067, "y": 2208, "id_bridge": 15, "pods": []},
+        {"type": "switch_out", "x": 7918.504027347265, "y": 2092.9745307751796, "id_bridge": 65, "pods": []},
+        {"type": "switch_in", "x": 7917.495972652735, "y": 2083.0254692248204, "id_bridge": 65, "pods": []},
+        {"type": "switch_out", "x": 8040.958077012097, "y": 1984.9682117553966, "id_bridge": 66, "pods": []},
+        {"type": "switch_in", "x": 8047.041922987903, "y": 1977.0317882446034, "id_bridge": 66, "pods": []},
+        {"type": "switch_out", "x": 8044, "y": 1918, "id_bridge": 16, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "8",
+      "elements": [
+        {"type": "switch_in", "x": 8111, "y": 3075, "id_bridge": 14, "pods": []},
+        {"type": "switch_out", "x": 7853.228519125472, "y": 3070.0052248289544, "id_bridge": 67, "pods": []},
+        {"type": "switch_in", "x": 7852.771480874528, "y": 3079.9947751710456, "id_bridge": 67, "pods": []},
+        {"type": "switch_out", "x": 8092.927183778911, "y": 3378.099626225944, "id_bridge": 68, "pods": []},
+        {"type": "switch_in", "x": 8101.072816221089, "y": 3383.900373774056, "id_bridge": 68, "pods": []},
+        {"type": "switch_out", "x": 8916.422270228508, "y": 3836.5071716786842, "id_bridge": 69, "pods": []},
+        {"type": "switch_in", "x": 8923.577729771492, "y": 3843.4928283213158, "id_bridge": 69, "pods": []},
+        {"type": "switch_out", "x": 9355.305509951815, "y": 4606.788144900376, "id_bridge": 70, "pods": []},
+        {"type": "switch_in", "x": 9360.694490048185, "y": 4615.211855099624, "id_bridge": 70, "pods": []},
+        {"type": "switch_out", "x": 9661.978967828627, "y": 5001.028249627444, "id_bridge": 71, "pods": []},
+        {"type": "switch_in", "x": 9670.021032171373, "y": 5006.971750372556, "id_bridge": 71, "pods": []},
+        {"type": "switch_out", "x": 9944.792595041334, "y": 5052.701433603438, "id_bridge": 72, "pods": []},
+        {"type": "switch_in", "x": 9953.207404958666, "y": 5047.298566396562, "id_bridge": 72, "pods": []},
+        {"type": "switch_out", "x": 10051.334761093945, "y": 4767.818548829481, "id_bridge": 73, "pods": []},
+        {"type": "switch_in", "x": 10048.665238906055, "y": 4758.181451170519, "id_bridge": 73, "pods": []},
+        {"type": "switch_out", "x": 9741.873554866686, "y": 4278.0917823045875, "id_bridge": 74, "pods": []},
+        {"type": "switch_in", "x": 9736.126445133314, "y": 4269.9082176954125, "id_bridge": 74, "pods": []},
+        {"type": "switch_out", "x": 9515.136434213475, "y": 3997.893941502455, "id_bridge": 75, "pods": []},
+        {"type": "switch_in", "x": 9508.863565786525, "y": 3990.106058497545, "id_bridge": 75, "pods": []},
+        {"type": "switch_out", "x": 9297.726274348632, "y": 3724.333898540557, "id_bridge": 76, "pods": []},
+        {"type": "switch_in", "x": 9290.273725651368, "y": 3717.666101459443, "id_bridge": 76, "pods": []},
+        {"type": "switch_out", "x": 8556.200417770442, "y": 3136.712285116604, "id_bridge": 77, "pods": []},
+        {"type": "switch_in", "x": 8547.799582229558, "y": 3131.287714883396, "id_bridge": 77, "pods": []},
+        {"type": "switch_out", "x": 8295, "y": 3075, "id_bridge": 15, "pods": []}
+      ],
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "pods": []
+    }
+  ],
+  "bridges": [
+    {
+      "name": "Bridge 1-2",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 2-1",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 2-4",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 3-5",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 3-6",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 4-2",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 4-7",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 4-5",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 5-4",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 5-3",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 5-7",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 6-3",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 6-7",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 7-6",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 7-5",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 7-4",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 7-8",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Bridge 8-7",
+      "pods": [],
+      "sections": [
+        {"speed": 19.44, "path": {"type": "line"}}
+      ],
+      "elements": []
+    },
+    {
+      "name": "Deviation for Le Reclus",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Le Reclus", "x": 2466.129350109263, "y": 1036.476078237615, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Saint-Andre",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Saint-Andre", "x": 2049.19359155649, "y": 890.6622836180585, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Faisanderie",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Faisanderie", "x": 886.0722254158441, "y": 434.61342444965584, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Vandoeuvre CHU Brabois",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Vandoeuvre CHU Brabois", "x": 47.54025018426768, "y": 45.646882629194934, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Depot 1",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "HangarSimple", "name": "Depot 1", "x": 161.87712514329806, "y": 837.9048242763764, "pods": {"max": 200, "count": 100}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Doyen Roubault",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Doyen Roubault", "x": 1401.9756903957202, "y": 1142.8939544168882, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Callot",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Callot", "x": 3131.4260369692965, "y": 1845.2865737269492, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Campus Artem",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Campus Artem", "x": 4223.850522022096, "y": 2257.8660764871006, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Jean Jaures",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Jean Jaures", "x": 5384.635538029809, "y": 2165.8102228152034, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Exelmans",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Exelmans", "x": 4782.787925947062, "y": 1911.3305973821246, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Montet Octroi",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Montet Octroi", "x": 3552.2403687418614, "y": 1464.6801386555724, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Velodrome",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Velodrome", "x": 3282.1432812854287, "y": 1347.1324638776493, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Messier",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Messier", "x": 7435.242825979138, "y": 925.8430758393381, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for chemin blanc",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "chemin blanc", "x": 7589.136101884624, "y": 660.1057908416138, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Arret Gare Saint-Leon",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Arret Gare Saint-Leon", "x": 6985.588196549504, "y": 289.0347180524011, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for europe",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "europe", "x": 5738.548333426722, "y": 440.7234533344643, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for medreville",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "medreville", "x": 6652.994091615504, "y": 933.5799925276148, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for gridel",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "gridel", "x": 6910.725547201102, "y": 964.9924618837981, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Varsovie",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Varsovie", "x": 6313.223626352438, "y": 2414.1779281613417, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Depot 3",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "HangarSimple", "name": "Depot 3", "x": 6599.674564540143, "y": 2726.9893979357703, "pods": {"max": 200, "count": 100}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for quartier saint-nicolas",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "quartier saint-nicolas", "x": 6805.542853094489, "y": 2455.0886564489865, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Mon Desert",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Mon Desert", "x": 6475.096900674995, "y": 1957.1250305053145, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for jeanne d'arc",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "jeanne d'arc", "x": 6302.429758121668, "y": 1689.7111940255047, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Garenne",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Garenne", "x": 5895.969512021765, "y": 2079.041086912851, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for kleber",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "kleber", "x": 6393.884670408809, "y": 1515.160270724898, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for commanderie",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "commanderie", "x": 6883.0, "y": 1421.0, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for poincare",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "poincare", "x": 7391.627659975345, "y": 1480.5590578175038, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for domremy",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "domremy", "x": 7192.484243968376, "y": 1548.4447982439665, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Saint-leon",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Saint-leon", "x": 7207.870297586341, "y": 1739.0940678750903, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Kennedy",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Kennedy", "x": 6879.497518595105, "y": 1847.97518595105, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Saint-mansuy",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Saint-mansuy", "x": 8865.005069031633, "y": 604.1020579585245, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Depot 2",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "HangarSimple", "name": "Depot 2", "x": 9360.722650655856, "y": 829.8062935956173, "pods": {"max": 200, "count": 100}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for alix le clerc",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "alix le clerc", "x": 9737.403910818155, "y": 1168.6323916063384, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Pierson",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Pierson", "x": 9926.683692972667, "y": 1879.75014860449, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for citadelle",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "citadelle", "x": 9425.698074599828, "y": 2010.9510293730773, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for simon",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "simon", "x": 9461.902845100798, "y": 1948.9808720189626, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for place aime morot",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "place aime morot", "x": 9225.5442960313, "y": 1275.4732499886568, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for cite universitaire",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "cite universitaire", "x": 8661.639691231729, "y": 1072.4469792490602, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for tour thiers gare",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "tour thiers gare", "x": 7674.301669426398, "y": 1825.7906043051805, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for poirel",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "poirel", "x": 7596.788025949806, "y": 1915.1505314482856, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Maginot",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Maginot", "x": 7388.025584988443, "y": 2028.999934540408, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Nancy Gare",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Nancy Gare", "x": 7353.000714664213, "y": 1910.0000000510745, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for saint sebastien",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "saint sebastien", "x": 7178.0, "y": 2150.0, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for marche central",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "marche central", "x": 7272.790750887255, "y": 2338.485445168301, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for place charles III point central",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "place charles III point central", "x": 7471.800038902759, "y": 2387.9959999559237, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Point Central",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Point Central", "x": 7699.694061072516, "y": 2357.951593604853, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for place stanilas - dom calmet",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "place stanilas - dom calmet", "x": 7880.668217474045, "y": 2266.577015684896, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for place dombasle",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "HangarLavage", "name": "place dombasle", "x": 7913.02546922482, "y": 2088.504027347265, "pods": {"max": 200, "count": 100}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for place carnot",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "place carnot", "x": 8047.968211755397, "y": 1984.0419229879028, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Cathedrale",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Cathedrale", "x": 7848.005224828955, "y": 3074.7714808745272, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Division de Fer",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Division de Fer", "x": 8094.099626225944, "y": 3385.0728162210894, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Cristalleries",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Cristalleries", "x": 8923.492828321316, "y": 3836.4222702285088, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Depot 4",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "HangarRevision", "name": "Depot 4", "x": 9353.788144900376, "y": 4613.694490048186, "pods": {"max": 200, "count": 100}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Essey Mouzimpre",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Essey Mouzimpre", "x": 9663.028249627445, "y": 5008.021032171373, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Clinique Pasteur",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Clinique Pasteur", "x": 9951.701433603439, "y": 5054.207404958667, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Essey Roosevelt",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Essey Roosevelt", "x": 10054.81854882948, "y": 4761.665238906055, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Washington Foch",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Washington Foch", "x": 9743.091782304587, "y": 4271.126445133313, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Saint-Livier",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Saint-Livier", "x": 9508.106058497546, "y": 3997.1364342134752, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Gerard Barrois",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Gerard Barrois", "x": 9297.333898540557, "y": 3717.273725651368, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    },
+    {
+      "name": "Deviation for Saint-Georges",
+      "sections": [
+        {"speed": 20.0, "path": {"type": "line"}},
+        {"speed": 20.0, "path": {"type": "line"}}
+      ],
+      "elements": [
+        {"type": "station", "name": "Saint-Georges", "x": 8554.712285116604, "y": 3129.7995822295575, "pods": {"max": 5, "count": 3}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+      ],
+      "pods": []
+    }
+  ],
+  "gestionnaireRevision": {
+    "limite_nombre_signalements_avant_revision": 2,
+    "limite_distance_parcourue_avant_revision": 2000,
+    "limite_temps_ecoule_avant_revision": 2000
+  },
+  "gestionnaireLavage": {
+    "limite_nombre_signalements_avant_lavage": 2
+  }
+}

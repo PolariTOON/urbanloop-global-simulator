@@ -174,13 +174,17 @@ class Hangar(Step):
                 i = 0
                 while i < len(self._pods) - 1 and (
                         self._pods[i] in self._departure_pods
-                        or self._pods[i].during_departure\
-                        or self.gestionnaireRevision.podDoitAllerEnRevision(self._pods[i])\
+                        or self._pods[i].during_departure
+                        or self.gestionnaireRevision.podDoitAllerEnRevision(self._pods[i])
                         or self.gestionnaireLavage.podDoitAllerAuLavage(self._pods[i])
                 ):
                     i += 1
                 pod = self._pods[i]
-                if self.gestionnaireRevision.podDoitAllerEnRevision(pod) or self.gestionnaireLavage.podDoitAllerAuLavage(pod):
+                if (self._pods[i] in self._departure_pods
+                        or self._pods[i].during_departure
+                        or self.gestionnaireRevision.podDoitAllerEnRevision(self._pods[i])
+                        or self.gestionnaireLavage.podDoitAllerAuLavage(self._pods[i])
+                ) :
                     network = self.parent.parent
                     found_station = network.get_station_by_name(station)
                     if found_station is None:
@@ -194,14 +198,15 @@ class Hangar(Step):
                         print(f"auteur : {message['author']}")
 
                     found_station.down_incoming_pods()
-                #print("")
-                #print(f"Un pod se voit assigner la destination {station} lorsque le {self.__class__.__name__} {self.name} traite un refill")
-                #print("")
-                pod.destination = station
-                self._departure_pods.append(pod)
-                #print(f"{self.name} : pod ajouté à self._departure_pods")
-                #print(f"self._departure_pods = ")
-                #print(f"{self._departure_pods}")
+                else :
+                    #print("")
+                    #print(f"Un pod se voit assigner la destination {station} lorsque le {self.__class__.__name__} {self.name} traite un refill")
+                    #print("")
+                    pod.destination = station
+                    self._departure_pods.append(pod)
+                    #print(f"{self.name} : pod ajouté à self._departure_pods")
+                    #print(f"self._departure_pods = ")
+                    #print(f"{self._departure_pods}")
             else:
                 # on cherche la station concernée,
                 # et on l'informe qu'elle ne recevra pas le pod.

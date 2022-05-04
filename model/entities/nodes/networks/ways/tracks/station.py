@@ -371,6 +371,7 @@ class Station(Step):
             for pod0 in self._departure_pods:
                 if pod0 not in self._pods:
                     print("\u001B[31mERROR: ", self.name, pod0.name[:8], "not in pods! (station l.207)\u001B[0m")
+                    raise ValueError("") #p_tbtc
                     self._departure_pods.remove(pod0)
 
             pod = self._pods[-1]
@@ -453,6 +454,7 @@ class Station(Step):
                 self._incoming_pods -= 1
                 if self._incoming_pods < 0:
                     print("\033[4;31mERROR: mauvais comptage des incoming pods\u001B[0m", self._incoming_pods, " ", self.name, "\n\t\t(station l.277)")
+                    raise ValueError("") #p_tbtc
 
                 #p_tbtc debut
                 if pod.travelers:
@@ -475,6 +477,7 @@ class Station(Step):
                 })
             else:
                 print("ERROR: La station %s ne devrait pas être pleine.\n\t\t(station l.333)" % self.name)
+                raise ValueError("") #p_tbtc
                 pod.write({ # "passing" fait passer le pod à travers la station
                     "author": self,
                     "type": "passing"
@@ -489,6 +492,7 @@ class Station(Step):
             pod.during_departure = False
             if pod != self._pods[-1]:
                 print("ERROR: a pod left without being in the front position.\n\t\t(station l.327)")
+                raise ValueError("") #p_tbtc
             for i in range(self._capacity-1, 0, -1):  # on décale les autres pods vers l'avant
                 # TODO : ne pas faire ce décalage si un passager est en train de monter
                 #        (sinon la capsule bouge pendant que la personne monte dedans...)
@@ -510,6 +514,7 @@ class Station(Step):
             else:
                 if pod is None:
                     print("\u001B[31mWARNING: ", self.name, ": pas de pod à libérer (station l.311)", len(self._departure_pods), "\u001B[0m")
+                    raise ValueError("") #p_tbtc
                 self._waiting_empty = False
             
         else:

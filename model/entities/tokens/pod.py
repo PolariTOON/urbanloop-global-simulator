@@ -96,6 +96,9 @@ class Pod(Token):
         print(f"Pod créé - quickInfos : {self._quickInfos} - objet : {self}")
         #p_tbtc fin
 
+    @property
+    def contain_real_user(self):
+        return self._contain_real_user
 
     @property
     def nombre_signalements_doit_aller_en_revision(self):

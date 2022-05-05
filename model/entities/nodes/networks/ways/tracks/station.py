@@ -317,7 +317,7 @@ class Station(Step):
             # Choix aléatoire pour l'instant
             if pod not in self._departure_pods:
                 destination = self.gestionnaireRevision.obtenirDestination(
-                    nom_station_source=self.name,
+                    station_source=self,
                     categorie_destination="HangarRevision"
                 )
                 if pod.travelers != []:
@@ -335,7 +335,7 @@ class Station(Step):
             # Choix aléatoire pour l'instant
             if pod not in self._departure_pods:
                 destination = self.gestionnaireLavage.obtenirDestination(
-                    nom_station_source=self.name,
+                    station_source=self,
                     categorie_destination="HangarLavage"
                 )
                 if pod.travelers != []:

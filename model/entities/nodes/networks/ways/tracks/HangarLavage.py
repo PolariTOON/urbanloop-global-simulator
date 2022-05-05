@@ -69,12 +69,12 @@ class HangarLavage(Hangar):
                 if self.gestionnaireRevision.podDoitAllerEnRevision(pod):
                     pod.en_direction_revision = True
                     destination = nw.gestionnaireRevision.obtenirDestination(
-                        nom_station_source=self.name,
+                        station_source=self,
                         categorie_destination="HangarRevision"
                     )
                 else:
                     destination = nw.gestionnaireLavage.obtenirDestination(
-                        nom_station_source=self.name,
+                        station_source=self,
                         categorie_destination="HangarSimple"
                     )
                 pod.during_departure = True

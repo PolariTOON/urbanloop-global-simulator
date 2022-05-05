@@ -85,18 +85,14 @@ class HangarSimple(Hangar):
 
         for pod in self._doiventAllerEnRevision:
             if pod not in self._departure_pods:
-                destination = self.gestionnaireRevision.obtenirDestinationDepuisHangarSimple(
-                    categorie_destination="HangarRevision"
-                )
+                destination = self.gestionnaireRevision.obtenirDestination(self, categorie_destination="HangarRevision")
                 if pod.travelers != []:
                     raise ValueError(f"Pod {pod.quickInfos_index} doit aller en révision mais pod.travelers n'est pas None\nadresse {pod}")
                 self.send_pod(pod, destination) # => self._departure_pods.append(pod) et pod.destination=destination
                 print(f"Il est constaté dans HangarSimple {self.name} que Pod {pod.quickInfos_index} doit aller en révision\n\tIl lui est ordonné d'aller en révision à {destination}")
         for pod in self._doiventAllerAuLavage:
             if pod not in self._departure_pods:
-                destination = self.gestionnaireLavage.obtenirDestinationDepuisHangarSimple(
-                    categorie_destination="HangarLavage"
-                )
+                destination = self.gestionnaireLavage.obtenirDestination(self, categorie_destination="HangarLavage")
                 if pod.travelers != []:
                     raise ValueError(f"Pod {pod.quickInfos_index} doit aller au lavage mais pod.travelers n'est pas None\nadresse {pod}")
                 self.send_pod(pod, destination)  # => self._departure_pods.append(pod) et pod.destination=destination

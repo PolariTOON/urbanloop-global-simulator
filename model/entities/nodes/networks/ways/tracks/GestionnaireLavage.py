@@ -51,15 +51,15 @@ class GestionnaireLavage(Gestionnaire):
     #         raise ValueError(f"Catégorie {categorie_destination} non traitée dans obtenirDestinationDepuisHangarSimple de GestionnaireLavage")
     #     return destination
 
-    def obtenirDestinationDepuisHangarSimple(self, categorie_destination="HangarLavage"):
-        # nom_station_source pourrait être ustilisé dans une recherche plus élaborée
-        if categorie_destination == "HangarLavage":
-            destination = self._network.hangarsLavage[randint(0, len(self._network.hangarsLavage) - 1)].name
-        elif categorie_destination == "HangarRevision":
-            destination = self._network.hangarsRevision[randint(0, len(self._network.hangarsRevision) - 1)].name
-        else:
-            raise ValueError(f"Catégorie {categorie_destination} non traitée dans obtenirDestinationDepuisHangarSimple de GestionnaireLavage")
-        return destination
+    # def obtenirDestinationDepuisHangarSimple(self, categorie_destination="HangarLavage"):
+    #     # nom_station_source pourrait être ustilisé dans une recherche plus élaborée
+    #     if categorie_destination == "HangarLavage":
+    #         destination = self._network.hangarsLavage[randint(0, len(self._network.hangarsLavage) - 1)].name
+    #     elif categorie_destination == "HangarRevision":
+    #         destination = self._network.hangarsRevision[randint(0, len(self._network.hangarsRevision) - 1)].name
+    #     else:
+    #         raise ValueError(f"Catégorie {categorie_destination} non traitée dans obtenirDestinationDepuisHangarSimple de GestionnaireLavage")
+    #     return destination
 
     def podDoitAllerAuLavage(self, pod):
         return pod.nombre_signalements_doit_aller_au_lavage >= self._limite_nombre_signalements_avant_lavage or pod.dernier_signalement_lavage_par_vrai_utilisateur

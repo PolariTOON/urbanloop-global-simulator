@@ -104,15 +104,15 @@ class GestionnaireRevision(Gestionnaire):
     #
     #     return dict_hangars_plus_proches[station_source].name
 
-    def obtenirDestinationDepuisHangarSimple(self, categorie_destination="HangarRevision"):
-        # nom_station_source pourrait être ustilisé dans une recherche plus élaborée
-        if categorie_destination == "HangarRevision":
-            destination = self._network.hangarsRevision[randint(0, len(self._network.hangarsRevision) - 1)].name
-        elif categorie_destination == "HangarLavage":
-            destination = self._network.hangarsLavage[randint(0, len(self._network.hangarsLavage) - 1)].name
-        else:
-            raise ValueError(f"Catégorie {categorie_destination} non traitée dans obtenirDestinationDepuisHangarSimple de GestionnaireRevision")
-        return destination
+    # def obtenirDestinationDepuisHangarSimple(self, categorie_destination="HangarRevision"):
+    #     # nom_station_source pourrait être ustilisé dans une recherche plus élaborée
+    #     if categorie_destination == "HangarRevision":
+    #         destination = self._network.hangarsRevision[randint(0, len(self._network.hangarsRevision) - 1)].name
+    #     elif categorie_destination == "HangarLavage":
+    #         destination = self._network.hangarsLavage[randint(0, len(self._network.hangarsLavage) - 1)].name
+    #     else:
+    #         raise ValueError(f"Catégorie {categorie_destination} non traitée dans obtenirDestinationDepuisHangarSimple de GestionnaireRevision")
+    #     return destination
 
     def podDoitAllerEnRevision(self, pod):
         return \

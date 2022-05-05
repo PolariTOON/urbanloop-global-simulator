@@ -14,13 +14,17 @@ class HangarRevision(Hangar):
         print("Hangar révision créé")
         self._enRevision = enRevision or []
 
+        self._quickInfos = ""
+        self.set_quickInfos(initialisation=True)
+
     def serialize(self):
         """sérialise les informations du dépôt"""
         dico = super().serialize()
         enRevision = [{"pod": pod.serialize()} for pod in self._enRevision]
         dico.update({
             "type": f"{self.__class__.__name__}",
-            "enRevision": enRevision
+            "enRevision": enRevision,
+            "quickInfos": self._quickInfos
         })
         return dico
 
@@ -32,11 +36,16 @@ class HangarRevision(Hangar):
     def enRevision(self):
         return self._enRevision
 
-    def ajouterEnRevision(self, pod):
-        self._enRevision.append(pod)
+    def set_quickInfos(self, initialisation):
+        super().set_quickInfos_hangar()
+        if not initialisation:
+            self._quickInfos += f"\nTemps révision : {self.temps_revision}"
+        self._quickInfos += f"\nEn révision : {len(self._enRevision)}"
 
     def update(self):
         """Fonction gérant le processus dépôt"""
+
+        self.set_quickInfos(initialisation=False)
 
         # Attente pour le prochain départ
         if self._wait != -1:

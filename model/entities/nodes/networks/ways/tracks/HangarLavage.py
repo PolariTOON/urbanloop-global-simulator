@@ -11,13 +11,17 @@ class HangarLavage(Hangar):
         print("Hangar lavage créé")
         self._enLavage = enLavage or []
 
+        self._quickInfos = ""
+        self.set_quickInfos(initialisation=True)
+
     def serialize(self):
         """sérialise les informations du dépôt"""
         dico = super().serialize()
         enLavage = [{"pod": pod.serialize()} for pod in self._enLavage]
         dico.update({
             "type": f"{self.__class__.__name__}",
-            "enLavage": enLavage
+            "enLavage": enLavage,
+            "quickInfos": self._quickInfos
         })
         return dico
 
@@ -25,16 +29,16 @@ class HangarLavage(Hangar):
     def temps_lavage(self):
         return self.parent.parent.gestionnaireLavage.temps_lavage
 
-    def ajouterEnLavage(self, pod):
-        if pod not in self._enLavage:
-            self._enLavage.append(pod)
-
-    def retirerEnLavage(self, pod):
-        if pod in self._enLavage:
-            self._enLavage.append(pod)
+    def set_quickInfos(self, initialisation):
+        super().set_quickInfos_hangar()
+        if not initialisation:
+            self._quickInfos += f"\nTemps lavage : {self.temps_lavage}"
+        self._quickInfos += f"\nEn lavage : {len(self._enLavage)}"
 
     def update(self):
         """Fonction gérant le processus dépôt"""
+
+        self.set_quickInfos(initialisation=False)
 
         # Attente pour le prochain départ
         if self._wait != -1:

@@ -31,6 +31,9 @@ class Hangar(Step):
             dico["pod"] = Pod(env, self, 0, p)
         self._wait = -1
 
+        self._quickInfos = ""
+        self.set_quickInfos_hangar()
+
     def serialize(self):
         """sérialise les informations du dépôt"""
         dict = super().serialize()
@@ -46,7 +49,8 @@ class Hangar(Step):
                 "max": self.capacity
             },
             "departure_pods": departure_pods,
-            "element_of_loop": self.element_of_loop
+            "element_of_loop": self.element_of_loop,
+            "quickInfos": self._quickInfos
         })
         #print(f"\nDEBUT TEST HANGARS : Problèmes lors de jsonify")
         #print(f"Type : {self.__class__.__name__} - Nom : {self.name}")
@@ -71,7 +75,7 @@ class Hangar(Step):
     @property
     def name(self):
         """Nom du dépôt"""
-        return super().name or "Shed %d" % self.id
+        return super().name or f"{self.__class__.__name__} %d" % self.id
 
     @property
     def pods(self):
@@ -107,3 +111,7 @@ class Hangar(Step):
 
     def handle_message(self, message):
         pass
+
+    def set_quickInfos_hangar(self):
+        self._quickInfos = f"{self.name}\n{self.__class__.__name__}"
+        self._quickInfos += f"\npods : {len(self.pods)}/{self._capacity}"

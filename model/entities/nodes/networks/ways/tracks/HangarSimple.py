@@ -21,13 +21,17 @@ class HangarSimple(Hangar):
             if doiventAllerAuLavage[i]:
                 self._doiventAllerAuLavage.append(self._pods[i])
 
+        self._quickInfos = ""
+        self.set_quickInfos()
+
     def serialize(self):
         """sérialise les informations du dépôt"""
         dico = super().serialize()
         dico.update({
             "type": f"{self.__class__.__name__}",
             "doiventAllerEnRevision": [True if pod in self._doiventAllerEnRevision else False for pod in self._pods],
-            "doiventAllerAuLavage": [True if pod in self._doiventAllerAuLavage else False for pod in self._pods]
+            "doiventAllerAuLavage": [True if pod in self._doiventAllerAuLavage else False for pod in self._pods],
+            "quickInfos": self._quickInfos
         })
         return dico
 
@@ -36,6 +40,11 @@ class HangarSimple(Hangar):
 
     def doitAllerEn_RevisionOuLavage(self, pod):
         return self.gestionnaireRevision.podDoitAllerEnRevision(pod) or self.gestionnaireLavage.podDoitAllerAuLavage(pod)
+
+    def set_quickInfos(self):
+        super().set_quickInfos_hangar()
+        self._quickInfos += f"\nÀ réviser : {len(self._doiventAllerEnRevision)}"
+        self._quickInfos += f"\nÀ laver : {len(self._doiventAllerAuLavage)}"
 
     def send_pod(self, pod, destination):
         for p in self._departure_pods:
@@ -48,6 +57,7 @@ class HangarSimple(Hangar):
         """Fonction gérant le processus dépôt"""
 
         # p debut
+        self.set_quickInfos()
         for pod in self._pods:
             if \
                     pod is not None and \

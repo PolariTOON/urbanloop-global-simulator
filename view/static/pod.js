@@ -267,7 +267,7 @@ export class Pod extends Entity {
         this.__dernier_signalement_revision_par_vrai_utilisateur = dernier_signalement_revision_par_vrai_utilisateur
         this.__en_direction_lavage = en_direction_lavage
         this.__dernier_signalement_lavage_par_vrai_utilisateur = dernier_signalement_lavage_par_vrai_utilisateur
-        this._quickInfos = quickInfos
+        this._quickInfos = quickInfos; //Si quickInfos existe, écrase this.__hint._name
         //p_tbtc Fin
 
         if (this._contain_real_user)

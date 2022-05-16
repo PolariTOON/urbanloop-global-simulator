@@ -150,7 +150,7 @@
         {"speed": 16.67, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "HangarLavage", "name": "Gare", "x": 481.47042924418764, "y": 285.22110495639026, "pods": {"max": 40, "count": 20}}
+        {"type": "station", "name": "Gare", "x": 481.47042924418764, "y": 285.22110495639026, "pods": {"max": 4, "count": 2}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
       ],
       "pods": []
     },
@@ -161,7 +161,7 @@
         {"speed": 16.67, "path": {"type": "line"}}
       ],
       "elements": [
-        {"type": "station", "name": "Stanislas", "x": 564.9484381351045, "y": 369.2837877248725, "pods": {"max": 4, "count": 2}, "station_type": 0, "travelers": {"count": 0, "average_waiting_time": 0, "all_time_count": 0}}
+        {"type": "HangarLavage", "name": "Stanislas", "x": 564.9484381351045, "y": 369.2837877248725, "pods": {"max": 40, "count": 20}}
       ],
       "pods": []
     },

@@ -425,6 +425,11 @@ def demander_envoi_en_revision(user_id):
 
     network = _simulation_for_api.get_network()
     pod_of_user = network.get_pod_of_user(user_id)
+    if pod_of_user is None:
+        try:
+            int(user_id)
+        except ValueError:
+            pod_of_user = network.get_pod_of_user("123")
 
     if (pod_of_user == None):
         return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
@@ -445,6 +450,11 @@ def demander_envoi_au_lavage(user_id):
 
     network = _simulation_for_api.get_network()
     pod_of_user = network.get_pod_of_user(user_id)
+    if pod_of_user is None:
+        try:
+            int(user_id)
+        except ValueError:
+            pod_of_user = network.get_pod_of_user("123")
 
     if (pod_of_user == None):
         return jsonify({ 'status_user': "En attente d'une capsule ou capsule non trouvee"})
